@@ -1,0 +1,18 @@
+﻿{
+  "Finbuckle:MultiTenant:InMemoryMultiTenantStore": {
+    "DefaultConnectionString": "Datasource=sample.db",
+    "TenantConfigurations": [
+      {
+        "Id": "initech",
+        "Identifier": "",
+        "Name": "Initech"
+      },
+      {
+        "Id": "lol",
+        "Identifier": "lol",
+        "Name": "LOL",
+        "ConnectionString": "Datasource=lol.db"
+      }
+    ]
+  }
+}

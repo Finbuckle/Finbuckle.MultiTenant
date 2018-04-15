@@ -1,0 +1,51 @@
+﻿@model TenantContext
+
+@if(Model != null)
+{
+    <p class="mt-4">Cookie Name: @ViewData["CookieName"]</p>
+    <a asp-action="Login" class="btn btn-primary">Login</a>
+    <a asp-action="Logout" class="btn btn-secondary">Logout</a>
+
+    <h3 class="mt-4">TenantContext Values</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+            <td>@nameof(Model.Id)</td>
+            <td>@Model.Id</td>
+            </tr>
+            <tr>
+            <td>@nameof(Model.Identifier)</td>
+            <td>@Model.Identifier</td>
+            </tr>
+            <tr>
+            <td>@nameof(Model.Name)</td>
+            <td>@Model.Name</td>
+            </tr>
+            <tr>
+            <td>@nameof(Model.ConnectionString)</td>
+            <td>@Model.ConnectionString</td>
+            </tr>
+            <tr>
+            <td>@nameof(Model.MultiTenantStrategyType)</td>
+            <td>@Model.MultiTenantStrategyType</td>
+            </tr>
+            <tr>
+            <td>@nameof(Model.MultiTenantStoreType)</td>
+            <td>@Model.MultiTenantStoreType</td>
+            </tr>
+        </tbody>
+    
+    </table>
+}
+else
+{
+    <span class="text-muted">No tenant found.</span>
+}
