@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Core
 {
@@ -11,14 +12,17 @@ namespace Finbuckle.MultiTenant.Core
     {
         public readonly IMultiTenantStore _multiTenantStore;
         private readonly IMultiTenantStrategy _multiTenantStrategy;
+        private readonly ILogger<TenantResolver> _logger;
 
-        public TenantResolver(IMultiTenantStore multiTenantStore, IMultiTenantStrategy _multiTenantStrategy)
+        public TenantResolver(IMultiTenantStore multiTenantStore, IMultiTenantStrategy multiTenantStrategy, ILogger<TenantResolver> logger = null)
         {
             _multiTenantStore = multiTenantStore ??
                 throw new MultiTenantException(null, new ArgumentNullException(nameof(multiTenantStore)));
             
-            this._multiTenantStrategy = _multiTenantStrategy ??
+            _multiTenantStrategy = multiTenantStrategy ??
                 throw new ArgumentNullException(nameof(_multiTenantStrategy));
+            
+            _logger = logger;
         }
 
         /// <summary>
@@ -28,11 +32,21 @@ namespace Finbuckle.MultiTenant.Core
         /// <returns></returns>
         public async Task<TenantContext> ResolveAsync(object context)
         {
+            TryLogInfo($"Resolving tenant using \"{_multiTenantStrategy.GetType()}\".");
+
             string identifier = _multiTenantStrategy.GetIdentifier(context);
-            if(string.IsNullOrWhiteSpace(identifier))
+
+            TryLogInfo($"Tenant identifier \"{identifier ?? "<null>"}\" detected.");
+
+            if (string.IsNullOrWhiteSpace(identifier))
                 return null;
 
+            TryLogInfo($"Retrieving TenantContext using \"{_multiTenantStore.GetType()}\".");
+
             var storeResult = await _multiTenantStore.GetByIdentifierAsync(identifier).ConfigureAwait(false);
+            
+            TryLogInfo($"TenantContext for Tenant Id \"{storeResult?.Id ?? "<null>"}\" was retrieved.");
+
             if (storeResult == null)
                 return null;
 
@@ -41,6 +55,14 @@ namespace Finbuckle.MultiTenant.Core
             result.MultiTenantStoreType = _multiTenantStore.GetType();
 
             return result;
+        }
+
+        private void TryLogInfo(string message)
+        {
+            if (_logger != null)
+            {
+                _logger.LogInformation(message);
+            }
         }
     }
 }
