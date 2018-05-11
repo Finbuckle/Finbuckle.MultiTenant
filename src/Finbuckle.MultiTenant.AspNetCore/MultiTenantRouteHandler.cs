@@ -11,11 +11,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantRouteHandler : IRouteHandler, IRouter
     {
-        private RequestDelegate _requestDelegate = (HttpContext) => null;
+        private RequestDelegate requestDelegate = (HttpContext) => null;
 
         public RequestDelegate GetRequestHandler(HttpContext httpContext, RouteData routeData)
         {
-            return _requestDelegate;
+            return requestDelegate;
         }
 
         public VirtualPathData GetVirtualPath(VirtualPathContext context)
@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         public Task RouteAsync(RouteContext context)
         {
             // set the context Handler so route matching will stop
-            context.Handler = _requestDelegate;
+            context.Handler = requestDelegate;
 
             // set the HttpContext feature so that a Route based TenantResolver can use it
             // note: this may be overwritten by later middleware

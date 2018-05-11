@@ -10,19 +10,19 @@ namespace Finbuckle.MultiTenant.Core
     /// </summary>
     public class TenantResolver
     {
-        public readonly IMultiTenantStore _multiTenantStore;
-        private readonly IMultiTenantStrategy _multiTenantStrategy;
-        private readonly ILogger<TenantResolver> _logger;
+        public readonly IMultiTenantStore multiTenantStore;
+        private readonly IMultiTenantStrategy multiTenantStrategy;
+        private readonly ILogger<TenantResolver> logger;
 
         public TenantResolver(IMultiTenantStore multiTenantStore, IMultiTenantStrategy multiTenantStrategy, ILogger<TenantResolver> logger = null)
         {
-            _multiTenantStore = multiTenantStore ??
+            this.multiTenantStore = multiTenantStore ??
                 throw new MultiTenantException(null, new ArgumentNullException(nameof(multiTenantStore)));
             
-            _multiTenantStrategy = multiTenantStrategy ??
-                throw new ArgumentNullException(nameof(_multiTenantStrategy));
+            this.multiTenantStrategy = multiTenantStrategy ??
+                throw new ArgumentNullException(nameof(TenantResolver.multiTenantStrategy));
             
-            _logger = logger;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -32,37 +32,29 @@ namespace Finbuckle.MultiTenant.Core
         /// <returns></returns>
         public async Task<TenantContext> ResolveAsync(object context)
         {
-            TryLogInfo($"Resolving tenant using \"{_multiTenantStrategy.GetType()}\".");
+            Utilities.TryLogInfo(logger, $"Resolving tenant using \"{multiTenantStrategy.GetType()}\".");
 
-            string identifier = _multiTenantStrategy.GetIdentifier(context);
+            string identifier = multiTenantStrategy.GetIdentifier(context);
 
-            TryLogInfo($"Tenant identifier \"{identifier ?? "<null>"}\" detected.");
+            Utilities.TryLogInfo(logger, $"Tenant identifier \"{identifier ?? "<null>"}\" detected.");
 
             if (string.IsNullOrWhiteSpace(identifier))
                 return null;
 
-            TryLogInfo($"Retrieving TenantContext using \"{_multiTenantStore.GetType()}\".");
+            Utilities.TryLogInfo(logger, $"Retrieving TenantContext using \"{multiTenantStore.GetType()}\".");
 
-            var storeResult = await _multiTenantStore.GetByIdentifierAsync(identifier).ConfigureAwait(false);
+            var storeResult = await multiTenantStore.GetByIdentifierAsync(identifier).ConfigureAwait(false);
             
-            TryLogInfo($"TenantContext for Tenant Id \"{storeResult?.Id ?? "<null>"}\" was retrieved.");
+            Utilities.TryLogInfo(logger, $"TenantContext for Tenant Id \"{storeResult?.Id ?? "<null>"}\" was retrieved.");
 
             if (storeResult == null)
                 return null;
 
             var result = new TenantContext(storeResult);
-            result.MultiTenantStrategyType = _multiTenantStrategy.GetType();
-            result.MultiTenantStoreType = _multiTenantStore.GetType();
+            result.MultiTenantStrategyType = multiTenantStrategy.GetType();
+            result.MultiTenantStoreType = multiTenantStore.GetType();
 
             return result;
-        }
-
-        private void TryLogInfo(string message)
-        {
-            if (_logger != null)
-            {
-                _logger.LogInformation(message);
-            }
         }
     }
 }

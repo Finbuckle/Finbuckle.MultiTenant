@@ -25,10 +25,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             var path = (context as HttpContext).Request.Path;
 
-            if (logger != null)
-            {
-                logger.LogInformation($"Path:  \"{path.Value ?? "<null>"}\"");
-            }
+            Utilities.TryLogInfo(logger, $"Path:  \"{path.Value ?? "<null>"}\"");
 
             var pathSegments =
                 path.Value.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -38,10 +35,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             string identifier = pathSegments[0];
 
-            if (logger != null)
-            {
-                logger.LogInformation($"Found identifier:  \"{identifier}\"");
-            }
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
 
             return identifier;
         }

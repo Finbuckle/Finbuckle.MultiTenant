@@ -26,10 +26,7 @@ namespace Finbuckle.MultiTenant.Core
 
         public string GetIdentifier(object context)
         {
-            if (logger != null)
-            {
-                logger.LogInformation($"Found identifier:  \"{identifier}\"");
-            }
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
 
             return identifier;
         }
