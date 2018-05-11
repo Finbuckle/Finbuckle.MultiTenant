@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Core
 {
@@ -9,18 +10,25 @@ namespace Finbuckle.MultiTenant.Core
     /// </summary>
     public class StaticMultiTenantStrategy : IMultiTenantStrategy
     {
-        private readonly string _identifier;
+        private readonly string identifier;
+        private readonly ILogger<StaticMultiTenantStrategy> logger;
 
-        public StaticMultiTenantStrategy(string identifier)
+        public StaticMultiTenantStrategy(string identifier, ILogger<StaticMultiTenantStrategy> logger = null)
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
                 throw new MultiTenantException(null, new ArgumentException("\"identifier\" must not be null or whitespace", nameof(identifier)));
             }
-            
-            _identifier = identifier;
+
+            this.identifier = identifier;
+            this.logger = logger;
         }
 
-        public string GetIdentifier(object context) => _identifier;
+        public string GetIdentifier(object context)
+        {
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
+
+            return identifier;
+        }
     }
 }
