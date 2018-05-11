@@ -19,7 +19,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly Action<TOptions, TenantContext> tenantConfig;
 
-        // Note: the object is just a dummy because there is no ConcurrentSet<T> class.
+        // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 

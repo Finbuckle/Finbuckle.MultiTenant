@@ -25,11 +25,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public Task RouteAsync(RouteContext context)
         {
-            // set the context Handler so route matching will stop
+            // Set the context Handler so route matching will stop.
             context.Handler = requestDelegate;
 
-            // set the HttpContext feature so that a Route based TenantResolver can use it
-            // note: this may be overwritten by later middleware
+            // Set the HttpContext feature so that a route based TenantResolver can use it.
+            // This may be overwritten by later MVC or other middleware.
             context.HttpContext.Features[typeof(IRoutingFeature)] = new RoutingFeature()
             {
                 RouteData = context.RouteData,
