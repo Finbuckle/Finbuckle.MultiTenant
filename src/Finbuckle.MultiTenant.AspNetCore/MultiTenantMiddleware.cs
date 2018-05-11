@@ -11,18 +11,18 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly IRouter _router;
+        private readonly RequestDelegate next;
+        private readonly IRouter router;
 
         public MultiTenantMiddleware(RequestDelegate next)
         {
-            this._next = next;
+            this.next = next;
         }
 
         public MultiTenantMiddleware(RequestDelegate next, IRouter router)
         {
-            this._next = next;
-            this._router = router;
+            this.next = next;
+            this.router = router;
         }
 
         public async Task Invoke(HttpContext context)
@@ -32,9 +32,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 var sp = context.RequestServices;
                 var resolver = sp.GetRequiredService<TenantResolver>();
 
-                if(_router != null)
+                if(router != null)
                 {
-                    await _router.RouteAsync(new RouteContext(context)).ConfigureAwait(false);
+                    await router.RouteAsync(new RouteContext(context)).ConfigureAwait(false);
                 }
                 
                 var tc = await resolver.ResolveAsync(context).ConfigureAwait(false);
@@ -42,8 +42,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     context.Items.Add(Constants.HttpContextTenantContext, tc);
             }
 
-            if(_next != null)
-                await _next(context);
+            if(next != null)
+                await next(context);
         }
     }
 }

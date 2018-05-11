@@ -16,19 +16,19 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly Action<TOptions, TenantContext> _tenantConfig;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly Action<TOptions, TenantContext> tenantConfig;
 
-        // Note: the object is just a dummy because there is no ConcurrentSet<T> class.
+        // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        private TenantContext TenantContext { get => _httpContextAccessor.HttpContext?.GetTenantContextAsync().Result; }
+        private TenantContext TenantContext { get => httpContextAccessor.HttpContext?.GetTenantContextAsync().Result; }
 
         public MultiTenantOptionsCache(IHttpContextAccessor httpContextAccessor, Action<TOptions, TenantContext> tenantConfig)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
+            this.httpContextAccessor = httpContextAccessor;
+            this.tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             if (TenantContext != null)
             {
-                _tenantConfig(options, TenantContext);
+                tenantConfig(options, TenantContext);
             }
         }
     }
