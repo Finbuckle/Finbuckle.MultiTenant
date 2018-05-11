@@ -18,7 +18,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     public class MultiTenantDbContext : DbContext
     {
         private readonly TenantContext _tenantContext;
-        private ImmutableList<IEntityType> _tenantScopeEntityTypes = null;
+        private ImmutableList<IEntityType> _multiTenantEntityTypes = null;
 
         protected string ConnectionString => _tenantContext.ConnectionString;
 
@@ -40,14 +40,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             get
             {
-                if (_tenantScopeEntityTypes == null)
+                if (_multiTenantEntityTypes == null)
                 {
-                    _tenantScopeEntityTypes = Model.GetEntityTypes().
+                    _multiTenantEntityTypes = Model.GetEntityTypes().
                        Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
                        ToImmutableList();
                 }
 
-                return _tenantScopeEntityTypes;
+                return _multiTenantEntityTypes;
             }
         }
 

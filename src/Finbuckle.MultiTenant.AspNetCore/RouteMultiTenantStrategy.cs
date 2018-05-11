@@ -4,14 +4,16 @@ using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     public class RouteMultiTenantStrategy : IMultiTenantStrategy
     {
         private readonly string _tenantParam;
+        private readonly ILogger<RouteMultiTenantStrategy> logger;
 
-        public RouteMultiTenantStrategy(string tenantParam)
+        public RouteMultiTenantStrategy(string tenantParam, ILogger<RouteMultiTenantStrategy> logger)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
@@ -19,6 +21,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             _tenantParam = tenantParam;
+            this.logger = logger;
         }
 
         public string GetIdentifier(object context)
@@ -30,6 +33,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
             object identifier = null;
             (context as HttpContext).GetRouteData()?.Values.TryGetValue(_tenantParam, out identifier);
 
+            if (logger != null)
+            {
+                logger.LogInformation($"Found identifier:  \"{(string)identifier ?? "<null>"}\"");
+            }
+            
             return identifier as string;
         }
     }
