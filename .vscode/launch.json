@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/AuthenticationOptionsSample/bin/Debug/netcoreapp2.0/AuthenticationOptionsSample.dll",
+            "program": "${workspaceRoot}/samples/AuthenticationOptionsSample/bin/Debug/netcoreapp2.1/AuthenticationOptionsSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/AuthenticationOptionsSample",
             "stopAtEntry": false,
@@ -42,7 +42,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/BasePathResolverSample/bin/Debug/netcoreapp2.0/BasePathResolverSample.dll",
+            "program": "${workspaceRoot}/samples/BasePathResolverSample/bin/Debug/netcoreapp2.1/BasePathResolverSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/BasePathResolverSample",
             "stopAtEntry": false,
@@ -74,7 +74,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/HostResolverSample/bin/Debug/netcoreapp2.0/HostResolverSample.dll",
+            "program": "${workspaceRoot}/samples/HostResolverSample/bin/Debug/netcoreapp2.1/HostResolverSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/HostResolverSample",
             "stopAtEntry": false,
@@ -106,7 +106,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/RouteResolverSample/bin/Debug/netcoreapp2.0/RouteResolverSample.dll",
+            "program": "${workspaceRoot}/samples/RouteResolverSample/bin/Debug/netcoreapp2.1/RouteResolverSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/RouteResolverSample",
             "stopAtEntry": false,
@@ -138,7 +138,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/StaticResolverSample/bin/Debug/netcoreapp2.0/StaticResolverSample.dll",
+            "program": "${workspaceRoot}/samples/StaticResolverSample/bin/Debug/netcoreapp2.1/StaticResolverSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/StaticResolverSample",
             "stopAtEntry": false,
