@@ -5,15 +5,38 @@ using Microsoft.AspNetCore.Http;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     public class HostMultiTenantStrategy : IMultiTenantStrategy
     {
+        private readonly string regex;
         private readonly ILogger<HostMultiTenantStrategy> logger;
 
-        public HostMultiTenantStrategy(ILogger<HostMultiTenantStrategy> logger = null)
+        public HostMultiTenantStrategy(string template = "__tenant__.*", ILogger<HostMultiTenantStrategy> logger = null)
         {
+            if (string.IsNullOrWhiteSpace(template) ||
+                Regex.Match(template, @"^.*\*.*\.__tenant__\..*\*.*$").Success)
+            {
+                throw new MultiTenantException("Invalid host template.");
+            }
+
+            template = template.Trim().Replace(".", @"\.");
+            string wildcardSegmentsPattern = @"(\.[^\.]+)#";
+            string singleSegmentPattern = @"[^\.]+";
+            if (template.Substring(template.Length - 3, 3) == @"\.*")
+            {
+                template = template.Substring(0, template.Length - 3) + wildcardSegmentsPattern;
+            }
+
+            wildcardSegmentsPattern = @"([^\.]+\.)#";
+            template = template.Replace(@"*\.", wildcardSegmentsPattern);
+            template = template.Replace("?", singleSegmentPattern);
+            template = template.Replace("__tenant__", @"(?<identifier>[^\.]+)");
+            template = $"^{template}$".Replace("#", "*");
+
+            this.regex = template;
             this.logger = logger;
         }
 
@@ -30,8 +53,21 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (host.HasValue == false)
                 return null;
 
+            string identifier = null;
+
             var hostSegments = host.Host.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
-            string identifier = hostSegments[0];
+            var match = Regex.Match(host.Host, regex,
+                RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase,
+                TimeSpan.FromMilliseconds(100));
+
+            if (match.Success)
+            {
+                identifier = match.Groups["identifier"].Value.ToLower();
+            }
+            else
+            {
+
+            }
 
             Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
 
