@@ -14,8 +14,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly string regex;
         private readonly ILogger<HostMultiTenantStrategy> logger;
 
-        public HostMultiTenantStrategy(string template = "__tenant__.*", ILogger<HostMultiTenantStrategy> logger = null)
+        public HostMultiTenantStrategy(string template, ILogger<HostMultiTenantStrategy> logger = null)
         {
+            // Check for valid template. Template cannot have "*" on each side of __tenant__ placeholder.
             if (string.IsNullOrWhiteSpace(template) ||
                 Regex.Match(template, @"^.*\*.*\.__tenant__\..*\*.*$").Success)
             {

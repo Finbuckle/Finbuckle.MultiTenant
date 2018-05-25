@@ -44,7 +44,15 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// Adds an empty InMemoryMultiTenantStore to the application.
         /// </summary>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithInMemoryStore() => WithInMemoryStore(_ => {});
+        public MultiTenantBuilder WithInMemoryStore() => WithInMemoryStore(_ => { });
+
+        /// <summary>
+        /// Adds and configures <c>InMemoryMultiTenantStore</c> to the application using the provided <c>ConfigurationSeciont</c>.
+        /// </summary>
+        /// <param name="config">The <c>ConfigurationSection</c> which contains the <c>InMemoryMultiTenantStore</c> configuartion settings.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection) =>
+            WithInMemoryStore(o => configurationSection.Bind(o));
 
         /// <summary>
         /// Adds and configures <c>InMemoryMultiTenantStore</c> to the application using the provided action.
@@ -61,20 +69,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
         }
 
         /// <summary>
-        /// Adds and configures <c>InMemoryMultiTenantStore</c> to the application using the provided <c>ConfigurationSeciont</c>.
-        /// </summary>
-        /// <param name="config">The <c>ConfigurationSection</c> which contains the <c>InMemoryMultiTenantStore</c> configuartion settings.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection)
-        {
-            services.AddOptions();
-            services.Configure<InMemoryMultiTenantStoreOptions>(o => configurationSection.Bind(o));
-            services.TryAddSingleton<IMultiTenantStore>(StoreFactory);
-
-            return this;
-        }
-
-        /// <summary>
         /// Creates an <c>InMemoryMultiTenantStore</c> from configured <c>InMemoryMultiTenantStoreOptions</c>.
         /// </summary>
         /// <param name="sp"></param>
@@ -83,8 +77,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             var optionsAccessor = sp.GetService<IOptions<InMemoryMultiTenantStoreOptions>>();
             var tenantConfigurations = optionsAccessor?.Value.TenantConfigurations ?? new InMemoryMultiTenantStoreOptions.TenantConfiguration[0];
-
-            var store = new InMemoryMultiTenantStore();
+            var logger = sp.GetService<ILogger<InMemoryMultiTenantStore>>();
+            var store = new InMemoryMultiTenantStore(logger: logger);
 
             try
             {
@@ -129,7 +123,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
         public MultiTenantBuilder WithStaticStrategy(string identifier)
         {
-            services.TryAddSingleton<IMultiTenantStrategy>(sp => new StaticMultiTenantStrategy(identifier));
+            services.TryAddSingleton<IMultiTenantStrategy>(sp => new StaticMultiTenantStrategy(identifier, sp.GetService<ILogger<StaticMultiTenantStrategy>>()));
 
             return this;
         }
@@ -140,7 +134,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returnsThe same <c>MultiTenantBuilder</c> passed into the method.></returns>
         public MultiTenantBuilder WithBasePathStrategy()
         {
-            services.TryAddSingleton<IMultiTenantStrategy, BasePathMultiTenantStrategy>();
+            services.TryAddSingleton<IMultiTenantStrategy>(sp =>
+            {
+                return new BasePathMultiTenantStrategy(sp.GetService<ILogger<BasePathMultiTenantStrategy>>());
+            });
 
             return this;
         }
@@ -152,7 +149,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
         public MultiTenantBuilder WithRouteStrategy(string tenantParam = "__tenant__")
         {
-            services.TryAddSingleton<IMultiTenantStrategy>(sp => new RouteMultiTenantStrategy(tenantParam, sp.GetRequiredService<ILogger<RouteMultiTenantStrategy>>()));
+            services.TryAddSingleton<IMultiTenantStrategy>(sp => new RouteMultiTenantStrategy(tenantParam, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
 
             return this;
         }
@@ -161,9 +158,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// Adds and configures a <c>HostMultiTenantStrategy</c> to the application.
         /// </summary>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithHostStrategy()
+        public MultiTenantBuilder WithHostStrategy(string template = "__tenant__.*")
         {
-            services.TryAddSingleton<IMultiTenantStrategy, HostMultiTenantStrategy>();
+            services.TryAddSingleton<IMultiTenantStrategy>(sp =>
+            {
+                return new HostMultiTenantStrategy(template, sp.GetService<ILogger<HostMultiTenantStrategy>>());
+            });
 
             return this;
         }
