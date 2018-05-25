@@ -15,11 +15,6 @@ namespace Finbuckle.MultiTenant.Core
 
         public StaticMultiTenantStrategy(string identifier, ILogger<StaticMultiTenantStrategy> logger = null)
         {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new MultiTenantException(null, new ArgumentException("\"identifier\" must not be null or whitespace", nameof(identifier)));
-            }
-
             this.identifier = identifier;
             this.logger = logger;
         }

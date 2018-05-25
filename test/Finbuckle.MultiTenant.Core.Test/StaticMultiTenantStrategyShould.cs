@@ -5,35 +5,18 @@ using Xunit;
 
 public class StaticTenantResolverShould
 {
-    private InMemoryMultiTenantStore CreateTestStore()
+    [Theory]
+    [InlineData("initech")]
+    [InlineData("Initech")] // maintain case
+    [InlineData("")] // empty string
+    [InlineData("    ")] // whitespace
+    [InlineData(null)] // null
+    public void ReturnExpectedIdentifier(string staticIdentifier)
     {
-        var store = new InMemoryMultiTenantStore();
-        store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null));
+        var strategy = new StaticMultiTenantStrategy(staticIdentifier);
 
-        return store;
-    }
+        var identifier = strategy.GetIdentifier(new Object());
 
-
-    [Fact]
-    public void GetTenantFromStore()
-    {
-        var store = CreateTestStore();
-
-        var strat = new StaticMultiTenantStrategy("initech");
-        var resolver = new TenantResolver(store, strat);
-        var tc = resolver.ResolveAsync(null).Result;
-
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal(typeof(StaticMultiTenantStrategy), tc.MultiTenantStrategyType);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), tc.MultiTenantStoreType);
-    }
-
-    [Fact]
-    public void ThrowIfIdentifierIsNull()
-    {
-        var store = CreateTestStore();
-        Assert.Throws<MultiTenantException>(() => new StaticMultiTenantStrategy(null));
+        Assert.Equal(staticIdentifier, identifier);
     }
 }
