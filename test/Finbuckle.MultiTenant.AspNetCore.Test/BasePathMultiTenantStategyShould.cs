@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Concurrent;
-using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
@@ -9,14 +7,6 @@ using Xunit;
 
 public class BasePathMultiTenantStrategyShould
 {
-    private InMemoryMultiTenantStore CreateTestStore()
-    {
-        var store = new InMemoryMultiTenantStore();
-        store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null));
-
-        return store;
-    }
-
     private HttpContext CreateHttpContextMock(string path)
     {
         var mock = new Mock<HttpContext>();
@@ -25,57 +15,28 @@ public class BasePathMultiTenantStrategyShould
         return mock.Object;
     }
 
-    [Fact]
-    public void GetTenantFromStore()
+    [Theory]
+    [InlineData("/test", "test")] // single path
+    [InlineData("/Test", "Test")] // maintain case
+    [InlineData("", null)] // no path
+    [InlineData("/", null)] // just trailing slash
+    [InlineData("/initech/ignore/ignore", "initech")] // multiple path segments
+    public void ReturnExpectedIdentifier(string path, string expected)
     {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMock("/initech");
+        var httpContext = CreateHttpContextMock(path);
+        var strategy = new BasePathMultiTenantStrategy();
 
-        var resolver = new TenantResolver(store, new BasePathMultiTenantStrategy());
-        var tc = resolver.ResolveAsync(httpContext).Result;
+        var identifier = strategy.GetIdentifier(httpContext);
 
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal(typeof(BasePathMultiTenantStrategy), tc.MultiTenantStrategyType);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), tc.MultiTenantStoreType);
+        Assert.Equal(expected, identifier);
     }
 
     [Fact]
     public void ThrowIfContextIsNotHttpContext()
     {
-        var store = CreateTestStore();
-        var httpContext = new Object();
-        var resolver = new TenantResolver(store, new BasePathMultiTenantStrategy());
+        var context = new Object();
+        var strategy = new BasePathMultiTenantStrategy();
 
-        Assert.Throws<MultiTenantException>(() => resolver.ResolveAsync(httpContext).GetAwaiter().GetResult());
-    }
-
-    [Fact]
-    public void ReturnNullIfNoPath()
-    {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMock("/");
-
-        var resolver = new TenantResolver(store, new BasePathMultiTenantStrategy());
-        var tc = resolver.ResolveAsync(httpContext).Result;
-
-        Assert.Null(tc);
-    }
-
-    [Fact]
-    public void HandleMultiplePathSegments()
-    {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMock("/initech/ignore/ignore");
-
-        var resolver = new TenantResolver(store, new BasePathMultiTenantStrategy());
-        var tc = resolver.ResolveAsync(httpContext).Result;
-
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal(typeof(BasePathMultiTenantStrategy), tc.MultiTenantStrategyType);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), tc.MultiTenantStoreType);
+        Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
     }
 }

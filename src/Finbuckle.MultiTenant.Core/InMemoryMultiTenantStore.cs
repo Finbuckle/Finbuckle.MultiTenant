@@ -33,7 +33,7 @@ namespace Finbuckle.MultiTenant.Core
             }
 
             _tenantMap.TryGetValue(identifier, out var result);
-            Utilities.TryLogInfo(logger, $"Tenant Id \"{result.Id}\"found in store for identifier \"{identifier}\".");
+            Utilities.TryLogInfo(logger, $"Tenant Id \"{result?.Id ?? "<null>"}\"found in store for identifier \"{identifier}\".");
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 

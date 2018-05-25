@@ -26,7 +26,7 @@ public class MultiTenantOptionsCacheShould
     }
 
     [Fact]
-    public void AdjustOptionsWithConfuredAction()
+    public void AdjustOptionsWithConfiguredAction()
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
 
