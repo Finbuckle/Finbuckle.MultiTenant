@@ -42,7 +42,7 @@ public class MultiTenansBuilderShould
     }
 
     [Fact]
-    public void AddHostStragegy()
+    public void AddHostStrategy()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant().WithHostStrategy();
@@ -89,7 +89,8 @@ public class MultiTenansBuilderShould
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
-        tc = store.GetByIdentifierAsync("lol").Result;
+        // Case insensitive test.
+        tc = store.GetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -117,11 +118,37 @@ public class MultiTenansBuilderShould
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
-        tc = store.GetByIdentifierAsync("lol").Result;
+        // Case insensitive test.
+        tc = store.GetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
         Assert.Equal("Datasource=lol.db", tc.ConnectionString);
+    }
+
+    [Fact]
+    public void AddInMemoryStoreWithCaseSentivity()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("testsettings.json");
+        var configuration = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        services.AddMultiTenant().
+                WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore").Bind(o), false);
+        var sp = services.BuildServiceProvider();
+
+        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryMultiTenantStore;
+
+        var tc = store.GetByIdentifierAsync("lol").Result;
+        Assert.Equal("lol", tc.Id);
+        Assert.Equal("lol", tc.Identifier);
+        Assert.Equal("LOL", tc.Name);
+        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
+
+        // Case sensitive test.
+        tc = store.GetByIdentifierAsync("LOL").Result;
+        Assert.Null(tc);
     }
 
     [Fact]

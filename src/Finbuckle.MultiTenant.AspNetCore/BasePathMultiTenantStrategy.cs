@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             string identifier = pathSegments[0];
 
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
             return identifier;
         }
