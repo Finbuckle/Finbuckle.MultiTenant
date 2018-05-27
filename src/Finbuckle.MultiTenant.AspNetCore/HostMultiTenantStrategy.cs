@@ -56,21 +56,16 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             string identifier = null;
 
-            var hostSegments = host.Host.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
             var match = Regex.Match(host.Host, regex,
                 RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase,
                 TimeSpan.FromMilliseconds(100));
 
             if (match.Success)
             {
-                identifier = match.Groups["identifier"].Value.ToLower();
-            }
-            else
-            {
-
+                identifier = match.Groups["identifier"].Value;
             }
 
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
             return identifier;
         }

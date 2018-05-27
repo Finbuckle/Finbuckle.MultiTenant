@@ -33,7 +33,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             object identifier = null;
             (context as HttpContext).GetRouteData()?.Values.TryGetValue(tenantParam, out identifier);
 
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier}\"");
+            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
             
             return identifier as string;
         }
