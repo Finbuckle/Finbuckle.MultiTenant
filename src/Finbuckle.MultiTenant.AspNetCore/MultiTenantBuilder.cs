@@ -44,26 +44,26 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// Adds an empty InMemoryMultiTenantStore to the application.
         /// </summary>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithInMemoryStore() => WithInMemoryStore(_ => { });
+        public MultiTenantBuilder WithInMemoryStore(bool ignoreCase = true) => WithInMemoryStore(_ => { }, ignoreCase);
 
         /// <summary>
         /// Adds and configures <c>InMemoryMultiTenantStore</c> to the application using the provided <c>ConfigurationSeciont</c>.
         /// </summary>
         /// <param name="config">The <c>ConfigurationSection</c> which contains the <c>InMemoryMultiTenantStore</c> configuartion settings.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection) =>
-            WithInMemoryStore(o => configurationSection.Bind(o));
+        public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection, bool ignoreCase = true) =>
+            WithInMemoryStore(o => configurationSection.Bind(o), ignoreCase);
 
         /// <summary>
         /// Adds and configures <c>InMemoryMultiTenantStore</c> to the application using the provided action.
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithInMemoryStore(Action<InMemoryMultiTenantStoreOptions> config)
+        public MultiTenantBuilder WithInMemoryStore(Action<InMemoryMultiTenantStoreOptions> config, bool ignoreCase = true)
         {
             services.AddOptions();
             services.Configure<InMemoryMultiTenantStoreOptions>(config);
-            services.TryAddSingleton<IMultiTenantStore>(StoreFactory);
+            services.TryAddSingleton<IMultiTenantStore>(sp => StoreFactory(sp, ignoreCase));
 
             return this;
         }
@@ -73,12 +73,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="sp"></param>
         /// <returns></returns>
-        private InMemoryMultiTenantStore StoreFactory(IServiceProvider sp)
+        private InMemoryMultiTenantStore StoreFactory(IServiceProvider sp, bool ignoreCase)
         {
             var optionsAccessor = sp.GetService<IOptions<InMemoryMultiTenantStoreOptions>>();
             var tenantConfigurations = optionsAccessor?.Value.TenantConfigurations ?? new InMemoryMultiTenantStoreOptions.TenantConfiguration[0];
             var logger = sp.GetService<ILogger<InMemoryMultiTenantStore>>();
-            var store = new InMemoryMultiTenantStore(logger: logger);
+            var store = new InMemoryMultiTenantStore(ignoreCase, logger);
 
             try
             {

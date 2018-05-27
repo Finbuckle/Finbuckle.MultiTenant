@@ -17,13 +17,14 @@ public class HostMultiTenantStrategyShould
 
     [Theory]
     [InlineData("", "template", null)] // no host
+    [InlineData("initech", "__tenant__", "initech")] // basic match
+    [InlineData("Initech", "__tenant__", "Initech")] // maintain case
     [InlineData("abc.com.test.", "template", null)] // invalid pattern
     [InlineData("abc.", "template", null)] // invalid pattern
     [InlineData(".abc", "template", null)] // invalid pattern
     [InlineData(".abc.", "template", null)] // invalid pattern
     [InlineData("abc", "__tenant__", "abc")] // only segment
     [InlineData("abc.com.test", "__tenant__.*", "abc")] // first segment
-    [InlineData("Abc.com.test", "__tenant__.*", "abc")] // first segment, ignore case
     [InlineData("www.example.test", "?.__tenant__.?", "example")] // domain
     [InlineData("www.example.test", "?.__tenant__.*", "example")] // 2nd segment
     [InlineData("www.example", "?.__tenant__.*", "example")] // 2nd segment
@@ -31,6 +32,7 @@ public class HostMultiTenantStrategyShould
     [InlineData("www.example.r.f", "?.__tenant__.?.*", "example")] // 2nd segment of 3+
     [InlineData("example.ok.test", "*.__tenant__.?.?", "example")] // 3rd last segment
     [InlineData("w.example.ok.test", "*.?.__tenant__.?.?", "example")] // 3rd last of 4+ segments
+    [InlineData("example.com", "__tenant__", null)] // no match
     public void ReturnExpectedIdentifier(string host, string template, string expected)
     {
         var httpContext = CreateHttpContextMock(host);
