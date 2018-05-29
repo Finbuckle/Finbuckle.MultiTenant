@@ -27,7 +27,7 @@ namespace AuthenticationOptionsSample
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
                 WithRouteStrategy().
-                WithPerTenantOptionsConfig<CookieAuthenticationOptions>((o, tc) => o.Cookie.Name += tc.Id);
+                WithPerTenantOptions<CookieAuthenticationOptions>((o, tc) => o.Cookie.Name += tc.Id);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
                 AddCookie(o =>

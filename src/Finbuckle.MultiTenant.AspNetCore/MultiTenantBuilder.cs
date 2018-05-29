@@ -1,3 +1,17 @@
+//    Copyright 2018 Andrew White
+// 
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+// 
+//        http://www.apache.org/licenses/LICENSE-2.0
+// 
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -25,16 +40,48 @@ namespace Finbuckle.MultiTenant.AspNetCore
         }
 
         /// <summary>
-        /// Adds per-tenant configuration for an options class.
+        /// Adds per-tenant configuration for an options class. (Obsolete: use <c>WithPerTenantOptions</c> instead).
         /// </summary>
         /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        [Obsolete("WithPerTenantOptionsConfig is obsolete. Use WithPerTenantOptions instead.")]
         public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, TenantContext> tenantConfig) where TOptions : class
         {
             services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
                     return (MultiTenantOptionsCache<TOptions>)
                         ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+                });
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds per-tenant configuration for an options class.
+        /// </summary>
+        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
+        {
+            // Handles IOptionsMonitor case.
+            services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
+                {
+                    return (MultiTenantOptionsCache<TOptions>)
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+                });
+
+            services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp =>
+                {
+                    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                    return (MultiTenantOptionsManager<TOptions>)
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { new MultiTenantOptionsCache<TOptions>(httpContextAccessor, tenantConfig) });
+                });
+
+            services.TryAddSingleton<IOptions<TOptions>>(sp =>
+                {
+                    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+                    return (MultiTenantOptionsManager<TOptions>)
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { new MultiTenantOptionsCache<TOptions>(httpContextAccessor, tenantConfig) });
                 });
 
             return this;
