@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "AuthenticationResolverSample": {
+    "AuthenticationStrategySample": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

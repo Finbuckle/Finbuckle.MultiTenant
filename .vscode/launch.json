@@ -37,14 +37,14 @@
             }
         },
         {
-            "name": "BasePathResolverSample",
+            "name": "BasePathStrategySample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/BasePathResolverSample/bin/Debug/netcoreapp2.1/BasePathResolverSample.dll",
+            "program": "${workspaceRoot}/samples/BasePathStrategySample/bin/Debug/netcoreapp2.1/BasePathStrategySample.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/BasePathResolverSample",
+            "cwd": "${workspaceRoot}/samples/BasePathStrategySample",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -65,18 +65,18 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/BasePathResolverSample/Views"
+                "/Views": "${workspaceRoot}/samples/BasePathStrategySample/Views"
             }
         },
         {
-            "name": "HostResolverSample",
+            "name": "HostStrategySample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/HostResolverSample/bin/Debug/netcoreapp2.1/HostResolverSample.dll",
+            "program": "${workspaceRoot}/samples/HostStrategySample/bin/Debug/netcoreapp2.1/HostStrategySample.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/HostResolverSample",
+            "cwd": "${workspaceRoot}/samples/HostStrategySample",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -97,18 +97,18 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/HostResolverSample/Views"
+                "/Views": "${workspaceRoot}/samples/HostStrategySample/Views"
             }
         },
         {
-            "name": "RouteResolverSample",
+            "name": "RouteStrategySample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/RouteResolverSample/bin/Debug/netcoreapp2.1/RouteResolverSample.dll",
+            "program": "${workspaceRoot}/samples/RouteStrategySample/bin/Debug/netcoreapp2.1/RouteStrategySample.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/RouteResolverSample",
+            "cwd": "${workspaceRoot}/samples/RouteStrategySample",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -129,18 +129,18 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/RouteResolverSample/Views"
+                "/Views": "${workspaceRoot}/samples/RouteStrategySample/Views"
             }
         },
         {
-            "name": "StaticResolverSample",
+            "name": "StaticStrategySample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/StaticResolverSample/bin/Debug/netcoreapp2.1/StaticResolverSample.dll",
+            "program": "${workspaceRoot}/samples/StaticStrategySample/bin/Debug/netcoreapp2.1/StaticStrategySample.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/StaticResolverSample",
+            "cwd": "${workspaceRoot}/samples/StaticStrategySample",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -161,7 +161,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/StaticResolverSample/Views"
+                "/Views": "${workspaceRoot}/samples/StaticStrategySample/Views"
             }
         },
         {
