@@ -100,6 +100,7 @@ public class MultiTenansBuilderShould
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
+        Assert.Equal("1234", tc.Items["test_item"]);
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
