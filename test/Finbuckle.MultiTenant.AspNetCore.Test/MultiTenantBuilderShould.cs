@@ -22,11 +22,14 @@ using Xunit;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 
 public class MultiTenansBuilderShould
 {
     // Used in some tests.
-    public int TestProp { get; set; }
+    public int TestProperty { get; set; }
 
     [Fact]
     public void AddStaticStrategy()
@@ -205,9 +208,21 @@ public class MultiTenansBuilderShould
     {
         var services = new ServiceCollection();
         // Note: using MultiTenansBuilderShould as our test options class.
-        services.AddMultiTenant().WithPerTenantOptions<MultiTenansBuilderShould>((o, tc) => o.TestProp = 1);
+        services.AddMultiTenant().WithPerTenantOptions<MultiTenansBuilderShould>((o, tc) => o.TestProperty = 1);
         var sp = services.BuildServiceProvider();
 
         var cache = sp.GetRequiredService<IOptionsMonitorCache<MultiTenansBuilderShould>>();
+    }
+
+    [Fact]
+    public void AddRemoteAuthenticationServices()
+    {
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithRemoteAuthentication();
+        var sp = services.BuildServiceProvider();
+
+        var authService = sp.GetRequiredService<IAuthenticationService>();
+        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>();
     }
 }

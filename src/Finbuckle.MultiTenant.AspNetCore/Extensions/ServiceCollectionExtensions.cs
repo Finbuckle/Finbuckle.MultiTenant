@@ -32,8 +32,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddSingleton<TenantResolver>();
-            services.TryAddScoped<TenantContext>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext.GetTenantContextAsync().Result);
-            
+            services.TryAddScoped<TenantContext>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetTenantContext());
+            services.TryAddSingleton<ITenantContextAccessor, TenantContextAccessor>();
+
             return new MultiTenantBuilder(services);
         }
     }
