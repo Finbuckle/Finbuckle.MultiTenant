@@ -6,9 +6,9 @@ namespace RouteStrategySample.Controllers
 {
     public class HomeController : Controller
     {
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var tc = await HttpContext.GetTenantContextAsync();
+            var tc = HttpContext.GetTenantContext();
             return View(tc);
         }
     }

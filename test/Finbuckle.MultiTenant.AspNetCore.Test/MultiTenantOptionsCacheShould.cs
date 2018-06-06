@@ -13,7 +13,9 @@
 //    limitations under the License.
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
@@ -43,10 +45,11 @@ public class MultiTenantOptionsCacheShould
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void AddAdjustedTenantOptionsForOptionsName(string name)
+    public void AdjustedOptionsNameOnAdd(string name)
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), (o, context) =>
+        var tca = new TestTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
         {
             o.Cookie.Name = context.Id;
         });
@@ -61,75 +64,77 @@ public class MultiTenantOptionsCacheShould
         result = cache.TryAdd(name, options);
         Assert.False(result);
 
-        // Check the option was adjusted.
-        var adjustedOption = cache.GetOrAdd(name, () => options);
-        Assert.Equal(tc.Id, adjustedOption.Cookie.Name);
+        // Change the TC id and confirm options can be added again.
+        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        result = cache.TryAdd(name, options);
+        Assert.True(result);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void GetOrAddAdjustedTenantOptionsForOptionsName(string name)
+    public void AdjustOptionsNameOnGetOrAdd(string name)
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), (o, context) =>
+        var tca = new TestTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
         {
             o.Cookie.Name = context.Id;
         });
 
         var options = new CookieAuthenticationOptions();
+        options.Cookie.Name = "a_name";
+        var options2 = new CookieAuthenticationOptions();
+        options2.Cookie.Name = "diff_name";
 
         // Add new options.
-        var result = cache.TryAdd(name, options);
-        Assert.True(result);
+        var result = cache.GetOrAdd(name, () => options);
+        Assert.Equal(options.Cookie.Name, result.Cookie.Name);
 
-        // Get an existing object.
-        var adjustedOption = cache.GetOrAdd(name, () => options);
-        Assert.Equal(tc.Id, adjustedOption.Cookie.Name);
+        // Get the existing object.
+        result = cache.GetOrAdd(name, () => options2);
+        Assert.NotEqual(options2.Cookie.Name, result.Cookie.Name);
 
-        // Add a nonexisting object.
-        adjustedOption = cache.GetOrAdd("not_here", () => new CookieAuthenticationOptions());
-        Assert.Equal(tc.Id, adjustedOption.Cookie.Name);
+        // Confirm different tenant on same object is an add.
+        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        result = cache.GetOrAdd(name, () => options2);
+        Assert.Equal(options2.Cookie.Name, result.Cookie.Name);
     }
 
     [Fact]
     public void ThrowsIfGetOtAddFactoryIsNull()
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), (o, context) =>
+        var tca = new TestTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
         {
             o.Cookie.Name = context.Id;
         });
 
-        Assert.Throws<MultiTenantException>(() => cache.GetOrAdd("", null));
+        Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null));
     }
 
     [Fact]
     public void ThrowIfContructorParamIsNull()
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), (o, context) =>
-        {
-            o.Cookie.Name = context.Id;
-        });
+        var tca = new TestTenantContextAccessor(tc);
 
-        Assert.Throws<MultiTenantException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), null));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, null));
 
-        Assert.Throws<MultiTenantException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null, (o, context) => o.Cookie.Name = ""));
-
-        Assert.Throws<MultiTenantException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null, null));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null, (o, context) => o.Cookie.Name = ""));
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void RemoveTenantOptionsForOptionsName(string name)
+    public void RemoveOptionsForAllTenants(string name)
     {
         var tc = new TenantContext("test-id-123", null, null, null, null, null);
-
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(CreateHttpContextAccessorMock(tc), (o, context) =>
+        var tca = new TestTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
         {
             o.Cookie.Name = context.Id;
         });
@@ -140,17 +145,15 @@ public class MultiTenantOptionsCacheShould
         var result = cache.TryAdd(name, options);
         Assert.True(result);
 
-        // Get an existing object.
-        var adjustedOption = cache.GetOrAdd(name, () => options);
-        Assert.Equal(tc.Id, adjustedOption.Cookie.Name);
-
-        // Remove the existing object.
-        result = cache.TryRemove(name);
+        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        result = cache.TryAdd(name, options);
         Assert.True(result);
 
-        // Get the nonexisting object.
-        adjustedOption = cache.GetOrAdd(name, () => options);
-        Assert.Same(adjustedOption, options);
+        // Remove all options.
+        result = cache.TryRemove(name);
+        Assert.True(result);
+        Assert.Empty((IEnumerable)cache.GetType().BaseType.
+            GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance).
+            GetValue(cache));
     }
-
 }

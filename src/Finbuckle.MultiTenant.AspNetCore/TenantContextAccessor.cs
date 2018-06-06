@@ -12,4 +12,20 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// Note: MultiTenantOptionsManager is a trivial tweak of Microsoft's OptionsManager implementation.
+using Finbuckle.MultiTenant.Core;
+using Microsoft.AspNetCore.Http;
+
+namespace Finbuckle.MultiTenant.AspNetCore
+{
+    public class TenantContextAccessor : ITenantContextAccessor
+    {
+        private readonly IHttpContextAccessor httpContextAccessor;
+
+        public TenantContextAccessor(IHttpContextAccessor httpContextAccessor)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+        }
+
+        public TenantContext TenantContext => httpContextAccessor.HttpContext?.GetTenantContext();
+    }
+}

@@ -7,7 +7,7 @@ namespace HostStrategySample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContextAsync().Result;
+            var tc = HttpContext.GetTenantContext();
             return View(tc);
         }
     }

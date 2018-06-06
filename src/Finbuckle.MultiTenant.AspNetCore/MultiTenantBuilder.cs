@@ -24,6 +24,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.OAuth;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -63,6 +66,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
         public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
         {
+            if (tenantConfig == null)
+            {
+                throw new ArgumentNullException(nameof(tenantConfig));
+            }
+
             // Handles IOptionsMonitor case.
             services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
@@ -70,19 +78,36 @@ namespace Finbuckle.MultiTenant.AspNetCore
                         ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
                 });
 
-            services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp =>
-                {
-                    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                    return (MultiTenantOptionsManager<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { new MultiTenantOptionsCache<TOptions>(httpContextAccessor, tenantConfig) });
-                });
+            // Necessary to apply tenant optios in between configuratio and postconfiguration
+            services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
+            {
+                return (IOptionsFactory<TOptions>)ActivatorUtilities.
+                    CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantConfig });
+            });
 
-            services.TryAddSingleton<IOptions<TOptions>>(sp =>
-                {
-                    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
-                    return (MultiTenantOptionsManager<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { new MultiTenantOptionsCache<TOptions>(httpContextAccessor, tenantConfig) });
-                });
+            services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager(sp, tenantConfig));
+
+            services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager(sp, tenantConfig));
+
+            return this;
+        }
+
+        private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp, Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
+        {
+            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+            return (MultiTenantOptionsManager<TOptions>)
+                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { cache });
+        }
+
+        /// <summary>
+        /// Configures support for multitenant OAuth and OpenIdConnect.
+        /// </summary>
+        /// <returns></returns>
+        public MultiTenantBuilder WithRemoteAuthentication()
+        {
+            // Replace needed instead of TryAdd...
+            services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
+            services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
             return this;
         }
