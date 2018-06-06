@@ -15,12 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Entit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.AspNetCore.Test", "test\Finbuckle.MultiTenant.AspNetCore.Test\Finbuckle.MultiTenant.AspNetCore.Test.csproj", "{CB55C7E5-D1A4-49BC-94D1-9C8CB598426B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C70800DE-7514-4FEC-A216-72C50B8ABC64}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{78DD95B5-E466-4ED0-8824-36F78AB08174}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticStrategySample", "samples\StaticStrategySample\StaticStrategySample.csproj", "{4C8D453C-46F6-40A7-9DD1-E5D4C35BA2E6}"
@@ -195,5 +189,13 @@ Global
 		{91057C7C-F9D3-42AF-86FC-6507BB75ADFD} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 		{4B3A1C30-D42B-43F0-8541-4AB5B51CD05C} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 		{AE28E953-59A3-4E8A-AEF2-88DBA1DB9564} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.VersionControlPolicy = $2
+		$2.CommitMessageStyle = $3
+		$3.LastFilePostfix = "@:\n  "
 	EndGlobalSection
 EndGlobal

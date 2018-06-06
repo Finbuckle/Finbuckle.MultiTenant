@@ -15,12 +15,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
@@ -30,19 +26,17 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly Action<TOptions, TenantContext> tenantConfig;
+        private readonly ITenantContextAccessor tenantContextAccessor;
 
         // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        private TenantContext TenantContext { get => httpContextAccessor.HttpContext?.GetTenantContextAsync().Result; }
-
-        public MultiTenantOptionsCache(IHttpContextAccessor httpContextAccessor, Action<TOptions, TenantContext> tenantConfig)
+        public MultiTenantOptionsCache(ITenantContextAccessor tenantContextAccessor, Action<TOptions, TenantContext> tenantConfig)
         {
-            this.httpContextAccessor = httpContextAccessor ?? throw new MultiTenantException("httpContextAccessor cannot be null.", new ArgumentNullException(nameof(httpContextAccessor)));
-            this.tenantConfig = tenantConfig ?? throw new MultiTenantException("tenantConfig cannot be null.", new ArgumentNullException(nameof(tenantConfig)));
+            this.tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
+            this.tenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
 
         /// <summary>
@@ -55,11 +49,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             if (createOptions == null)
             {
-                throw new MultiTenantException("createOptions cannot be null.", new ArgumentNullException(nameof(createOptions)));
+                throw new ArgumentNullException(nameof(createOptions));
             }
 
             name = name ?? Options.DefaultName;
-            var adjustedOptionsName = AdjustOptionsName(TenantContext?.Id, name);
+            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor.TenantContext?.Id, name);
             return base.GetOrAdd(adjustedOptionsName, () => MultiTenantFactoryWrapper(name, adjustedOptionsName, createOptions));
         }
 
@@ -73,8 +67,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             name = name ?? Options.DefaultName;
 
-            var adjustedOptionsName = AdjustOptionsName(TenantContext?.Id, name);
-            AdjustOptions(options, TenantContext?.Id);
+            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor?.TenantContext.Id, name);
+            //AdjustOptions(options, tenantContext?.Id);
 
             if (base.TryAdd(adjustedOptionsName, options))
             {
@@ -156,7 +150,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             var options = createOptions();
-            AdjustOptions(options, TenantContext?.Id);
+            //AdjustOptions(options, CurrentTenantContext?.Id);
             CacheAdjustedOptionsName(optionsName, adjustedOptionsName);
 
             return options;
@@ -177,12 +171,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="options"></param>
         /// <param name="tenantSubstitution"></param>
-        private void AdjustOptions(TOptions options, string tenantSubstitution)
-        {
-            if (TenantContext != null)
-            {
-                tenantConfig(options, TenantContext);
-            }
-        }
+        // private void AdjustOptions(TOptions options, string tenantSubstitution)
+        // {
+        //     if (tenantContext != null)
+        //     {
+        //         tenantConfig(options, tenantContext);
+        //     }
+        // }
     }
 }
