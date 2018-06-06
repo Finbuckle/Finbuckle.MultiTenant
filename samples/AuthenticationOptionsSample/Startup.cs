@@ -46,7 +46,7 @@ namespace AuthenticationOptionsSample
                 }).AddOpenIdConnect("OpenIdConnect", options =>
                 {
                     options.ClientId = "default"; // Required here, but overridden by tenant config.
-                    options.Authority = "default"; // Required here, but overridden by tenant config.
+                    options.Authority = "https://default"; // Required here, but overridden by tenant config.
                     options.RequireHttpsMetadata = false; // For testing only.
                 });
 

@@ -42,10 +42,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>The <c>TenantContext</c> instance for the current tenant.</returns>
         public static TenantContext GetTenantContext(this HttpContext context)
         {
-            object tc = null;
-            context.Items.TryGetValue(Constants.HttpContextTenantContext, out tc);
+            object tenantContext = null;
+            context.Items.TryGetValue(Constants.HttpContextTenantContext, out tenantContext);
             
-            return (TenantContext)tc;
+            return (TenantContext)tenantContext;
         }
     }
 }
