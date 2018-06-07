@@ -26,11 +26,39 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
-public class MultiTenansBuilderShould
+public class MultiTenantBuilderShould
 {
     // Used in some tests.
     public int TestProperty { get; set; }
+
+    [Fact]
+    public void AddCustomStoreWithDefaultCtor()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStore<TestStore>();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStore>();
+    }
+
+    [Fact]
+    public void AddCustomStoreWithFactory()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStore(_sp => new TestStore());
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStore>();
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingCustomStore()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(null));
+    }
 
     [Fact]
     public void AddInMemoryStoreViaConfigSection()
@@ -163,17 +191,17 @@ public class MultiTenansBuilderShould
     {
         var services = new ServiceCollection();
         // Note: using MultiTenansBuilderShould as our test options class.
-        services.AddMultiTenant().WithPerTenantOptions<MultiTenansBuilderShould>((o, tc) => o.TestProperty = 1);
+        services.AddMultiTenant().WithPerTenantOptions<MultiTenantBuilderShould>((o, tc) => o.TestProperty = 1);
         var sp = services.BuildServiceProvider();
 
-        var cache = sp.GetRequiredService<IOptionsMonitorCache<MultiTenansBuilderShould>>();
+        var cache = sp.GetRequiredService<IOptionsMonitorCache<MultiTenantBuilderShould>>();
     }
 
     [Fact]
     public void ThrowIfNullParamAddingPerTenantOptions()
     {
         var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithPerTenantOptions<MultiTenansBuilderShould>(null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithPerTenantOptions<MultiTenantBuilderShould>(null));
     }
 
     [Fact]

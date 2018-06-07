@@ -113,6 +113,31 @@ namespace Finbuckle.MultiTenant.AspNetCore
         }
 
         /// <summary>
+        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using dependency injection.
+        /// </summary>>
+        /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithStore<T>(params object[] parameters) where T : IMultiTenantStore
+            => WithStore(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
+
+        /// <summary>
+        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using a factory method.
+        /// </summary>
+        /// <param name="factory">A delegate that will create and configure the strategy.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithStore(Func<IServiceProvider, IMultiTenantStore> factory)
+        {
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            services.TryAddSingleton<IMultiTenantStore>(sp => factory(sp));
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds an empty, case-insensitive InMemoryMultiTenantStore to the application.
         /// </summary>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
@@ -164,26 +189,26 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 throw new ArgumentNullException(nameof(config));
             }
 
-            services.AddOptions();
-            services.Configure<InMemoryMultiTenantStoreOptions>(config);
-            services.TryAddSingleton<IMultiTenantStore>(sp => StoreFactory(sp, ignoreCase));
-
-            return this;
+            return WithStore(sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<InMemoryMultiTenantStore>>()));
         }
 
         /// <summary>
         /// Creates an <c>InMemoryMultiTenantStore</c> from configured <c>InMemoryMultiTenantStoreOptions</c>.
         /// </summary>
-        private InMemoryMultiTenantStore StoreFactory(IServiceProvider sp, bool ignoreCase)
+        private InMemoryMultiTenantStore InMemoryStoreFactory(Action<InMemoryMultiTenantStoreOptions> config, bool ignoreCase, ILogger<InMemoryMultiTenantStore> logger)
         {
-            var optionsAccessor = sp.GetService<IOptions<InMemoryMultiTenantStoreOptions>>();
-            var tenantConfigurations = optionsAccessor?.Value.TenantConfigurations ?? new InMemoryMultiTenantStoreOptions.TenantConfiguration[0];
-            var logger = sp.GetService<ILogger<InMemoryMultiTenantStore>>();
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            var options = new InMemoryMultiTenantStoreOptions();
+            config(options);
             var store = new InMemoryMultiTenantStore(ignoreCase, logger);
 
             try
             {
-                foreach (var tenantConfig in tenantConfigurations)
+                foreach (var tenantConfig in options.TenantConfigurations ?? new InMemoryMultiTenantStoreOptions.TenantConfiguration[0])
                 {
                     if (string.IsNullOrWhiteSpace(tenantConfig.Id) ||
                         string.IsNullOrWhiteSpace(tenantConfig.Identifier))
@@ -192,7 +217,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     var tenantContext = new TenantContext(tenantConfig.Id,
                                                tenantConfig.Identifier,
                                                tenantConfig.Name,
-                                               tenantConfig.ConnectionString ?? optionsAccessor.Value.DefaultConnectionString,
+                                               tenantConfig.ConnectionString ?? options.DefaultConnectionString,
                                                null,
                                                null);
 
@@ -226,12 +251,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
-                throw new ArgumentException("message", nameof(identifier));
+                throw new ArgumentException("Invalid value for \"identifier\"", nameof(identifier));
             }
 
-            services.TryAddSingleton<IMultiTenantStrategy>(sp => new StaticMultiTenantStrategy(identifier, sp.GetService<ILogger<StaticMultiTenantStrategy>>()));
-
-            return this;
+            return WithStrategy(sp => new StaticMultiTenantStrategy(identifier, sp.GetService<ILogger<StaticMultiTenantStrategy>>()));
         }
 
         /// <summary>
@@ -239,14 +262,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <returnsThe same <c>MultiTenantBuilder</c> passed into the method.></returns>
         public MultiTenantBuilder WithBasePathStrategy()
-        {
-            services.TryAddSingleton<IMultiTenantStrategy>(sp =>
-            {
-                return new BasePathMultiTenantStrategy(sp.GetService<ILogger<BasePathMultiTenantStrategy>>());
-            });
-
-            return this;
-        }
+            => WithStrategy(sp => new BasePathMultiTenantStrategy(sp.GetService<ILogger<BasePathMultiTenantStrategy>>()));
 
         /// <summary>
         /// Adds and configures a <c>RouteMultiTenantStrategy</c> with a route parameter "__tenant__" to the application.
@@ -264,12 +280,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
-                throw new ArgumentException("message", nameof(tenantParam));
+                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
             }
 
-            services.TryAddSingleton<IMultiTenantStrategy>(sp => new RouteMultiTenantStrategy(tenantParam, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
-
-            return this;
+            return WithStrategy(sp => new RouteMultiTenantStrategy(tenantParam, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
         }
 
         /// <summary>
@@ -288,24 +302,19 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             if (string.IsNullOrWhiteSpace(template))
             {
-                throw new ArgumentException("message", nameof(template));
+                throw new ArgumentException("Invalid value for \"template\"", nameof(template));
             }
 
-            services.TryAddSingleton<IMultiTenantStrategy>(sp =>
-            {
-                return new HostMultiTenantStrategy(template, sp.GetService<ILogger<HostMultiTenantStrategy>>());
-            });
-
-            return this;
+            return WithStrategy(sp => new HostMultiTenantStrategy(template, sp.GetService<ILogger<HostMultiTenantStrategy>>()));
         }
 
         /// <summary>
-        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor.
+        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using dependency injection.
         /// </summary>
-        /// <param name="factory">A delegate that will create and configure the strategy.</param>
+        /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithStrategy<T>() where T : IMultiTenantStrategy, new()
-            => WithStrategy(sp => new T());
+        public MultiTenantBuilder WithStrategy<T>(params object[] parameters) where T : IMultiTenantStrategy
+            => WithStrategy(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
 
         /// <summary>
         /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using a factory method.
