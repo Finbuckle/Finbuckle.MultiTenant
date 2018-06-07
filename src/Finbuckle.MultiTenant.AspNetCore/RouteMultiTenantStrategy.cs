@@ -27,18 +27,22 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly string tenantParam;
         private readonly ILogger<RouteMultiTenantStrategy> logger;
 
-        public RouteMultiTenantStrategy(string tenantParam, ILogger<RouteMultiTenantStrategy> logger = null)
+        public RouteMultiTenantStrategy(string tenantParam) : this(tenantParam, null)
+        {
+        }
+
+        public RouteMultiTenantStrategy(string tenantParam, ILogger<RouteMultiTenantStrategy> logger)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
-                throw new MultiTenantException(null, new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam)));
+                throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam));
             }
 
             this.tenantParam = tenantParam;
             this.logger = logger;
         }
 
-        public string GetIdentifier(object context)
+        public virtual string GetIdentifier(object context)
         {
             if(!typeof(HttpContext).IsAssignableFrom(context.GetType()))
                 throw new MultiTenantException(null,

@@ -28,7 +28,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly string regex;
         private readonly ILogger<HostMultiTenantStrategy> logger;
 
-        public HostMultiTenantStrategy(string template, ILogger<HostMultiTenantStrategy> logger = null)
+        public HostMultiTenantStrategy(string template) : this(template, null)
+        {
+        }
+
+        public HostMultiTenantStrategy(string template, ILogger<HostMultiTenantStrategy> logger)
         {
             // Check for valid template. Template cannot have "*" on each side of __tenant__ placeholder.
             if (string.IsNullOrWhiteSpace(template) ||
@@ -55,7 +59,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             this.logger = logger;
         }
 
-        public string GetIdentifier(object context)
+        public virtual string GetIdentifier(object context)
         {
             if (!typeof(HttpContext).IsAssignableFrom(context.GetType()))
                 throw new MultiTenantException(null,

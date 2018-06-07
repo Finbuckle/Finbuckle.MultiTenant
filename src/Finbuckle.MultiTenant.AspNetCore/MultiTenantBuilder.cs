@@ -298,5 +298,30 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             return this;
         }
+
+        /// <summary>
+        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor.
+        /// </summary>
+        /// <param name="factory">A delegate that will create and configure the strategy.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithStrategy<T>() where T : IMultiTenantStrategy, new()
+            => WithStrategy(sp => new T());
+
+        /// <summary>
+        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using a factory method.
+        /// </summary>
+        /// <param name="factory">A delegate that will create and configure the strategy.</param>
+        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        public MultiTenantBuilder WithStrategy(Func<IServiceProvider, IMultiTenantStrategy> factory)
+        {
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            services.TryAddSingleton<IMultiTenantStrategy>(factory);
+
+            return this;
+        }
     }
 }

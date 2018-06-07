@@ -27,15 +27,19 @@ namespace Finbuckle.MultiTenant.Core
         private readonly string identifier;
         private readonly ILogger<StaticMultiTenantStrategy> logger;
 
-        public StaticMultiTenantStrategy(string identifier, ILogger<StaticMultiTenantStrategy> logger = null)
+        public StaticMultiTenantStrategy(string identifier) : this(identifier, null)
+        {
+        }
+
+        public StaticMultiTenantStrategy(string identifier, ILogger<StaticMultiTenantStrategy> logger)
         {
             this.identifier = identifier;
             this.logger = logger;
         }
 
-        public string GetIdentifier(object context)
+        public virtual string GetIdentifier(object context)
         {
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
+            Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
 
             return identifier;
         }
