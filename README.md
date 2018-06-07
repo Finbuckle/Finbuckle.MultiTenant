@@ -9,11 +9,12 @@ See [LICENSE](LICENSE) file for license information.
 ## Version History
 
 **1.1.0**
-* Logging support
-* Host strategy improvements
-* InMemory store case sensitivity support
+* Remote authentication support
+* Strategy improvements
+* Store improvements
 * Per-tenant options improvements
-* Updated Samples
+* Logging support
+* Updated samples
 * Improved unit and integration tests
 * Switch to Apache 2.0 license
 

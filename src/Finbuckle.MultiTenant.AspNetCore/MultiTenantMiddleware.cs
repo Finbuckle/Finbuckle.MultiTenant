@@ -135,13 +135,16 @@ namespace Finbuckle.MultiTenant.AspNetCore
                         var properties = oAuthOptions?.StateDataFormat.Unprotect(state) ??
                                      openIdConnectOptions?.StateDataFormat.Unprotect(state);
 
-                        var tenantIdentifier = properties.Items["tenantIdentifier"];
+                        if (properties.Items.Keys.Contains("tenantIdentifier"))
+                        {
+                            var tenantIdentifier = properties.Items["tenantIdentifier"];
 
-                        var strategy = new StaticMultiTenantStrategy(tenantIdentifier);
-                        var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
-                        var resolver = new TenantResolver(store, strategy);
+                            var strategy = new StaticMultiTenantStrategy(tenantIdentifier);
+                            var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
+                            var resolver = new TenantResolver(store, strategy);
 
-                        return await resolver.ResolveAsync(context); ;
+                            return await resolver.ResolveAsync(context);
+                        }
                     }
                     catch (Exception e)
                     {
