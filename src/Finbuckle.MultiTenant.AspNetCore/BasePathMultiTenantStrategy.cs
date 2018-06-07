@@ -26,12 +26,16 @@ namespace Finbuckle.MultiTenant.AspNetCore
     {
         private readonly ILogger<BasePathMultiTenantStrategy> logger;
 
-        public BasePathMultiTenantStrategy(ILogger<BasePathMultiTenantStrategy> logger = null)
+        public BasePathMultiTenantStrategy()
+        {
+        }
+
+        public BasePathMultiTenantStrategy(ILogger<BasePathMultiTenantStrategy> logger)
         {
             this.logger = logger;
         }
 
-        public string GetIdentifier(object context)
+        public virtual string GetIdentifier(object context)
         {
             if(!typeof(HttpContext).IsAssignableFrom(context.GetType()))
                 throw new MultiTenantException(null,
