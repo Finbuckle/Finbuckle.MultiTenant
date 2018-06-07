@@ -59,6 +59,7 @@ public class MultiTenantMiddlewareShould
     public void SetContextItemToNullIfNoTenant()
     {
         var services = new ServiceCollection();
+        services.AddAuthentication();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
         services.AddTransient<IAuthenticationHandlerProvider, AuthenticationHandlerProvider>();
         services.AddTransient<IAuthenticationSchemeProvider, AuthenticationSchemeProvider>();

@@ -25,64 +25,39 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
-public class MultiTenansBuilderShould
+public class MultiTenantBuilderShould
 {
     // Used in some tests.
     public int TestProperty { get; set; }
 
     [Fact]
-    public void AddStaticStrategy()
+    public void AddCustomStoreWithDefaultCtor()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStaticStrategy("initech");
+        services.AddMultiTenant().WithStore<TestStore>();
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<StaticMultiTenantStrategy>(resolver);
-
-        var tenantId = (string)resolver.GetType().
-            GetField("identifier", BindingFlags.Instance | BindingFlags.NonPublic).
-            GetValue(resolver);
-        Assert.Equal("initech", tenantId);
+        var strategy = sp.GetRequiredService<IMultiTenantStore>();
     }
 
     [Fact]
-    public void AddBasePathStrategy()
+    public void AddCustomStoreWithFactory()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithBasePathStrategy();
+        services.AddMultiTenant().WithStore(_sp => new TestStore());
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<BasePathMultiTenantStrategy>(resolver);
+        var strategy = sp.GetRequiredService<IMultiTenantStore>();
     }
 
     [Fact]
-    public void AddHostStrategy()
+    public void ThrowIfNullParamAddingCustomStore()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithHostStrategy();
-        var sp = services.BuildServiceProvider();
-
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<HostMultiTenantStrategy>(resolver);
-    }
-
-    [Fact]
-    public void AddRouteStrategy()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant().WithRouteStrategy("routeParam");
-        var sp = services.BuildServiceProvider();
-
-        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<RouteMultiTenantStrategy>(strategy);
-
-        var tenantParam = (string)strategy.GetType().
-            GetField("tenantParam", BindingFlags.Instance | BindingFlags.NonPublic).
-            GetValue(strategy);
-        Assert.Equal("routeParam", tenantParam);
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(null));
     }
 
     [Fact]
@@ -145,6 +120,14 @@ public class MultiTenansBuilderShould
     }
 
     [Fact]
+    public void ThrowIfNullParamAddingInMemoryStore()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(()
+            => services.AddMultiTenant().WithInMemoryStore(config: null));
+    }
+
+    [Fact]
     public void AddInMemoryStoreWithCaseSentivity()
     {
         var configBuilder = new ConfigurationBuilder();
@@ -204,14 +187,21 @@ public class MultiTenansBuilderShould
     }
 
     [Fact]
-    public void AddPerTenantConfigOptions()
+    public void AddPerTenantOptions()
     {
         var services = new ServiceCollection();
         // Note: using MultiTenansBuilderShould as our test options class.
-        services.AddMultiTenant().WithPerTenantOptions<MultiTenansBuilderShould>((o, tc) => o.TestProperty = 1);
+        services.AddMultiTenant().WithPerTenantOptions<MultiTenantBuilderShould>((o, tc) => o.TestProperty = 1);
         var sp = services.BuildServiceProvider();
 
-        var cache = sp.GetRequiredService<IOptionsMonitorCache<MultiTenansBuilderShould>>();
+        var cache = sp.GetRequiredService<IOptionsMonitorCache<MultiTenantBuilderShould>>();
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingPerTenantOptions()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithPerTenantOptions<MultiTenantBuilderShould>(null));
     }
 
     [Fact]
@@ -224,5 +214,110 @@ public class MultiTenansBuilderShould
 
         var authService = sp.GetRequiredService<IAuthenticationService>();
         var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>();
+    }
+
+    [Fact]
+    public void AddStaticStrategy()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<StaticMultiTenantStrategy>(resolver);
+
+        var tenantId = (string)resolver.GetType().
+            GetField("identifier", BindingFlags.Instance | BindingFlags.NonPublic).
+            GetValue(resolver);
+        Assert.Equal("initech", tenantId);
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingStaticStrategy()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentException>(()
+            => services.AddMultiTenant().WithStaticStrategy(null));
+    }
+
+    [Fact]
+    public void AddBasePathStrategy()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithBasePathStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<BasePathMultiTenantStrategy>(resolver);
+    }
+
+    [Fact]
+    public void AddHostStrategy()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithHostStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<HostMultiTenantStrategy>(resolver);
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingHostStrategy()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentException>(()
+            => services.AddMultiTenant().WithHostStrategy(null));
+    }
+
+    [Fact]
+    public void AddRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithRouteStrategy("routeParam");
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<RouteMultiTenantStrategy>(strategy);
+
+        var tenantParam = (string)strategy.GetType().
+            GetField("tenantParam", BindingFlags.Instance | BindingFlags.NonPublic).
+            GetValue(strategy);
+        Assert.Equal("routeParam", tenantParam);
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentException>(()
+            => services.AddMultiTenant().WithRouteStrategy(null));
+    }
+
+    [Fact]
+    public void AddCustomStrategyWithDefaultCtor()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStrategy<BasePathMultiTenantStrategy>();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+    }
+
+    [Fact]
+    public void AddCustomStrategyWithFactory()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStrategy(_sp => new BasePathMultiTenantStrategy());
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+    }
+
+    [Fact]
+    public void ThrowIfNullFactoryAddingCustomStrategy()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStrategy(null));
     }
 }

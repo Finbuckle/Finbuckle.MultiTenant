@@ -26,7 +26,19 @@ namespace Finbuckle.MultiTenant.Core
     /// </summary>
     public class InMemoryMultiTenantStore : IMultiTenantStore
     {
-        public InMemoryMultiTenantStore(bool ignoreCase = true, ILogger<InMemoryMultiTenantStore> logger = null)
+        public InMemoryMultiTenantStore() : this (true, null)
+        {
+        }
+
+        public InMemoryMultiTenantStore(bool igoreCase) : this (igoreCase, null)
+        {
+        }
+
+        public InMemoryMultiTenantStore(ILogger<InMemoryMultiTenantStore> logger) : this (true, logger)
+        {
+        }
+
+        public InMemoryMultiTenantStore(bool ignoreCase, ILogger<InMemoryMultiTenantStore> logger)
         {
             var stringComparerer = StringComparer.OrdinalIgnoreCase;
             if(!ignoreCase)
@@ -39,7 +51,7 @@ namespace Finbuckle.MultiTenant.Core
         private readonly ConcurrentDictionary<string, TenantContext> _tenantMap;
         private readonly ILogger<InMemoryMultiTenantStore> logger;
 
-        public async Task<TenantContext> GetByIdentifierAsync(string identifier)
+        public virtual async Task<TenantContext> GetByIdentifierAsync(string identifier)
         {
             if (identifier == null)
             {
@@ -51,7 +63,7 @@ namespace Finbuckle.MultiTenant.Core
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 
-        public Task<bool> TryAdd(TenantContext context)
+        public virtual Task<bool> TryAdd(TenantContext context)
         {
             if (context == null)
             {
@@ -72,7 +84,7 @@ namespace Finbuckle.MultiTenant.Core
             return Task.FromResult(result);
         }
 
-        public Task<bool> TryRemove(string identifier)
+        public virtual Task<bool> TryRemove(string identifier)
         {
             if (identifier == null)
             {

@@ -95,6 +95,6 @@ public class RouteMultiTenantStrategyShould
     [InlineData(" ")]
     public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
     {
-        Assert.Throws<MultiTenantException>(() => new RouteMultiTenantStrategy(testString));
+        Assert.Throws<ArgumentException>(() => new RouteMultiTenantStrategy(testString));
     }
 }
