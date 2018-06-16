@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "PathStrategySample": {
+    "BasePathStrategySample": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
