@@ -51,7 +51,7 @@ namespace DataIsolationSample
         private void SetupDb()
         {
             var tc = new TenantContext("finbuckle", null, null, "Data Source=Data/ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc, new DbContextOptions<ToDoDbContext>()))
+            using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
@@ -62,7 +62,7 @@ namespace DataIsolationSample
             }
 
             tc = new TenantContext("megacorp", null, null, "Data Source=Data/ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc, new DbContextOptions<ToDoDbContext>()))
+            using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureCreated();
                 db.ToDoItems.Add(new ToDoItem { Title = "Send Invoices", Completed = true });
@@ -72,7 +72,7 @@ namespace DataIsolationSample
             }
 
             tc = new TenantContext("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc, new DbContextOptions<ToDoDbContext>()))
+            using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
