@@ -12,23 +12,42 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-public class MultiTenantModelCacheKeyFactory : IModelCacheKeyFactory
+    public class MultiTenantModelCacheKeyFactory : IModelCacheKeyFactory
     {
         public object Create(DbContext context)
         {
-            if (context.GetType().IsSubclassOf(typeof(MultiTenantDbContext)) ||
-                context.GetType().IsSubclassOf(typeof(MultiTenantIdentityDbContext<>)))
+            if (context is MultiTenantDbContext || ContextDerivesFromMultiTenantIdentityDbContext(context))
             {
                 dynamic derivedContext = context;
-                return (context.GetType(), derivedContext.tenantContext.Id);
+                return (context.GetType(), (string)derivedContext.tenantContext.Id);
             }
-            
+
             return context.GetType();
+        }
+
+        private bool ContextDerivesFromMultiTenantIdentityDbContext(DbContext context)
+        {
+            var currentType = context?.GetType();
+
+            while (context != null && currentType != typeof(object))
+            {
+                if (currentType.IsGenericType &&
+                    currentType.GetGenericTypeDefinition() == typeof(MultiTenantIdentityDbContext<>))
+                {
+                    return true;
+                }
+
+                currentType = currentType.BaseType;
+            }
+
+            return false;
         }
     }
 }

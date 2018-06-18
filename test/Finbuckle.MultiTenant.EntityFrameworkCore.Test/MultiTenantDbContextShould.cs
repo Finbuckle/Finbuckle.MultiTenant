@@ -36,6 +36,26 @@ public class MultiTenantDbContextShould
     }
 
     [Fact]
+    public void WorkWithSingleParamCtor()
+    {
+        var tenant1 = new TenantContext("abc", "abc", "abc",
+            "DataSource=testdb.db", null, null);
+        var c = new TestDbContext(tenant1);
+
+        Assert.NotNull(c);
+    }
+
+    [Fact]
+    public void WorkWithTwoParamCtor()
+    {
+        var tenant1 = new TenantContext("abc", "abc", "abc",
+            "DataSource=testdb.db", null, null);
+        var c = new TestDbContext(tenant1, new DbContextOptions<TestDbContext>());
+
+        Assert.NotNull(c);
+    }
+
+    [Fact]
     public void IdentifyOnlyTenantScopedProperties()
     {
         var tenant1 = new TenantContext("abc", "abc", "abc",

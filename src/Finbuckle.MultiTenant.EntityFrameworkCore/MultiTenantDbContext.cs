@@ -38,11 +38,17 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         protected string ConnectionString => tenantContext.ConnectionString;
 
+        protected MultiTenantDbContext(TenantContext tenantContext)
+        {
+            this.tenantContext = tenantContext;
+        }
+        
         protected MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
             this.tenantContext = tenantContext;
         }
 
+        [Obsolete("This constructor is obsolete and will be removed in future versions.")]
         protected MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
         {
             tenantContext = new TenantContext(null, null, null, connectionString, null, null);

@@ -1,7 +1,8 @@
 <Project>
     <PropertyGroup>
         <GenerateFullPaths>true</GenerateFullPaths>
-        
+
+        <VersionPrefix>1.1.1</VersionPrefix>
         <Authors>Andrew White</Authors>
         <Copyright>Copyright ©2018 Andrew White</Copyright>
         <PackageLicenseUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/master/LICENSE</PackageLicenseUrl>
