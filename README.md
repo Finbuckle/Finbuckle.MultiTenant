@@ -8,6 +8,11 @@ See [LICENSE](LICENSE) file for license information.
 
 ## Version History
 
+**1.1.1**
+* Fixed bug affecting per-tenant data isolation using a shared database
+* Added sample project for data isolation
+* Added new constructors for `MultiTenantDbContext` and `MultiTenantIdentityDbContext`
+
 **1.1.0**
 * Remote authentication support
 * Strategy improvements
