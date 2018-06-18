@@ -29,6 +29,10 @@ public class TestDbContext : MultiTenantDbContext
         DbContextOptions<TestDbContext> options) :
         base(tenantContext, options)
     { }
+
+    public TestDbContext(TenantContext tenantContext) : base(tenantContext)
+    {
+    }
 }
 
 public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext

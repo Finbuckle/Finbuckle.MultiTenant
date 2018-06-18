@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,9 @@ public class MultiTenantModelCacheKeyFactoryShould
         {
         }
     }
-    public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
+
+    public class TestAppUser : IdentityUser {}
+    public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext<TestAppUser>
     {
         public TestMultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
         {
@@ -53,9 +56,11 @@ public class MultiTenantModelCacheKeyFactoryShould
             new TenantContext("test", null, null, null, null, null),
             new DbContextOptions<TestMultiTenantDbContext>());
 
-        var key = factory.Create(dbContext);
+        dynamic key = factory.Create(dbContext);
 
-        Assert.Equal((typeof(TestMultiTenantDbContext), "test"), key);
+        Assert.IsType<(Type, string)>(key);
+        Assert.Equal(typeof(TestMultiTenantDbContext), key.Item1);
+        Assert.Equal("test", key.Item2);
     }
 
     [Fact]
@@ -66,8 +71,10 @@ public class MultiTenantModelCacheKeyFactoryShould
             new TenantContext("test", null, null, null, null, null),
             new DbContextOptions<TestMultiTenantIdentityDbContext>());
 
-        var key = factory.Create(dbContext);
+        dynamic key = factory.Create(dbContext);
 
-        Assert.Equal((typeof(TestMultiTenantIdentityDbContext), "test"), key);
+        Assert.IsType<(Type, string)>(key);
+        Assert.Equal(typeof(TestMultiTenantIdentityDbContext), key.Item1);
+        Assert.Equal("test", key.Item2);
     }
 }
