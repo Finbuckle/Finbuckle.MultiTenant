@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ToDoItem>
+@{
+    ViewData["Title"] = "Data Isolation Sample";
+}
+
+@if(Context.GetTenantContext() != null)
+{
+    <p class="mt-4">Tenant Id: @Context.GetTenantContext().Id</p>
+    <p class="my-4">Connection String: @Context.GetTenantContext().ConnectionString</p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="text-muted">Id</th>
+                <th></th>
+                <th>Title</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="width: 4rem" class="text-muted">@item.Id</td>
+                    <td style="width: 2rem"><input asp-for="@item.Completed" /></td>
+                    <td>@item.Title</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <span class="text-muted">No tenant found.</span>
+}

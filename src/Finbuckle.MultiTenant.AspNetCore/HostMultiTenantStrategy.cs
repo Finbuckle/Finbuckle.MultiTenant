@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public virtual string GetIdentifier(object context)
         {
-            if (!typeof(HttpContext).IsAssignableFrom(context.GetType()))
+            if (!(context is HttpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
 

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     
-    <VersionPrefix>1.1.0</VersionPrefix>
     <Title>Finbuckle.MultiTenant.Core</Title>
     <Description>Core package for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>

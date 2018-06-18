@@ -105,8 +105,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 if (options.CallbackPath == context.Request.Path)
                 {
                     // Skip if this is not a compatible type of authentication.
-                    if (!typeof(OAuthOptions).IsAssignableFrom(options.GetType()) &&
-                        !typeof(OpenIdConnectOptions).IsAssignableFrom(options.GetType()))
+                    if (!(options is OAuthOptions || options is OpenIdConnectOptions))
                     {
                         continue;
                     }
