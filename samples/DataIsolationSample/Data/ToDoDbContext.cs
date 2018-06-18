@@ -21,11 +21,7 @@ namespace DataIsolationSample.Data
 {
     public class ToDoDbContext : MultiTenantDbContext
     {
-        public ToDoDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
-        {
-        }
-
-        public ToDoDbContext(string connectionString, DbContextOptions options) : base(connectionString, options)
+        public ToDoDbContext(TenantContext tenantContext) : base(tenantContext)
         {
         }
 
