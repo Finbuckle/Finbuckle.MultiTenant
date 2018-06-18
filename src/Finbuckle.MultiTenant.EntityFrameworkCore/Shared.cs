@@ -90,7 +90,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var leftExp = efPropertyExp;
 
                 // build expression tree for EF.Property<string>(e, "TenantId") == tenantId
-                var rightExp = Expression.Constant(tenantContext.Id, typeof(string));
+                var rightExp = Expression.Constant(tenantContext?.Id, typeof(string));
                 var equalExp = Expression.Equal(leftExp, rightExp);
 
                 // build the final expression tree
