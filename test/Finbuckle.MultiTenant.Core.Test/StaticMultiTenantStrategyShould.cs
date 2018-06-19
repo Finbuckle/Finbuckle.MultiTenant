@@ -1,3 +1,17 @@
+//    Copyright 2018 Andrew White
+// 
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+// 
+//        http://www.apache.org/licenses/LICENSE-2.0
+// 
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 using System;
 using System.Collections.Concurrent;
 using Finbuckle.MultiTenant.Core;
@@ -5,35 +19,18 @@ using Xunit;
 
 public class StaticTenantResolverShould
 {
-    private InMemoryMultiTenantStore CreateTestStore()
+    [Theory]
+    [InlineData("initech")]
+    [InlineData("Initech")] // maintain case
+    [InlineData("")] // empty string
+    [InlineData("    ")] // whitespace
+    [InlineData(null)] // null
+    public void ReturnExpectedIdentifier(string staticIdentifier)
     {
-        var store = new InMemoryMultiTenantStore();
-        store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null));
+        var strategy = new StaticMultiTenantStrategy(staticIdentifier);
 
-        return store;
-    }
+        var identifier = strategy.GetIdentifier(new Object());
 
-
-    [Fact]
-    public void GetTenantFromStore()
-    {
-        var store = CreateTestStore();
-
-        var strat = new StaticMultiTenantStrategy("initech");
-        var resolver = new TenantResolver(store, strat);
-        var tc = resolver.ResolveAsync(null).Result;
-
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal(typeof(StaticMultiTenantStrategy), tc.MultiTenantStrategyType);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), tc.MultiTenantStoreType);
-    }
-
-    [Fact]
-    public void ThrowIfIdentifierIsNull()
-    {
-        var store = CreateTestStore();
-        Assert.Throws<MultiTenantException>(() => new StaticMultiTenantStrategy(null));
+        Assert.Equal(staticIdentifier, identifier);
     }
 }

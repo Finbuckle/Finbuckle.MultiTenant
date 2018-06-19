@@ -1,12 +1,22 @@
+//    Copyright 2018 Andrew White
+// 
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+// 
+//        http://www.apache.org/licenses/LICENSE-2.0
+// 
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
@@ -16,19 +26,17 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly Action<TOptions, TenantContext> _tenantConfig;
+        private readonly Action<TOptions, TenantContext> tenantConfig;
+        private readonly ITenantContextAccessor tenantContextAccessor;
 
-        // Note: the object is just a dummy because there is no ConcurrentSet<T> class.
+        // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        private TenantContext TenantContext { get => _httpContextAccessor.HttpContext?.GetTenantContextAsync().Result; }
-
-        public MultiTenantOptionsCache(IHttpContextAccessor httpContextAccessor, Action<TOptions, TenantContext> tenantConfig)
+        public MultiTenantOptionsCache(ITenantContextAccessor tenantContextAccessor, Action<TOptions, TenantContext> tenantConfig)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
+            this.tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
+            this.tenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
 
         /// <summary>
@@ -39,7 +47,13 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns></returns>
         public override TOptions GetOrAdd(string name, Func<TOptions> createOptions)
         {
-            var adjustedOptionsName = AdjustOptionsName(TenantContext?.Id, name);
+            if (createOptions == null)
+            {
+                throw new ArgumentNullException(nameof(createOptions));
+            }
+
+            name = name ?? Options.DefaultName;
+            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor.TenantContext?.Id, name);
             return base.GetOrAdd(adjustedOptionsName, () => MultiTenantFactoryWrapper(name, adjustedOptionsName, createOptions));
         }
 
@@ -51,8 +65,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns></returns>
         public override bool TryAdd(string name, TOptions options)
         {
-            var adjustedOptionsName = AdjustOptionsName(TenantContext?.Id, name);
-            AdjustOptions(options, TenantContext?.Id);
+            name = name ?? Options.DefaultName;
+
+            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor?.TenantContext.Id, name);
+            //AdjustOptions(options, tenantContext?.Id);
 
             if (base.TryAdd(adjustedOptionsName, options))
             {
@@ -70,6 +86,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns></returns>
         public override bool TryRemove(string name)
         {
+            name = name ?? Options.DefaultName;
             var result = false;
 
             if (!_adjustedOptionsNames.TryGetValue(name, out var adjustedOptionsNames))
@@ -104,13 +121,18 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns></returns>
         private string AdjustOptionsName(string prefix, string name)
         {
+            if (name == null)
+            {
+                throw new MultiTenantException("", new ArgumentNullException(nameof(name)));
+            }
+
             // Hash so that prefix + option name can't cause a collision. 
             byte[] buffer = Encoding.UTF8.GetBytes(prefix ?? "");
             var sha1 = System.Security.Cryptography.SHA1.Create();
             var hash = sha1.ComputeHash(buffer);
             prefix = Convert.ToBase64String(hash);
 
-            return (prefix) + (name ?? Options.DefaultName);
+            return (prefix) + (name);
         }
 
         /// <summary>
@@ -122,8 +144,13 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns></returns>
         private TOptions MultiTenantFactoryWrapper(string optionsName, string adjustedOptionsName, Func<TOptions> createOptions)
         {
+            if (createOptions == null)
+            {
+                throw new ArgumentNullException(nameof(createOptions));
+            }
+
             var options = createOptions();
-            AdjustOptions(options, TenantContext?.Id);
+            //AdjustOptions(options, CurrentTenantContext?.Id);
             CacheAdjustedOptionsName(optionsName, adjustedOptionsName);
 
             return options;
@@ -144,12 +171,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="options"></param>
         /// <param name="tenantSubstitution"></param>
-        private void AdjustOptions(TOptions options, string tenantSubstitution)
-        {
-            if (TenantContext != null)
-            {
-                _tenantConfig(options, TenantContext);
-            }
-        }
+        // private void AdjustOptions(TOptions options, string tenantSubstitution)
+        // {
+        //     if (tenantContext != null)
+        //     {
+        //         tenantConfig(options, tenantContext);
+        //     }
+        // }
     }
 }

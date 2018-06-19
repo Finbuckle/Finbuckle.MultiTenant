@@ -2,9 +2,18 @@
 
 @if(Model != null)
 {
-    <p class="mt-4">Cookie Name: @ViewData["CookieName"]</p>
-    <a asp-action="Login" class="btn btn-primary">Login</a>
-    <a asp-action="Logout" class="btn btn-secondary">Logout</a>
+    <h6 class="text-warning">This demo requires external configuration to work properly! See the comments in Startup.cs for more details.</h6>
+
+    @if(!User.Identity.IsAuthenticated)
+    {
+        <a asp-action="Authenticate" class="btn btn-primary">Login</a>
+    } else
+    {
+        <a asp-action="Logout" class="btn btn-secondary">Logout</a>
+    }
+
+    <p class="mt-4">Default Challenge Scheme: @ViewData["ChallengeScheme"]</p>
+    <p class="mt-4">Session Cookie Name: @ViewData["CookieName"]</p>
 
     <h3 class="mt-4">TenantContext Values</h3>
 

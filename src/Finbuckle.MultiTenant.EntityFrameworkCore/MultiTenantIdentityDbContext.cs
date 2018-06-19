@@ -1,3 +1,17 @@
+//    Copyright 2018 Andrew White
+// 
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+// 
+//        http://www.apache.org/licenses/LICENSE-2.0
+// 
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -19,19 +33,19 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     /// </summary>
     public class MultiTenantIdentityDbContext<TUser> : IdentityDbContext<TUser> where TUser : IdentityUser
     {
-        private readonly TenantContext _tenantContext;
-        private ImmutableList<IEntityType> _tenantScopeEntityTypes = null;
+        private readonly TenantContext tenantContext;
+        private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
 
-        protected string ConnectionString => _tenantContext.ConnectionString;
+        protected string ConnectionString => tenantContext.ConnectionString;
 
         public MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
-            _tenantContext = tenantContext;
+            this.tenantContext = tenantContext;
         }
 
         public MultiTenantIdentityDbContext(string connectionString, DbContextOptions options) : base(options)
         {
-            _tenantContext = new TenantContext(null, null, null, connectionString, null, null);
+            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -42,14 +56,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             get
             {
-                if (_tenantScopeEntityTypes == null)
+                if (tenantScopeEntityTypes == null)
                 {
-                    _tenantScopeEntityTypes = Model.GetEntityTypes().
+                    tenantScopeEntityTypes = Model.GetEntityTypes().
                        Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
                        ToImmutableList();
                 }
 
-                return _tenantScopeEntityTypes;
+                return tenantScopeEntityTypes;
             }
         }
 
@@ -57,7 +71,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, _tenantContext);
+            Shared.SetupModel(builder, tenantContext);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -65,7 +79,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(_tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -83,7 +97,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(_tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

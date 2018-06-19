@@ -1,3 +1,17 @@
+//    Copyright 2018 Andrew White
+// 
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+// 
+//        http://www.apache.org/licenses/LICENSE-2.0
+// 
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
 using System;
 using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
@@ -10,20 +24,12 @@ using Xunit;
 
 public class RouteMultiTenantStrategyShould
 {
-    private InMemoryMultiTenantStore CreateTestStore()
-    {
-        var store = new InMemoryMultiTenantStore();
-        store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null));
-
-        return store;
-    }
-
-    private HttpContext CreateHttpContextMock(string routeValue)
+    private HttpContext CreateHttpContextMock(string tenantParam, string routeValue)
     {
         var routeData = new RouteData();
-        routeData.Values.Add("tenant", routeValue);
+        routeData.Values.Add(tenantParam, routeValue);
         var mockFeature = new Mock<IRoutingFeature>();
-        mockFeature.Setup(f=>f.RouteData).Returns(routeData);
+        mockFeature.Setup(f => f.RouteData).Returns(routeData);
 
         var mock = new Mock<HttpContext>();
         mock.Setup(c => c.Features[typeof(IRoutingFeature)]).Returns(mockFeature.Object);
@@ -31,7 +37,7 @@ public class RouteMultiTenantStrategyShould
         return mock.Object;
     }
 
-    private HttpContext CreateHttpContextMockWithNoRouteData(string routeValue)
+    private HttpContext CreateHttpContextMockWithNoRouteData()
     {
         var mock = new Mock<HttpContext>();
         mock.Setup(c => c.Features[typeof(IRoutingFeature)]).Returns(null);
@@ -39,54 +45,48 @@ public class RouteMultiTenantStrategyShould
         return mock.Object;
     }
 
-    [Fact]
-    public void GetTenantFromStore()
+    [Theory]
+    [InlineData("__tenant__", "initech", "initech")] // single path
+    [InlineData("__tenant__", "Initech", "Initech")] // maintain case
+    public void ReturnExpectedIdentifier(string tenantParam, string routeValue, string expected)
     {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMock("initech");
+        var httpContext = CreateHttpContextMock(tenantParam, routeValue);
+        var strategy = new RouteMultiTenantStrategy(tenantParam);
 
-        var resolver = new TenantResolver(store, new RouteMultiTenantStrategy("tenant"));
-        var tc = resolver.ResolveAsync(httpContext).Result;
+        var identifier = strategy.GetIdentifier(httpContext);
 
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal(typeof(RouteMultiTenantStrategy), tc.MultiTenantStrategyType);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), tc.MultiTenantStoreType);
+        Assert.Equal(expected, identifier);
     }
 
     [Fact]
     public void ThrowIfContextIsNotHttpContext()
     {
-        var store = CreateTestStore();
-        var httpContext = new Object();
-        var resolver = new TenantResolver(store, new RouteMultiTenantStrategy("tenant"));
+        var context = new Object();
+        var strategy = new RouteMultiTenantStrategy("__tenant__");
 
-        Assert.Throws<MultiTenantException>(() => resolver.ResolveAsync(httpContext).GetAwaiter().GetResult());
+        Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
     }
 
     [Fact]
     public void ReturnNullIfNoRouteParamMatch()
     {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMock("initech");
+        var httpContext = CreateHttpContextMock("__tenant__", "initech");
 
-        var resolver = new TenantResolver(store, new RouteMultiTenantStrategy("nomatch_tenant"));
-        var tc = resolver.ResolveAsync(httpContext).Result;
+        var strategy = new RouteMultiTenantStrategy("controller");
+        var identifier = strategy.GetIdentifier(httpContext);
 
-        Assert.Null(tc);
+        Assert.Null(identifier);
     }
 
     [Fact]
     public void ReturnNullIfNoRouteData()
     {
-        var store = CreateTestStore();
-        var httpContext = CreateHttpContextMockWithNoRouteData("initech");
+        var httpContext = CreateHttpContextMockWithNoRouteData();
 
-        var resolver = new TenantResolver(store, new RouteMultiTenantStrategy("tenant"));
-        var tc = resolver.ResolveAsync(httpContext).Result;
+        var strategy = new RouteMultiTenantStrategy("__tenant__");
+        var identifier = strategy.GetIdentifier(httpContext);
 
-        Assert.Null(tc);
+        Assert.Null(identifier);
     }
 
     [Theory]
@@ -95,6 +95,6 @@ public class RouteMultiTenantStrategyShould
     [InlineData(" ")]
     public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
     {
-        Assert.Throws<MultiTenantException>(() => new RouteMultiTenantStrategy(testString));
+        Assert.Throws<ArgumentException>(() => new RouteMultiTenantStrategy(testString));
     }
 }
