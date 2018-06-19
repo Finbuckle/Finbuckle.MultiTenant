@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationOptionsSample
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataIsolationSample", "samples\DataIsolationSample\DataIsolationSample.csproj", "{58453662-5F28-408F-B30D-2736C621A664}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant", "src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj", "{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -190,6 +192,18 @@ Global
 		{58453662-5F28-408F-B30D-2736C621A664}.Release|x64.Build.0 = Release|Any CPU
 		{58453662-5F28-408F-B30D-2736C621A664}.Release|x86.ActiveCfg = Release|Any CPU
 		{58453662-5F28-408F-B30D-2736C621A664}.Release|x86.Build.0 = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Debug|x86.Build.0 = Debug|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|x64.Build.0 = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|x86.ActiveCfg = Release|Any CPU
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -204,6 +218,7 @@ Global
 		{4B3A1C30-D42B-43F0-8541-4AB5B51CD05C} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 		{AE28E953-59A3-4E8A-AEF2-88DBA1DB9564} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 		{58453662-5F28-408F-B30D-2736C621A664} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
+		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

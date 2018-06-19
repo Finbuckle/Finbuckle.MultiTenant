@@ -8,7 +8,7 @@
         <PackageLicenseUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/master/LICENSE</PackageLicenseUrl>
         <PackageProjectUrl>https://www.finbuckle.com</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
-        <PackageTags>finbuckle;multitenant</PackageTags>
+        <PackageTags>finbuckle;multitenant;aspnetcore;efcore</PackageTags>
         <PackageOutputPath>/Users/acw/Dev/Nuget</PackageOutputPath>
     </PropertyGroup>
 </Project>

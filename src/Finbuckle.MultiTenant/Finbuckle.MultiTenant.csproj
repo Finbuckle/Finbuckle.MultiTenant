@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>Metapackage for Finbuckle.MultiTenant.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+      <ProjectReference Include="../Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
+      <ProjectReference Include="../Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>
