@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "HostStrategySample": {
+    "DataIsolationSample": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

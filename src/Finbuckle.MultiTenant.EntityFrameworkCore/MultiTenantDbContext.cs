@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
@@ -31,19 +32,30 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     /// </summary>
     public class MultiTenantDbContext : DbContext
     {
-        private readonly TenantContext tenantContext;
+        internal readonly TenantContext tenantContext;
+        
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
         protected string ConnectionString => tenantContext.ConnectionString;
 
-        public MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        protected MultiTenantDbContext(TenantContext tenantContext)
+        {
+            this.tenantContext = tenantContext;
+        }
+        
+        protected MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
             this.tenantContext = tenantContext;
         }
 
-        public MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
+        [Obsolete("This constructor is obsolete and will be removed in future versions.")]
+        protected MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
         {
             tenantContext = new TenantContext(null, null, null, connectionString, null, null);
+        }
+
+        protected MultiTenantDbContext()
+        {
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -65,6 +77,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ReplaceService<IModelCacheKeyFactory, MultiTenantModelCacheKeyFactory>();
+            base.OnConfiguring(optionsBuilder);
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             Shared.SetupModel(modelBuilder, tenantContext);
@@ -72,6 +90,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
+            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
@@ -90,6 +109,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
+            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
