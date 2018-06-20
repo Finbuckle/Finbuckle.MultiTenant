@@ -123,4 +123,107 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return result;
         }
     }
+
+
+    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
+        where TUserRole : IdentityUserRole<TKey>
+        where TUserClaim : IdentityUserClaim<TKey>
+        where TRoleClaim : IdentityRoleClaim<TKey>
+        where TKey : IEquatable<TKey>
+        where TUserToken : IdentityUserToken<TKey>
+    {
+        internal readonly TenantContext tenantContext;
+
+        private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
+
+        protected string ConnectionString => tenantContext.ConnectionString;
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        {
+            this.tenantContext = tenantContext;
+        }
+
+        protected MultiTenantIdentityDbContext(string connectionString, DbContextOptions options) : base(options)
+        {
+            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
+        }
+
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+        public IImmutableList<IEntityType> MultiTenantEntityTypes
+        {
+            get
+            {
+                if (tenantScopeEntityTypes == null)
+                {
+                    tenantScopeEntityTypes = Model.GetEntityTypes().
+                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
+                       ToImmutableList();
+                }
+
+                return tenantScopeEntityTypes;
+            }
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ReplaceService<IModelCacheKeyFactory, MultiTenantModelCacheKeyFactory>();
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            Shared.SetupModel(builder, tenantContext);
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
+            if (ChangeTracker.AutoDetectChangesEnabled)
+                ChangeTracker.DetectChanges();
+
+            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+
+            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
+            ChangeTracker.AutoDetectChangesEnabled = false;
+
+            var result = base.SaveChanges(acceptAllChangesOnSuccess);
+
+            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
+
+            return result;
+        }
+
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
+            if (ChangeTracker.AutoDetectChangesEnabled)
+                ChangeTracker.DetectChanges();
+
+            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+
+            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
+            ChangeTracker.AutoDetectChangesEnabled = false;
+
+            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
+
+            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
+
+            return result;
+        }
+    }
+
+    
 }
