@@ -28,112 +28,57 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
+    public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    {
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        {
+        }
+    }
+
     /// <summary>
     /// A database context compatiable with Identity that enforces tenant integrity on entity types
     /// marked with the <c>MultiTenant</c> attribute.
     /// </summary>
-    public class MultiTenantIdentityDbContext<TUser> : IdentityDbContext<TUser> where TUser : IdentityUser
+    public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
+        where TUser : MultiTenantIdentityUser
     {
-        internal readonly TenantContext tenantContext;
-        
-        private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
-
-        protected string ConnectionString => tenantContext.ConnectionString;
-
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
-        {
-            this.tenantContext = tenantContext;
-        }
-
-        protected MultiTenantIdentityDbContext(string connectionString, DbContextOptions options) : base(options)
-        {
-            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
-        }
-
         protected MultiTenantIdentityDbContext()
         {
         }
 
-        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
-
-        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
-
-        public IImmutableList<IEntityType> MultiTenantEntityTypes
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
         {
-            get
-            {
-                if (tenantScopeEntityTypes == null)
-                {
-                    tenantScopeEntityTypes = Model.GetEntityTypes().
-                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
-                       ToImmutableList();
-                }
-
-                return tenantScopeEntityTypes;
-            }
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.ReplaceService<IModelCacheKeyFactory, MultiTenantModelCacheKeyFactory>();
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            Shared.SetupModel(builder, tenantContext);
-        }
-
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = base.SaveChanges(acceptAllChangesOnSuccess);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
-        }
-
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
         }
     }
 
-
-    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserLogin, TUserRole, TUserClaim, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
-        where TUser : IdentityUser<TKey>
-        where TRole : IdentityRole<TKey>
-        where TUserLogin : IdentityUserLogin<TKey>
-        where TUserRole : IdentityUserRole<TKey>
-        where TUserClaim : IdentityUserClaim<TKey>
-        where TRoleClaim : IdentityRoleClaim<TKey>
+    public class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
+        where TUser : MultiTenantIdentityUser<TKey>
+        where TRole : MultiTenantIdentityRole<TKey>
         where TKey : IEquatable<TKey>
-        where TUserToken : IdentityUserToken<TKey>
+    {
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        {
+        }
+    }
+
+    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+        where TUser : MultiTenantIdentityUser<TKey>
+        where TRole : MultiTenantIdentityRole<TKey>
+        where TUserClaim : MultiTenantIdentityUserClaim<TKey>
+        where TUserRole : MultiTenantIdentityUserRole<TKey>
+        where TUserLogin : MultiTenantIdentityUserLogin<TKey>
+        where TRoleClaim : MultiTenantIdentityRoleClaim<TKey>
+        where TUserToken : MultiTenantIdentityUserToken<TKey>
+        where TKey : IEquatable<TKey>
+        
     {
         internal readonly TenantContext tenantContext;
 
@@ -141,18 +86,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         protected string ConnectionString => tenantContext.ConnectionString;
 
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
         protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
             this.tenantContext = tenantContext;
-        }
-
-        protected MultiTenantIdentityDbContext(string connectionString, DbContextOptions options) : base(options)
-        {
-            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
-        }
-
-        protected MultiTenantIdentityDbContext()
-        {
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -224,6 +164,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return result;
         }
     }
-
-    
 }

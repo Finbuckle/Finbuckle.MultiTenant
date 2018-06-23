@@ -29,8 +29,7 @@ public class MultiTenantModelCacheKeyFactoryShould
         }
     }
 
-    public class TestAppUser : IdentityUser {}
-    public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext<TestAppUser>
+    public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext
     {
         public TestMultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
         {
