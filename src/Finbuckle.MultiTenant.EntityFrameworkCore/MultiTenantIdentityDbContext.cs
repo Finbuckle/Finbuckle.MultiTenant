@@ -70,13 +70,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     }
 
     public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
-        where TUser : MultiTenantIdentityUser<TKey>
-        where TRole : MultiTenantIdentityRole<TKey>
-        where TUserClaim : MultiTenantIdentityUserClaim<TKey>
-        where TUserRole : MultiTenantIdentityUserRole<TKey>
-        where TUserLogin : MultiTenantIdentityUserLogin<TKey>
-        where TRoleClaim : MultiTenantIdentityRoleClaim<TKey>
-        where TUserToken : MultiTenantIdentityUserToken<TKey>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+        where TUserClaim : IdentityUserClaim<TKey>
+        where TUserRole : IdentityUserRole<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
+        where TRoleClaim : IdentityRoleClaim<TKey>
+        where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
         
     {
