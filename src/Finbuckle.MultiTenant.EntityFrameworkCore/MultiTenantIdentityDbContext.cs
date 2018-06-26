@@ -78,7 +78,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         where TRoleClaim : IdentityRoleClaim<TKey>
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
-        
     {
         internal readonly TenantContext tenantContext;
 
