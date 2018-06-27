@@ -79,11 +79,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        internal readonly TenantContext tenantContext;
+        protected internal TenantContext TenantContext { get; protected set; }
 
         private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
 
-        protected string ConnectionString => tenantContext.ConnectionString;
+        protected string ConnectionString => TenantContext.ConnectionString;
 
         protected MultiTenantIdentityDbContext()
         {
@@ -91,7 +91,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
-            this.tenantContext = tenantContext;
+            this.TenantContext = tenantContext;
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -123,7 +123,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, tenantContext);
+            Shared.SetupModel(builder, TenantContext);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -132,7 +132,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -151,7 +151,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

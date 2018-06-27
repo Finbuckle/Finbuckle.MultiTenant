@@ -39,10 +39,11 @@ namespace DataIsolationSample
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
 
+            app.UseStaticFiles();
             app.UseMultiTenant(ConfigRoutes);
-
             app.UseMvc(ConfigRoutes);
 
             SetupDb();
