@@ -36,7 +36,7 @@ namespace IdentityDataIsolationSample.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
+                    b.HasIndex("NormalizedName", "TenantId")
                         .IsUnique()
                         .HasName("RoleNameIndex");
 
@@ -113,7 +113,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
-                    b.HasIndex("NormalizedUserName")
+                    b.HasIndex("NormalizedUserName", "TenantId")
                         .IsUnique()
                         .HasName("UserNameIndex");
 

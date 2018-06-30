@@ -167,7 +167,7 @@ namespace IdentityDataIsolationSample.Migrations
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
-                column: "NormalizedName",
+                columns: new[] { "NormalizedName", "TenantId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -193,7 +193,7 @@ namespace IdentityDataIsolationSample.Migrations
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
-                column: "NormalizedUserName",
+                columns: new[] { "NormalizedUserName", "TenantId" },
                 unique: true);
         }
 

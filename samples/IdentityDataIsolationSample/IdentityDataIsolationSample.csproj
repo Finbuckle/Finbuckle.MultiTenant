@@ -2,18 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <UserSecretsId>aspnet-IdentityDataIsolationSample-399A168A-B2A8-4F26-9D5D-364DEA3D0A96</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Update="app.db" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="1.1.1" />
+    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="1.2.0" /> -->
+    <ProjectReference Include="../../src/**/*.csproj" />
   </ItemGroup>
 
 </Project>

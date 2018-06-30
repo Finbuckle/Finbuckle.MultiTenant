@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace IdentityDataIsolationSample.Data
 {
-    public class DesignTimeFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    public class SharedDesignTimeFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            var tenantContext = new TenantContext(null, null, null, "Data Source=Data/SharedIdentity3.db", null, null);
+            var tenantContext = new TenantContext(null, null, null, "Data Source=Data/SharedIdentity.db", null, null);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
             return new ApplicationDbContext(tenantContext, optionsBuilder.Options);

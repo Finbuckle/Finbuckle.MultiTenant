@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IdentityDataIsolationSample.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180626024650_Initial")]
+    [Migration("20180629191152_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace IdentityDataIsolationSample.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
+                    b.HasIndex("NormalizedName", "TenantId")
                         .IsUnique()
                         .HasName("RoleNameIndex");
 
@@ -115,7 +115,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
-                    b.HasIndex("NormalizedUserName")
+                    b.HasIndex("NormalizedUserName", "TenantId")
                         .IsUnique()
                         .HasName("UserNameIndex");
 
