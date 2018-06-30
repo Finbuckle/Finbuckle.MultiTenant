@@ -69,7 +69,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 if (multiTenantEntityTypes == null)
                 {
                     multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
+                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 

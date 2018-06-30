@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -105,7 +106,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 if (tenantScopeEntityTypes == null)
                 {
                     tenantScopeEntityTypes = Model.GetEntityTypes().
-                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
+                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 
@@ -124,6 +125,26 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             base.OnModelCreating(builder);
 
             Shared.SetupModel(builder, TenantContext);
+
+            // Adjust "unique" constraints on Username and Rolename.
+            // Consider a more general solution in the future.
+            if(Shared.HasMultiTenantAttribute(typeof(TUser)))
+            {
+                var props = new List<IProperty>(new[] { builder.Entity<TUser>().Metadata.FindProperty("NormalizedUserName") });
+                builder.Entity<TUser>().Metadata.RemoveIndex(props);
+                
+                builder.Entity<TUser>(b =>
+                    b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
+            }
+
+            if(Shared.HasMultiTenantAttribute(typeof(TRole)))
+            {
+                var props = new List<IProperty>(new[] { builder.Entity<TRole>().Metadata.FindProperty("NormalizedName") });
+                builder.Entity<TRole>().Metadata.RemoveIndex(props);
+
+                builder.Entity<TRole>(b =>
+                    b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
+            }            
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
