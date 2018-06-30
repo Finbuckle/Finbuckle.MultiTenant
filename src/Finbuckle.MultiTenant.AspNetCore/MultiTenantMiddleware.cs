@@ -61,10 +61,15 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
                 if (tenantContext == null)
                 {
-                    // Resolve for remote authentication callbacks.
-                    tenantContext = await ResolveForRemoteAuthentication(context);
-                }
+                    var authenticationService = context.RequestServices.GetService<IAuthenticationService>();
 
+                    if (authenticationService != null && authenticationService is MultiTenantAuthenticationService)
+                    {
+                        // Resolve for remote authentication callbacks.
+                        tenantContext = await ResolveForRemoteAuthentication(context);
+                    }
+                }
+                
                 context.Items[Constants.HttpContextTenantContext] = tenantContext;
             }
 
@@ -79,7 +84,15 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             if (router != null)
             {
-                await router.RouteAsync(new RouteContext(context)).ConfigureAwait(false);
+                var routeContext = new RouteContext(context);
+                await router.RouteAsync(routeContext).ConfigureAwait(false);
+                if (routeContext.Handler != null)
+                {
+                    context.Features[typeof(IRoutingFeature)] = new RoutingFeature()
+                    {
+                        RouteData = routeContext.RouteData
+                    };
+                }
             }
 
             return await resolver.ResolveAsync(context).ConfigureAwait(false);
