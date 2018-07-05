@@ -109,6 +109,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
             services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
+            services.TryAddSingleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>();
+
             return this;
         }
 

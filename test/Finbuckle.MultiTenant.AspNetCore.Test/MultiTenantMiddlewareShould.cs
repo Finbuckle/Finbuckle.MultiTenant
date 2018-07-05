@@ -61,8 +61,6 @@ public class MultiTenantMiddlewareShould
         var services = new ServiceCollection();
         services.AddAuthentication();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
-        services.AddTransient<IAuthenticationHandlerProvider, AuthenticationHandlerProvider>();
-        services.AddTransient<IAuthenticationSchemeProvider, AuthenticationSchemeProvider>();
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);
@@ -73,5 +71,54 @@ public class MultiTenantMiddlewareShould
 
         var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
         Assert.Null(resolveTenantContext);
+    }
+
+    internal class NullStrategy : IMultiTenantStrategy
+    {
+        public string GetIdentifier(object context)
+        {
+           return null;
+        }
+    }
+
+    [Fact]
+    public void HandleRemoteAuthenticationResolutionIfUsingWithRemoteAuthentication()
+    {
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>().WithRemoteAuthentication();
+        
+        // Substitute in the mock...
+        services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
+        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
+        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        var sp = services.BuildServiceProvider();
+
+        var mock = CreateHttpContextMock(sp);
+        var context = mock.Object;
+        
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+        remoteResolverMock.Verify(r => r.GetIdentifier(context));
+    }
+
+    [Fact]
+    public void SkipRemoteAuthenticationResolutionIfNotUsingWithRemoteAuthentication()
+    {
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>();
+        
+        // Add in the mock...
+        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
+        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        var sp = services.BuildServiceProvider();
+
+        var mock = CreateHttpContextMock(sp);
+        var context = mock.Object;
+        
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+        remoteResolverMock.Verify(r => r.GetIdentifier(context), Times.Never);
     }
 }
