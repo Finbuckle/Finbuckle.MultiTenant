@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    var tenantContext = Context.GetTenantContext();
+}
+
+@using Finbuckle.MultiTenant.AspNetCore
+
+<div class="row">
+    <div class="col">
+        @if (tenantContext != null)
+        {
+            <p class="mt-4 lead">TenantContext Details</p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                    <td>@nameof(tenantContext.Id)</td>
+                    <td>@tenantContext.Id</td>
+                    </tr>
+                    <tr>
+                    <td>@nameof(tenantContext.Identifier)</td>
+                    <td>@tenantContext.Identifier</td>
+                    </tr>
+                    <tr>
+                    <td>@nameof(tenantContext.Name)</td>
+                    <td>@tenantContext.Name</td>
+                    </tr>
+                    <tr>
+                    <td>@nameof(tenantContext.ConnectionString)</td>
+                    <td>@tenantContext.ConnectionString</td>
+                    </tr>
+                    <tr>
+                    <td>@nameof(tenantContext.MultiTenantStrategyType)</td>
+                    <td>@tenantContext.MultiTenantStrategyType</td>
+                    </tr>
+                    <tr>
+                    <td>@nameof(tenantContext.MultiTenantStoreType)</td>
+                    <td>@tenantContext.MultiTenantStoreType</td>
+                    </tr>
+                </tbody>
+            
+            </table>
+        
+        }
+        else
+        {
+            <p>This sample demonstrates Finbuckle.MultiTenant support for ASP.NET Core Identity</p>
+            <p>
+                Select a link from the navbar to change the current tenant. You can register, login, logout,
+                and manage account via the default Identity UI within eacb tenant.
+            </p>
+            <p>
+                The Fibuckle and MegaCorp tenants share a common SQLite database, but Initech has its own separate datasebase.
+                Both of these databases need to be created by applying the latest migration via <em>dotnet ef database update</em> or similar.
+                To apply the migration to each database adjust the connection string used in the <em>Data/DesignTimeFactoy.cs</em> file in
+                between migrations.
+            </p>
+        }
+    </div>
+</div>

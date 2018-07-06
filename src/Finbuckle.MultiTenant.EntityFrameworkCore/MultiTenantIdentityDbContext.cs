@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -28,30 +29,70 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
+    public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    {
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        {
+        }
+    }
+
     /// <summary>
     /// A database context compatiable with Identity that enforces tenant integrity on entity types
     /// marked with the <c>MultiTenant</c> attribute.
     /// </summary>
-    public class MultiTenantIdentityDbContext<TUser> : IdentityDbContext<TUser> where TUser : IdentityUser
+    public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
+        where TUser : MultiTenantIdentityUser
     {
-        internal readonly TenantContext tenantContext;
-        
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        {
+        }
+    }
+
+    public class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
+        where TUser : MultiTenantIdentityUser<TKey>
+        where TRole : MultiTenantIdentityRole<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        protected MultiTenantIdentityDbContext()
+        {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        {
+        }
+    }
+
+    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
+        where TUserClaim : IdentityUserClaim<TKey>
+        where TUserRole : IdentityUserRole<TKey>
+        where TUserLogin : IdentityUserLogin<TKey>
+        where TRoleClaim : IdentityRoleClaim<TKey>
+        where TUserToken : IdentityUserToken<TKey>
+        where TKey : IEquatable<TKey>
+    {
+        protected internal TenantContext TenantContext { get; protected set; }
+
         private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
 
-        protected string ConnectionString => tenantContext.ConnectionString;
-
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
-        {
-            this.tenantContext = tenantContext;
-        }
-
-        protected MultiTenantIdentityDbContext(string connectionString, DbContextOptions options) : base(options)
-        {
-            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
-        }
+        protected string ConnectionString => TenantContext.ConnectionString;
 
         protected MultiTenantIdentityDbContext()
         {
+        }
+
+        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        {
+            this.TenantContext = tenantContext;
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -65,7 +106,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 if (tenantScopeEntityTypes == null)
                 {
                     tenantScopeEntityTypes = Model.GetEntityTypes().
-                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
+                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 
@@ -83,7 +124,27 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, tenantContext);
+            Shared.SetupModel(builder, TenantContext);
+
+            // Adjust "unique" constraints on Username and Rolename.
+            // Consider a more general solution in the future.
+            if(Shared.HasMultiTenantAttribute(typeof(TUser)))
+            {
+                var props = new List<IProperty>(new[] { builder.Entity<TUser>().Metadata.FindProperty("NormalizedUserName") });
+                builder.Entity<TUser>().Metadata.RemoveIndex(props);
+                
+                builder.Entity<TUser>(b =>
+                    b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
+            }
+
+            if(Shared.HasMultiTenantAttribute(typeof(TRole)))
+            {
+                var props = new List<IProperty>(new[] { builder.Entity<TRole>().Metadata.FindProperty("NormalizedName") });
+                builder.Entity<TRole>().Metadata.RemoveIndex(props);
+
+                builder.Entity<TRole>(b =>
+                    b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
+            }            
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -92,7 +153,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -111,7 +172,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

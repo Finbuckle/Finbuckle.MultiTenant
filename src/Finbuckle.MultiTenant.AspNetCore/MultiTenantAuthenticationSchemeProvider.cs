@@ -156,7 +156,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 {
                     throw new InvalidOperationException("Scheme already exists: " + scheme.Name);
                 }
-                if (scheme.HandlerType is IAuthenticationRequestHandler)
+                if (typeof(IAuthenticationRequestHandler).IsAssignableFrom(scheme.HandlerType))
                 {
                     _requestHandlers.Add(scheme);
                 }

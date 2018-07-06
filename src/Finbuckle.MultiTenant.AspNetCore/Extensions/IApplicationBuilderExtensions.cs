@@ -43,12 +43,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same <c>IApplicationBuilder</c> passed into the method.</returns>
         public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder, Action<IRouteBuilder> configRoute)
         {
-            var rb = new RouteBuilder(builder, new MultiTenantRouteHandler());
+            var routeHandler = new RouteHandler(context => null);
+            var rb = new RouteBuilder(builder, routeHandler);
             configRoute(rb);
 
             // insert attribute based routes 
             rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(builder.ApplicationServices));
-
+            
             var routes = rb.Build();
 
             return builder.UseMiddleware<MultiTenantMiddleware>(routes);

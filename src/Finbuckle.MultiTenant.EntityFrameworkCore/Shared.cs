@@ -66,7 +66,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         internal static void SetupModel(ModelBuilder modelBuilder, TenantContext tenantContext)
         {
             foreach (var t in modelBuilder.Model.GetEntityTypes().
-                Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null))
+                Where(t => HasMultiTenantAttribute(t.ClrType)))
+                
             {
                 var r = modelBuilder.Entity(t.ClrType);
 
@@ -102,6 +103,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
         }
 
+        internal static bool HasMultiTenantAttribute(Type t)
+        {
+            return t.GetCustomAttribute<MultiTenantAttribute>() != null;
+        }
+
         /// <summary>
         /// Checks the <c>TenantId</c> on entities taking into account
         /// the <c>tenantNotSetMode</c> and the <c>tenantMismatchMode</c>.
@@ -123,7 +129,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             var changedMultiTenantEntities = changeTracker.Entries().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted).
-                Where(e => e.Entity.GetType().GetCustomAttribute<MultiTenantAttribute>() != null);
+                Where(e => Shared.HasMultiTenantAttribute(e.Entity.GetType()));
 
             // ensure tenant context is valid
             if (changedMultiTenantEntities.Any())
