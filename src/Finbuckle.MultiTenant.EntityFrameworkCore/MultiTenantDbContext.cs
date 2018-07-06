@@ -32,26 +32,26 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     /// </summary>
     public class MultiTenantDbContext : DbContext
     {
-        internal readonly TenantContext tenantContext;
+        protected internal TenantContext TenantContext { get; protected set; }
         
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
-        protected string ConnectionString => tenantContext.ConnectionString;
+        protected string ConnectionString => TenantContext.ConnectionString;
 
         protected MultiTenantDbContext(TenantContext tenantContext)
         {
-            this.tenantContext = tenantContext;
+            this.TenantContext = tenantContext;
         }
         
         protected MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
         {
-            this.tenantContext = tenantContext;
+            this.TenantContext = tenantContext;
         }
 
         [Obsolete("This constructor is obsolete and will be removed in future versions.")]
         protected MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
         {
-            tenantContext = new TenantContext(null, null, null, connectionString, null, null);
+            TenantContext = new TenantContext(null, null, null, connectionString, null, null);
         }
 
         protected MultiTenantDbContext()
@@ -69,7 +69,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 if (multiTenantEntityTypes == null)
                 {
                     multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => t.ClrType.GetCustomAttribute<MultiTenantAttribute>() != null).
+                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 
@@ -85,7 +85,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, tenantContext);
+            Shared.SetupModel(modelBuilder, TenantContext);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -94,7 +94,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -113,7 +113,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(tenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

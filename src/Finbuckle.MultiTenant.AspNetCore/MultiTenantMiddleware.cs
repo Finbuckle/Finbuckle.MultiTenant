@@ -55,105 +55,55 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (!context.Items.ContainsKey(Constants.HttpContextTenantContext))
             {
                 context.Items.Add(Constants.HttpContextTenantContext, null);
+                await HandleRouting(context);
 
-                // Resolve normally.
-                var tenantContext = await ResolveAsync(context);
+                // Try the registered strategy.
+                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
+                var identifier = strategy.GetIdentifier(context);
+                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
 
-                if (tenantContext == null)
+                TenantContext tenantContext = null;
+                if (identifier != null)
                 {
-                    // Resolve for remote authentication callbacks.
-                    tenantContext = await ResolveForRemoteAuthentication(context);
+                    tenantContext = await store.GetByIdentifierAsync(identifier);
+                }
+
+                // Resolve for remote authentication callbacks if applicable.
+                if (tenantContext == null &&
+                    context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
+                {
+                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
+                    identifier = strategy.GetIdentifier(context);
+
+                    if (identifier != null)
+                    {
+                        tenantContext = await store.GetByIdentifierAsync(identifier);
+                    }
                 }
 
                 context.Items[Constants.HttpContextTenantContext] = tenantContext;
             }
 
             if (next != null)
+            {
                 await next(context);
+            }
         }
 
-        private async Task<TenantContext> ResolveAsync(HttpContext context)
+        private async Task HandleRouting(HttpContext context)
         {
-            var sp = context.RequestServices;
-            var resolver = sp.GetRequiredService<TenantResolver>();
-
             if (router != null)
             {
-                await router.RouteAsync(new RouteContext(context)).ConfigureAwait(false);
-            }
-
-            return await resolver.ResolveAsync(context).ConfigureAwait(false);
-        }
-
-        private static async Task<TenantContext> ResolveForRemoteAuthentication(HttpContext context)
-        {
-            var schemes = context.RequestServices.GetService<IAuthenticationSchemeProvider>();
-            var handlers = context.RequestServices.GetService<IAuthenticationHandlerProvider>();
-
-            foreach (var scheme in await schemes.GetRequestHandlerSchemesAsync())
-            {
-                // Check to see if this handler would apply and resolve tenant context if so.
-                // Hanlders have a method, ShouldHandleAsync, which would be nice here, but it causes issues
-                // with caching.
-                // Workaround is to copy the logic from ShouldHandleAsync which requires instantiating options the hard way.
-
-                var optionType = scheme.HandlerType.GetProperty("Options").PropertyType;
-                var optionsFactoryType = typeof(IOptionsFactory<>).MakeGenericType(optionType);
-                var optionsFactory = context.RequestServices.GetRequiredService(optionsFactoryType);
-                var options = optionsFactoryType.GetMethod("Create").Invoke(optionsFactory, new[] { scheme.Name }) as RemoteAuthenticationOptions;
-
-                if (options.CallbackPath == context.Request.Path)
+                var routeContext = new RouteContext(context);
+                await router.RouteAsync(routeContext).ConfigureAwait(false);
+                if (routeContext.Handler != null)
                 {
-                    // Skip if this is not a compatible type of authentication.
-                    if (!(options is OAuthOptions || options is OpenIdConnectOptions))
+                    context.Features[typeof(IRoutingFeature)] = new RoutingFeature()
                     {
-                        continue;
-                    }
-
-                    try
-                    {
-                        string state = null;
-
-                        if (string.Equals(context.Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
-                        {
-                            state = context.Request.Query["state"];
-                        }
-                        else if (string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
-                            && !string.IsNullOrEmpty(context.Request.ContentType)
-                            && context.Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)
-                            && context.Request.Body.CanRead)
-                        {
-                            var formOptions = new FormOptions { BufferBody = true };
-                            var form = await context.Request.ReadFormAsync(formOptions);
-                            state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
-                        }
-
-                        var oAuthOptions = options as OAuthOptions;
-                        var openIdConnectOptions = options as OpenIdConnectOptions;
-
-                        var properties = oAuthOptions?.StateDataFormat.Unprotect(state) ??
-                                     openIdConnectOptions?.StateDataFormat.Unprotect(state);
-
-                        if (properties.Items.Keys.Contains("tenantIdentifier"))
-                        {
-                            var tenantIdentifier = properties.Items["tenantIdentifier"];
-
-                            var strategy = new StaticMultiTenantStrategy(tenantIdentifier);
-                            var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
-                            var resolver = new TenantResolver(store, strategy);
-
-                            return await resolver.ResolveAsync(context);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MultiTenantException("Error occurred resolving tenant for remote authentication.", e);
-                    }
-
+                        RouteData = routeContext.RouteData
+                    };
                 }
             }
-
-            return null;
         }
     }
 }
