@@ -8,8 +8,8 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
-    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="1.2.0" /> -->
-    <ProjectReference Include="../../src/*/*.csproj" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="1.2.0" />
+    <!-- <ProjectReference Include="../../src/*/*.csproj" /> -->
   </ItemGroup>
 
 </Project>
