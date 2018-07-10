@@ -72,7 +72,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 if (tenantContext == null &&
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
-                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
+                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationMultiTenantStrategy>();
                     identifier = strategy.GetIdentifier(context);
 
                     if (identifier != null)

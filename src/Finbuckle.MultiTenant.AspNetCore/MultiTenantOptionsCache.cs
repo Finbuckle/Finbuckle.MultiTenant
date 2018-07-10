@@ -26,16 +26,14 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     public class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
-        private readonly Action<TOptions, TenantContext> tenantConfig;
         private readonly ITenantContextAccessor tenantContextAccessor;
 
         // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        public MultiTenantOptionsCache(ITenantContextAccessor tenantContextAccessor, Action<TOptions, TenantContext> tenantConfig)
+        public MultiTenantOptionsCache(ITenantContextAccessor tenantContextAccessor)
         {
-            this.tenantConfig = tenantConfig ?? throw new ArgumentNullException(nameof(tenantConfig));
             this.tenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
 
@@ -68,7 +66,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
             name = name ?? Options.DefaultName;
 
             var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor?.TenantContext.Id, name);
-            //AdjustOptions(options, tenantContext?.Id);
 
             if (base.TryAdd(adjustedOptionsName, options))
             {
@@ -111,7 +108,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         }
 
         /// <summary>
-        /// Concatenates a perfix string to the options name string.
+        /// Concatenates a prefix string to the options name string.
         /// </summary>
         /// <remarks>
         /// If the prefix is null, an empty string is used. If name is null, the Options.DefaultName is used.
@@ -150,7 +147,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             var options = createOptions();
-            //AdjustOptions(options, CurrentTenantContext?.Id);
             CacheAdjustedOptionsName(optionsName, adjustedOptionsName);
 
             return options;
@@ -165,18 +161,5 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             _adjustedOptionsNames.GetOrAdd(optionsName, new ConcurrentDictionary<string, object>()).TryAdd(adjustedOptionsName, null);
         }
-
-        /// <summary>
-        /// Adjust the options by running the configured action.
-        /// </summary>
-        /// <param name="options"></param>
-        /// <param name="tenantSubstitution"></param>
-        // private void AdjustOptions(TOptions options, string tenantSubstitution)
-        // {
-        //     if (tenantContext != null)
-        //     {
-        //         tenantConfig(options, tenantContext);
-        //     }
-        // }
     }
 }
