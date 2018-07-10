@@ -71,14 +71,14 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 throw new ArgumentNullException(nameof(tenantConfig));
             }
 
-            // Handles IOptionsMonitor case.
+            // Handles multiplexing cached options.
             services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
                     return (MultiTenantOptionsCache<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
                 });
 
-            // Necessary to apply tenant optios in between configuratio and postconfiguration
+            // Necessary to apply tenant options in between configuration and postconfiguration
             services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
             {
                 return (IOptionsFactory<TOptions>)ActivatorUtilities.
@@ -94,7 +94,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp, Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
         {
-            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
             return (MultiTenantOptionsManager<TOptions>)
                 ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { cache });
         }
@@ -109,7 +109,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
-            services.TryAddSingleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>();
+            services.TryAddSingleton<IRemoteAuthenticationMultiTenantStrategy, RemoteAuthenticationMultiTenantStrategy>();
 
             return this;
         }

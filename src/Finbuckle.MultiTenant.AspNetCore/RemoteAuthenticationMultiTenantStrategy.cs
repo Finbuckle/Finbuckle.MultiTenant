@@ -27,11 +27,11 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
-    public interface IRemoteAuthenticationStrategy
+    public interface IRemoteAuthenticationMultiTenantStrategy
     {
     }
 
-    public class RemoteAuthenticationStrategy : IMultiTenantStrategy, IRemoteAuthenticationStrategy
+    public class RemoteAuthenticationMultiTenantStrategy : IMultiTenantStrategy, IRemoteAuthenticationMultiTenantStrategy
     {
         public virtual string GetIdentifier(object context)
         {
@@ -46,24 +46,26 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             foreach (var scheme in schemes.GetRequestHandlerSchemesAsync().Result)
             {
-                // Check to see if this handler would apply and resolve tenant context if so.
-                // Handlers have a method, ShouldHandleRequestAsync, which would be nice here, but it instantiaties
-                // the handler and hence its options (which we should't instantiate without knowing the tenant...)
-                // Workaround is to copy the logic from ShouldHandleRequestAsync which requires instantiating options the hard way.
-
                 var optionType = scheme.HandlerType.GetProperty("Options").PropertyType;
-                var optionsFactoryType = typeof(IOptionsFactory<>).MakeGenericType(optionType);
-                var optionsFactory = httpContext.RequestServices.GetRequiredService(optionsFactoryType);
-                var options = optionsFactoryType.GetMethod("Create").Invoke(optionsFactory, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+                
+                // Skip if this is not a compatible type of authentication.
+                if (!typeof(OAuthOptions).IsAssignableFrom(optionType) &&
+                    !typeof(OpenIdConnectOptions).IsAssignableFrom(optionType))
+                {
+                    continue;
+                }
 
+                // RequestHandlers have a method, ShouldHandleRequestAsync, which would be nice here,
+                // but instantiating the handler internally caches an Options instance... which is bad because
+                // we don't know the tenant yet. Thus we will get the Options ourselves with reflection,
+                // and replicate the ShouldHandleRequestAsync logic.
+
+                var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionType);
+                var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
+                var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+                
                 if (options.CallbackPath == httpContext.Request.Path)
                 {
-                    // Skip if this is not a compatible type of authentication.
-                    if (!(options is OAuthOptions || options is OpenIdConnectOptions))
-                    {
-                        continue;
-                    }
-
                     try
                     {
                         string state = null;
@@ -73,8 +75,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                             state = httpContext.Request.Query["state"];
                         }
                         else if (string.Equals(httpContext.Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
-                            && !string.IsNullOrEmpty(httpContext.Request.ContentType)
-                            && httpContext.Request.ContentType.StartsWith("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase)
+                            && httpContext.Request.HasFormContentType
                             && httpContext.Request.Body.CanRead)
                         {
                             var formOptions = new FormOptions { BufferBody = true };
@@ -86,7 +87,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                         var openIdConnectOptions = options as OpenIdConnectOptions;
 
                         var properties = oAuthOptions?.StateDataFormat.Unprotect(state) ??
-                                     openIdConnectOptions?.StateDataFormat.Unprotect(state);
+                                         openIdConnectOptions?.StateDataFormat.Unprotect(state);
 
                         if (properties.Items.Keys.Contains("tenantIdentifier"))
                         {
