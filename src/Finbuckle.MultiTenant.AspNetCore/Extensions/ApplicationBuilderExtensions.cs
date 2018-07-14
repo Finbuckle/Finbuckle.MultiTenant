@@ -21,12 +21,12 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Extension methods for using <c>Finbuckle.MultiTenant.AspNetCore</c>.
     /// </summary>
-    public static class IApplicationBuilderExtensions
+    public static class ApplicationBuilderExtensions
     {
         /// <summary>
         /// Use <c>Finbuckle.MultiTenant</c> middleware in processing the request.

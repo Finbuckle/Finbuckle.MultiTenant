@@ -14,8 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant;
 
 internal class TestStore : IMultiTenantStore
 {

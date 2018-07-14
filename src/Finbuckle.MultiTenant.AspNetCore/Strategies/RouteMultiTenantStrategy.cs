@@ -13,14 +13,12 @@
 //    limitations under the License.
 
 using System;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant.Strategies
 {
     public class RouteMultiTenantStrategy : IMultiTenantStrategy
     {

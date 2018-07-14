@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Marks a class as multitenant when used with a database context

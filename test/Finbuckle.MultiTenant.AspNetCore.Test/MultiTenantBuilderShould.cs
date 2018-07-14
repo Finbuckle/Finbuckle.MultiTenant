@@ -13,20 +13,16 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Reflection;
 using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Strategies;
 
 public class MultiTenantBuilderShould
 {

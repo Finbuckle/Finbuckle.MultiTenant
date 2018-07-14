@@ -14,8 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using Finbuckle.MultiTenant.Core;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Contains information for a specific tenant.

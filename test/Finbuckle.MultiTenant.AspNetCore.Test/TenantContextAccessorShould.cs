@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System.Collections.Generic;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;

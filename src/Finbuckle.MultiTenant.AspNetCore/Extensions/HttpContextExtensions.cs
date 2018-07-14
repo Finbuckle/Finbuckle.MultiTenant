@@ -14,10 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// <c>Finbuckle.MultiTenant.AspNetCore</c> extensions to <c>HttpContext</c>.

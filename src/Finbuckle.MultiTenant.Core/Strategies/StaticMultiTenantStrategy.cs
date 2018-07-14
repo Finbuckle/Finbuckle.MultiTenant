@@ -12,12 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant.Strategies
 {
     /// <summary>
     /// <c>IMultiTenantResolverStrategy</c> implementation that always resolves the same identifier.

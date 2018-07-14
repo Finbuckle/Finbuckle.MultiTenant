@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Finbuckle.MultiTenant.Core.Abstractions
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// The interface for determining the tenant idenfitider.

@@ -15,6 +15,7 @@
 using System;
 using System.Data.Common;
 using System.Linq;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;

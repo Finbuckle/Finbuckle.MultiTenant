@@ -12,12 +12,27 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Core;
-
 namespace Finbuckle.MultiTenant
 {
-    public interface ITenantContextAccessor
+
+    /// <summary>
+    /// Determines how entities where <c>TenantId</c> does not match the <c>TenantContext</c> are handled
+    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// </summary>
+    public enum TenantMismatchMode
     {
-        TenantContext TenantContext { get; }
+        Throw,
+        Ignore,
+        Overwrite
+    }
+
+    /// <summary>
+    /// Determines how entities with null <c>TenantId</c> are handled
+    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// </summary>
+    public enum TenantNotSetMode
+    {
+        Throw,
+        Overwrite
     }
 }
