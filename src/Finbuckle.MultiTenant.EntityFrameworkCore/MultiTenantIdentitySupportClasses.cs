@@ -15,7 +15,7 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     [MultiTenant]
     public class MultiTenantIdentityUser : MultiTenantIdentityUser<string>
