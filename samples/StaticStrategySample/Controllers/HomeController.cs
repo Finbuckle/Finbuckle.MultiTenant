@@ -1,4 +1,4 @@
-﻿using Finbuckle.MultiTenant.AspNetCore;
+﻿using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StaticStrategySample.Controllers

@@ -1,7 +1,7 @@
 ﻿using System;
 using DataIsolationSample.Data;
 using DataIsolationSample.Models;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

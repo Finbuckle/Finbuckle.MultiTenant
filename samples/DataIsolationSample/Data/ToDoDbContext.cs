@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using DataIsolationSample.Models;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

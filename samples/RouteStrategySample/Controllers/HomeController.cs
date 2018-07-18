@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RouteStrategySample.Controllers

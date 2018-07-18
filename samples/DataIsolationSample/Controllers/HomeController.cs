@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using DataIsolationSample.Data;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using DataIsolationSample.Models;

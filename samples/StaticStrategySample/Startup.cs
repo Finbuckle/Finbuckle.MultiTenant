@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,8 @@ namespace StaticStrategySample
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMultiTenant();
 
             app.UseMvcWithDefaultRoute();
         }
