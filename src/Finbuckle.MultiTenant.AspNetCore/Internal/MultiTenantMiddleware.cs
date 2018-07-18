@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
@@ -72,6 +73,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     }
                 }
 
+                if(tenantContext != null)
+                {
+                    tenantContext = AddStrategyAndStoreToTenantContext(tenantContext, strategy.GetType(), store.GetType());
+                }
+
                 context.Items[Constants.HttpContextTenantContext] = tenantContext;
             }
 
@@ -79,6 +85,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
             {
                 await next(context);
             }
+        }
+
+        private TenantContext AddStrategyAndStoreToTenantContext(TenantContext tc, Type strategy, Type store)
+        {
+            return new TenantContext(tc.Id, tc.Identifier, tc.Name, tc.ConnectionString, strategy, store);
         }
 
         private async Task HandleRouting(HttpContext context)

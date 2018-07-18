@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,7 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void ResolveTenantRequest()
+    public void ResolveTenant()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
@@ -51,6 +52,44 @@ public class MultiTenantMiddlewareShould
 
         var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
         Assert.Equal("initech", resolveTenantContext.Id);
+    }
+
+    [Fact]
+    public void SetStrategyType()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+        var tc = new TenantContext("initech", "initech", null, null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
+        Assert.Equal("initech", resolveTenantContext.Id);
+        Assert.Equal(typeof(StaticMultiTenantStrategy), resolveTenantContext.MultiTenantStrategyType);
+    }
+
+    [Fact]
+    public void SetStoreType()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+        var tc = new TenantContext("initech", "initech", null, null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
+        Assert.Equal("initech", resolveTenantContext.Id);
+        Assert.Equal(typeof(InMemoryMultiTenantStore), resolveTenantContext.MultiTenantStoreType);
     }
 
     [Fact]
