@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class RouteMultiTenantStrategy : IMultiTenantStrategy
     {
-        private readonly string tenantParam;
+        internal readonly string tenantParam;
         private readonly ILogger<RouteMultiTenantStrategy> logger;
 
         public RouteMultiTenantStrategy(string tenantParam) : this(tenantParam, null)

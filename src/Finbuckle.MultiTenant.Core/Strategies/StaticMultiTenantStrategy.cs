@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.Strategies
     /// </summary>
     public class StaticMultiTenantStrategy : IMultiTenantStrategy
     {
-        private readonly string identifier;
+        internal readonly string identifier;
         private readonly ILogger<StaticMultiTenantStrategy> logger;
 
         public StaticMultiTenantStrategy(string identifier) : this(identifier, null)

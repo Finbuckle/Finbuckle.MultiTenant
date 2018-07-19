@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using System;
-using System.Reflection;
+//using System.Reflection;
 using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -219,13 +219,9 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>() as StaticMultiTenantStrategy;
         Assert.IsType<StaticMultiTenantStrategy>(resolver);
-
-        var tenantId = (string)resolver.GetType().
-            GetField("identifier", BindingFlags.Instance | BindingFlags.NonPublic).
-            GetValue(resolver);
-        Assert.Equal("initech", tenantId);
+        Assert.Equal("initech", resolver.identifier);
     }
 
     [Fact]
@@ -273,13 +269,9 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithRouteStrategy("routeParam");
         var sp = services.BuildServiceProvider();
 
-        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>() as RouteMultiTenantStrategy;
         Assert.IsType<RouteMultiTenantStrategy>(strategy);
-
-        var tenantParam = (string)strategy.GetType().
-            GetField("tenantParam", BindingFlags.Instance | BindingFlags.NonPublic).
-            GetValue(strategy);
-        Assert.Equal("routeParam", tenantParam);
+        Assert.Equal("routeParam", strategy.tenantParam);
     }
 
     [Fact]
