@@ -22,7 +22,7 @@ namespace RouteStrategySample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
-                WithRouteStrategy();
+                WithRouteStrategy(ConfigRoutes);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -32,8 +32,8 @@ namespace RouteStrategySample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMultiTenant(ConfigRoutes);
-
+            app.UseStaticFiles();
+            app.UseMultiTenant();
             app.UseMvc(ConfigRoutes);
         }
 

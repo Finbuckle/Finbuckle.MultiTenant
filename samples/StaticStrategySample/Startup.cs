@@ -31,8 +31,8 @@ namespace StaticStrategySample
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
             app.UseMultiTenant();
-
             app.UseMvcWithDefaultRoute();
         }
     }

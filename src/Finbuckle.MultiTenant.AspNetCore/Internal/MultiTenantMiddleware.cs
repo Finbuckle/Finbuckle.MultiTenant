@@ -12,12 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.AspNetCore
@@ -28,17 +26,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
     public class MultiTenantMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly IRouter router;
 
         public MultiTenantMiddleware(RequestDelegate next)
         {
             this.next = next;
-        }
-
-        public MultiTenantMiddleware(RequestDelegate next, IRouter router)
-        {
-            this.next = next;
-            this.router = router;
         }
 
         public async Task Invoke(HttpContext context)
@@ -47,7 +38,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (!context.Items.ContainsKey(Constants.HttpContextTenantContext))
             {
                 context.Items.Add(Constants.HttpContextTenantContext, null);
-                await HandleRouting(context);
 
                 // Try the registered strategy.
                 var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
@@ -85,22 +75,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (next != null)
             {
                 await next(context);
-            }
-        }
-
-        private async Task HandleRouting(HttpContext context)
-        {
-            if (router != null)
-            {
-                var routeContext = new RouteContext(context);
-                await router.RouteAsync(routeContext).ConfigureAwait(false);
-                if (routeContext.Handler != null)
-                {
-                    context.Features[typeof(IRoutingFeature)] = new RoutingFeature()
-                    {
-                        RouteData = routeContext.RouteData
-                    };
-                }
             }
         }
     }

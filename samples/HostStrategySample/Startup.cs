@@ -31,8 +31,8 @@ namespace HostStrategySample
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
             app.UseMultiTenant();
-
             app.UseMvc(routes => routes.MapRoute("Defaut", "{controller=Home}/{action=Index}"));
         }
     }

@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authentication;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
+using Microsoft.AspNetCore.Builder;
 
 public class MultiTenantBuilderShould
 {
@@ -266,7 +267,7 @@ public class MultiTenantBuilderShould
     public void AddRouteStrategy()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithRouteStrategy("routeParam");
+        services.AddMultiTenant().WithRouteStrategy("routeParam", cr => cr.MapRoute("test", "test"));
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>() as RouteMultiTenantStrategy;

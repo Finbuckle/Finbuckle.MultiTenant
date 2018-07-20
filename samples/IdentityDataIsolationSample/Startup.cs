@@ -52,7 +52,7 @@ namespace IdentityDataIsolationSample
                 });
 
             services.AddMultiTenant()
-                .WithRouteStrategy()
+                .WithRouteStrategy(ConfigRoutes)
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore"))
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantContext) =>
                {
@@ -74,7 +74,7 @@ namespace IdentityDataIsolationSample
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMultiTenant(ConfigRoutes);
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

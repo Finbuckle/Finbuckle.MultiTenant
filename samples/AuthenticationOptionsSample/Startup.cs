@@ -50,7 +50,7 @@ namespace AuthenticationOptionsSample
 
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
-                WithRouteStrategy().
+                WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantContext) =>
                 {
@@ -106,10 +106,9 @@ namespace AuthenticationOptionsSample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMultiTenant(ConfigRoutes);
-
+            app.UseStaticFiles();
+            app.UseMultiTenant();
             app.UseAuthentication();
-
             app.UseMvc(ConfigRoutes);
         }
 

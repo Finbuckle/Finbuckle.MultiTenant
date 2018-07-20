@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authentication;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Strategies;
 using Finbuckle.MultiTenant.Stores;
+using Microsoft.AspNetCore.Routing;
 
 namespace Finbuckle.MultiTenant
 {
@@ -266,22 +267,22 @@ namespace Finbuckle.MultiTenant
         /// Adds and configures a <c>RouteMultiTenantStrategy</c> with a route parameter "__tenant__" to the application.
         /// </summary>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithRouteStrategy()
-            => WithRouteStrategy("__tenant__");
+        public MultiTenantBuilder WithRouteStrategy(Action<IRouteBuilder> configRoutes)
+            => WithRouteStrategy("__tenant__", configRoutes);
 
         /// <summary>
         /// Adds and configures a <c>RouteMultiTenantStrategy</c> to the application.
         /// </summary>
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithRouteStrategy(string tenantParam)
+        public MultiTenantBuilder WithRouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
                 throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
             }
 
-            return WithStrategy(sp => new RouteMultiTenantStrategy(tenantParam, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
+            return WithStrategy(sp => new RouteMultiTenantStrategy(tenantParam, configRoutes, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
         }
 
         /// <summary>
