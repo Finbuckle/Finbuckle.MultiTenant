@@ -280,7 +280,17 @@ public class MultiTenantBuilderShould
     {
         var services = new ServiceCollection();
         Assert.Throws<ArgumentException>(()
+            => services.AddMultiTenant().WithRouteStrategy(null, rb => rb.GetType()));
+    }
+
+    [Fact]
+    public void ThrowIfNullRouteConfigAddingRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(()
             => services.AddMultiTenant().WithRouteStrategy(null));
+        Assert.Throws<ArgumentNullException>(()
+            => services.AddMultiTenant().WithRouteStrategy("param", null));
     }
 
     [Fact]

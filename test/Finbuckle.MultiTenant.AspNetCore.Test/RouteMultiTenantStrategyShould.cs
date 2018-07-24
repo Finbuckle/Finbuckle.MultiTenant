@@ -14,12 +14,17 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
@@ -30,39 +35,45 @@ public class RouteMultiTenantStrategyShould
         routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
     }
 
-    // private HttpContext CreateHttpContextMock(string tenantParam, string routeValue)
-    // {
-    //     var routeData = new RouteData();
-    //     routeData.Values.Add(tenantParam, routeValue);
-    //     var mockFeature = new Mock<IRoutingFeature>();
-    //     mockFeature.Setup(f => f.RouteData).Returns(routeData);
+    [Theory]
+    [InlineData("/initech", "initech", "initech")]
+    [InlineData("/", "initech", "")]
+    public async Task ReturnExpectedIdentifier(string path, string identifier, string expected)
+    {
+        Action<IRouteBuilder> configRoutes = (IRouteBuilder rb) => rb.MapRoute("testRoute", "{__tenant__}");
+        IWebHostBuilder hostBuilder = GetTestHostBuilder(identifier, configRoutes);
 
-    //     var mock = new Mock<HttpContext>();
-    //     mock.Setup(c => c.Features[typeof(IRoutingFeature)]).Returns(mockFeature.Object);
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync(path);
+            Assert.Equal(expected, response);
+        }
+    }
 
-    //     return mock.Object;
-    // }
+    private static IWebHostBuilder GetTestHostBuilder(string identifier, Action<IRouteBuilder> configRoutes)
+    {
+        return new WebHostBuilder()
+                    .ConfigureServices(services =>
+                    {
+                        services.AddMultiTenant().WithRouteStrategy(configRoutes).WithInMemoryStore();
+                        services.AddMvc();
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseMultiTenant();
+                        app.Run(async context =>
+                        {
+                            if (context.GetTenantContext() != null)
+                            {
+                                await context.Response.WriteAsync(context.GetTenantContext().Id);
+                            }
+                        });
 
-    // private HttpContext CreateHttpContextMockWithNoRouteData()
-    // {
-    //     var mock = new Mock<HttpContext>();
-    //     mock.Setup(c => c.Features[typeof(IRoutingFeature)]).Returns(null);
-
-    //     return mock.Object;
-    // }
-
-    // [Theory]
-    // [InlineData("__tenant__", "initech", "initech")] // single path
-    // [InlineData("__tenant__", "Initech", "Initech")] // maintain case
-    // public void ReturnExpectedIdentifier(string tenantParam, string routeValue, string expected)
-    // {
-    //     var httpContext = CreateHttpContextMock(tenantParam, routeValue);
-    //     var strategy = new RouteMultiTenantStrategy(tenantParam, configTestRoute);
-
-    //     var identifier = strategy.GetIdentifier(httpContext);
-
-    //     Assert.Equal(expected, identifier);
-    // }
+                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
+                        store.TryAdd(new TenantContext(identifier, identifier, null, null, null, null));
+                    });
+    }
 
     [Fact]
     public void ThrowIfContextIsNotHttpContext()
@@ -73,27 +84,19 @@ public class RouteMultiTenantStrategyShould
         Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
     }
 
-    // [Fact]
-    // public void ReturnNullIfNoRouteParamMatch()
-    // {
-    //     var httpContext = CreateHttpContextMock("__tenant__", "initech");
+    [Fact]
+    public async Task ReturnNullIfNoRouteParamMatch()
+    {
+        Action<IRouteBuilder> configRoutes = (IRouteBuilder rb) => rb.MapRoute("testRoute", "{controller}");
+        IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant", configRoutes);
 
-    //     var strategy = new RouteMultiTenantStrategy("controller", configTestRoute);
-    //     var identifier = strategy.GetIdentifier(httpContext);
-
-    //     Assert.Null(identifier);
-    // }
-
-    // [Fact]
-    // public void ReturnNullIfNoRouteData()
-    // {
-    //     var httpContext = CreateHttpContextMockWithNoRouteData();
-
-    //     var strategy = new RouteMultiTenantStrategy("__tenant__", configTestRoute);
-    //     var identifier = strategy.GetIdentifier(httpContext);
-
-    //     Assert.Null(identifier);
-    // }
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync("/test_tenant");
+            Assert.Equal("", response);
+        }
+    }
 
     [Theory]
     [InlineData(null)]

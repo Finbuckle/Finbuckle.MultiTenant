@@ -282,6 +282,11 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
             }
 
+            if (configRoutes == null)
+            {
+                throw new ArgumentNullException(nameof(configRoutes));
+            }
+
             return WithStrategy(sp => new RouteMultiTenantStrategy(tenantParam, configRoutes, sp.GetService<ILogger<RouteMultiTenantStrategy>>()));
         }
 
