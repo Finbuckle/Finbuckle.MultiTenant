@@ -81,7 +81,7 @@ public class RouteMultiTenantStrategyShould
         var context = new Object();
         var strategy = new RouteMultiTenantStrategy("__tenant__", configTestRoute);
 
-        Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
+        Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }
 
     [Fact]

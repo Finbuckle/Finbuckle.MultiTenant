@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
@@ -56,7 +57,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.logger = logger;
         }
 
-        public virtual string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext))
                 throw new MultiTenantException(null,
@@ -82,7 +83,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
-            return identifier;
+            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }
     }
 }

@@ -27,11 +27,11 @@ public class StaticTenantResolverShould
     [InlineData("")] // empty string
     [InlineData("    ")] // whitespace
     [InlineData(null)] // null
-    public void ReturnExpectedIdentifier(string staticIdentifier)
+    public async void ReturnExpectedIdentifier(string staticIdentifier)
     {
         var strategy = new StaticMultiTenantStrategy(staticIdentifier);
 
-        var identifier = strategy.GetIdentifier(new Object());
+        var identifier = await strategy.GetIdentifierAsync(new Object());
 
         Assert.Equal(staticIdentifier, identifier);
     }

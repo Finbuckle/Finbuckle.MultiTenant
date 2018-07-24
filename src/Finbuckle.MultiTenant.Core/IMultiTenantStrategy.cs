@@ -27,6 +27,6 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        string GetIdentifier(object context);
+        Task<string> GetIdentifierAsync(object context);
     }
 }

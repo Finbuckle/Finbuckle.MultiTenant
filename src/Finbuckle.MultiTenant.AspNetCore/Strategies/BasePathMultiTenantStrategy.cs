@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.logger = logger;
         }
 
-        public virtual string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext))
                 throw new MultiTenantException(null,
@@ -52,7 +53,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
-            return identifier;
+            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }
     }
 }

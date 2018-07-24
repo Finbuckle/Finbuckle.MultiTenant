@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -30,7 +31,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
     public class RemoteAuthenticationMultiTenantStrategy : IMultiTenantStrategy, IRemoteAuthenticationMultiTenantStrategy
     {
-        public virtual string GetIdentifier(object context)
+        public async virtual Task<string> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext))
                 throw new MultiTenantException(null,
@@ -76,7 +77,7 @@ namespace Finbuckle.MultiTenant.Strategies
                             && httpContext.Request.Body.CanRead)
                         {
                             var formOptions = new FormOptions { BufferBody = true };
-                            var form = httpContext.Request.ReadFormAsync(formOptions).Result;
+                            var form = await httpContext.Request.ReadFormAsync(formOptions).ConfigureAwait(false);
                             state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
                         }
 

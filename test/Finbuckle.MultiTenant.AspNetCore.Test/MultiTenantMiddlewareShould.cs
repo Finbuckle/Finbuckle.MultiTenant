@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Stores;
@@ -112,9 +113,9 @@ public class MultiTenantMiddlewareShould
 
     internal class NullStrategy : IMultiTenantStrategy
     {
-        public string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
-           return null;
+           return await Task.FromResult<string>(null);
         }
     }
 
@@ -136,7 +137,7 @@ public class MultiTenantMiddlewareShould
         
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifier(context));
+        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context));
     }
 
     [Fact]
@@ -156,6 +157,6 @@ public class MultiTenantMiddlewareShould
         
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifier(context), Times.Never);
+        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context), Times.Never);
     }
 }

@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
@@ -50,7 +51,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.logger = logger;
         }
 
-        public virtual string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext))
                 throw new MultiTenantException(null,
@@ -69,8 +70,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             // Check the route.
             var routeContext = new RouteContext(httpContext);
-            //await router.RouteAsync(routeContext).ConfigureAwait(false);
-            router.RouteAsync(routeContext).Wait();
+            await router.RouteAsync(routeContext).ConfigureAwait(false);
 
             object identifier = null;
             routeContext.RouteData?.Values.TryGetValue(tenantParam, out identifier);
