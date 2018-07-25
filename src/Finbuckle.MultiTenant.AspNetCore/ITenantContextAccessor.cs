@@ -14,7 +14,7 @@
 
 using Finbuckle.MultiTenant.Core;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
     public interface ITenantContextAccessor
     {

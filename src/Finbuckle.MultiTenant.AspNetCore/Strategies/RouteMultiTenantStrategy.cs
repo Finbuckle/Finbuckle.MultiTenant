@@ -14,45 +14,68 @@
 
 using System;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant.Strategies
 {
     public class RouteMultiTenantStrategy : IMultiTenantStrategy
     {
-        private readonly string tenantParam;
+        internal readonly string tenantParam;
+        internal IRouter router;
         private readonly ILogger<RouteMultiTenantStrategy> logger;
+        internal readonly Action<IRouteBuilder> configRoutes;
 
-        public RouteMultiTenantStrategy(string tenantParam) : this(tenantParam, null)
+        public RouteMultiTenantStrategy(string tenantParam, Action<IRouteBuilder> configRoutes) : this(tenantParam, configRoutes, null)
         {
         }
 
-        public RouteMultiTenantStrategy(string tenantParam, ILogger<RouteMultiTenantStrategy> logger)
+        public RouteMultiTenantStrategy(string tenantParam, Action<IRouteBuilder> configRoutes, ILogger<RouteMultiTenantStrategy> logger)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
                 throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam));
             }
 
+            if (configRoutes == null)
+            {
+                throw new ArgumentNullException(nameof(configRoutes));
+            }
+
             this.tenantParam = tenantParam;
+            this.configRoutes = configRoutes;
             this.logger = logger;
         }
 
-        public virtual string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
-            if(!(context is HttpContext))
+            if (!(context is HttpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
 
-            object identifier = null;
-            (context as HttpContext).GetRouteData()?.Values.TryGetValue(tenantParam, out identifier);
+            var httpContext = context as HttpContext;
 
+            // Create the IRouter if not yet created.
+            // Done here rather than at startup so that order doesn't matter in ConfigureServices.
+            if (router == null)
+            {
+                var rb = new MultiTenantRouteBuilder(httpContext.RequestServices);
+                configRoutes(rb);
+                router = rb.Build();
+            }
+
+            // Check the route.
+            var routeContext = new RouteContext(httpContext);
+            await router.RouteAsync(routeContext).ConfigureAwait(false);
+
+            object identifier = null;
+            routeContext.RouteData?.Values.TryGetValue(tenantParam, out identifier);
             Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
-            
+
             return identifier as string;
         }
     }

@@ -12,21 +12,9 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Threading.Tasks;
-
-namespace Finbuckle.MultiTenant.Core.Abstractions
-{
-    /// <summary>
-    /// The interface for determining the tenant idenfitider.
-    /// </summary>
-    public interface IMultiTenantStrategy
-    {
-        /// <summary>
-        ///  Method for implemenations to control how the identifier is determined.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        string GetIdentifier(object context);
-    }
-}
+using System.Runtime.CompilerServices;
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Core.Test")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore.Test")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore.Test")]

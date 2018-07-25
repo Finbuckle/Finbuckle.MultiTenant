@@ -14,12 +14,11 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant.Stores
 {
     /// <summary>
     /// A basic Tenant Store that runs in local memory. Ignores string case by default.

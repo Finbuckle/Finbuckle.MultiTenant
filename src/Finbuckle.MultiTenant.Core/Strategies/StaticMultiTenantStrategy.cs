@@ -12,19 +12,18 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant.Strategies
 {
     /// <summary>
     /// <c>IMultiTenantResolverStrategy</c> implementation that always resolves the same identifier.
     /// </summary>
     public class StaticMultiTenantStrategy : IMultiTenantStrategy
     {
-        private readonly string identifier;
+        internal readonly string identifier;
         private readonly ILogger<StaticMultiTenantStrategy> logger;
 
         public StaticMultiTenantStrategy(string identifier) : this(identifier, null)
@@ -37,11 +36,11 @@ namespace Finbuckle.MultiTenant.Core
             this.logger = logger;
         }
 
-        public virtual string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
             Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
 
-            return identifier;
+            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }
     }
 }

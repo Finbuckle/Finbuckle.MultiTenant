@@ -12,21 +12,11 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -36,17 +26,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
     public class MultiTenantMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly IRouter router;
 
         public MultiTenantMiddleware(RequestDelegate next)
         {
             this.next = next;
-        }
-
-        public MultiTenantMiddleware(RequestDelegate next, IRouter router)
-        {
-            this.next = next;
-            this.router = router;
         }
 
         public async Task Invoke(HttpContext context)
@@ -55,11 +38,10 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (!context.Items.ContainsKey(Constants.HttpContextTenantContext))
             {
                 context.Items.Add(Constants.HttpContextTenantContext, null);
-                await HandleRouting(context);
 
                 // Try the registered strategy.
                 var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
-                var identifier = strategy.GetIdentifier(context);
+                var identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
                 var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
 
                 TenantContext tenantContext = null;
@@ -73,12 +55,18 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
                     strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationMultiTenantStrategy>();
-                    identifier = strategy.GetIdentifier(context);
+                    identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
 
                     if (identifier != null)
                     {
                         tenantContext = await store.GetByIdentifierAsync(identifier);
                     }
+                }
+
+                if(tenantContext != null)
+                {
+                    tenantContext.MultiTenantStrategyType = strategy.GetType();
+                    tenantContext.MultiTenantStoreType = store.GetType();
                 }
 
                 context.Items[Constants.HttpContextTenantContext] = tenantContext;
@@ -87,22 +75,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (next != null)
             {
                 await next(context);
-            }
-        }
-
-        private async Task HandleRouting(HttpContext context)
-        {
-            if (router != null)
-            {
-                var routeContext = new RouteContext(context);
-                await router.RouteAsync(routeContext).ConfigureAwait(false);
-                if (routeContext.Handler != null)
-                {
-                    context.Features[typeof(IRoutingFeature)] = new RoutingFeature()
-                    {
-                        RouteData = routeContext.RouteData
-                    };
-                }
             }
         }
     }

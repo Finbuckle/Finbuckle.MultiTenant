@@ -25,7 +25,6 @@
                 "isDefault": true
             },
             "presentation": {
-                "panel": "new",
                 "reveal": "always"
             }
         }

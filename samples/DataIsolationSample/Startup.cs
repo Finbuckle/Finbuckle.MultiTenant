@@ -1,7 +1,7 @@
 ﻿using System;
 using DataIsolationSample.Data;
 using DataIsolationSample.Models;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +27,7 @@ namespace DataIsolationSample
 
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
-                WithRouteStrategy();
+                WithRouteStrategy(ConfigRoutes);
 
             // Register the db context, but do not specify a provider/connection string since
             // these vary by tenant.
@@ -43,7 +43,7 @@ namespace DataIsolationSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant(ConfigRoutes);
+            app.UseMultiTenant();
             app.UseMvc(ConfigRoutes);
 
             SetupDb();

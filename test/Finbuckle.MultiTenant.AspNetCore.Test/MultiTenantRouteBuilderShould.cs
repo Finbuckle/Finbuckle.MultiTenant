@@ -12,25 +12,4 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using DataIsolationSample.Models;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace DataIsolationSample.Data
-{
-    public class ToDoDbContext : MultiTenantDbContext
-    {
-        public ToDoDbContext(TenantContext tenantContext) : base(tenantContext)
-        {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<ToDoItem> ToDoItems { get; set; }
-    }
-}
+// Note: MultiTenantOptionsManager is a trivial tweak of Microsoft's RouteBuilder implementation.

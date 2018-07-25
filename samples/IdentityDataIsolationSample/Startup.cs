@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using IdentityDataIsolationSample.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
@@ -52,7 +52,7 @@ namespace IdentityDataIsolationSample
                 });
 
             services.AddMultiTenant()
-                .WithRouteStrategy()
+                .WithRouteStrategy(ConfigRoutes)
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore"))
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantContext) =>
                {
@@ -74,7 +74,7 @@ namespace IdentityDataIsolationSample
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMultiTenant(ConfigRoutes);
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

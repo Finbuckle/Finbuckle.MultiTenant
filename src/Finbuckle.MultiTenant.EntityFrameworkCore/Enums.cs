@@ -12,25 +12,27 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using DataIsolationSample.Models;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-
-namespace DataIsolationSample.Data
+namespace Finbuckle.MultiTenant
 {
-    public class ToDoDbContext : MultiTenantDbContext
+
+    /// <summary>
+    /// Determines how entities where <c>TenantId</c> does not match the <c>TenantContext</c> are handled
+    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// </summary>
+    public enum TenantMismatchMode
     {
-        public ToDoDbContext(TenantContext tenantContext) : base(tenantContext)
-        {
-        }
+        Throw,
+        Ignore,
+        Overwrite
+    }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<ToDoItem> ToDoItems { get; set; }
+    /// <summary>
+    /// Determines how entities with null <c>TenantId</c> are handled
+    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// </summary>
+    public enum TenantNotSetMode
+    {
+        Throw,
+        Overwrite
     }
 }

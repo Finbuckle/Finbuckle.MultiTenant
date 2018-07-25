@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
 using Xunit;
 

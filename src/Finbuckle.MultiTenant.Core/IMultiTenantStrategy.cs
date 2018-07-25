@@ -12,25 +12,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using DataIsolationSample.Models;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
 
-namespace DataIsolationSample.Data
+namespace Finbuckle.MultiTenant
 {
-    public class ToDoDbContext : MultiTenantDbContext
+    /// <summary>
+    /// The interface for determining the tenant idenfitider.
+    /// </summary>
+    public interface IMultiTenantStrategy
     {
-        public ToDoDbContext(TenantContext tenantContext) : base(tenantContext)
-        {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<ToDoItem> ToDoItems { get; set; }
+        /// <summary>
+        ///  Method for implemenations to control how the identifier is determined.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task<string> GetIdentifierAsync(object context);
     }
 }

@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;

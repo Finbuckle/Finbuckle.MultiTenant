@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Finbuckle.MultiTenant.Core.Abstractions
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Interface definition for tenant stores.
@@ -23,21 +23,21 @@ namespace Finbuckle.MultiTenant.Core.Abstractions
     public interface IMultiTenantStore
     {
         /// <summary>
-        /// Try to add the <c>TenantContext</c> to the store.
+        /// Try to add the TenantContext to the store.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
         Task<bool> TryAdd(TenantContext context);
 
         /// <summary>
-        /// Try to remove the <c>TenantContext</c> from the store.
+        /// Try to remove the TenantContext from the store.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
         Task<bool> TryRemove(string identifier);
 
         /// <summary>
-        /// Retrieve the <c>TenantContext<c> for a given identifier.
+        /// Retrieve the TenantContext for a given identifier.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>

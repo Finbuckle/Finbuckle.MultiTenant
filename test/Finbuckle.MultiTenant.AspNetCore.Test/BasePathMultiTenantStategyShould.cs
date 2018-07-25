@@ -13,8 +13,11 @@
 //    limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -35,12 +38,12 @@ public class BasePathMultiTenantStrategyShould
     [InlineData("", null)] // no path
     [InlineData("/", null)] // just trailing slash
     [InlineData("/initech/ignore/ignore", "initech")] // multiple path segments
-    public void ReturnExpectedIdentifier(string path, string expected)
+    public async void ReturnExpectedIdentifier(string path, string expected)
     {
         var httpContext = CreateHttpContextMock(path);
         var strategy = new BasePathMultiTenantStrategy();
 
-        var identifier = strategy.GetIdentifier(httpContext);
+        var identifier = await strategy.GetIdentifierAsync(httpContext);
 
         Assert.Equal(expected, identifier);
     }
@@ -51,6 +54,6 @@ public class BasePathMultiTenantStrategyShould
         var context = new Object();
         var strategy = new BasePathMultiTenantStrategy();
 
-        Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
+        Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }
 }

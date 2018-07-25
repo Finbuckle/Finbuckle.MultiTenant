@@ -15,7 +15,7 @@
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
     public class TenantContextAccessor : ITenantContextAccessor
     {

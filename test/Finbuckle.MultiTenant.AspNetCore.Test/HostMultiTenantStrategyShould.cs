@@ -13,8 +13,10 @@
 //    limitations under the License.
 
 using System;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -47,12 +49,12 @@ public class HostMultiTenantStrategyShould
     [InlineData("example.ok.test", "*.__tenant__.?.?", "example")] // 3rd last segment
     [InlineData("w.example.ok.test", "*.?.__tenant__.?.?", "example")] // 3rd last of 4+ segments
     [InlineData("example.com", "__tenant__", null)] // no match
-    public void ReturnExpectedIdentifier(string host, string template, string expected)
+    public async void ReturnExpectedIdentifier(string host, string template, string expected)
     {
         var httpContext = CreateHttpContextMock(host);
         var strategy = new HostMultiTenantStrategy(template);
 
-        var identifier = strategy.GetIdentifier(httpContext);
+        var identifier = await strategy.GetIdentifierAsync(httpContext);
 
         Assert.Equal(expected, identifier);
     }
@@ -74,6 +76,6 @@ public class HostMultiTenantStrategyShould
         var context = new Object();
         var strategy = new HostMultiTenantStrategy("__tenant__.*");
 
-        Assert.Throws<MultiTenantException>(() => strategy.GetIdentifier(context));
+        Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }
 }

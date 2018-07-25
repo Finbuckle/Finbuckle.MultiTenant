@@ -24,27 +24,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
     /// <summary>
-    /// Determines how entities where <c>TenantId</c> does not match the <c>TenantContext</c> are handled
-    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
-    /// </summary>
-    public enum TenantMismatchMode
-    {
-        Throw,
-        Ignore,
-        Overwrite
-    }
-
-    /// <summary>
-    /// Determines how entities with null <c>TenantId</c> are handled
-    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
-    /// </summary>
-    public enum TenantNotSetMode
-    {
-        Throw,
-        Overwrite
-    }
-
-    /// <summary>
     /// A static class containing static methods shared between
     /// MultiTenantDbContext and MultiTenantIdentityDbContext.
     /// </summary>

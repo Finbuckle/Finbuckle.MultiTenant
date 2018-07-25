@@ -19,12 +19,13 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// A database context that enforces tenant integrity on entity types
