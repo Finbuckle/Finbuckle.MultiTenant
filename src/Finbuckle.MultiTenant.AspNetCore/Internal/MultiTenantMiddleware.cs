@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Middleware for resolving the <c>TenantContext</c> and storing it in <c>HttpContext</c>.
     /// </summary>
-    public class MultiTenantMiddleware
+    internal class MultiTenantMiddleware
     {
         private readonly RequestDelegate next;
 

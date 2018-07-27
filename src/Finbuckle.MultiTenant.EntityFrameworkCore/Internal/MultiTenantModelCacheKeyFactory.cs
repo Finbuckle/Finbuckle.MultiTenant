@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class MultiTenantModelCacheKeyFactory : IModelCacheKeyFactory
+    internal class MultiTenantModelCacheKeyFactory : IModelCacheKeyFactory
     {
         public object Create(DbContext context)
         {

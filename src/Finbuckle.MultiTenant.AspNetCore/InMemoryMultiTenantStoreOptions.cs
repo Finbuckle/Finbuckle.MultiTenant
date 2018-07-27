@@ -15,7 +15,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Holds data for configuring an <c>InMemoryMultiTenantStore</c>.

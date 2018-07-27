@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </remarks>
         /// <param name="modelBuilder"></param>
         /// <param name="tenantContext"></param>
-        internal static void SetupModel(ModelBuilder modelBuilder, TenantContext tenantContext)
+        public static void SetupModel(ModelBuilder modelBuilder, TenantContext tenantContext)
         {
             foreach (var t in modelBuilder.Model.GetEntityTypes().
                 Where(t => HasMultiTenantAttribute(t.ClrType)))
@@ -82,7 +82,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
         }
 
-        internal static bool HasMultiTenantAttribute(Type t)
+        public static bool HasMultiTenantAttribute(Type t)
         {
             return t.GetCustomAttribute<MultiTenantAttribute>() != null;
         }
@@ -101,7 +101,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <param name="changeTracker"></param>
         /// <param name="tenantNotSetMode"></param>
         /// <param name="tenantMismatchMode"></param>
-        internal static void EnforceTenantId(TenantContext tenantContext,
+        public static void EnforceTenantId(TenantContext tenantContext,
                                             ChangeTracker changeTracker,
                                             TenantNotSetMode tenantNotSetMode,
                                             TenantMismatchMode tenantMismatchMode)

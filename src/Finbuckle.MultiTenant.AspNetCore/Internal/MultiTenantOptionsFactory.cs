@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// Implementation of IOptionsFactory.
     /// </summary>
     /// <typeparam name="TOptions">The type of options being requested.</typeparam>
-    public class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
+    internal class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
     {
         private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
         private readonly Action<TOptions, TenantContext> tenantConfig;

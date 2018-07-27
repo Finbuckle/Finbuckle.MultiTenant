@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Implements <see cref="IAuthenticationSchemeProvider"/>.
     /// </summary>
-    public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
+    internal class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
         /// <summary>
         /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
