@@ -24,7 +24,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
     /// </summary>
     /// <typeparam name="TOptions"></typeparam>
-    public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
+    internal class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
     {
         private readonly IOptionsFactory<TOptions> _factory;
         private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache

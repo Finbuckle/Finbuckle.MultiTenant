@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
-    public class MultiTenantAuthenticationService : AuthenticationService
+    internal class MultiTenantAuthenticationService : AuthenticationService
     {
         public MultiTenantAuthenticationService(IAuthenticationSchemeProvider schemes, IAuthenticationHandlerProvider handlers, IClaimsTransformation transform) : base(schemes, handlers, transform)
         {

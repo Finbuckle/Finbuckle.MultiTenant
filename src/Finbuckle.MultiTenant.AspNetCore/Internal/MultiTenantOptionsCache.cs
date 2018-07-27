@@ -24,7 +24,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
     /// </summary>
-    public class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
+    internal class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
         private readonly ITenantContextAccessor tenantContextAccessor;
 
