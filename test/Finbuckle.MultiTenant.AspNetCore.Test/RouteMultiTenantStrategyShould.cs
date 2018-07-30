@@ -71,7 +71,7 @@ public class RouteMultiTenantStrategyShould
                         });
 
                         var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAdd(new TenantContext(identifier, identifier, null, null, null, null));
+                        store.TryAddAsync(new TenantContext(identifier, identifier, null, null, null, null)).Wait();
                     });
     }
 

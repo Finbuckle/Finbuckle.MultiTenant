@@ -25,6 +25,9 @@ namespace Finbuckle.MultiTenant.Stores
     /// </summary>
     public class InMemoryMultiTenantStore : IMultiTenantStore
     {
+        private readonly ConcurrentDictionary<string, TenantContext> tenantMap;
+        private readonly ILogger<InMemoryMultiTenantStore> logger;
+
         public InMemoryMultiTenantStore() : this (true, null)
         {
         }
@@ -43,12 +46,9 @@ namespace Finbuckle.MultiTenant.Stores
             if(!ignoreCase)
                 stringComparerer = StringComparer.Ordinal;
                 
-            _tenantMap = new ConcurrentDictionary<string, TenantContext>(stringComparerer);
+            tenantMap = new ConcurrentDictionary<string, TenantContext>(stringComparerer);
             this.logger = logger;
         }
-
-        private readonly ConcurrentDictionary<string, TenantContext> _tenantMap;
-        private readonly ILogger<InMemoryMultiTenantStore> logger;
 
         public virtual async Task<TenantContext> GetByIdentifierAsync(string identifier)
         {
@@ -57,19 +57,19 @@ namespace Finbuckle.MultiTenant.Stores
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            _tenantMap.TryGetValue(identifier, out var result);
+            tenantMap.TryGetValue(identifier, out var result);
             Utilities.TryLogInfo(logger, $"Tenant Id \"{result?.Id ?? "<null>"}\" found in store for identifier \"{identifier}\".");
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 
-        public virtual Task<bool> TryAdd(TenantContext context)
+        public virtual Task<bool> TryAddAsync(TenantContext context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var result = _tenantMap.TryAdd(context.Identifier, context);
+            var result = tenantMap.TryAdd(context.Identifier, context);
 
             if(result)
             {
@@ -83,14 +83,14 @@ namespace Finbuckle.MultiTenant.Stores
             return Task.FromResult(result);
         }
 
-        public virtual Task<bool> TryRemove(string identifier)
+        public virtual Task<bool> TryRemoveAsync(string identifier)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            var result = _tenantMap.TryRemove(identifier, out var dummy);
+            var result = tenantMap.TryRemove(identifier, out var dummy);
 
             if(result)
             {

@@ -27,12 +27,12 @@ internal class TestStore : IMultiTenantStore
         throw new NotImplementedException();
     }
 
-    public Task<bool> TryAdd(TenantContext context)
+    public Task<bool> TryAddAsync(TenantContext context)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> TryRemove(string identifier)
+    public Task<bool> TryRemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }

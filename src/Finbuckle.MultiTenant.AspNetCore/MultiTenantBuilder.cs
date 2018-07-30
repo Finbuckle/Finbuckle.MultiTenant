@@ -228,7 +228,7 @@ namespace Finbuckle.MultiTenant
                             tenantContext.Items.Add(item.Key, item.Value);
                     }
 
-                    if (!store.TryAdd(tenantContext).Result)
+                    if (!store.TryAddAsync(tenantContext).Result)
                         throw new MultiTenantException($"Unable to add {tenantContext.Identifier} is already configured.");
                 }
             }

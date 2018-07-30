@@ -44,7 +44,7 @@ public class MultiTenantMiddlewareShould
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
         var tc = new TenantContext("initech", "initech", null, null, null, null);
-        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(tc).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
 
@@ -62,7 +62,7 @@ public class MultiTenantMiddlewareShould
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
         var tc = new TenantContext("initech", "initech", null, null, null, null);
-        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(tc).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
 
@@ -81,7 +81,7 @@ public class MultiTenantMiddlewareShould
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
         var tc = new TenantContext("initech", "initech", null, null, null, null);
-        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(tc).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
 
