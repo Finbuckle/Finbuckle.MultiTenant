@@ -38,24 +38,7 @@ namespace Finbuckle.MultiTenant
         {
             this.services = services;
         }
-
-        /// <summary>
-        /// Adds per-tenant configuration for an options class. (Obsolete: use <c>WithPerTenantOptions</c> instead).
-        /// </summary>
-        /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        [Obsolete("WithPerTenantOptionsConfig is obsolete. Use WithPerTenantOptions instead.")]
-        public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class
-        {
-            services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
-                {
-                    return (MultiTenantOptionsCache<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantInfo });
-                });
-
-            return this;
-        }
-
+        
         /// <summary>
         /// Adds per-tenant configuration for an options class.
         /// </summary>
