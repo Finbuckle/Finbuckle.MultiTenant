@@ -49,7 +49,7 @@ namespace AuthenticationOptionsSample
                 });
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
                 WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantContext) =>

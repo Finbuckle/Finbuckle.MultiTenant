@@ -38,7 +38,7 @@ public class MultiTenantOptionsCacheShould
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();
@@ -66,7 +66,7 @@ public class MultiTenantOptionsCacheShould
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();
@@ -92,7 +92,7 @@ public class MultiTenantOptionsCacheShould
     public void ThrowsIfGetOtAddFactoryIsNull()
     {
         var tc = new MultiTenantContext();
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null));
@@ -102,7 +102,7 @@ public class MultiTenantOptionsCacheShould
     public void ThrowIfContructorParamIsNull()
     {
         var tc = new MultiTenantContext();
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
 
         Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null));
     }
@@ -116,7 +116,7 @@ public class MultiTenantOptionsCacheShould
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();

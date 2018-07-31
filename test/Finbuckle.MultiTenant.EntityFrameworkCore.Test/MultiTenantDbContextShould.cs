@@ -57,7 +57,7 @@ public class MultiTenantDbContextShould
     }
 
     [Fact]
-    public void IdentifyOnlyTenantScopedProperties()
+    public void IdentifyOnlyMultiTenantAnnotatedProperties()
     {
         var tenant1 = new TenantInfo("abc", "abc", "abc",
             "DataSource=testdb.db", null);

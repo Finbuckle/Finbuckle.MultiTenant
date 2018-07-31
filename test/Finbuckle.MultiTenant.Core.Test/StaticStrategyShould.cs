@@ -19,7 +19,7 @@ using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Xunit;
 
-public class StaticTenantResolverShould
+public class StaticStrategyShould
 {
     [Theory]
     [InlineData("initech")]
@@ -29,7 +29,7 @@ public class StaticTenantResolverShould
     [InlineData(null)] // null
     public async void ReturnExpectedIdentifier(string staticIdentifier)
     {
-        var strategy = new StaticMultiTenantStrategy(staticIdentifier);
+        var strategy = new StaticStrategy(staticIdentifier);
 
         var identifier = await strategy.GetIdentifierAsync(new Object());
 

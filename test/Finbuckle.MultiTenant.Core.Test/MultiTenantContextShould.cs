@@ -12,18 +12,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
+using Xunit;
 
-public class TestTenantContextAccessor : IMultiTenantContextAccessor
+public class MultiTenantContextShould
 {
-    private readonly MultiTenantContext tenantContext;
-
-    public TestTenantContextAccessor(MultiTenantContext tenantContext)
+    [Fact]
+    public void ThrowIfTenantIdSetWithLengthAboveTenantIdMaxLength()
     {
-        this.tenantContext = tenantContext;
+        new TenantInfo("".PadRight(1, 'a'), null, null, null, null);
+        new TenantInfo("".PadRight(Constants.TenantIdMaxLength, 'a'), null, null, null, null);
+        
+        Assert.Throws<MultiTenantException>(() => new TenantInfo("".PadRight(Constants.TenantIdMaxLength + 1, 'a'), null, null, null, null));
+        Assert.Throws<MultiTenantException>(() => new TenantInfo("".PadRight(999, 'a'), null, null, null, null));
     }
-
-    public MultiTenantContext MultiTenantContext => tenantContext;
 }

@@ -76,7 +76,7 @@ public class MultiTenantMiddlewareShould
         
         Assert.NotNull(resolvedTenantContext.StrategyInfo);
         Assert.NotNull(resolvedTenantContext.StrategyInfo.Strategy);
-        Assert.Equal(typeof(StaticMultiTenantStrategy), resolvedTenantContext.StrategyInfo.StrategyType);
+        Assert.Equal(typeof(StaticStrategy), resolvedTenantContext.StrategyInfo.StrategyType);
         Assert.NotNull(resolvedTenantContext.StrategyInfo.MultiTenantContext);
     }
 
@@ -98,7 +98,7 @@ public class MultiTenantMiddlewareShould
         
         Assert.NotNull(resolvedTenantContext.StoreInfo);
         Assert.NotNull(resolvedTenantContext.StoreInfo.Store);
-        Assert.Equal(typeof(InMemoryMultiTenantStore), resolvedTenantContext.StoreInfo.StoreType);
+        Assert.Equal(typeof(InMemoryStore), resolvedTenantContext.StoreInfo.StoreType);
         Assert.NotNull(resolvedTenantContext.StoreInfo.MultiTenantContext);
     }
 
@@ -136,9 +136,9 @@ public class MultiTenantMiddlewareShould
         services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>().WithRemoteAuthentication();
         
         // Substitute in the mock...
-        services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationMultiTenantStrategy, RemoteAuthenticationMultiTenantStrategy>());
-        var remoteResolverMock = new Mock<RemoteAuthenticationMultiTenantStrategy>();
-        services.AddSingleton<IRemoteAuthenticationMultiTenantStrategy>(_sp => remoteResolverMock.Object);
+        services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
+        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
+        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);
@@ -157,8 +157,8 @@ public class MultiTenantMiddlewareShould
         services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>();
         
         // Add in the mock...
-        var remoteResolverMock = new Mock<RemoteAuthenticationMultiTenantStrategy>();
-        services.AddSingleton<IRemoteAuthenticationMultiTenantStrategy>(_sp => remoteResolverMock.Object);
+        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
+        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);

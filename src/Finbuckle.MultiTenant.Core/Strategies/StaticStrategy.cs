@@ -12,46 +12,33 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class BasePathMultiTenantStrategy : IMultiTenantStrategy
+    /// <summary>
+    /// IMultiTenantStrategy implementation that always resolves the same identifier.
+    /// </summary>
+    public class StaticStrategy : IMultiTenantStrategy
     {
-        private readonly ILogger<BasePathMultiTenantStrategy> logger;
+        internal readonly string identifier;
+        private readonly ILogger<StaticStrategy> logger;
 
-        public BasePathMultiTenantStrategy()
+        public StaticStrategy(string identifier) : this(identifier, null)
         {
         }
 
-        public BasePathMultiTenantStrategy(ILogger<BasePathMultiTenantStrategy> logger)
+        public StaticStrategy(string identifier, ILogger<StaticStrategy> logger)
         {
+            this.identifier = identifier;
             this.logger = logger;
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
-            if(!(context is HttpContext))
-                throw new MultiTenantException(null,
-                    new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
-
-            var path = (context as HttpContext).Request.Path;
-
-            Utilities.TryLogInfo(logger, $"Path:  \"{path.Value ?? "<null>"}\"");
-
-            var pathSegments =
-                path.Value.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (pathSegments.Length == 0)
-                return null;
-
-            string identifier = pathSegments[0];
-
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
+            Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
 
             return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }

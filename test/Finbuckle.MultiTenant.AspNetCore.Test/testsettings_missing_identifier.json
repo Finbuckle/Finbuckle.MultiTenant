@@ -1,5 +1,5 @@
 ﻿{
-  "Finbuckle:MultiTenant:InMemoryMultiTenantStore": {
+  "Finbuckle:MultiTenant:InMemoryStore": {
     "DefaultConnectionString": "Datasource=sample.db",
     "TenantConfigurations": [
       {

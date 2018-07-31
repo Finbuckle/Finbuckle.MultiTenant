@@ -28,7 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-public class RouteMultiTenantStrategyShould
+public class RouteStrategyShould
 {
     internal void configTestRoute(Microsoft.AspNetCore.Routing.IRouteBuilder routes)
     {
@@ -79,7 +79,7 @@ public class RouteMultiTenantStrategyShould
     public void ThrowIfContextIsNotHttpContext()
     {
         var context = new Object();
-        var strategy = new RouteMultiTenantStrategy("__tenant__", configTestRoute);
+        var strategy = new RouteStrategy("__tenant__", configTestRoute);
 
         Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }
@@ -104,6 +104,6 @@ public class RouteMultiTenantStrategyShould
     [InlineData(" ")]
     public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
     {
-        Assert.Throws<ArgumentException>(() => new RouteMultiTenantStrategy(testString, configTestRoute));
+        Assert.Throws<ArgumentException>(() => new RouteStrategy(testString, configTestRoute));
     }
 }

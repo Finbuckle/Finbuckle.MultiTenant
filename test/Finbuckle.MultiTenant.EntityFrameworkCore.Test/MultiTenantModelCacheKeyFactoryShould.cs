@@ -38,7 +38,7 @@ public class MultiTenantModelCacheKeyFactoryShould
     }
 
     [Fact]
-    public void ReturnTypeForNonMultiTenantContext()
+    public void ReturnTypeForNonMultiTenantDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestDbContext();
@@ -49,7 +49,7 @@ public class MultiTenantModelCacheKeyFactoryShould
     }
 
     [Fact]
-    public void ReturnTypePlusTenantIdForMultiTenantContext()
+    public void ReturnTypePlusTenantIdForMultiTenantDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestMultiTenantDbContext(
@@ -64,7 +64,7 @@ public class MultiTenantModelCacheKeyFactoryShould
     }
 
     [Fact]
-    public void ReturnTypePlusTenantIdForMultiTenantIdentityContext()
+    public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestMultiTenantIdentityDbContext(

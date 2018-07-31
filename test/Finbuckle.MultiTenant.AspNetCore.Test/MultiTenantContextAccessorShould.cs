@@ -20,10 +20,10 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-public class TenantContextAccessorShould
+public class MultiTenantContextAccessorShould
 {
     [Fact]
-    public void GetTenantFromIHttpAccessor()
+    public void GetMultiTenantContextFromIHttpAccessor()
     {
         var items = new Dictionary<object, object>();
         var ti = new TenantInfo("test", null, null, null, null);

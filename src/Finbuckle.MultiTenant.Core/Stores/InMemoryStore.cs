@@ -21,26 +21,26 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Stores
 {
     /// <summary>
-    /// A basic Tenant Store that runs in local memory. Ignores string case by default.
+    /// A basic multitenant Store that runs in local memory. Ignores string case by default.
     /// </summary>
-    public class InMemoryMultiTenantStore : IMultiTenantStore
+    public class InMemoryStore : IMultiTenantStore
     {
         private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;
-        private readonly ILogger<InMemoryMultiTenantStore> logger;
+        private readonly ILogger<InMemoryStore> logger;
 
-        public InMemoryMultiTenantStore() : this (true, null)
+        public InMemoryStore() : this (true, null)
         {
         }
 
-        public InMemoryMultiTenantStore(bool igoreCase) : this (igoreCase, null)
+        public InMemoryStore(bool igoreCase) : this (igoreCase, null)
         {
         }
 
-        public InMemoryMultiTenantStore(ILogger<InMemoryMultiTenantStore> logger) : this (true, logger)
+        public InMemoryStore(ILogger<InMemoryStore> logger) : this (true, logger)
         {
         }
 
-        public InMemoryMultiTenantStore(bool ignoreCase, ILogger<InMemoryMultiTenantStore> logger)
+        public InMemoryStore(bool ignoreCase, ILogger<InMemoryStore> logger)
         {
             var stringComparerer = StringComparer.OrdinalIgnoreCase;
             if(!ignoreCase)
@@ -73,11 +73,11 @@ namespace Finbuckle.MultiTenant.Stores
 
             if(result)
             {
-                Utilities.TryLogInfo(logger, $"Tenant \"{tenantInfo.Identifier}\" added to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Tenant \"{tenantInfo.Identifier}\" added to InMemoryStore.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{tenantInfo.Identifier}\" to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{tenantInfo.Identifier}\" to InMemoryStore.");
             }
 
             return Task.FromResult(result);
@@ -94,11 +94,11 @@ namespace Finbuckle.MultiTenant.Stores
 
             if(result)
             {
-                Utilities.TryLogInfo(logger, $"Tenant \"{identifier}\" removed from InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Tenant \"{identifier}\" removed from InMemoryStore.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"Unable to remove tenant \"{identifier}\" from InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Unable to remove tenant \"{identifier}\" from InMemoryStore.");
             }
 
             return Task.FromResult(result);

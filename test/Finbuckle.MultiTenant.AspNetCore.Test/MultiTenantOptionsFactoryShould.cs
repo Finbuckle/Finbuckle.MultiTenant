@@ -38,7 +38,7 @@ public class MultiTenantOptionsFactoryShould
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
-        var tca = new TestTenantContextAccessor(tc);
+        var tca = new TestMultiTenantContextAccessor(tc);
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
@@ -58,7 +58,7 @@ public class MultiTenantOptionsFactoryShould
     [Fact]
     public void IgnoreNullTenantContext()
     {
-        var tca = new TestTenantContextAccessor(null);
+        var tca = new TestMultiTenantContextAccessor(null);
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);

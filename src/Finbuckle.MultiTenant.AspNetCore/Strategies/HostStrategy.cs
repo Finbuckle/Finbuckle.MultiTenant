@@ -21,16 +21,16 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class HostMultiTenantStrategy : IMultiTenantStrategy
+    public class HostStrategy : IMultiTenantStrategy
     {
         private readonly string regex;
-        private readonly ILogger<HostMultiTenantStrategy> logger;
+        private readonly ILogger<HostStrategy> logger;
 
-        public HostMultiTenantStrategy(string template) : this(template, null)
+        public HostStrategy(string template) : this(template, null)
         {
         }
 
-        public HostMultiTenantStrategy(string template, ILogger<HostMultiTenantStrategy> logger)
+        public HostStrategy(string template, ILogger<HostStrategy> logger)
         {
             // Check for valid template. Template cannot have "*" on each side of __tenant__ placeholder.
             if (string.IsNullOrWhiteSpace(template) ||

@@ -18,9 +18,9 @@ using System.Collections.Generic;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// Holds data for configuring an <c>InMemoryMultiTenantStore</c>.
+    /// Holds data for configuring an <c>InMemoryStore</c>.
     /// </summary>
-    public class InMemoryMultiTenantStoreOptions
+    public class InMemoryStoreOptions
     {
         public string DefaultConnectionString { get; set; }
         public TenantConfiguration[] TenantConfigurations { get; set; }

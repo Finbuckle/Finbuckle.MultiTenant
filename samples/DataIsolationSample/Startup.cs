@@ -26,7 +26,7 @@ namespace DataIsolationSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
                 WithRouteStrategy(ConfigRoutes);
 
             // Register the db context, but do not specify a provider/connection string since

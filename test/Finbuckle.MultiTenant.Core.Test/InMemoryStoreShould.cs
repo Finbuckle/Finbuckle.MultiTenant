@@ -17,11 +17,11 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class InMemoryMultiTenantStoreShould
+public class InMemoryStoreShould
 {
-    private static InMemoryMultiTenantStore CreateTestStore(bool ignoreCase = true)
+    private static InMemoryStore CreateTestStore(bool ignoreCase = true)
     {
-        var store = new InMemoryMultiTenantStore(ignoreCase);
+        var store = new InMemoryStore(ignoreCase);
         store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null));
         store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null));
 
@@ -29,21 +29,21 @@ public class InMemoryMultiTenantStoreShould
     }
 
     [Fact]
-    public void GetTenantFromStore()
+    public void GetTenantInfoFromStore()
     {
         var store = CreateTestStore();
         Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
     }
 
     [Fact]
-    public void GetTenantFromStoreIgnoringCaseByDefault()
+    public void GetTenantInfoFromStoreIgnoringCaseByDefault()
     {
         var store = CreateTestStore();
         Assert.Equal("initech", store.GetByIdentifierAsync("iNitEch").Result.Identifier);
     }
 
     [Fact]
-    public void GetTenantFromStoreMatchingCase()
+    public void GetTenantInfoFromStoreMatchingCase()
     {
         var store = CreateTestStore(false);
         Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
@@ -77,7 +77,7 @@ public class InMemoryMultiTenantStoreShould
     }
 
     [Fact]
-    public void RemoveTenantFromStore()
+    public void RemoveTenantInfoFromStore()
     {
         var store = CreateTestStore();
 
@@ -102,19 +102,19 @@ public class InMemoryMultiTenantStoreShould
     [Fact]
     public void ThrowIfTenantIdentifierIsNullWhenRemoving()
     {
-        var store = new InMemoryMultiTenantStore();
+        var store = new InMemoryStore();
         var e = Assert.Throws<ArgumentNullException>(() => store.TryRemoveAsync(null).Result);
     }
 
     [Fact]
-    public void ThrowIfTenantContextIsNullWhenAdding()
+    public void ThrowIfTenantInfoIsNullWhenAdding()
     {
-        var store = new InMemoryMultiTenantStore();
+        var store = new InMemoryStore();
         var e = Assert.Throws<ArgumentNullException>(() => store.TryAddAsync(null).Result);
     }
 
     [Fact]
-    public void ReturnNullIfTenantNotFound()
+    public void ReturnNullIfTenantInfoNotFound()
     {
         var store = CreateTestStore();
 
