@@ -3,10 +3,10 @@
     ViewData["Title"] = "Data Isolation Sample";
 }
 
-@if(Context.GetTenantContext() != null)
+@if(Context.GetMultiTenantContext() != null)
 {
-    <p class="mt-4">Tenant Id: @Context.GetTenantContext().Id</p>
-    <p class="my-4">Connection String: @Context.GetTenantContext().ConnectionString</p>
+    <p class="mt-4">Tenant Id: @Context.GetMultiTenantContext().TenantInfo.Id</p>
+    <p class="my-4">Connection String: @Context.GetMultiTenantContext().TenantInfo.ConnectionString</p>
     
     <table class="table">
         <thead>

@@ -42,15 +42,15 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Adds per-tenant configuration for an options class. (Obsolete: use <c>WithPerTenantOptions</c> instead).
         /// </summary>
-        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
+        /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
         [Obsolete("WithPerTenantOptionsConfig is obsolete. Use WithPerTenantOptions instead.")]
-        public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class
+        public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class
         {
             services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
                     return (MultiTenantOptionsCache<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantConfig });
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>), new[] { tenantInfo });
                 });
 
             return this;
@@ -59,13 +59,13 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Adds per-tenant configuration for an options class.
         /// </summary>
-        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
+        /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class, new()
+        public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class, new()
         {
-            if (tenantConfig == null)
+            if (tenantInfo == null)
             {
-                throw new ArgumentNullException(nameof(tenantConfig));
+                throw new ArgumentNullException(nameof(tenantInfo));
             }
 
             // Handles multiplexing cached options.
@@ -79,17 +79,17 @@ namespace Finbuckle.MultiTenant
             services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
             {
                 return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                    CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantConfig });
+                    CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantInfo });
             });
 
-            services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager(sp, tenantConfig));
+            services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
 
-            services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager(sp, tenantConfig));
+            services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
 
             return this;
         }
 
-        private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp, Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class, new()
+        private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp) where TOptions : class, new()
         {
             var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
             return (MultiTenantOptionsManager<TOptions>)

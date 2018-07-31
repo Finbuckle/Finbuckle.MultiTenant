@@ -51,7 +51,7 @@ namespace DataIsolationSample
 
         private void SetupDb()
         {
-            var tc = new MultiTenantContext("finbuckle", null, null, "Data Source=Data/ToDoList.db", null, null);
+            var tc = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();
@@ -62,7 +62,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new MultiTenantContext("megacorp", null, null, "Data Source=Data/ToDoList.db", null, null);
+            tc = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureCreated();
@@ -72,7 +72,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new MultiTenantContext("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null, null);
+            tc = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();

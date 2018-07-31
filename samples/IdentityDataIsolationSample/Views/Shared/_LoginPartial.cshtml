@@ -3,7 +3,7 @@
 @inject SignInManager<MultiTenantIdentityUser> SignInManager
 @inject UserManager<MultiTenantIdentityUser> UserManager
 
-@if (Context.GetTenantContext() != null)
+@if (Context.GetMultiTenantContext() != null)
 {
     <div class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
@@ -15,8 +15,8 @@
     }
     else
     {
-        <a class="nav-item nav-link" asp-route-__tenant__="@Context.GetTenantContext().Identifier" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="@Context.Request.Path">Register</a>
-        <a class="nav-item nav-link" asp-route-__tenant__="@Context.GetTenantContext().Identifier" asp-area="Identity" asp-page="/Account/Login" asp-route-returnurl="@Context.Request.Path">Login</a>
+        <a class="nav-item nav-link" asp-route-__tenant__="@Context.GetMultiTenantContext().TenantInfo.Identifier" asp-area="Identity" asp-page="/Account/Register" asp-route-returnurl="@Context.Request.Path">Register</a>
+        <a class="nav-item nav-link" asp-route-__tenant__="@Context.GetMultiTenantContext().TenantInfo.Identifier" asp-area="Identity" asp-page="/Account/Login" asp-route-returnurl="@Context.Request.Path">Login</a>
     }
     </div>
 }

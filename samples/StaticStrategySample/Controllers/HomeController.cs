@@ -7,7 +7,7 @@ namespace StaticStrategySample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetMultiTenantContext();
+            var tc = HttpContext.GetMultiTenantContext()?.TenantInfo;
             return View(tc);
         }
     }
