@@ -22,8 +22,8 @@ public class InMemoryMultiTenantStoreShould
     private static InMemoryMultiTenantStore CreateTestStore(bool ignoreCase = true)
     {
         var store = new InMemoryMultiTenantStore(ignoreCase);
-        store.TryAddAsync(new TenantContext("initech", "initech", "Initech", null, null, null));
-        store.TryAddAsync(new TenantContext("lol", "lol", "Lol, Inc.", null, null, null));
+        store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null));
+        store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null));
 
         return store;
     }
@@ -54,26 +54,26 @@ public class InMemoryMultiTenantStoreShould
     public void FailIfAddingDuplicate()
     {
         var store = CreateTestStore();
-        Assert.False(store.TryAddAsync(new TenantContext("initech", "initech", "Initech", null, null, null)).Result);
-        Assert.False(store.TryAddAsync(new TenantContext("iNitEch", "iNitEch", "Initech", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("iNitEch", "iNitEch", "Initech", null, null)).Result);
 
         store = CreateTestStore(false);
-        Assert.False(store.TryAddAsync(new TenantContext("initech", "initech", "Initech", null, null, null)).Result);
-        Assert.True(store.TryAddAsync(new TenantContext("iNiTEch", "iNiTEch", "Initech", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
+        Assert.True(store.TryAddAsync(new TenantInfo("iNiTEch", "iNiTEch", "Initech", null, null)).Result);
     }
 
     [Fact]
-    public void AddTenantToStore()
+    public void AddTenantInfoToStore()
     {
         var store = CreateTestStore();
 
         Assert.Null(store.GetByIdentifierAsync("test").Result);
-        Assert.True(store.TryAddAsync(new TenantContext("test", "test", "test", null, null, null)).Result);
+        Assert.True(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
 
         Assert.NotNull(store.GetByIdentifierAsync("test").Result);
 
         // test when already added
-        Assert.False(store.TryAddAsync(new TenantContext("test", "test", "test", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
     }
 
     [Fact]

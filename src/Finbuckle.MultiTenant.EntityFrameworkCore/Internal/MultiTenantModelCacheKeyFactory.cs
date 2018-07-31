@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (context is MultiTenantDbContext || ContextDerivesFromMultiTenantIdentityDbContext(context))
             {
                 dynamic derivedContext = context;
-                return (context.GetType(), (string)derivedContext.TenantContext.Id);
+                return (context.GetType(), (string)derivedContext.TenantInfo.Id);
             }
 
             return context.GetType();

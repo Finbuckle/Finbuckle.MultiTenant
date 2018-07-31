@@ -16,8 +16,8 @@ using Finbuckle.MultiTenant.Core;
 
 namespace Finbuckle.MultiTenant
 {
-    public interface ITenantContextAccessor
+    public interface IMultiTenantContextAccessor
     {
-        TenantContext TenantContext { get; }
+        MultiTenantContext MultiTenantContext { get; }
     }
 }

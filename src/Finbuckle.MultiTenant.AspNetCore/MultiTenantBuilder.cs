@@ -45,7 +45,7 @@ namespace Finbuckle.MultiTenant
         /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
         [Obsolete("WithPerTenantOptionsConfig is obsolete. Use WithPerTenantOptions instead.")]
-        public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, TenantContext> tenantConfig) where TOptions : class
+        public MultiTenantBuilder WithPerTenantOptionsConfig<TOptions>(Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class
         {
             services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
         /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
-        public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
+        public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class, new()
         {
             if (tenantConfig == null)
             {
@@ -89,7 +89,7 @@ namespace Finbuckle.MultiTenant
             return this;
         }
 
-        private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp, Action<TOptions, TenantContext> tenantConfig) where TOptions : class, new()
+        private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp, Action<TOptions, MultiTenantContext> tenantConfig) where TOptions : class, new()
         {
             var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
             return (MultiTenantOptionsManager<TOptions>)
@@ -213,29 +213,25 @@ namespace Finbuckle.MultiTenant
                         string.IsNullOrWhiteSpace(tenantConfig.Identifier))
                         throw new MultiTenantException("Tenant Id and Identifer cannot be null or whitespace.");
 
-                    var tenantContext = new TenantContext(tenantConfig.Id,
+                    var tenantInfo = new TenantInfo(tenantConfig.Id,
                                                tenantConfig.Identifier,
                                                tenantConfig.Name,
                                                tenantConfig.ConnectionString ?? options.DefaultConnectionString,
-                                               null,
                                                null);
 
-                    // Add any other items from the config, but don't override
-                    // the explicitly named items.
                     foreach (var item in tenantConfig.Items ?? new Dictionary<string, string>())
                     {
-                        if (!tenantContext.Items.ContainsKey(item.Key))
-                            tenantContext.Items.Add(item.Key, item.Value);
+                        tenantInfo.Items.Add(item.Key, item.Value);
                     }
 
-                    if (!store.TryAddAsync(tenantContext).Result)
-                        throw new MultiTenantException($"Unable to add {tenantContext.Identifier} is already configured.");
+                    if (!store.TryAddAsync(tenantInfo).Result)
+                        throw new MultiTenantException($"Unable to add {tenantInfo.Identifier} is already configured.");
                 }
             }
             catch (Exception e)
             {
                 throw new MultiTenantException
-                    ("Unable to add tenant context to store.", e);
+                    ("Unable to add tenant to store.", e);
             }
 
             return store;

@@ -35,22 +35,24 @@ public class MultiTenantOptionsFactoryShould
     [InlineData("name")]
     public void CreateOptionsWithTenantAction(string name)
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
         var tca = new TestTenantContextAccessor(tc);
 
         var services = new ServiceCollection();
-        services.AddTransient<ITenantContextAccessor>(_sp => tca);
+        services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
         services.Configure<CookieAuthenticationOptions>(name, o => o.Cookie.Name = $"{name}_begin");
         services.PostConfigure<CookieAuthenticationOptions>(name, o => o.Cookie.Name += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<CookieAuthenticationOptions, TenantContext> tenantConfig = (o, _tc) => o.Cookie.Name += $"_{_tc.Id}_";
+        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
             CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });
 
         var options = factory.Create(name);
-        Assert.Equal($"{name}_begin_{tc.Id}_end", options.Cookie.Name);
+        Assert.Equal($"{name}_begin_{ti.Id}_end", options.Cookie.Name);
     }
 
     [Fact]
@@ -59,12 +61,12 @@ public class MultiTenantOptionsFactoryShould
         var tca = new TestTenantContextAccessor(null);
 
         var services = new ServiceCollection();
-        services.AddTransient<ITenantContextAccessor>(_sp => tca);
+        services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
         services.Configure<CookieAuthenticationOptions>(o => o.Cookie.Name = "begin");
         services.PostConfigure<CookieAuthenticationOptions>(o => o.Cookie.Name += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<CookieAuthenticationOptions, TenantContext> tenantConfig = (o, _tc) => o.Cookie.Name += $"_{_tc.Id}_";
+        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
             CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });

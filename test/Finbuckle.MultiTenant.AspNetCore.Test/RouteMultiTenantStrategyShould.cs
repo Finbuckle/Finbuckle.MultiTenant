@@ -64,14 +64,14 @@ public class RouteMultiTenantStrategyShould
                         app.UseMultiTenant();
                         app.Run(async context =>
                         {
-                            if (context.GetTenantContext() != null)
+                            if (context.GetMultiTenantContext() != null)
                             {
-                                await context.Response.WriteAsync(context.GetTenantContext().Id);
+                                await context.Response.WriteAsync(context.GetMultiTenantContext().TenantInfo.Id);
                             }
                         });
 
                         var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAddAsync(new TenantContext(identifier, identifier, null, null, null, null)).Wait();
+                        store.TryAddAsync(new TenantInfo(identifier, identifier, null, null, null)).Wait();
                     });
     }
 

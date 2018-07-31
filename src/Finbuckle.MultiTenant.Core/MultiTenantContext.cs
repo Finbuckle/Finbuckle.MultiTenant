@@ -12,20 +12,19 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant
 {
-    public class MultiTenantContextAccessor : IMultiTenantContextAccessor
+    /// <summary>
+    /// Contains information for a specific tenant.
+    /// </summary>
+    public class MultiTenantContext
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        public MultiTenantContextAccessor(IHttpContextAccessor httpContextAccessor)
-        {
-            this.httpContextAccessor = httpContextAccessor;
-        }
-
-        public MultiTenantContext MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext();
+        public TenantInfo TenantInfo { get; internal set; }
+        public StrategyInfo StrategyInfo { get; internal set; }
+        public StoreInfo StoreInfo { get; internal set; }
     }
 }

@@ -25,7 +25,7 @@ namespace Finbuckle.MultiTenant.Stores
     /// </summary>
     public class InMemoryMultiTenantStore : IMultiTenantStore
     {
-        private readonly ConcurrentDictionary<string, TenantContext> tenantMap;
+        private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;
         private readonly ILogger<InMemoryMultiTenantStore> logger;
 
         public InMemoryMultiTenantStore() : this (true, null)
@@ -46,11 +46,11 @@ namespace Finbuckle.MultiTenant.Stores
             if(!ignoreCase)
                 stringComparerer = StringComparer.Ordinal;
                 
-            tenantMap = new ConcurrentDictionary<string, TenantContext>(stringComparerer);
+            tenantMap = new ConcurrentDictionary<string, TenantInfo>(stringComparerer);
             this.logger = logger;
         }
 
-        public virtual async Task<TenantContext> GetByIdentifierAsync(string identifier)
+        public virtual async Task<TenantInfo> GetByIdentifierAsync(string identifier)
         {
             if (identifier == null)
             {
@@ -62,22 +62,22 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 
-        public virtual Task<bool> TryAddAsync(TenantContext context)
+        public virtual Task<bool> TryAddAsync(TenantInfo tenantInfo)
         {
-            if (context == null)
+            if (tenantInfo == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(tenantInfo));
             }
 
-            var result = tenantMap.TryAdd(context.Identifier, context);
+            var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
             if(result)
             {
-                Utilities.TryLogInfo(logger, $"Tenant \"{context.Identifier}\" added to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Tenant \"{tenantInfo.Identifier}\" added to InMemoryMultiTenantStore.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{context.Identifier}\" to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{tenantInfo.Identifier}\" to InMemoryMultiTenantStore.");
             }
 
             return Task.FromResult(result);

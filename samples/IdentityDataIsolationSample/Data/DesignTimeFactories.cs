@@ -12,7 +12,7 @@ namespace IdentityDataIsolationSample.Data
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            var tenantContext = new TenantContext(null, null, null, "Data Source=Data/SharedIdentity.db", null, null);
+            var tenantContext = new MultiTenantContext(null, null, null, "Data Source=Data/SharedIdentity.db", null, null);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
             return new ApplicationDbContext(tenantContext, optionsBuilder.Options);

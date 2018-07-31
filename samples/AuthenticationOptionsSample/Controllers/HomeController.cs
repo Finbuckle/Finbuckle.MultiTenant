@@ -14,7 +14,7 @@ namespace AuthenticationOptionsSample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContext();
+            var tc = HttpContext.GetMultiTenantContext();
             var title = (tc?.Name ?? "No tenant") + " - ";
 
             ViewData["style"] = "navbar-light bg-light";

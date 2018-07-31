@@ -8,7 +8,7 @@ namespace RouteStrategySample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContext();
+            var tc = HttpContext.GetMultiTenantContext();
             return View(tc);
         }
     }

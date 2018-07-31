@@ -26,12 +26,12 @@ public class TestDbContext : MultiTenantDbContext
     public DbSet<Post> Posts { get; set; }
     public DbSet<ThingWithTenantId> Things { get; set; }
 
-    public TestDbContext(TenantContext tenantContext,
+    public TestDbContext(TenantInfo tenantInfo,
         DbContextOptions<TestDbContext> options) :
-        base(tenantContext, options)
+        base(tenantInfo, options)
     { }
 
-    public TestDbContext(TenantContext tenantContext) : base(tenantContext)
+    public TestDbContext(TenantInfo tenantInfo) : base(tenantInfo)
     {
     }
 }
@@ -40,9 +40,9 @@ public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext
 {
     public DbSet<ThingWithIntTenantId> Thing2s { get; set; }
 
-    public TestWrongTenantIdTypeDbContext(TenantContext tenantContext,
+    public TestWrongTenantIdTypeDbContext(TenantInfo tenantInfo,
         DbContextOptions<TestWrongTenantIdTypeDbContext> options) :
-        base(tenantContext, options)
+        base(tenantInfo, options)
     { }
 }
 
@@ -54,9 +54,9 @@ public class TestTenantIdConstraintsTypeDbContext : MultiTenantDbContext
 
     public DbSet<ThingWithHigherTenantIdMaxLength> ThingsWithHigherTenantIdsMaxLength { get; set; }
 
-    public TestTenantIdConstraintsTypeDbContext(TenantContext tenantContext,
+    public TestTenantIdConstraintsTypeDbContext(TenantInfo tenantInfo,
         DbContextOptions<TestTenantIdConstraintsTypeDbContext> options) :
-        base(tenantContext, options)
+        base(tenantInfo, options)
     { }
 }
 

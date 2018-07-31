@@ -21,7 +21,7 @@ namespace DataIsolationSample.Controllers
         {
             // Get the list of to do items. This will only return items for the current tenant.
             IEnumerable<ToDoItem> toDoItems = null;
-            if(HttpContext.GetTenantContext() != null)
+            if(HttpContext.GetMultiTenantContext() != null)
             {
                 toDoItems = dbContext.ToDoItems.ToList();
             }

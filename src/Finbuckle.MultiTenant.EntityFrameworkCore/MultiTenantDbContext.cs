@@ -33,26 +33,20 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public class MultiTenantDbContext : DbContext
     {
-        protected internal TenantContext TenantContext { get; protected set; }
+        protected internal TenantInfo TenantInfo { get; protected set; }
         
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
-        protected string ConnectionString => TenantContext.ConnectionString;
+        protected string ConnectionString => TenantInfo.ConnectionString;
 
-        protected MultiTenantDbContext(TenantContext tenantContext)
+        protected MultiTenantDbContext(TenantInfo tenantInfo)
         {
-            this.TenantContext = tenantContext;
+            this.TenantInfo = tenantInfo;
         }
         
-        protected MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
-            this.TenantContext = tenantContext;
-        }
-
-        [Obsolete("This constructor is obsolete and will be removed in future versions.")]
-        protected MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
-        {
-            TenantContext = new TenantContext(null, null, null, connectionString, null, null);
+            this.TenantInfo = tenantInfo;
         }
 
         protected MultiTenantDbContext()
@@ -86,7 +80,7 @@ namespace Finbuckle.MultiTenant
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, TenantContext);
+            Shared.SetupModel(modelBuilder, TenantInfo);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -95,7 +89,7 @@ namespace Finbuckle.MultiTenant
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -114,7 +108,7 @@ namespace Finbuckle.MultiTenant
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

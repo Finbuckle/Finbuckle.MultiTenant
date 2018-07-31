@@ -21,7 +21,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     internal static class Constants
     {
-        public const string HttpContextTenantContext =
-            "Finbuckle.MultiTenant.AspNetCore.TenantContext";
+        public const string HttpContextMultiTenantContext =
+            "Finbuckle.MultiTenant.AspNetCore.MultiTenantContext";
     }
 }

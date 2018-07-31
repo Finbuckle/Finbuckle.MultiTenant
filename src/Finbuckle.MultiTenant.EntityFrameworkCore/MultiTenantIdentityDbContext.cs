@@ -34,7 +34,7 @@ namespace Finbuckle.MultiTenant
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
@@ -50,7 +50,7 @@ namespace Finbuckle.MultiTenant
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
@@ -64,7 +64,7 @@ namespace Finbuckle.MultiTenant
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
@@ -79,19 +79,19 @@ namespace Finbuckle.MultiTenant
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected internal TenantContext TenantContext { get; protected set; }
+        protected internal TenantInfo TenantInfo { get; protected set; }
 
-        private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
+        private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
-        protected string ConnectionString => TenantContext.ConnectionString;
+        protected string ConnectionString => TenantInfo.ConnectionString;
 
         protected MultiTenantIdentityDbContext()
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
-            this.TenantContext = tenantContext;
+            this.TenantInfo = tenantInfo;
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -102,14 +102,14 @@ namespace Finbuckle.MultiTenant
         {
             get
             {
-                if (tenantScopeEntityTypes == null)
+                if (multiTenantEntityTypes == null)
                 {
-                    tenantScopeEntityTypes = Model.GetEntityTypes().
+                    multiTenantEntityTypes = Model.GetEntityTypes().
                        Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 
-                return tenantScopeEntityTypes;
+                return multiTenantEntityTypes;
             }
         }
 
@@ -123,7 +123,7 @@ namespace Finbuckle.MultiTenant
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, TenantContext);
+            Shared.SetupModel(builder, TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
             // Consider a more general solution in the future.
@@ -152,7 +152,7 @@ namespace Finbuckle.MultiTenant
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -171,7 +171,7 @@ namespace Finbuckle.MultiTenant
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
