@@ -21,84 +21,84 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Stores
 {
     /// <summary>
-    /// A basic Tenant Store that runs in local memory. Ignores string case by default.
+    /// A basic multitenant Store that runs in local memory. Ignores string case by default.
     /// </summary>
-    public class InMemoryMultiTenantStore : IMultiTenantStore
+    public class InMemoryStore : IMultiTenantStore
     {
-        public InMemoryMultiTenantStore() : this (true, null)
+        private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;
+        private readonly ILogger<InMemoryStore> logger;
+
+        public InMemoryStore() : this (true, null)
         {
         }
 
-        public InMemoryMultiTenantStore(bool igoreCase) : this (igoreCase, null)
+        public InMemoryStore(bool igoreCase) : this (igoreCase, null)
         {
         }
 
-        public InMemoryMultiTenantStore(ILogger<InMemoryMultiTenantStore> logger) : this (true, logger)
+        public InMemoryStore(ILogger<InMemoryStore> logger) : this (true, logger)
         {
         }
 
-        public InMemoryMultiTenantStore(bool ignoreCase, ILogger<InMemoryMultiTenantStore> logger)
+        public InMemoryStore(bool ignoreCase, ILogger<InMemoryStore> logger)
         {
             var stringComparerer = StringComparer.OrdinalIgnoreCase;
             if(!ignoreCase)
                 stringComparerer = StringComparer.Ordinal;
                 
-            _tenantMap = new ConcurrentDictionary<string, TenantContext>(stringComparerer);
+            tenantMap = new ConcurrentDictionary<string, TenantInfo>(stringComparerer);
             this.logger = logger;
         }
 
-        private readonly ConcurrentDictionary<string, TenantContext> _tenantMap;
-        private readonly ILogger<InMemoryMultiTenantStore> logger;
-
-        public virtual async Task<TenantContext> GetByIdentifierAsync(string identifier)
+        public virtual async Task<TenantInfo> GetByIdentifierAsync(string identifier)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            _tenantMap.TryGetValue(identifier, out var result);
+            tenantMap.TryGetValue(identifier, out var result);
             Utilities.TryLogInfo(logger, $"Tenant Id \"{result?.Id ?? "<null>"}\" found in store for identifier \"{identifier}\".");
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 
-        public virtual Task<bool> TryAdd(TenantContext context)
+        public virtual Task<bool> TryAddAsync(TenantInfo tenantInfo)
         {
-            if (context == null)
+            if (tenantInfo == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(tenantInfo));
             }
 
-            var result = _tenantMap.TryAdd(context.Identifier, context);
+            var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
             if(result)
             {
-                Utilities.TryLogInfo(logger, $"Tenant \"{context.Identifier}\" added to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Tenant \"{tenantInfo.Identifier}\" added to InMemoryStore.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{context.Identifier}\" to InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{tenantInfo.Identifier}\" to InMemoryStore.");
             }
 
             return Task.FromResult(result);
         }
 
-        public virtual Task<bool> TryRemove(string identifier)
+        public virtual Task<bool> TryRemoveAsync(string identifier)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            var result = _tenantMap.TryRemove(identifier, out var dummy);
+            var result = tenantMap.TryRemove(identifier, out var dummy);
 
             if(result)
             {
-                Utilities.TryLogInfo(logger, $"Tenant \"{identifier}\" removed from InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Tenant \"{identifier}\" removed from InMemoryStore.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"Unable to remove tenant \"{identifier}\" from InMemoryMultiTenantStore.");
+                Utilities.TryLogInfo(logger, $"Unable to remove tenant \"{identifier}\" from InMemoryStore.");
             }
 
             return Task.FromResult(result);

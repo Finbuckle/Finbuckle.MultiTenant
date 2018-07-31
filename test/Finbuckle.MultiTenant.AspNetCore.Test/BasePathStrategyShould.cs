@@ -22,7 +22,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-public class BasePathMultiTenantStrategyShould
+public class BasePathStrategyShould
 {
     private HttpContext CreateHttpContextMock(string path)
     {
@@ -41,7 +41,7 @@ public class BasePathMultiTenantStrategyShould
     public async void ReturnExpectedIdentifier(string path, string expected)
     {
         var httpContext = CreateHttpContextMock(path);
-        var strategy = new BasePathMultiTenantStrategy();
+        var strategy = new BasePathStrategy();
 
         var identifier = await strategy.GetIdentifierAsync(httpContext);
 
@@ -52,7 +52,7 @@ public class BasePathMultiTenantStrategyShould
     public void ThrowIfContextIsNotHttpContext()
     {
         var context = new Object();
-        var strategy = new BasePathMultiTenantStrategy();
+        var strategy = new BasePathStrategy();
 
         Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }

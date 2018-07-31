@@ -22,17 +22,17 @@ internal class TestStore : IMultiTenantStore
     {
     }
 
-    public Task<TenantContext> GetByIdentifierAsync(string identifier)
+    public Task<TenantInfo> GetByIdentifierAsync(string identifier)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> TryAdd(TenantContext context)
+    public Task<bool> TryAddAsync(TenantInfo context)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> TryRemove(string identifier)
+    public Task<bool> TryRemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }

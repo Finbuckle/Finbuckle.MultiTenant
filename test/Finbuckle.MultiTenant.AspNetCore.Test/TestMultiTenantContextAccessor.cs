@@ -16,14 +16,14 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 
-public class TestTenantContextAccessor : ITenantContextAccessor
+public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor
 {
-    private readonly TenantContext tenantContext;
+    private readonly MultiTenantContext tenantContext;
 
-    public TestTenantContextAccessor(TenantContext tenantContext)
+    public TestMultiTenantContextAccessor(MultiTenantContext tenantContext)
     {
         this.tenantContext = tenantContext;
     }
 
-    public TenantContext TenantContext => tenantContext;
+    public MultiTenantContext MultiTenantContext => tenantContext;
 }

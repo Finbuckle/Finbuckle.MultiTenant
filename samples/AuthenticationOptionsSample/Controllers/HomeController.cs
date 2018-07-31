@@ -14,8 +14,8 @@ namespace AuthenticationOptionsSample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContext();
-            var title = (tc?.Name ?? "No tenant") + " - ";
+            var ti = HttpContext.GetMultiTenantContext()?.TenantInfo;
+            var title = (ti?.Name ?? "No tenant") + " - ";
 
             ViewData["style"] = "navbar-light bg-light";
 
@@ -31,7 +31,7 @@ namespace AuthenticationOptionsSample.Controllers
 
             ViewData["Title"] = title;
 
-            if (tc != null)
+            if (ti != null)
             {
                 var cookieOptionsMonitor = HttpContext.RequestServices.GetService<IOptionsMonitor<CookieAuthenticationOptions>>();
                 var cookieName = cookieOptionsMonitor.Get(CookieAuthenticationDefaults.AuthenticationScheme).Cookie.Name;
@@ -41,7 +41,7 @@ namespace AuthenticationOptionsSample.Controllers
                 ViewData["ChallengeScheme"] = schemes.GetDefaultChallengeSchemeAsync().Result.Name;
             }
 
-            return View(tc);
+            return View(ti);
         }
 
         [Authorize]

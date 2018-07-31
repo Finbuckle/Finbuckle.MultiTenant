@@ -26,7 +26,7 @@ namespace DataIsolationSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
                 WithRouteStrategy(ConfigRoutes);
 
             // Register the db context, but do not specify a provider/connection string since
@@ -51,7 +51,7 @@ namespace DataIsolationSample
 
         private void SetupDb()
         {
-            var tc = new TenantContext("finbuckle", null, null, "Data Source=Data/ToDoList.db", null, null);
+            var tc = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();
@@ -62,7 +62,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantContext("megacorp", null, null, "Data Source=Data/ToDoList.db", null, null);
+            tc = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureCreated();
@@ -72,7 +72,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantContext("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null, null);
+            tc = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
             using (var db = new ToDoDbContext(tc))
             {
                 db.Database.EnsureDeleted();

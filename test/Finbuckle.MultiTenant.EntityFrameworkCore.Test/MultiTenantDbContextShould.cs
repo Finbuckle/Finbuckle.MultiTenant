@@ -39,8 +39,8 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantContext("abc", "abc", "abc",
-            "DataSource=testdb.db", null, null);
+        var tenant1 = new TenantInfo("abc", "abc", "abc",
+            "DataSource=testdb.db", null);
         var c = new TestDbContext(tenant1);
 
         Assert.NotNull(c);
@@ -49,18 +49,18 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithTwoParamCtor()
     {
-        var tenant1 = new TenantContext("abc", "abc", "abc",
-            "DataSource=testdb.db", null, null);
+        var tenant1 = new TenantInfo("abc", "abc", "abc",
+            "DataSource=testdb.db", null);
         var c = new TestDbContext(tenant1, new DbContextOptions<TestDbContext>());
 
         Assert.NotNull(c);
     }
 
     [Fact]
-    public void IdentifyOnlyTenantScopedProperties()
+    public void IdentifyOnlyMultiTenantAnnotatedProperties()
     {
-        var tenant1 = new TenantContext("abc", "abc", "abc",
-            "DataSource=testdb.db", null, null);
+        var tenant1 = new TenantInfo("abc", "abc", "abc",
+            "DataSource=testdb.db", null);
         using (var db = new TestDbContext(tenant1, _options))
         {
             var types = db.MultiTenantEntityTypes.Select(t => t.ClrType);
@@ -78,8 +78,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
             using (var db = new TestDbContext(tenant1, _options))
             {
                 db.Database.EnsureDeleted();
@@ -92,8 +92,8 @@ public class MultiTenantDbContextShould
                 db.SaveChanges();
             }
 
-            var tenant2 = new TenantContext("123", "123", "123",
-                "DataSource=testdb.db", null, null);
+            var tenant2 = new TenantInfo("123", "123", "123",
+                "DataSource=testdb.db", null);
             using (var db = new TestDbContext(tenant2, _options))
             {
                 var blog1 = new Blog { Title = "123" };
@@ -126,8 +126,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantNotSetMode.Throw, should act as Overwrite when adding
             using (var db = new TestDbContext(tenant1, _options))
@@ -167,8 +167,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -224,8 +224,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantNotSetMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -272,8 +272,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -337,8 +337,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantNotSetMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -386,8 +386,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -446,8 +446,8 @@ public class MultiTenantDbContextShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                    "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                    "DataSource=testdb.db", null);
 
             var _options = new DbContextOptionsBuilder<TestTenantIdConstraintsTypeDbContext>()
                 .UseSqlite(_connection)
@@ -485,8 +485,8 @@ public class MultiTenantDbContextShould
         {
 
             _connection.Open();
-            var tenant1 = new TenantContext("abc", "abc", "abc",
-                    "DataSource=testdb.db", null, null);
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                    "DataSource=testdb.db", null);
 
             var _options = new DbContextOptionsBuilder<TestWrongTenantIdTypeDbContext>()
                 .UseSqlite(_connection)

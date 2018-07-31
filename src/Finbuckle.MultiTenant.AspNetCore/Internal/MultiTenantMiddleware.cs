@@ -35,41 +35,56 @@ namespace Finbuckle.MultiTenant.AspNetCore
         public async Task Invoke(HttpContext context)
         {
             // Set the tenant context (or null) into the Items collections.
-            if (!context.Items.ContainsKey(Constants.HttpContextTenantContext))
+            if (!context.Items.ContainsKey(Constants.HttpContextMultiTenantContext))
             {
-                context.Items.Add(Constants.HttpContextTenantContext, null);
+                context.Items.Add(Constants.HttpContextMultiTenantContext, null);
 
                 // Try the registered strategy.
                 var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
                 var identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
                 var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
 
-                TenantContext tenantContext = null;
+                TenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
-                    tenantContext = await store.GetByIdentifierAsync(identifier);
+                    tenantInfo = await store.GetByIdentifierAsync(identifier);
                 }
 
                 // Resolve for remote authentication callbacks if applicable.
-                if (tenantContext == null &&
+                if (tenantInfo == null &&
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
-                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationMultiTenantStrategy>();
+                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
                     identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
 
                     if (identifier != null)
                     {
-                        tenantContext = await store.GetByIdentifierAsync(identifier);
+                        tenantInfo = await store.GetByIdentifierAsync(identifier);
                     }
                 }
 
-                if(tenantContext != null)
+                MultiTenantContext multiTenantContext = null;
+                if(tenantInfo != null)
                 {
-                    tenantContext.MultiTenantStrategyType = strategy.GetType();
-                    tenantContext.MultiTenantStoreType = store.GetType();
+                    multiTenantContext = new MultiTenantContext();
+
+                    multiTenantContext.TenantInfo = tenantInfo;
+                    tenantInfo.MultiTenantContext = multiTenantContext;
+
+                    var storeInfo = new StoreInfo();
+                    storeInfo.MultiTenantContext = multiTenantContext;
+                    storeInfo.Store = store;
+                    storeInfo.StoreType = store.GetType();
+                    multiTenantContext.StoreInfo = storeInfo;
+
+                    var strategyInfo = new StrategyInfo();
+                    strategyInfo.MultiTenantContext = multiTenantContext;
+                    strategyInfo.Strategy = strategy;
+                    strategyInfo.StrategyType = strategy.GetType();
+                    multiTenantContext.StrategyInfo = strategyInfo;
                 }
 
-                context.Items[Constants.HttpContextTenantContext] = tenantContext;
+                context.Items[Constants.HttpContextMultiTenantContext] = multiTenantContext;
             }
 
             if (next != null)

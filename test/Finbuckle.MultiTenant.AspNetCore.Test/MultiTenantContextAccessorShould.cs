@@ -20,14 +20,16 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-public class TenantContextAccessorShould
+public class MultiTenantContextAccessorShould
 {
     [Fact]
-    public void GetTenantFromIHttpAccessor()
+    public void GetMultiTenantContextFromIHttpAccessor()
     {
         var items = new Dictionary<object, object>();
-        var tc = new TenantContext("test", null, null, null, null, null);
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext, tc);
+        var ti = new TenantInfo("test", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
 
         var httpContextMock = new Mock<HttpContext>();
         httpContextMock.Setup(c => c.Items).Returns(items);
@@ -35,9 +37,9 @@ public class TenantContextAccessorShould
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        var accessor = new TenantContextAccessor(httpContextAccessorMock.Object);
+        var accessor = new MultiTenantContextAccessor(httpContextAccessorMock.Object);
 
-        Assert.Equal(tc.Id, accessor.TenantContext.Id);
+        Assert.Equal(ti.Id, accessor.MultiTenantContext.TenantInfo.Id);
     }
 
     [Fact]
@@ -46,8 +48,8 @@ public class TenantContextAccessorShould
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(a => a.HttpContext).Returns((HttpContext)null);
 
-        var accessor = new TenantContextAccessor(httpContextAccessorMock.Object);
+        var accessor = new MultiTenantContextAccessor(httpContextAccessorMock.Object);
 
-        Assert.Null(accessor.TenantContext);
+        Assert.Null(accessor.MultiTenantContext);
     }
 }

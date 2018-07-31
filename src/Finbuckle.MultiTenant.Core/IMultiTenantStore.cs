@@ -27,20 +27,20 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<bool> TryAdd(TenantContext context);
+        Task<bool> TryAddAsync(TenantInfo tenantInfo);
 
         /// <summary>
         /// Try to remove the TenantContext from the store.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        Task<bool> TryRemove(string identifier);
+        Task<bool> TryRemoveAsync(string identifier);
 
         /// <summary>
         /// Retrieve the TenantContext for a given identifier.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        Task<TenantContext> GetByIdentifierAsync(string identifier);
+        Task<TenantInfo> GetByIdentifierAsync(string identifier);
     }
 }

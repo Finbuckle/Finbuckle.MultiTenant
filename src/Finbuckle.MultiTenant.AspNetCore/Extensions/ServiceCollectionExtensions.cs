@@ -32,8 +32,8 @@ namespace Finbuckle.MultiTenant
         public static MultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.TryAddScoped<TenantContext>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetTenantContext());
-            services.TryAddSingleton<ITenantContextAccessor, TenantContextAccessor>();
+            services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
+            services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
 
             return new MultiTenantBuilder(services);
         }

@@ -1,13 +1,13 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    var tenantContext = Context.GetTenantContext();
+    var tenantInfo = Context.GetMultiTenantContext()?.TenantInfo;
 }
 
 @using Finbuckle.MultiTenant.AspNetCore
 
 <div class="row">
     <div class="col">
-        @if (tenantContext != null)
+        @if (tenantInfo != null)
         {
             <p class="mt-4 lead">TenantContext Details</p>
 
@@ -21,28 +21,20 @@
 
                 <tbody>
                     <tr>
-                    <td>@nameof(tenantContext.Id)</td>
-                    <td>@tenantContext.Id</td>
+                        <td>@nameof(tenantInfo.Id)</td>
+                        <td>@tenantInfo.Id</td>
                     </tr>
                     <tr>
-                    <td>@nameof(tenantContext.Identifier)</td>
-                    <td>@tenantContext.Identifier</td>
+                        <td>@nameof(tenantInfo.Identifier)</td>
+                        <td>@tenantInfo.Identifier</td>
                     </tr>
                     <tr>
-                    <td>@nameof(tenantContext.Name)</td>
-                    <td>@tenantContext.Name</td>
+                        <td>@nameof(tenantInfo.Name)</td>
+                        <td>@tenantInfo.Name</td>
                     </tr>
                     <tr>
-                    <td>@nameof(tenantContext.ConnectionString)</td>
-                    <td>@tenantContext.ConnectionString</td>
-                    </tr>
-                    <tr>
-                    <td>@nameof(tenantContext.MultiTenantStrategyType)</td>
-                    <td>@tenantContext.MultiTenantStrategyType</td>
-                    </tr>
-                    <tr>
-                    <td>@nameof(tenantContext.MultiTenantStoreType)</td>
-                    <td>@tenantContext.MultiTenantStoreType</td>
+                        <td>@nameof(tenantInfo.ConnectionString)</td>
+                        <td>@tenantInfo.ConnectionString</td>
                     </tr>
                 </tbody>
             

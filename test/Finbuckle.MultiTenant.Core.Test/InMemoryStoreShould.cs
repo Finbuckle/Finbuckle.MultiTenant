@@ -17,33 +17,33 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class InMemoryMultiTenantStoreShould
+public class InMemoryStoreShould
 {
-    private static InMemoryMultiTenantStore CreateTestStore(bool ignoreCase = true)
+    private static InMemoryStore CreateTestStore(bool ignoreCase = true)
     {
-        var store = new InMemoryMultiTenantStore(ignoreCase);
-        store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null));
-        store.TryAdd(new TenantContext("lol", "lol", "Lol, Inc.", null, null, null));
+        var store = new InMemoryStore(ignoreCase);
+        store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null));
+        store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null));
 
         return store;
     }
 
     [Fact]
-    public void GetTenantFromStore()
+    public void GetTenantInfoFromStore()
     {
         var store = CreateTestStore();
         Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
     }
 
     [Fact]
-    public void GetTenantFromStoreIgnoringCaseByDefault()
+    public void GetTenantInfoFromStoreIgnoringCaseByDefault()
     {
         var store = CreateTestStore();
         Assert.Equal("initech", store.GetByIdentifierAsync("iNitEch").Result.Identifier);
     }
 
     [Fact]
-    public void GetTenantFromStoreMatchingCase()
+    public void GetTenantInfoFromStoreMatchingCase()
     {
         var store = CreateTestStore(false);
         Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
@@ -54,40 +54,40 @@ public class InMemoryMultiTenantStoreShould
     public void FailIfAddingDuplicate()
     {
         var store = CreateTestStore();
-        Assert.False(store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null)).Result);
-        Assert.False(store.TryAdd(new TenantContext("iNitEch", "iNitEch", "Initech", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("iNitEch", "iNitEch", "Initech", null, null)).Result);
 
         store = CreateTestStore(false);
-        Assert.False(store.TryAdd(new TenantContext("initech", "initech", "Initech", null, null, null)).Result);
-        Assert.True(store.TryAdd(new TenantContext("iNiTEch", "iNiTEch", "Initech", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
+        Assert.True(store.TryAddAsync(new TenantInfo("iNiTEch", "iNiTEch", "Initech", null, null)).Result);
     }
 
     [Fact]
-    public void AddTenantToStore()
+    public void AddTenantInfoToStore()
     {
         var store = CreateTestStore();
 
         Assert.Null(store.GetByIdentifierAsync("test").Result);
-        Assert.True(store.TryAdd(new TenantContext("test", "test", "test", null, null, null)).Result);
+        Assert.True(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
 
         Assert.NotNull(store.GetByIdentifierAsync("test").Result);
 
         // test when already added
-        Assert.False(store.TryAdd(new TenantContext("test", "test", "test", null, null, null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
     }
 
     [Fact]
-    public void RemoveTenantFromStore()
+    public void RemoveTenantInfoFromStore()
     {
         var store = CreateTestStore();
 
         Assert.NotNull(store.GetByIdentifierAsync("initech").Result);
-        Assert.True(store.TryRemove("initech").Result);
+        Assert.True(store.TryRemoveAsync("initech").Result);
 
         Assert.Null(store.GetByIdentifierAsync("initech").Result);
 
         // test when already removed
-        Assert.False(store.TryRemove("initech").Result);
+        Assert.False(store.TryRemoveAsync("initech").Result);
     }
 
     [Fact]
@@ -102,19 +102,19 @@ public class InMemoryMultiTenantStoreShould
     [Fact]
     public void ThrowIfTenantIdentifierIsNullWhenRemoving()
     {
-        var store = new InMemoryMultiTenantStore();
-        var e = Assert.Throws<ArgumentNullException>(() => store.TryRemove(null).Result);
+        var store = new InMemoryStore();
+        var e = Assert.Throws<ArgumentNullException>(() => store.TryRemoveAsync(null).Result);
     }
 
     [Fact]
-    public void ThrowIfTenantContextIsNullWhenAdding()
+    public void ThrowIfTenantInfoIsNullWhenAdding()
     {
-        var store = new InMemoryMultiTenantStore();
-        var e = Assert.Throws<ArgumentNullException>(() => store.TryAdd(null).Result);
+        var store = new InMemoryStore();
+        var e = Assert.Throws<ArgumentNullException>(() => store.TryAddAsync(null).Result);
     }
 
     [Fact]
-    public void ReturnNullIfTenantNotFound()
+    public void ReturnNullIfTenantInfoNotFound()
     {
         var store = CreateTestStore();
 

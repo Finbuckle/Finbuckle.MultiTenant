@@ -12,25 +12,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using DataIsolationSample.Models;
+using System;
+using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+using Finbuckle.MultiTenant.Core;
+using Xunit;
 
-namespace DataIsolationSample.Data
+public class MultiTenantContextShould
 {
-    public class ToDoDbContext : MultiTenantDbContext
+    [Fact]
+    public void ThrowIfTenantIdSetWithLengthAboveTenantIdMaxLength()
     {
-        public ToDoDbContext(TenantInfo tenantInfo) : base(tenantInfo)
-        {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<ToDoItem> ToDoItems { get; set; }
+        new TenantInfo("".PadRight(1, 'a'), null, null, null, null);
+        new TenantInfo("".PadRight(Constants.TenantIdMaxLength, 'a'), null, null, null, null);
+        
+        Assert.Throws<MultiTenantException>(() => new TenantInfo("".PadRight(Constants.TenantIdMaxLength + 1, 'a'), null, null, null, null));
+        Assert.Throws<MultiTenantException>(() => new TenantInfo("".PadRight(999, 'a'), null, null, null, null));
     }
 }

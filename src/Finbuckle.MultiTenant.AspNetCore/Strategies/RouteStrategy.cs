@@ -23,18 +23,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class RouteMultiTenantStrategy : IMultiTenantStrategy
+    public class RouteStrategy : IMultiTenantStrategy
     {
         internal readonly string tenantParam;
         internal IRouter router;
-        private readonly ILogger<RouteMultiTenantStrategy> logger;
+        private readonly ILogger<RouteStrategy> logger;
         internal readonly Action<IRouteBuilder> configRoutes;
 
-        public RouteMultiTenantStrategy(string tenantParam, Action<IRouteBuilder> configRoutes) : this(tenantParam, configRoutes, null)
+        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes) : this(tenantParam, configRoutes, null)
         {
         }
 
-        public RouteMultiTenantStrategy(string tenantParam, Action<IRouteBuilder> configRoutes, ILogger<RouteMultiTenantStrategy> logger)
+        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes, ILogger<RouteStrategy> logger)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {

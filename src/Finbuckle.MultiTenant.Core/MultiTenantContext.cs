@@ -13,26 +13,18 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
-using Finbuckle.MultiTenant;
+using System.Collections.Generic;
 using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Strategies;
-using Xunit;
 
-public class StaticTenantResolverShould
+namespace Finbuckle.MultiTenant
 {
-    [Theory]
-    [InlineData("initech")]
-    [InlineData("Initech")] // maintain case
-    [InlineData("")] // empty string
-    [InlineData("    ")] // whitespace
-    [InlineData(null)] // null
-    public async void ReturnExpectedIdentifier(string staticIdentifier)
+    /// <summary>
+    /// Contains information for a specific tenant.
+    /// </summary>
+    public class MultiTenantContext
     {
-        var strategy = new StaticMultiTenantStrategy(staticIdentifier);
-
-        var identifier = await strategy.GetIdentifierAsync(new Object());
-
-        Assert.Equal(staticIdentifier, identifier);
+        public TenantInfo TenantInfo { get; internal set; }
+        public StrategyInfo StrategyInfo { get; internal set; }
+        public StoreInfo StoreInfo { get; internal set; }
     }
 }

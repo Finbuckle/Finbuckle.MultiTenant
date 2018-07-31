@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
-public class HostMultiTenantStrategyShould
+public class HostStrategyShould
 {
     private HttpContext CreateHttpContextMock(string host)
     {
@@ -52,7 +52,7 @@ public class HostMultiTenantStrategyShould
     public async void ReturnExpectedIdentifier(string host, string template, string expected)
     {
         var httpContext = CreateHttpContextMock(host);
-        var strategy = new HostMultiTenantStrategy(template);
+        var strategy = new HostStrategy(template);
 
         var identifier = await strategy.GetIdentifierAsync(httpContext);
 
@@ -67,14 +67,14 @@ public class HostMultiTenantStrategyShould
 
     public void ThrowIfInvalidTemplate(string template)
     {
-        Assert.Throws<MultiTenantException>(() => new HostMultiTenantStrategy(template));
+        Assert.Throws<MultiTenantException>(() => new HostStrategy(template));
     }
 
     [Fact]
     public void ThrowIfContextIsNotHttpContext()
     {
         var context = new Object();
-        var strategy = new HostMultiTenantStrategy("__tenant__.*");
+        var strategy = new HostStrategy("__tenant__.*");
 
         Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }

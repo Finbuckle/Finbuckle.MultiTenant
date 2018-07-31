@@ -12,20 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Http;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Finbuckle.MultiTenant
 {
-    public class TenantContextAccessor : ITenantContextAccessor
+    /// <summary>
+    /// Holds data for configuring an <c>InMemoryStore</c>.
+    /// </summary>
+    public class InMemoryStoreOptions
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        public string DefaultConnectionString { get; set; }
+        public TenantConfiguration[] TenantConfigurations { get; set; }
 
-        public TenantContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public class TenantConfiguration
         {
-            this.httpContextAccessor = httpContextAccessor;
+            public string Id { get; set; }
+            public string Identifier { get; set; }
+            public string Name { get; set; }
+            public string ConnectionString { get; set; }
+            public Dictionary<string, string> Items { get; set; }
         }
-
-        public TenantContext TenantContext => httpContextAccessor.HttpContext?.GetTenantContext();
     }
 }

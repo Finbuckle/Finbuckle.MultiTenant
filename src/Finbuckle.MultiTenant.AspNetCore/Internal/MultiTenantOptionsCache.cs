@@ -26,15 +26,15 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     internal class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
     {
-        private readonly ITenantContextAccessor tenantContextAccessor;
+        private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
 
         // The object is just a dummy because there is no ConcurrentSet<T> class.
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        public MultiTenantOptionsCache(ITenantContextAccessor tenantContextAccessor)
+        public MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
         {
-            this.tenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
+            this.multiTenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             name = name ?? Options.DefaultName;
-            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor.TenantContext?.Id, name);
+            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo.Id, name);
             return base.GetOrAdd(adjustedOptionsName, () => MultiTenantFactoryWrapper(name, adjustedOptionsName, createOptions));
         }
 
@@ -65,7 +65,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             name = name ?? Options.DefaultName;
 
-            var adjustedOptionsName = AdjustOptionsName(tenantContextAccessor?.TenantContext.Id, name);
+            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor?.MultiTenantContext.TenantInfo.Id, name);
 
             if (base.TryAdd(adjustedOptionsName, options))
             {

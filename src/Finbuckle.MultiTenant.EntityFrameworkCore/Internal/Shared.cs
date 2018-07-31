@@ -41,8 +41,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         ///     </list>
         /// </remarks>
         /// <param name="modelBuilder"></param>
-        /// <param name="tenantContext"></param>
-        public static void SetupModel(ModelBuilder modelBuilder, TenantContext tenantContext)
+        /// <param name="tenantInfo"></param>
+        public static void SetupModel(ModelBuilder modelBuilder, TenantInfo tenantInfo)
         {
             foreach (var t in modelBuilder.Model.GetEntityTypes().
                 Where(t => HasMultiTenantAttribute(t.ClrType)))
@@ -70,7 +70,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var leftExp = efPropertyExp;
 
                 // build expression tree for EF.Property<string>(e, "TenantId") == tenantId
-                var rightExp = Expression.Constant(tenantContext?.Id, typeof(string));
+                var rightExp = Expression.Constant(tenantInfo?.Id, typeof(string));
                 var equalExp = Expression.Equal(leftExp, rightExp);
 
                 // build the final expression tree
@@ -97,14 +97,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         ///         <item><description>If any changes are detected in an entitiy with the <c>MultiTenant</c> attribute then the <c>TenantContext</c> must not be null.</description></item>
         ///     </list>  
         /// </remarks>
-        /// /// <param name="tenantContext"></param>
+        /// /// <param name="tenantInfo"></param>
         /// <param name="changeTracker"></param>
         /// <param name="tenantNotSetMode"></param>
         /// <param name="tenantMismatchMode"></param>
-        public static void EnforceTenantId(TenantContext tenantContext,
-                                            ChangeTracker changeTracker,
-                                            TenantNotSetMode tenantNotSetMode,
-                                            TenantMismatchMode tenantMismatchMode)
+        public static void EnforceTenantId(TenantInfo tenantInfo,
+            ChangeTracker changeTracker,
+            TenantNotSetMode tenantNotSetMode,
+            TenantMismatchMode tenantMismatchMode)
         {
             var changedMultiTenantEntities = changeTracker.Entries().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted).
@@ -112,7 +112,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // ensure tenant context is valid
             if (changedMultiTenantEntities.Any())
-                CheckTenantContext(tenantContext);
+                CheckTenantInfo(tenantInfo);
 
             // get list of all added entities with TenantScope attribute
             var addedTenantScopeEntities = changedMultiTenantEntities.
@@ -121,7 +121,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for added entities
             var mismatchedAdded = addedTenantScopeEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantContext.Id);
+                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedAdded.Any())
             {
@@ -137,7 +137,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                     case TenantMismatchMode.Overwrite:
                         foreach (var e in mismatchedAdded)
                         {
-                            e.Property("TenantId").CurrentValue = tenantContext.Id;
+                            e.Property("TenantId").CurrentValue = tenantInfo.Id;
                         }
                         break;
                 }
@@ -149,7 +149,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             foreach (var e in notSetAdded)
             {
-                e.Property("TenantId").CurrentValue = tenantContext.Id;
+                e.Property("TenantId").CurrentValue = tenantInfo.Id;
             }
 
             // get list of all modified entities with TenantScope attribute
@@ -159,7 +159,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for modified entities
             var mismatchedModified = modifiedTenantScopeEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantContext.Id);
+                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedModified.Any())
             {
@@ -175,7 +175,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                     case TenantMismatchMode.Overwrite:
                         foreach (var e in mismatchedModified)
                         {
-                            e.Property("TenantId").CurrentValue = tenantContext.Id;
+                            e.Property("TenantId").CurrentValue = tenantInfo.Id;
                         }
                         break;
                 }
@@ -195,7 +195,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                     case TenantNotSetMode.Overwrite:
                         foreach (var e in notSetModified)
                         {
-                            e.Property("TenantId").CurrentValue = tenantContext.Id;
+                            e.Property("TenantId").CurrentValue = tenantInfo.Id;
                         }
                         break;
                 }
@@ -208,7 +208,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for deleted entities
             var mismatchedDeleted = deletedTenantScopeEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantContext.Id);
+                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedDeleted.Any())
             {
@@ -245,10 +245,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
         }
 
-        private static void CheckTenantContext(TenantContext tenantContext)
+        private static void CheckTenantInfo(TenantInfo tenantInfo)
         {
-            if (tenantContext == null)
-                throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantContext is null.");
+            if (tenantInfo == null)
+                throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
         }
     }
 }
