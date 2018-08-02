@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityDataIsolationSample", "samples\IdentityDataIsolationSample\IdentityDataIsolationSample.csproj", "{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseStoreSample", "samples\DatabaseStoreSample\DatabaseStoreSample.csproj", "{910E39BF-D907-4099-82C2-765118E302BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -218,6 +220,18 @@ Global
 		{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}.Release|x64.Build.0 = Release|Any CPU
 		{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}.Release|x86.ActiveCfg = Release|Any CPU
 		{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}.Release|x86.Build.0 = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|x64.Build.0 = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Debug|x86.Build.0 = Debug|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|x64.ActiveCfg = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|x64.Build.0 = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|x86.ActiveCfg = Release|Any CPU
+		{910E39BF-D907-4099-82C2-765118E302BB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -234,6 +248,7 @@ Global
 		{58453662-5F28-408F-B30D-2736C621A664} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 		{AA57B76D-83F5-49E2-AF15-D00F13BEB38C} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
+		{910E39BF-D907-4099-82C2-765118E302BB} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

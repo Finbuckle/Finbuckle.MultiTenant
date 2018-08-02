@@ -24,15 +24,15 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// Extension methods for using <c>Finbuckle.MultiTenant.AspNetCore</c>.
+    /// Extension methods for using Finbuckle.MultiTenant.AspNetCore.
     /// </summary>
     public static class ApplicationBuilderExtensions
     {
         /// <summary>
-        /// Use <c>Finbuckle.MultiTenant</c> middleware in processing the request.
+        /// Use Finbuckle.MultiTenant middleware in processing the request.
         /// </summary>
-        /// <param name="builder">The <c>IApplicationBuilder<c/> instance the extension method applies to.</param>
-        /// <returns>The same <c>IApplicationBuilder</c> passed into the method.</returns>
+        /// <param name="builder">The IApplicationBuilder<c/> instance the extension method applies to.</param>
+        /// <returns>The same IApplicationBuilder passed into the method.</returns>
         public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder) =>
                 builder.UseMiddleware<MultiTenantMiddleware>();
     }

@@ -21,7 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
-    /// Middleware for resolving the <c>TenantContext</c> and storing it in <c>HttpContext</c>.
+    /// Middleware for resolving the TenantContext and storing it in HttpContext.
     /// </summary>
     internal class MultiTenantMiddleware
     {

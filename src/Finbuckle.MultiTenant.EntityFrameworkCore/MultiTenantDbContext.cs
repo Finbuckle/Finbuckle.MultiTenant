@@ -29,7 +29,7 @@ namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// A database context that enforces tenant integrity on entity types
-    /// marked with the <c>MultiTenant</c> attribute.
+    /// marked with the MultiTenant attribute.
     /// </summary>
     public class MultiTenantDbContext : DbContext
     {

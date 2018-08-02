@@ -12,19 +12,25 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
+using Finbuckle.MultiTenant;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.Core
+namespace DatabaseStoreSample.Data
 {
-    /// <summary>
-    /// Contains constant values for Finbuckle.MultiTenant.Core.
-    /// </summary>
-    public static class Constants
+
+    public class MultiTenantStoreDbContext : DbContext
     {
-        /// <summary>
-        /// The maximum character length for Id property on a TenantContet.
-        /// The property setter will throw a MultiTenantException if the assigned value exceeds this limit.
-        /// </summary>
-        public const int TenantIdMaxLength = 64;
+        public MultiTenantStoreDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        public DbSet<TenantInfo> TenantInfo { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Ignore nontrivial properties on TenantInfo.
+            modelBuilder.Entity<TenantInfo>().Ignore(ti => ti.MultiTenantContext).Ignore(ti => ti.Items);
+        }
     }
 }

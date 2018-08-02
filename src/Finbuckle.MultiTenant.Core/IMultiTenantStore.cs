@@ -23,21 +23,28 @@ namespace Finbuckle.MultiTenant
     public interface IMultiTenantStore
     {
         /// <summary>
-        /// Try to add the TenantContext to the store.
+        /// Try to add the TenantInfo to the store.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
         Task<bool> TryAddAsync(TenantInfo tenantInfo);
 
         /// <summary>
-        /// Try to remove the TenantContext from the store.
+        /// Try to update the TenantInfo in the store.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task<bool> TryUpdateAsync(TenantInfo tenantInfo);
+
+        /// <summary>
+        /// Try to remove the TenantInfo from the store.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
         Task<bool> TryRemoveAsync(string identifier);
 
         /// <summary>
-        /// Retrieve the TenantContext for a given identifier.
+        /// Retrieve the TenantInfo for a given identifier.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>

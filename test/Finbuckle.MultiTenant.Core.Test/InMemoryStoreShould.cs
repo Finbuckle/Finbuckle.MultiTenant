@@ -90,6 +90,36 @@ public class InMemoryStoreShould
         Assert.False(store.TryRemoveAsync("initech").Result);
     }
 
+    [Theory]
+    [InlineData("initech", true)]
+    [InlineData("notFound", false)]
+    public void UpdateTenantInfoInStore(string id, bool expected)
+    {
+        var store = CreateTestStore();
+
+        var result = store.TryUpdateAsync(new TenantInfo(id, "test", null, null, null)).Result;
+
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void ThrowIfTenantIInfoIsNullWhenUpdating()
+    {
+        var store = CreateTestStore();
+
+        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(null).Result);
+        Assert.IsType<ArgumentNullException>(e.InnerException);
+    }
+
+    [Fact]
+    public void ThrowIfTenantIdIsNullWhenUpdating()
+    {
+        var store = CreateTestStore();
+
+        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(new TenantInfo(null, null, null, null, null)).Result);
+        Assert.IsType<ArgumentNullException>(e.InnerException);
+    }
+
     [Fact]
     public void ThrowIfTenantIdentifierIsNullWhenGetting()
     {

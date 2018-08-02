@@ -17,7 +17,7 @@ using System;
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
-    /// Constant values for use with <c>Finbuckle.MultiTenant.AspNetCore.
+    /// Constant values for use with Finbuckle.MultiTenant.AspNetCore.
     /// </summary>
     internal static class Constants
     {

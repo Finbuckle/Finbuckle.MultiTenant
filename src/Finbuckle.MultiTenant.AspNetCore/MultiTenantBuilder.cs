@@ -28,7 +28,7 @@ using Microsoft.AspNetCore.Routing;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// Configures <c>Finbuckle.MultiTenant.AspNetCore</c> services and configuration.
+    /// Configures Finbuckle.MultiTenant.AspNetCore services and configuration.
     /// </summary>
     public class MultiTenantBuilder
     {
@@ -43,7 +43,7 @@ namespace Finbuckle.MultiTenant
         /// Adds per-tenant configuration for an options class.
         /// </summary>
         /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class, new()
         {
             if (tenantInfo == null)
@@ -82,7 +82,7 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Configures support for multitenant OAuth and OpenIdConnect.
         /// </summary>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithRemoteAuthentication()
         {
             // Replace needed instead of TryAdd...
@@ -95,18 +95,18 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using dependency injection.
         /// </summary>>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithStore<T>(params object[] parameters) where T : IMultiTenantStore
             => WithStore(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
 
         /// <summary>
-        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using a factory method.
+        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using a factory method.
         /// </summary>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithStore(Func<IServiceProvider, IMultiTenantStore> factory)
         {
             if (factory == null)
@@ -122,48 +122,48 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.
         /// </summary>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore() => WithInMemoryStore(true);
 
         /// <summary>
         /// Adds an empty InMemoryStore to the application.
         /// </summary>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore(bool ignoreCase) => WithInMemoryStore(_ => { }, ignoreCase);
 
         /// <summary>
-        /// Adds and configures a case-insensitive <c>InMemoryStore</c> to the application using the provided <c>ConfigurationSeciont</c>.
+        /// Adds and configures a case-insensitive InMemoryStore to the application using the provided ConfigurationSeciont.
         /// </summary>
-        /// <param name="config">The <c>ConfigurationSection</c> which contains the <c>InMemoryStore</c> configuartion settings.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection) =>
             WithInMemoryStore(o => configurationSection.Bind(o), true);
 
         /// <summary>
-        /// Adds and configures <c>InMemoryStore</c> to the application using the provided <c>ConfigurationSeciont</c>.
+        /// Adds and configures InMemoryStore to the application using the provided ConfigurationSeciont.
         /// </summary>
-        /// <param name="config">The <c>ConfigurationSection</c> which contains the <c>InMemoryStore</c> configuartion settings.</param>
+        /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore(IConfigurationSection configurationSection, bool ignoreCase) =>
             WithInMemoryStore(o => configurationSection.Bind(o), ignoreCase);
 
         /// <summary>
-        /// Adds and configures a case-insensitive <c>InMemoryStore</c> to the application using the provided action.
+        /// Adds and configures a case-insensitive InMemoryStore to the application using the provided action.
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore(Action<InMemoryStoreOptions> config)
             => WithInMemoryStore(config, true);
 
         /// <summary>
-        /// Adds and configures <c>InMemoryStore</c> to the application using the provided action.
+        /// Adds and configures InMemoryStore to the application using the provided action.
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithInMemoryStore(Action<InMemoryStoreOptions> config, bool ignoreCase)
         {
             if (config == null)
@@ -175,7 +175,7 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Creates an <c>InMemoryStore</c> from configured <c>InMemoryMultiTenantStoreOptions</c>.
+        /// Creates an InMemoryStore from configured InMemoryMultiTenantStoreOptions.
         /// </summary>
         private InMemoryStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase, ILogger<InMemoryStore> logger)
         {
@@ -221,10 +221,10 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a <c>StaticMultiTenantStrategy</c> to the application.
+        /// Adds and configures a StaticMultiTenantStrategy to the application.
         /// </summary>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithStaticStrategy(string identifier)
         {
             if (string.IsNullOrWhiteSpace(identifier))
@@ -236,24 +236,24 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a <c>BasePathMultiTenantStrategy</c> to the application.
+        /// Adds and configures a BasePathMultiTenantStrategy to the application.
         /// </summary>
-        /// <returnsThe same <c>MultiTenantBuilder</c> passed into the method.></returns>
+        /// <returnsThe same MultiTenantBuilder passed into the method.></returns>
         public MultiTenantBuilder WithBasePathStrategy()
             => WithStrategy(sp => new BasePathStrategy(sp.GetService<ILogger<BasePathStrategy>>()));
 
         /// <summary>
-        /// Adds and configures a <c>RouteMultiTenantStrategy</c> with a route parameter "__tenant__" to the application.
+        /// Adds and configures a RouteMultiTenantStrategy with a route parameter "__tenant__" to the application.
         /// </summary>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithRouteStrategy(Action<IRouteBuilder> configRoutes)
             => WithRouteStrategy("__tenant__", configRoutes);
 
         /// <summary>
-        /// Adds and configures a <c>RouteMultiTenantStrategy</c> to the application.
+        /// Adds and configures a RouteMultiTenantStrategy to the application.
         /// </summary>
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithRouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
@@ -270,17 +270,17 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a <c>HostMultiTenantStrategy</c> with template "__tenant__.*" to the application.
+        /// Adds and configures a HostMultiTenantStrategy with template "__tenant__.*" to the application.
         /// </summary>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithHostStrategy()
             => WithHostStrategy("__tenant__.*");
 
         /// <summary>
-        /// Adds and configures a <c>HostMultiTenantStrategy</c> to the application.
+        /// Adds and configures a HostMultiTenantStrategy to the application.
         /// </summary>
         /// <param name="template">The template for determining the tenant identifier in the host.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithHostStrategy(string template)
         {
             if (string.IsNullOrWhiteSpace(template))
@@ -292,18 +292,18 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using its default constructor using dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using dependency injection.
         /// </summary>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithStrategy<T>(params object[] parameters) where T : IMultiTenantStrategy
             => WithStrategy(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
 
         /// <summary>
-        /// Adds and configures a <c>IMultiTenantStrategy</c> to the application using a factory method.
+        /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
         /// </summary>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
-        /// <returns>The same <c>MultiTenantBuilder</c> passed into the method.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public MultiTenantBuilder WithStrategy(Func<IServiceProvider, IMultiTenantStrategy> factory)
         {
             if (factory == null)
