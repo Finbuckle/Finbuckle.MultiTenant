@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// Holds data for configuring an <c>InMemoryStore</c>.
+    /// Holds data for configuring an InMemoryStore.
     /// </summary>
     public class InMemoryStoreOptions
     {

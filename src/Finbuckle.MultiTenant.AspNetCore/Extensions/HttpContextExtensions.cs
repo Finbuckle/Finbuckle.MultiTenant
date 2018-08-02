@@ -20,15 +20,15 @@ using Microsoft.AspNetCore.Http;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// <c>Finbuckle.MultiTenant.AspNetCore</c> extensions to <c>HttpContext</c>.
+    /// Finbuckle.MultiTenant.AspNetCore extensions to HttpContext.
     /// </summary>
     public static class HttpContextExtensions
     {
         /// <summary>
-        /// Returns the current <c>TenantContext</c> or null if there is none.
+        /// Returns the current TenantContext or null if there is none.
         /// </summary>
-        /// <param name="context">The <c>HttpContext<c/> instance the extension method applies to.</param>
-        /// <returns>The <c>TenantContext</c> instance for the current tenant.</returns>
+        /// <param name="context">The HttpContext<c/> instance the extension method applies to.</param>
+        /// <returns>The TenantContext instance for the current tenant.</returns>
         public static MultiTenantContext GetMultiTenantContext(this HttpContext context)
         {
             object tenantContext = null;

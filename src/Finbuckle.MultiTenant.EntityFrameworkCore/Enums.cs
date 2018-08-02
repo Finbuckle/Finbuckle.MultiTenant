@@ -16,8 +16,8 @@ namespace Finbuckle.MultiTenant
 {
 
     /// <summary>
-    /// Determines how entities where <c>TenantId</c> does not match the <c>TenantContext</c> are handled
-    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// Determines how entities where TenantId does not match the TenantContext are handled
+    /// when SaveChanges or SaveChangesAsync is called.
     /// </summary>
     public enum TenantMismatchMode
     {
@@ -27,8 +27,8 @@ namespace Finbuckle.MultiTenant
     }
 
     /// <summary>
-    /// Determines how entities with null <c>TenantId</c> are handled
-    /// when <c>SaveChanges</c> or <c>SaveChangesAsync</c> is called.
+    /// Determines how entities with null TenantId are handled
+    /// when SaveChanges or SaveChangesAsync is called.
     /// </summary>
     public enum TenantNotSetMode
     {

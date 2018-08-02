@@ -25,10 +25,10 @@ namespace Finbuckle.MultiTenant
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Configure <c>Finbuckle.MultiTenant</c> services for the application.
+        /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
-        /// <param name="services">The <c>IServiceCollection<c/> instance the extension method applies to.</param>
-        /// <returns>An new instance of <c>MultiTenantBuilder</c>.</returns>
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
         public static MultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();

@@ -30,14 +30,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     internal static class Shared
     {
         /// <summary>
-        /// Adds a "required" constraint to the <c>TenantId</c> string property and
-        /// sets the query filter for the entity on <c>TenantId</c>.
+        /// Adds a "required" constraint to the TenantId string property and
+        /// sets the query filter for the entity on TenantId.
         /// </summary>
         /// <remarks>
         ///     <list type="bullet">
-        ///         <item><description>This method is called from <c>OnModelCreating</c> of the derived <c>DbContext</c>.</description></item>
+        ///         <item><description>This method is called from OnModelCreating of the derived DbContext.</description></item>
         ///         <item><description>If no TenantId string property exists, a shadow property is created.</description></item>
-        ///         <item><description>The query filter has no effect when calling <c>DbSet.Find</c>.</description></item>
+        ///         <item><description>The query filter has no effect when calling DbSet.Find.</description></item>
         ///     </list>
         /// </remarks>
         /// <param name="modelBuilder"></param>
@@ -88,13 +88,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Checks the <c>TenantId</c> on entities taking into account
-        /// the <c>tenantNotSetMode</c> and the <c>tenantMismatchMode</c>.
+        /// Checks the TenantId on entities taking into account
+        /// the tenantNotSetMode and the tenantMismatchMode.
         /// </summary>
         /// <remarks>
         ///     <list type="bullet">
-        ///         <item><description>This method is called from <c>SaveChanges</c> or <c>SaveChangesAsync</c> of the derived <c>DbContext</c>.</description></item>
-        ///         <item><description>If any changes are detected in an entitiy with the <c>MultiTenant</c> attribute then the <c>TenantContext</c> must not be null.</description></item>
+        ///         <item><description>This method is called from SaveChanges or SaveChangesAsync of the derived DbContext.</description></item>
+        ///         <item><description>If any changes are detected in an entitiy with the MultiTenant attribute then the TenantContext must not be null.</description></item>
         ///     </list>  
         /// </remarks>
         /// /// <param name="tenantInfo"></param>

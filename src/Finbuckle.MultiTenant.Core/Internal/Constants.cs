@@ -17,13 +17,13 @@ using System;
 namespace Finbuckle.MultiTenant.Core
 {
     /// <summary>
-    /// Contains constant values for <c>Finbuckle.MultiTenant.Core</c>.
+    /// Contains constant values for Finbuckle.MultiTenant.Core.
     /// </summary>
     public static class Constants
     {
         /// <summary>
-        /// The maximum character length for <c>Id</c> property on a <c>TenantContet</c>.
-        /// The property setter will throw a <c>MultiTenantException</c> if the assigned value exceeds this limit.
+        /// The maximum character length for Id property on a TenantContet.
+        /// The property setter will throw a MultiTenantException if the assigned value exceeds this limit.
         /// </summary>
         public const int TenantIdMaxLength = 64;
     }
