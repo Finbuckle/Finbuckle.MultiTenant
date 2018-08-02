@@ -36,4 +36,9 @@ internal class TestStore : IMultiTenantStore
     {
         throw new NotImplementedException();
     }
+
+    public Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+    {
+        throw new NotImplementedException();
+    }
 }

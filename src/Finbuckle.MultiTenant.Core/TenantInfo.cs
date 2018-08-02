@@ -28,7 +28,7 @@ namespace Finbuckle.MultiTenant
             Identifier = identifier;
             Name = name;
             ConnectionString = connectionString;
-            if(items != null)
+            if (items != null)
             {
                 Items = Items;
             }
@@ -42,14 +42,17 @@ namespace Finbuckle.MultiTenant
             }
             set
             {
-                if (value.Length > Constants.TenantIdMaxLength)
+                if (value != null)
                 {
-                    throw new MultiTenantException($"The tenant id cannot exceed {Constants.TenantIdMaxLength} characters.");
+                    if (value.Length > Constants.TenantIdMaxLength)
+                    {
+                        throw new MultiTenantException($"The tenant id cannot be null or exceed {Constants.TenantIdMaxLength} characters.");
+                    }
+                    id = value;
                 }
-                id = value;
             }
         }
-        
+
         public string Identifier { get; internal set; }
         public string Name { get; internal set; }
         public string ConnectionString { get; internal set; }

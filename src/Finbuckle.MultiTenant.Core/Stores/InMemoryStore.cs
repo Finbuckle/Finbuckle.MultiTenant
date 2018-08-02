@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
@@ -102,6 +103,32 @@ namespace Finbuckle.MultiTenant.Stores
             }
 
             return Task.FromResult(result);
+        }
+
+        public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        {
+            if (tenantInfo == null)
+            {
+                throw new ArgumentNullException(nameof(tenantInfo));
+            }
+
+            if (tenantInfo.Id == null)
+            {
+                throw new ArgumentNullException(nameof(tenantInfo.Id));
+            }
+
+            var existingTenantInfo = tenantMap.Values.Where(ti => ti.Id == tenantInfo.Id).SingleOrDefault();
+
+            if(existingTenantInfo == null)
+            {
+                Utilities.TryLogInfo(logger, $"Tenant Id \"{tenantInfo.Id}\" not found in InMemoryStore.");
+                return false;
+            }
+
+            existingTenantInfo = tenantInfo;
+            Utilities.TryLogInfo(logger, $"Tenant Id \"{tenantInfo.Id}\" updated in InMemoryStore.");
+
+            return await Task.FromResult(true);
         }
     }
 }

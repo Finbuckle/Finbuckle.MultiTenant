@@ -30,6 +30,13 @@ namespace Finbuckle.MultiTenant
         Task<bool> TryAddAsync(TenantInfo tenantInfo);
 
         /// <summary>
+        /// Try to update the TenantInfo in the store.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task<bool> TryUpdateAsync(TenantInfo tenantInfo);
+
+        /// <summary>
         /// Try to remove the TenantInfo from the store.
         /// </summary>
         /// <param name="identifier"></param>
