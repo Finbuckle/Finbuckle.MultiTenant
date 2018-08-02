@@ -51,8 +51,8 @@ namespace DataIsolationSample
 
         private void SetupDb()
         {
-            var tc = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
-            using (var db = new ToDoDbContext(tc))
+            var ti = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
@@ -62,8 +62,8 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
-            using (var db = new ToDoDbContext(tc))
+            ti = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureCreated();
                 db.ToDoItems.Add(new ToDoItem { Title = "Send Invoices", Completed = true });
@@ -72,8 +72,8 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
-            using (var db = new ToDoDbContext(tc))
+            ti = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();

@@ -2,7 +2,7 @@
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
-namespace RouteStrategySample.Controllers
+namespace DatabaseStoreSample.Controllers
 {
     public class HomeController : Controller
     {

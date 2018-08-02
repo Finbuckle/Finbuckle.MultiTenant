@@ -7,8 +7,8 @@ namespace BasePathStrategySample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetMultiTenantContext()?.TenantInfo;
-            return View(tc);
+            var ti = HttpContext.GetMultiTenantContext()?.TenantInfo;
+            return View(ti);
         }
     }
 }
