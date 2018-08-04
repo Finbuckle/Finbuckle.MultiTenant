@@ -133,7 +133,7 @@ public class MultiTenantMiddlewareShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>().WithRemoteAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton).WithRemoteAuthentication();
         
         // Substitute in the mock...
         services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
@@ -154,7 +154,7 @@ public class MultiTenantMiddlewareShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton);
         
         // Add in the mock...
         var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();

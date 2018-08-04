@@ -67,31 +67,79 @@ public class MultiTenantBuilderShould
         }
     }
 
-    [Fact]
-    public void AddCustomStoreWithDefaultCtor()
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore<TestStore>();
+        services.AddMultiTenant().WithStore<TestStore>(lifetime);
+
         var sp = services.BuildServiceProvider();
 
-        var strategy = sp.GetRequiredService<IMultiTenantStore>();
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var scope = sp.CreateScope();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(store, store2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(store, store2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(store, store2);
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                Assert.NotSame(store, store2);
+                break;
+        }
+    }
+
+    // TODO: Test case where optional parameters are passed to WithStore<T>.
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStore(lifetime, _sp => new TestStore());
+
+        var sp = services.BuildServiceProvider();
+
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var scope = sp.CreateScope();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(store, store2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(store, store2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(store, store2);
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                Assert.NotSame(store, store2);
+                break;
+        }
     }
 
     [Fact]
-    public void AddCustomStoreWithFactory()
+    public void ThrowIfNullFactoryAddingCustomStore()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore(_sp => new TestStore());
-        var sp = services.BuildServiceProvider();
-
-        var strategy = sp.GetRequiredService<IMultiTenantStore>();
-    }
-
-    [Fact]
-    public void ThrowIfNullParamAddingCustomStore()
-    {
-        var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(ServiceLifetime.Singleton, null));
     }
 
     [Fact]
@@ -330,30 +378,78 @@ public class MultiTenantBuilderShould
             => services.AddMultiTenant().WithRouteStrategy("param", null));
     }
 
-    [Fact]
-    public void AddCustomStrategyWithDefaultCtor()
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStrategy<BasePathStrategy>();
-        var sp = services.BuildServiceProvider();
+        services.AddMultiTenant().WithStrategy<BasePathStrategy>(lifetime);
 
+        var sp = services.BuildServiceProvider();
+        
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var scope = sp.CreateScope();
+        var strategy2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(strategy, strategy2);
+                strategy = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+                Assert.NotSame(strategy, strategy2);
+                break;
+        }
     }
 
-    [Fact]
-    public void AddCustomStrategyWithFactory()
+    // TODO: Test case where optional parameters are passed to WithStrategy<T>.
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStrategy(_sp => new BasePathStrategy());
+        services.AddMultiTenant().WithStrategy(lifetime, _sp => new BasePathStrategy());
+
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var scope = sp.CreateScope();
+        var strategy2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(strategy, strategy2);
+                strategy = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+                Assert.NotSame(strategy, strategy2);
+                break;
+        }
     }
 
     [Fact]
     public void ThrowIfNullFactoryAddingCustomStrategy()
     {
         var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStrategy(null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStrategy(ServiceLifetime.Singleton, null));
     }
 }

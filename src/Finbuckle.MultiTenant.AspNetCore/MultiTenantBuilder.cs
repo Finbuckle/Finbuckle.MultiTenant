@@ -95,26 +95,28 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using using default dependency injection.
         /// </summary>>
+        /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public MultiTenantBuilder WithStore<T>(params object[] parameters) where T : IMultiTenantStore
-            => WithStore(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
+        public MultiTenantBuilder WithStore<T>(ServiceLifetime lifetime, params object[] parameters) where T : IMultiTenantStore
+            => WithStore(lifetime, sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using a factory method.
+        /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
         /// </summary>
+        /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public MultiTenantBuilder WithStore(Func<IServiceProvider, IMultiTenantStore> factory)
+        public MultiTenantBuilder WithStore(ServiceLifetime lifetime, Func<IServiceProvider, IMultiTenantStore> factory)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            services.TryAddSingleton<IMultiTenantStore>(sp => factory(sp));
+            services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStore), factory, lifetime));
 
             return this;
         }
@@ -171,7 +173,7 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentNullException(nameof(config));
             }
 
-            return WithStore(sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<InMemoryStore>>()));
+            return WithStore(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<InMemoryStore>>()));
         }
 
         /// <summary>
@@ -232,7 +234,7 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentException("Invalid value for \"identifier\"", nameof(identifier));
             }
 
-            return WithStrategy(sp => new StaticStrategy(identifier, sp.GetService<ILogger<StaticStrategy>>()));
+            return WithStrategy(ServiceLifetime.Singleton, sp => new StaticStrategy(identifier, sp.GetService<ILogger<StaticStrategy>>()));
         }
 
         /// <summary>
@@ -240,7 +242,7 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <returnsThe same MultiTenantBuilder passed into the method.></returns>
         public MultiTenantBuilder WithBasePathStrategy()
-            => WithStrategy(sp => new BasePathStrategy(sp.GetService<ILogger<BasePathStrategy>>()));
+            => WithStrategy(ServiceLifetime.Singleton, sp => new BasePathStrategy(sp.GetService<ILogger<BasePathStrategy>>()));
 
         /// <summary>
         /// Adds and configures a RouteMultiTenantStrategy with a route parameter "__tenant__" to the application.
@@ -266,7 +268,7 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentNullException(nameof(configRoutes));
             }
 
-            return WithStrategy(sp => new RouteStrategy(tenantParam, configRoutes, sp.GetService<ILogger<RouteStrategy>>()));
+            return WithStrategy(ServiceLifetime.Singleton, sp => new RouteStrategy(tenantParam, configRoutes, sp.GetService<ILogger<RouteStrategy>>()));
         }
 
         /// <summary>
@@ -288,31 +290,33 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentException("Invalid value for \"template\"", nameof(template));
             }
 
-            return WithStrategy(sp => new HostStrategy(template, sp.GetService<ILogger<HostStrategy>>()));
+            return WithStrategy(ServiceLifetime.Singleton, sp => new HostStrategy(template, sp.GetService<ILogger<HostStrategy>>()));
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using its default constructor using dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the applicationusing default dependency injection.
         /// </summary>
+        /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public MultiTenantBuilder WithStrategy<T>(params object[] parameters) where T : IMultiTenantStrategy
-            => WithStrategy(sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
+        public MultiTenantBuilder WithStrategy<T>(ServiceLifetime lifetime, params object[] parameters) where T : IMultiTenantStrategy
+            => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
 
         /// <summary>
         /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
         /// </summary>
+        /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public MultiTenantBuilder WithStrategy(Func<IServiceProvider, IMultiTenantStrategy> factory)
+        public MultiTenantBuilder WithStrategy(ServiceLifetime lifetime, Func<IServiceProvider, IMultiTenantStrategy> factory)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            services.TryAddSingleton<IMultiTenantStrategy>(factory);
-
+            services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy), factory, lifetime));
+            
             return this;
         }
     }
