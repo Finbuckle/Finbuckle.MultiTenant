@@ -24,12 +24,17 @@ namespace DatabaseStoreSample
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMultiTenant()
-                // Register our custom IMultiTenantStore. See the DatabaseStore class for details.
-                .WithStore<DatabaseStore>("Data Source=Data/MultiTenantData.db")
+                // Register our custom IMultiTenantStore.
+                // Specify a scoped lifetime because the DbContext used is also scoped (added by AddDbContext below).
+                // See the DatabaseStore class for details.
+                .WithStore<DatabaseStore>(ServiceLifetime.Scoped)
                 .WithRouteStrategy(ConfigRoutes);
 
-            // Note in this example the DbContext used by the multitenant store is not registered as a service.
-            // This is because a store is a singleton and services.AddDbContext adds a scoped service.
+            // Register the DbContext as usual (note the service is registered with a scope lifetime)...
+            services.AddDbContext<MultiTenantStoreDbContext>(options =>
+            {
+                options.UseSqlite("Data Source=Data/MultiTenantData.db");
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

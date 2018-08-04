@@ -26,91 +26,73 @@ namespace DatabaseStoreSample.Data
     /// </summary>
     public class DatabaseStore : IMultiTenantStore
     {
-        private readonly string connectionString;
+        private readonly MultiTenantStoreDbContext dbContext;
 
-        public DatabaseStore(string connectionString)
+        public DatabaseStore(MultiTenantStoreDbContext dbContext)
         {
-            this.connectionString = connectionString;
-        }
-
-        private MultiTenantStoreDbContext GetDb()
-        {
-            var options = new DbContextOptionsBuilder().UseSqlite(connectionString).Options;
-            return new MultiTenantStoreDbContext(options);
+            this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         public async Task<TenantInfo> GetByIdentifierAsync(string identifier)
         {
-            using (var dbContext = GetDb())
-            {
-                return await dbContext.TenantInfo
-                    .Where(ti => ti.Identifier == identifier)
-                    .SingleOrDefaultAsync();
-            }
+            return await dbContext.TenantInfo
+                .Where(ti => ti.Identifier == identifier)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<bool> TryAddAsync(TenantInfo tenantInfo)
         {
-            using (var dbContext = GetDb())
+            int result = 0;
+            dbContext.TenantInfo.Add(tenantInfo);
+
+            try
             {
-                int result = 0;
-                dbContext.TenantInfo.Add(tenantInfo);
-
-                try
-                {
-                    result = await dbContext.SaveChangesAsync();
-                }
-                catch
-                {
-                    // Do something that makes sense here...
-                }
-
-                return result > 0;
+                result = await dbContext.SaveChangesAsync();
             }
+            catch
+            {                
+                // Do something that makes sense here...
+            }
+
+            return result > 0;
         }
 
         public async Task<bool> TryRemoveAsync(string identifier)
         {
-            using (var dbContext = GetDb())
+            int result = 0;
+            var existing = await GetByIdentifierAsync(identifier);
+
+            if (existing != null)
             {
-                int result = 0;
-                var existing = await GetByIdentifierAsync(identifier);
-
-                if (existing != null)
+                try
                 {
-                    try
-                    {
-                        dbContext.TenantInfo.Remove(existing);
-                        result = await dbContext.SaveChangesAsync();
-                    }
-                    catch
-                    {
-                        // Do something that makes sense here...
-                    }
+                    dbContext.TenantInfo.Remove(existing);
+                    result = await dbContext.SaveChangesAsync();
                 }
-
-                return result > 0;
+                catch
+                {                    
+                    // Do something that makes sense here...
+                }
             }
+
+            return result > 0;
         }
 
         public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
         {
-            using (var dbContext = GetDb())
+            int result = 0;
+            dbContext.Entry(tenantInfo).State = EntityState.Modified;
+
+            try
             {
-                int result = 0;
-                dbContext.Entry(tenantInfo).State = EntityState.Modified;
-
-                try
-                {
-                    result = await dbContext.SaveChangesAsync();
-                }
-                catch
-                {
-                    // Do something that makes sense here...
-                }
-
-                return result > 0;
+                result = await dbContext.SaveChangesAsync();
             }
+            catch
+            {                
+                // Do something that makes sense here...
+            }
+
+            return result > 0;
         }
     }
 }
