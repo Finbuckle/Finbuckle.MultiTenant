@@ -154,9 +154,9 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>();;
 
-        var tc = store.GetByIdentifierAsync("initech").Result;
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
@@ -165,7 +165,7 @@ public class MultiTenantBuilderShould
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         // Case insensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -184,9 +184,9 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
 
-        var tc = store.GetByIdentifierAsync("initech").Result;
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
@@ -194,7 +194,7 @@ public class MultiTenantBuilderShould
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         // Case insensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -221,16 +221,16 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
 
-        var tc = store.GetByIdentifierAsync("lol").Result;
+        var tc = store.TryGetByIdentifierAsync("lol").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
         Assert.Equal("Datasource=lol.db", tc.ConnectionString);
 
         // Case sensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Null(tc);
     }
 

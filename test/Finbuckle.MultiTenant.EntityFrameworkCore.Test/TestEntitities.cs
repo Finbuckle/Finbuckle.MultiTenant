@@ -27,7 +27,7 @@ public class TestDbContext : MultiTenantDbContext
     public DbSet<ThingWithTenantId> Things { get; set; }
 
     public TestDbContext(TenantInfo tenantInfo,
-        DbContextOptions<TestDbContext> options) :
+        DbContextOptions options) :
         base(tenantInfo, options)
     { }
 

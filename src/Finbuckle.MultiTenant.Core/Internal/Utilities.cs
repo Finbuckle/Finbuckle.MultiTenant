@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Core
@@ -23,6 +24,14 @@ namespace Finbuckle.MultiTenant.Core
             if (logger != null)
             {
                 logger.LogInformation(message);
+            }
+        }
+
+        public static void TryLogError(ILogger logger, string message, Exception e)
+        {
+            if (logger != null)
+            {
+                logger.LogError(e, message);
             }
         }
     }

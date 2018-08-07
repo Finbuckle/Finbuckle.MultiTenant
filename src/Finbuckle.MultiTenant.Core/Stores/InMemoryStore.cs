@@ -22,113 +22,63 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Stores
 {
     /// <summary>
-    /// A basic multitenant Store that runs in local memory. Ignores string case by default.
+    /// A basic multitenant store that runs in local memory. Ignores string case by default.
     /// </summary>
     public class InMemoryStore : IMultiTenantStore
     {
         private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;
-        private readonly ILogger<InMemoryStore> logger;
 
-        public InMemoryStore() : this (true, null)
+        public InMemoryStore() : this (true)
         {
         }
 
-        public InMemoryStore(bool igoreCase) : this (igoreCase, null)
-        {
-        }
-
-        public InMemoryStore(ILogger<InMemoryStore> logger) : this (true, logger)
-        {
-        }
-
-        public InMemoryStore(bool ignoreCase, ILogger<InMemoryStore> logger)
+        public InMemoryStore(bool ignoreCase)
         {
             var stringComparerer = StringComparer.OrdinalIgnoreCase;
             if(!ignoreCase)
                 stringComparerer = StringComparer.Ordinal;
                 
             tenantMap = new ConcurrentDictionary<string, TenantInfo>(stringComparerer);
-            this.logger = logger;
         }
 
-        public virtual async Task<TenantInfo> GetByIdentifierAsync(string identifier)
+        public virtual async Task<TenantInfo> TryGetAsync(string id)
         {
-            if (identifier == null)
-            {
-                throw new ArgumentNullException(nameof(identifier));
-            }
+            var result = tenantMap.Values.Where(ti => ti.Id == id).SingleOrDefault();
+            
+            return await Task.FromResult(result);
+        }
 
+        public virtual async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        {
             tenantMap.TryGetValue(identifier, out var result);
-            Utilities.TryLogInfo(logger, $"Tenant Id \"{result?.Id ?? "<null>"}\" found in store for identifier \"{identifier}\".");
-            return await Task.FromResult(result).ConfigureAwait(false);
+            
+            return await Task.FromResult(result);
         }
 
-        public virtual Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryAddAsync(TenantInfo tenantInfo)
         {
-            if (tenantInfo == null)
-            {
-                throw new ArgumentNullException(nameof(tenantInfo));
-            }
-
             var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
-            if(result)
-            {
-                Utilities.TryLogInfo(logger, $"Tenant \"{tenantInfo.Identifier}\" added to InMemoryStore.");
-            }
-            else
-            {
-                Utilities.TryLogInfo(logger, $"Unable to add tenant \"{tenantInfo.Identifier}\" to InMemoryStore.");
-            }
-
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
-        public virtual Task<bool> TryRemoveAsync(string identifier)
+        public async Task<bool> TryRemoveAsync(string identifier)
         {
-            if (identifier == null)
-            {
-                throw new ArgumentNullException(nameof(identifier));
-            }
-
             var result = tenantMap.TryRemove(identifier, out var dummy);
 
-            if(result)
-            {
-                Utilities.TryLogInfo(logger, $"Tenant \"{identifier}\" removed from InMemoryStore.");
-            }
-            else
-            {
-                Utilities.TryLogInfo(logger, $"Unable to remove tenant \"{identifier}\" from InMemoryStore.");
-            }
-
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
         {
-            if (tenantInfo == null)
+            var existingTenantInfo = await TryGetAsync(tenantInfo.Id);
+
+            if(existingTenantInfo != null)
             {
-                throw new ArgumentNullException(nameof(tenantInfo));
+                existingTenantInfo = tenantInfo;
             }
 
-            if (tenantInfo.Id == null)
-            {
-                throw new ArgumentNullException(nameof(tenantInfo.Id));
-            }
-
-            var existingTenantInfo = tenantMap.Values.Where(ti => ti.Id == tenantInfo.Id).SingleOrDefault();
-
-            if(existingTenantInfo == null)
-            {
-                Utilities.TryLogInfo(logger, $"Tenant Id \"{tenantInfo.Id}\" not found in InMemoryStore.");
-                return false;
-            }
-
-            existingTenantInfo = tenantInfo;
-            Utilities.TryLogInfo(logger, $"Tenant Id \"{tenantInfo.Id}\" updated in InMemoryStore.");
-
-            return await Task.FromResult(true);
+            return existingTenantInfo != null;
         }
     }
 }

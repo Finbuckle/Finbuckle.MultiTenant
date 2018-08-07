@@ -33,7 +33,12 @@ namespace DatabaseStoreSample.Data
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<TenantInfo> GetByIdentifierAsync(string identifier)
+        public async Task<TenantInfo> TryGetAsync(string id)
+        {
+            return await dbContext.TenantInfo.FindAsync(id);
+        }
+
+        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             return await dbContext.TenantInfo
                 .Where(ti => ti.Identifier == identifier)
@@ -57,10 +62,10 @@ namespace DatabaseStoreSample.Data
             return result > 0;
         }
 
-        public async Task<bool> TryRemoveAsync(string identifier)
+        public async Task<bool> TryRemoveAsync(string id)
         {
             int result = 0;
-            var existing = await GetByIdentifierAsync(identifier);
+            var existing = await dbContext.TenantInfo.FindAsync(id);
 
             if (existing != null)
             {

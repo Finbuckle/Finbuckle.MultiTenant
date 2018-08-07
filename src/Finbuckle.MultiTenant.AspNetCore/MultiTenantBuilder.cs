@@ -173,13 +173,13 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentNullException(nameof(config));
             }
 
-            return WithStore(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<InMemoryStore>>()));
+            return WithStore(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<MultiTenantStoreWrapper<InMemoryStore>>>()));
         }
 
         /// <summary>
         /// Creates an InMemoryStore from configured InMemoryMultiTenantStoreOptions.
         /// </summary>
-        private InMemoryStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase, ILogger<InMemoryStore> logger)
+        private IMultiTenantStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase, ILogger<MultiTenantStoreWrapper<InMemoryStore>> logger)
         {
             if (config == null)
             {
@@ -188,7 +188,7 @@ namespace Finbuckle.MultiTenant
 
             var options = new InMemoryStoreOptions();
             config(options);
-            var store = new InMemoryStore(ignoreCase, logger);
+            var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(ignoreCase), logger);
 
             try
             {

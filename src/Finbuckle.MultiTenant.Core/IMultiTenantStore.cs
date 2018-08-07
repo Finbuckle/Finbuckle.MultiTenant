@@ -39,15 +39,22 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Try to remove the TenantInfo from the store.
         /// </summary>
-        /// <param name="identifier"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<bool> TryRemoveAsync(string identifier);
+        Task<bool> TryRemoveAsync(string id);
 
         /// <summary>
         /// Retrieve the TenantInfo for a given identifier.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        Task<TenantInfo> GetByIdentifierAsync(string identifier);
+        Task<TenantInfo> TryGetByIdentifierAsync(string identifier);
+
+        /// <summary>
+        /// Retrieve the TenantInfo for a given tenant Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<TenantInfo> TryGetAsync(string id);
     }
 }
