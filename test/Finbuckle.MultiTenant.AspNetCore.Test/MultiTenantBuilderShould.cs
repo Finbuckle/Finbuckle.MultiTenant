@@ -74,7 +74,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore<TestStore>(lifetime);
+        services.AddMultiTenant().WithStore<TestNullStore>(lifetime);
 
         var sp = services.BuildServiceProvider();
 
@@ -109,7 +109,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore(lifetime, _sp => new TestStore());
+        services.AddMultiTenant().WithStore(lifetime, _sp => new TestNullStore());
 
         var sp = services.BuildServiceProvider();
 

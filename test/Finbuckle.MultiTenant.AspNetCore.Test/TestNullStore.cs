@@ -16,9 +16,9 @@ using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 
-internal class TestStore : IMultiTenantStore
+internal class TestNullStore : IMultiTenantStore
 {
-    public TestStore()
+    public TestNullStore()
     {
     }
 
