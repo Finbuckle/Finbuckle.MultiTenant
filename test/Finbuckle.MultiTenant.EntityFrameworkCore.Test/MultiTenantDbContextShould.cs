@@ -24,13 +24,13 @@ using Xunit;
 
 public class MultiTenantDbContextShould
 {
-    private DbContextOptions<TestDbContext> _options;
+    private DbContextOptions _options;
     private DbConnection _connection;
 
     public MultiTenantDbContextShould()
     {
         _connection = new SqliteConnection("DataSource=:memory:");
-        _options = new DbContextOptionsBuilder<TestDbContext>()
+        _options = new DbContextOptionsBuilder()
                 .UseSqlite(_connection)
                 .Options;
 

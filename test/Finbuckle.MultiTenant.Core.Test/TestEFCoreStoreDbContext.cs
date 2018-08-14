@@ -12,27 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using Microsoft.Extensions.Logging;
+using System.Data.Common;
+using Finbuckle.MultiTenant.Stores;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.Core
+public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
 {
-    public class Utilities
+    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-        public static void TryLogInfo(ILogger logger, string message)
-        {
-            if (logger != null)
-            {
-                logger.LogInformation(message);
-            }
-        }
-
-        public static void TryLogError(ILogger logger, string message, Exception e)
-        {
-            if (logger != null)
-            {
-                logger.LogError(e, message);
-            }
-        }
     }
 }

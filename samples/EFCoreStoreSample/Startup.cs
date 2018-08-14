@@ -1,5 +1,5 @@
 ﻿using System;
-using DatabaseStoreSample.Data;
+using EFCoreStoreSample.Data;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DatabaseStoreSample
+namespace EFCoreStoreSample
 {
     public class Startup
     {
@@ -23,18 +23,10 @@ namespace DatabaseStoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddMultiTenant()
-                // Register our custom IMultiTenantStore.
-                // Specify a scoped lifetime because the DbContext used is also scoped (added by AddDbContext below).
-                // See the DatabaseStore class for details.
-                .WithStore<DatabaseStore>(ServiceLifetime.Scoped)
-                .WithRouteStrategy(ConfigRoutes);
 
-            // Register the DbContext as usual (note the service is registered with a scope lifetime)...
-            services.AddDbContext<MultiTenantStoreDbContext>(options =>
-            {
-                options.UseSqlite("Data Source=Data/MultiTenantData.db");
-            });
+            services.AddMultiTenant()
+                .WithEFCoreStore<AppDbContext, AppTenantInfo>()
+                .WithRouteStrategy(ConfigRoutes);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -49,20 +41,16 @@ namespace DatabaseStoreSample
             app.UseMvc(ConfigRoutes);
 
             // Seed the database the multitenant store will need.
-            SetupDb();
+            SetupStore(app.ApplicationServices);
         }
 
-        private void SetupDb()
+        private void SetupStore(IServiceProvider sp)
         {
-            var options = (new DbContextOptionsBuilder()).UseSqlite("Data Source=Data/MultiTenantData.db").Options;
-            using (var db = new MultiTenantStoreDbContext(options))
-            {
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-                db.TenantInfo.Add(new TenantInfo("tenant-finbuckle-d043favoiaw", "finbuckle", "Finbuckle", "finbuckle_conn_string", null));
-                db.TenantInfo.Add(new TenantInfo("tenant-initech-341ojadsfa", "initech", "Initech LLC", "initech_conn_string", null));
-                db.SaveChanges();
-            }
+            var scopeServices = sp.CreateScope().ServiceProvider;
+            var store = scopeServices.GetRequiredService<IMultiTenantStore>();
+
+            store.TryAddAsync(new TenantInfo("tenant-finbuckle-d043favoiaw", "finbuckle", "Finbuckle", "finbuckle_conn_string", null)).Wait();
+            store.TryAddAsync(new TenantInfo("tenant-initech-341ojadsfa", "initech", "Initech LLC", "initech_conn_string", null)).Wait();
         }
 
         private void ConfigRoutes(IRouteBuilder routes)

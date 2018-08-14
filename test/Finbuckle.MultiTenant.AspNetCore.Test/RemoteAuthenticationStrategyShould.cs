@@ -13,12 +13,3 @@
 //    limitations under the License.
 
 // TODO: Implement tests.
-
-// using System;
-// using Finbuckle.MultiTenant.AspNetCore;
-// using Finbuckle.MultiTenant.Core;
-// using Microsoft.AspNetCore.Http;
-// using Moq;
-// using Xunit;
-
-// TODO

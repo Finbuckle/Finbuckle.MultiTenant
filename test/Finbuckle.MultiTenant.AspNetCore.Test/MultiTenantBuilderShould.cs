@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 public class MultiTenantBuilderShould
 {
@@ -74,7 +75,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore<TestStore>(lifetime);
+        services.AddMultiTenant().WithStore<TestNullStore>(lifetime);
 
         var sp = services.BuildServiceProvider();
 
@@ -109,7 +110,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithStore(lifetime, _sp => new TestStore());
+        services.AddMultiTenant().WithStore(lifetime, _sp => new TestNullStore());
 
         var sp = services.BuildServiceProvider();
 
@@ -143,6 +144,29 @@ public class MultiTenantBuilderShould
     }
 
     [Fact]
+    public void AddEFCoreStore()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+    }
+
+    [Fact]
+    public void AddEFCoreStoreWithExistingDbContext()
+    {
+        var services = new ServiceCollection();
+        services.AddDbContext<TestEFCoreStoreDbContext>(o => o.UseInMemoryDatabase(nameof(AddEFCoreStoreWithExistingDbContext)));
+        services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+    }
+
+    [Fact]
     public void AddInMemoryStoreViaConfigSection()
     {
         var configBuilder = new ConfigurationBuilder();
@@ -154,9 +178,9 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
 
-        var tc = store.GetByIdentifierAsync("initech").Result;
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
@@ -165,7 +189,7 @@ public class MultiTenantBuilderShould
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         // Case insensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -184,9 +208,9 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
 
-        var tc = store.GetByIdentifierAsync("initech").Result;
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
@@ -194,7 +218,7 @@ public class MultiTenantBuilderShould
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         // Case insensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -221,16 +245,16 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>() as InMemoryStore;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
 
-        var tc = store.GetByIdentifierAsync("lol").Result;
+        var tc = store.TryGetByIdentifierAsync("lol").Result;
         Assert.Equal("lol", tc.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
         Assert.Equal("Datasource=lol.db", tc.ConnectionString);
 
         // Case sensitive test.
-        tc = store.GetByIdentifierAsync("LOL").Result;
+        tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Null(tc);
     }
 
@@ -388,7 +412,7 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStrategy<BasePathStrategy>(lifetime);
 
         var sp = services.BuildServiceProvider();
-        
+
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         var scope = sp.CreateScope();
         var strategy2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
@@ -410,8 +434,6 @@ public class MultiTenantBuilderShould
                 break;
         }
     }
-
-    // TODO: Test case where optional parameters are passed to WithStrategy<T>.
 
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]

@@ -69,14 +69,14 @@
             }
         },
         {
-            "name": "DatabaseStoreSample",
+            "name": "EFCoreStoreSample",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/DatabaseStoreSample/bin/Debug/netcoreapp2.1/DatabaseStoreSample.dll",
+            "program": "${workspaceRoot}/samples/EFCoreStoreSample/bin/Debug/netcoreapp2.1/EFCoreStoreSample.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/DatabaseStoreSample",
+            "cwd": "${workspaceRoot}/samples/EFCoreStoreSample",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
@@ -97,7 +97,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/DatabaseStoreSample/Views"
+                "/Views": "${workspaceRoot}/samples/EFCoreStoreSample/Views"
             }
         },
         {

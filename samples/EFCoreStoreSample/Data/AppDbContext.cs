@@ -12,27 +12,24 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using Microsoft.Extensions.Logging;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Stores;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.Core
+namespace EFCoreStoreSample.Data
 {
-    public class Utilities
+
+    public class AppDbContext : EFCoreStoreDbContext<AppTenantInfo>
     {
-        public static void TryLogInfo(ILogger logger, string message)
+        public AppDbContext(DbContextOptions options) : base(options)
         {
-            if (logger != null)
-            {
-                logger.LogInformation(message);
-            }
         }
 
-        public static void TryLogError(ILogger logger, string message, Exception e)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (logger != null)
-            {
-                logger.LogError(e, message);
-            }
+            optionsBuilder.UseInMemoryDatabase("EFCoreStoreSampleDb");
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

@@ -17,137 +17,46 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class InMemoryStoreShould
+public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
 {
-    private static InMemoryStore CreateTestStore(bool ignoreCase = true)
+    protected override IMultiTenantStore CreateTestStore()
     {
-        var store = new InMemoryStore(ignoreCase);
-        store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null));
-        store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null));
+        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(), null);
+
+        return PopulateTestStore(store);
+    }
+
+    // Note, basic store functionality tested in MultiTenantStoreWrapperShould.cs
+
+    private IMultiTenantStore CreateCaseSensitiveTestStore()
+    {
+        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(false), null);
+        store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Wait();
+        store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null)).Wait();
 
         return store;
     }
 
     [Fact]
-    public void GetTenantInfoFromStore()
+    public void GetTenantInfoFromStoreCaseInsensitiveByDefault()
     {
         var store = CreateTestStore();
-        Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
+        Assert.Equal("initech", store.TryGetByIdentifierAsync("iNitEch").Result.Identifier);
     }
 
     [Fact]
-    public void GetTenantInfoFromStoreIgnoringCaseByDefault()
+    public void GetTenantInfoFromStoreCaseSensitive()
     {
-        var store = CreateTestStore();
-        Assert.Equal("initech", store.GetByIdentifierAsync("iNitEch").Result.Identifier);
+        var store = CreateCaseSensitiveTestStore();
+        Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
+        Assert.Null(store.TryGetByIdentifierAsync("iNitEch").Result);
     }
 
     [Fact]
-    public void GetTenantInfoFromStoreMatchingCase()
+    public void FailIfAddingDuplicateCaseSensitive()
     {
-        var store = CreateTestStore(false);
-        Assert.Equal("initech", store.GetByIdentifierAsync("initech").Result.Identifier);
-        Assert.Null(store.GetByIdentifierAsync("iNitEch").Result);
-    }
-
-    [Fact]
-    public void FailIfAddingDuplicate()
-    {
-        var store = CreateTestStore();
-        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
-        Assert.False(store.TryAddAsync(new TenantInfo("iNitEch", "iNitEch", "Initech", null, null)).Result);
-
-        store = CreateTestStore(false);
+        var store = CreateCaseSensitiveTestStore();
         Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
         Assert.True(store.TryAddAsync(new TenantInfo("iNiTEch", "iNiTEch", "Initech", null, null)).Result);
-    }
-
-    [Fact]
-    public void AddTenantInfoToStore()
-    {
-        var store = CreateTestStore();
-
-        Assert.Null(store.GetByIdentifierAsync("test").Result);
-        Assert.True(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
-
-        Assert.NotNull(store.GetByIdentifierAsync("test").Result);
-
-        // test when already added
-        Assert.False(store.TryAddAsync(new TenantInfo("test", "test", "test", null, null)).Result);
-    }
-
-    [Fact]
-    public void RemoveTenantInfoFromStore()
-    {
-        var store = CreateTestStore();
-
-        Assert.NotNull(store.GetByIdentifierAsync("initech").Result);
-        Assert.True(store.TryRemoveAsync("initech").Result);
-
-        Assert.Null(store.GetByIdentifierAsync("initech").Result);
-
-        // test when already removed
-        Assert.False(store.TryRemoveAsync("initech").Result);
-    }
-
-    [Theory]
-    [InlineData("initech", true)]
-    [InlineData("notFound", false)]
-    public void UpdateTenantInfoInStore(string id, bool expected)
-    {
-        var store = CreateTestStore();
-
-        var result = store.TryUpdateAsync(new TenantInfo(id, "test", null, null, null)).Result;
-
-        Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public void ThrowIfTenantIInfoIsNullWhenUpdating()
-    {
-        var store = CreateTestStore();
-
-        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(null).Result);
-        Assert.IsType<ArgumentNullException>(e.InnerException);
-    }
-
-    [Fact]
-    public void ThrowIfTenantIdIsNullWhenUpdating()
-    {
-        var store = CreateTestStore();
-
-        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(new TenantInfo(null, null, null, null, null)).Result);
-        Assert.IsType<ArgumentNullException>(e.InnerException);
-    }
-
-    [Fact]
-    public void ThrowIfTenantIdentifierIsNullWhenGetting()
-    {
-        var store = CreateTestStore();
-
-        var e = Assert.Throws<AggregateException>(() => store.GetByIdentifierAsync(null).Result);
-        Assert.IsType<ArgumentNullException>(e.InnerException);
-    }
-
-    [Fact]
-    public void ThrowIfTenantIdentifierIsNullWhenRemoving()
-    {
-        var store = new InMemoryStore();
-        var e = Assert.Throws<ArgumentNullException>(() => store.TryRemoveAsync(null).Result);
-    }
-
-    [Fact]
-    public void ThrowIfTenantInfoIsNullWhenAdding()
-    {
-        var store = new InMemoryStore();
-        var e = Assert.Throws<ArgumentNullException>(() => store.TryAddAsync(null).Result);
-    }
-
-    [Fact]
-    public void ReturnNullIfTenantInfoNotFound()
-    {
-        var store = CreateTestStore();
-
-        Assert.Null(store.GetByIdentifierAsync("fake123").Result);
     }
 }

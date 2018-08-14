@@ -13,32 +13,19 @@
 //    limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Stores;
+using Microsoft.EntityFrameworkCore;
 
-internal class TestStore : IMultiTenantStore
+namespace EFCoreStoreSample.Data
 {
-    public TestStore()
+    public class AppTenantInfo : IEFCoreStoreTenantInfo
     {
-    }
-
-    public Task<TenantInfo> GetByIdentifierAsync(string identifier)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> TryAddAsync(TenantInfo context)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> TryRemoveAsync(string identifier)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
-    {
-        throw new NotImplementedException();
+        public string Id { get; set; }
+        public string Identifier { get; set; }
+        public string Name { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

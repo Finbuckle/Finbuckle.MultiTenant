@@ -1,11 +1,11 @@
 ﻿@model TenantInfo
 
 @{
-    ViewData["Title"] = "Database Store Sample";
+    ViewData["Title"] = "EFCoreStore Sample";
 }
 
-<p>TenantInfo pulled from Data/MultiTenantData.db SQLite database.</p>
-<p>See the DatabaseStore class for implementation details.</p>
+<p>TenantInfo pulled from EFCore database.</p>
+<p>See the AppDbContext and AppTenantInfo class for implementation details.</p>
 <p>Select a tenant in the top right menu to see its details from the database.</p>
 
 @if(Model != null)

@@ -122,6 +122,18 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
+        /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public MultiTenantBuilder WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>()
+            where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+            where TTenantInfo : class, IEFCoreStoreTenantInfo, new()
+        {
+            this.services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
+            return WithStore<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
+        }
+
+        /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
@@ -173,13 +185,13 @@ namespace Finbuckle.MultiTenant
                 throw new ArgumentNullException(nameof(config));
             }
 
-            return WithStore(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<InMemoryStore>>()));
+            return WithStore(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase, sp.GetService<ILogger<MultiTenantStoreWrapper<InMemoryStore>>>()));
         }
 
         /// <summary>
         /// Creates an InMemoryStore from configured InMemoryMultiTenantStoreOptions.
         /// </summary>
-        private InMemoryStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase, ILogger<InMemoryStore> logger)
+        private IMultiTenantStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase, ILogger<MultiTenantStoreWrapper<InMemoryStore>> logger)
         {
             if (config == null)
             {
@@ -188,7 +200,7 @@ namespace Finbuckle.MultiTenant
 
             var options = new InMemoryStoreOptions();
             config(options);
-            var store = new InMemoryStore(ignoreCase, logger);
+            var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(ignoreCase), logger);
 
             try
             {

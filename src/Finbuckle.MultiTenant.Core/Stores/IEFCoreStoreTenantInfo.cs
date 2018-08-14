@@ -12,18 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Finbuckle.MultiTenant.Core;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant.Stores
 {
-    public interface ITenantInfoEntity
+    public interface IEFCoreStoreTenantInfo
     {
-        string Id { get; }
-        string Identifier { get; }
-        string Name { get; }
-        string ConnectionString { get; }
-        IDictionary<string, object> Items { get; }
+        string Id { get; set; }
+        string Identifier { get; set; }
+        string Name { get; set; }
+        string ConnectionString { get; set; }
     }
 }

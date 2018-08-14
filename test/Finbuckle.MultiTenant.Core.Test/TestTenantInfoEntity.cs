@@ -12,25 +12,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant;
-using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
+using Finbuckle.MultiTenant.Stores;
 
-namespace DatabaseStoreSample.Data
+public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
 {
-
-    public class MultiTenantStoreDbContext : DbContext
-    {
-        public MultiTenantStoreDbContext(DbContextOptions options) : base(options)
-        {
-        }
-
-        public DbSet<TenantInfo> TenantInfo { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            // Ignore nontrivial properties on TenantInfo.
-            modelBuilder.Entity<TenantInfo>().Ignore(ti => ti.MultiTenantContext).Ignore(ti => ti.Items);
-        }
-    }
+    public string Id { get; set; }
+    public string Identifier { get; set; }
+    public string Name { get; set; }
+    public string ConnectionString { get; set; }
 }

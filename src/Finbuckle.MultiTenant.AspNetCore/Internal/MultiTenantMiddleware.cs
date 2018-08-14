@@ -47,7 +47,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 TenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
-                    tenantInfo = await store.GetByIdentifierAsync(identifier);
+                    tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                 }
 
                 // Resolve for remote authentication callbacks if applicable.
@@ -59,7 +59,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
                     if (identifier != null)
                     {
-                        tenantInfo = await store.GetByIdentifierAsync(identifier);
+                        tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                     }
                 }
 
