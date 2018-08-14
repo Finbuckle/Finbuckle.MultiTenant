@@ -144,6 +144,8 @@ public class MultiTenantBuilderShould
 
     // TODO: Test for adding EFCoreStore
 
+    // TODO: Test for adding EFCoreStore adding the DbContext
+
     [Fact]
     public void AddInMemoryStoreViaConfigSection()
     {

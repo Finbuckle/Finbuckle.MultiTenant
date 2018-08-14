@@ -38,5 +38,7 @@ public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCor
         return PopulateTestStore(store);
     }
 
+    // Note, basic store functionality tested in MultiTenantStoreWrapperShould.cs
+
     // TODO Test property constraints
 }

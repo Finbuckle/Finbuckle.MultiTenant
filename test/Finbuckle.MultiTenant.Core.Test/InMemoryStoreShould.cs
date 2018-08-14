@@ -26,6 +26,8 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
         return PopulateTestStore(store);
     }
 
+    // Note, basic store functionality tested in MultiTenantStoreWrapperShould.cs
+
     private IMultiTenantStore CreateCaseSensitiveTestStore()
     {
         var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(false), null);
