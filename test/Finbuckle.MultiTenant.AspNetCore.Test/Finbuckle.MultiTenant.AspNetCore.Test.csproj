@@ -11,9 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.*" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.1" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
     <PackageReference Include="Moq" Version="4.9.0" />
@@ -21,5 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
+    <ProjectReference Include="../../test/Finbuckle.MultiTenant.Core.Test/Finbuckle.MultiTenant.Core.Test.csproj" />
   </ItemGroup>
 </Project>

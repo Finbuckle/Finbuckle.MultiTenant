@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 public class MultiTenantBuilderShould
 {
@@ -142,9 +143,28 @@ public class MultiTenantBuilderShould
         Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(ServiceLifetime.Singleton, null));
     }
 
-    // TODO: Test for adding EFCoreStore
+    [Fact]
+    public void AddEFCoreStore()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+        var sp = services.BuildServiceProvider();
 
-    // TODO: Test for adding EFCoreStore adding the DbContext
+        var resolver = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+    }
+
+    [Fact]
+    public void AddEFCoreStoreWithExistingDbContext()
+    {
+        var services = new ServiceCollection();
+        services.AddDbContext<TestEFCoreStoreDbContext>(o => o.UseInMemoryDatabase(nameof(AddEFCoreStoreWithExistingDbContext)));
+        services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+    }
 
     [Fact]
     public void AddInMemoryStoreViaConfigSection()
@@ -158,7 +178,7 @@ public class MultiTenantBuilderShould
                 WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();;
+        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -392,7 +412,7 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStrategy<BasePathStrategy>(lifetime);
 
         var sp = services.BuildServiceProvider();
-        
+
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         var scope = sp.CreateScope();
         var strategy2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
@@ -414,8 +434,6 @@ public class MultiTenantBuilderShould
                 break;
         }
     }
-
-    // TODO: Test case where optional parameters are passed to WithStrategy<T>.
 
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]

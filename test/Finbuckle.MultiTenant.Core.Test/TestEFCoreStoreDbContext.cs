@@ -17,11 +17,9 @@ using Finbuckle.MultiTenant.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-public class TestEFCoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
+public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
 {
-    private DbConnection connection = new SqliteConnection("Datasource=:memory:");
-
-    public TestEFCoreDbContext(DbContextOptions options) : base(options)
+    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
     }
 }
