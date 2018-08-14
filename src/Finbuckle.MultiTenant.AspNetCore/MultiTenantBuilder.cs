@@ -122,6 +122,18 @@ namespace Finbuckle.MultiTenant
         }
 
         /// <summary>
+        /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public MultiTenantBuilder WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>()
+            where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+            where TTenantInfo : class, IEFCoreStoreTenantInfo, new()
+        {
+            this.services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
+            return WithStore<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
+        }
+
+        /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>

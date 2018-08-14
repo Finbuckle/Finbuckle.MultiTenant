@@ -142,6 +142,8 @@ public class MultiTenantBuilderShould
         Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(ServiceLifetime.Singleton, null));
     }
 
+    // TODO: Test for adding EFCoreStore
+
     [Fact]
     public void AddInMemoryStoreViaConfigSection()
     {
