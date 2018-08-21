@@ -12,30 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Finbuckle.MultiTenant
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class FinbuckleMultiTenantServiceCollectionExtensions
     {
         /// <summary>
         /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static MultiTenantBuilder AddMultiTenant(this IServiceCollection services)
+        public static FinbuckeMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
             services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
             services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
 
-            return new MultiTenantBuilder(services);
+            return new FinbuckeMultiTenantBuilder(services);
         }
     }
 }

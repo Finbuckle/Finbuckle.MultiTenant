@@ -12,21 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Internal;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Finbuckle.MultiTenant
+namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// Extension methods for using Finbuckle.MultiTenant.AspNetCore.
     /// </summary>
-    public static class ApplicationBuilderExtensions
+    public static class FinbuckleMultiTenantApplicationBuilderExtensions
     {
         /// <summary>
         /// Use Finbuckle.MultiTenant middleware in processing the request.
