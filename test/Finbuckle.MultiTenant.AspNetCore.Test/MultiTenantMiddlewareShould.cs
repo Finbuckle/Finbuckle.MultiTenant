@@ -38,7 +38,7 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void ResolveTenant()
+    public void SetTenantInfo()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
@@ -103,7 +103,7 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void SetContextItemToNullIfNoTenant()
+    public void SetMultiTenantContextItemsIfNoTenant()
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
@@ -116,8 +116,10 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolveTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
-        Assert.Null(resolveTenantContext);
+        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.Null(multiTenantContext.TenantInfo);
+        Assert.NotNull(multiTenantContext.StoreInfo);
+        Assert.NotNull(multiTenantContext.StrategyInfo);
     }
 
     internal class NullStrategy : IMultiTenantStrategy
@@ -147,6 +149,9 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
         remoteResolverMock.Verify(r => r.GetIdentifierAsync(context));
+
+        // Check that the remote strategy was set in the multitenant context.
+        Assert.IsAssignableFrom<RemoteAuthenticationStrategy>(context.GetMultiTenantContext().StrategyInfo.Strategy);
     }
 
     [Fact]

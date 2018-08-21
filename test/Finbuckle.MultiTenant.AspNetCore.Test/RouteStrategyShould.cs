@@ -64,7 +64,7 @@ public class RouteStrategyShould
                         app.UseMultiTenant();
                         app.Run(async context =>
                         {
-                            if (context.GetMultiTenantContext() != null)
+                            if (context.GetMultiTenantContext().TenantInfo != null)
                             {
                                 await context.Response.WriteAsync(context.GetMultiTenantContext().TenantInfo.Id);
                             }

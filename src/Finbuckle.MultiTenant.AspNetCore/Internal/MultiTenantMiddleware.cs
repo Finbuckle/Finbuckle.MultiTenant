@@ -34,16 +34,30 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public async Task Invoke(HttpContext context)
         {
-            // Set the tenant context (or null) into the Items collections.
+            // Set the initial multitenant context into the Items collections.
             if (!context.Items.ContainsKey(Constants.HttpContextMultiTenantContext))
             {
-                context.Items.Add(Constants.HttpContextMultiTenantContext, null);
+                var multiTenantContext = new MultiTenantContext();
+
+                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
+                var storeInfo = new StoreInfo();
+                storeInfo.MultiTenantContext = multiTenantContext;
+                storeInfo.Store = store;
+                storeInfo.StoreType = store.GetType();
+                multiTenantContext.StoreInfo = storeInfo;
+
+                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
+                var strategyInfo = new StrategyInfo();
+                strategyInfo.MultiTenantContext = multiTenantContext;
+                strategyInfo.Strategy = strategy;
+                strategyInfo.StrategyType = strategy.GetType();
+                multiTenantContext.StrategyInfo = strategyInfo;
+
+                context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
                 // Try the registered strategy.
-                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
                 var identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
-                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
-
+                
                 TenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
@@ -55,6 +69,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
                     strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
+                    
+                    // Adjust the strategy info in the multitenant context.
+                    strategyInfo.Strategy = strategy;
+                    strategyInfo.StrategyType = strategy.GetType();
+
                     identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
 
                     if (identifier != null)
@@ -63,28 +82,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     }
                 }
 
-                MultiTenantContext multiTenantContext = null;
-                if(tenantInfo != null)
+                // Set the tenant info in the multitenant context if applicable.
+                if (tenantInfo != null)
                 {
-                    multiTenantContext = new MultiTenantContext();
-
                     multiTenantContext.TenantInfo = tenantInfo;
                     tenantInfo.MultiTenantContext = multiTenantContext;
-
-                    var storeInfo = new StoreInfo();
-                    storeInfo.MultiTenantContext = multiTenantContext;
-                    storeInfo.Store = store;
-                    storeInfo.StoreType = store.GetType();
-                    multiTenantContext.StoreInfo = storeInfo;
-
-                    var strategyInfo = new StrategyInfo();
-                    strategyInfo.MultiTenantContext = multiTenantContext;
-                    strategyInfo.Strategy = strategy;
-                    strategyInfo.StrategyType = strategy.GetType();
-                    multiTenantContext.StrategyInfo = strategyInfo;
                 }
-
-                context.Items[Constants.HttpContextMultiTenantContext] = multiTenantContext;
             }
 
             if (next != null)
