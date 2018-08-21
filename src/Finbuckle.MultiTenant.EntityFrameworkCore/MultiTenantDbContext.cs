@@ -43,11 +43,6 @@ namespace Finbuckle.MultiTenant
         {
             this.TenantInfo = tenantInfo;
         }
-        
-        protected MultiTenantDbContext()
-        {
-        
-        }
 
         protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
