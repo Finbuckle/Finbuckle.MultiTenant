@@ -19,11 +19,12 @@ See [LICENSE](LICENSE) file for license information.
 * `TryUpdate` method added to `IMultiTenantStore` interface.
 * Added `EFCoreStore` which allows an Entity Framework Core database context as the tenant store.
 * Added sample project demonstrating use of `EFCoreStore`.
-* Custom strategies automatically receive logging and error support via internal use of `MultiTenantStoreWrapper`.
+* Custom can be configured with custom dependenct injection lifetime (single, scoped, or transient) via `WithStore` method overloads.
+* Custom stores automatically receive logging and error support via internal use of `MultiTenantStoreWrapper`.
 
 **MultiTenant Strategy Enhancements**
 * Use of async/await for strategy execution for improved performance.
-* Custom strateogies and stores can be configured with custom dependenct injection lifetime (single, scoped, or transient) via `WithStrategy` and `WithStore` method overloads.
+* Custom strategies can be configured with custom dependenct injection lifetime (single, scoped, or transient) via `WithStrategy` method overloads.
 * Moved route configuration for RouteStrategy from `UseMultiTenant` to `WithRouteStrategy`.
 
 **1.2.0**
