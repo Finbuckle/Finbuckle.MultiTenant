@@ -8,21 +8,21 @@ See [LICENSE](LICENSE) file for license information.
 
 ## Version History
 
-**2.0.0**
+**2.0.0 General Changes**
 * Changed `TenantContext` to `MultiTenantContext` which includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties.
 * Namespace changes (e.g. use of `Microsoft.Extensions.DependencyInjection` namespace for `Configure` and `ConfigureServices` methods).
 * Additional and improved unit tests.
 * Updated sample project dependencies.
 * Various other internal improvements to code and bug fixes.
 
-**MultiTenant Store Enhancements**
+**2.0.0 MultiTenant Store Enhancements**
 * `TryUpdate` method added to `IMultiTenantStore` interface.
 * Added `EFCoreStore` which allows an Entity Framework Core database context as the tenant store.
 * Added sample project demonstrating use of `EFCoreStore`.
 * Custom can be configured with custom dependenct injection lifetime (single, scoped, or transient) via `WithStore` method overloads.
 * Custom stores automatically receive logging and error support via internal use of `MultiTenantStoreWrapper`.
 
-**MultiTenant Strategy Enhancements**
+**2.0.0 MultiTenant Strategy Enhancements**
 * Use of async/await for strategy execution for improved performance.
 * Custom strategies can be configured with custom dependenct injection lifetime (single, scoped, or transient) via `WithStrategy` method overloads.
 * Moved route configuration for RouteStrategy from `UseMultiTenant` to `WithRouteStrategy`.
