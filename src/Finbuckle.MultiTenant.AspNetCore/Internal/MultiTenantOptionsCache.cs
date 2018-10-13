@@ -32,7 +32,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
             new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        public MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
+        public  MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
         {
             this.multiTenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
@@ -51,7 +51,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             name = name ?? Options.DefaultName;
-            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo.Id, name);
+            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id, name);
             return base.GetOrAdd(adjustedOptionsName, () => MultiTenantFactoryWrapper(name, adjustedOptionsName, createOptions));
         }
 
@@ -65,7 +65,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             name = name ?? Options.DefaultName;
 
-            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor?.MultiTenantContext.TenantInfo.Id, name);
+            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id, name);
 
             if (base.TryAdd(adjustedOptionsName, options))
             {

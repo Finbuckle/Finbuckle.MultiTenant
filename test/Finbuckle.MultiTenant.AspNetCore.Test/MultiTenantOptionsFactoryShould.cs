@@ -56,7 +56,27 @@ public class MultiTenantOptionsFactoryShould
     }
 
     [Fact]
-    public void IgnoreNullTenantContext()
+    public void IgnoreNullTenantInfo()
+    {
+        var tca = new TestMultiTenantContextAccessor(new MultiTenantContext());
+
+        var services = new ServiceCollection();
+        services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
+        services.Configure<CookieAuthenticationOptions>(o => o.Cookie.Name = "begin");
+        services.PostConfigure<CookieAuthenticationOptions>(o => o.Cookie.Name += "end");
+        var sp = services.BuildServiceProvider();
+
+        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
+        
+        var factory = ActivatorUtilities.
+            CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });
+
+        var options = factory.Create("");
+        Assert.Equal($"beginend", options.Cookie.Name);
+    }
+
+    [Fact]
+    public void IgnoreNullMultiTenantContext()
     {
         var tca = new TestMultiTenantContextAccessor(null);
 
