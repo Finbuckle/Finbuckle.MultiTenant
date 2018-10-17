@@ -34,7 +34,11 @@ namespace AuthenticationOptionsSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
-                AddCookie(CookieAuthenticationDefaults.AuthenticationScheme).
+                AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    // Required for Safari 12 issue and OpenID Connect.
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                }).
                 AddFacebook("Facebook", options =>
                 {
                     // These configuration settings should be set via user-secrets or environment variables!
