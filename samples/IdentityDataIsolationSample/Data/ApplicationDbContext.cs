@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +9,7 @@ namespace IdentityDataIsolationSample.Data
 {
     public class ApplicationDbContext : MultiTenantIdentityDbContext
     {
-        public ApplicationDbContext(TenantContext tenantContext, DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(TenantInfo tenantContext, DbContextOptions<ApplicationDbContext> options)
             : base(tenantContext, options)
         {
         }

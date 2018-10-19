@@ -1,7 +1,7 @@
 ﻿using System;
 using DataIsolationSample.Data;
 using DataIsolationSample.Models;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +26,8 @@ namespace DataIsolationSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
-                WithRouteStrategy();
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithRouteStrategy(ConfigRoutes);
 
             // Register the db context, but do not specify a provider/connection string since
             // these vary by tenant.
@@ -43,7 +43,7 @@ namespace DataIsolationSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant(ConfigRoutes);
+            app.UseMultiTenant();
             app.UseMvc(ConfigRoutes);
 
             SetupDb();
@@ -51,8 +51,8 @@ namespace DataIsolationSample
 
         private void SetupDb()
         {
-            var tc = new TenantContext("finbuckle", null, null, "Data Source=Data/ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc))
+            var ti = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
@@ -62,8 +62,8 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantContext("megacorp", null, null, "Data Source=Data/ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc))
+            ti = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureCreated();
                 db.ToDoItems.Add(new ToDoItem { Title = "Send Invoices", Completed = true });
@@ -72,8 +72,8 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            tc = new TenantContext("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null, null);
-            using (var db = new ToDoDbContext(tc))
+            ti = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
+            using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();

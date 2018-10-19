@@ -1,4 +1,4 @@
-﻿@model TenantContext
+﻿@model TenantInfo
 
 @if(Model != null)
 {
@@ -15,7 +15,7 @@
     <p class="mt-4">Default Challenge Scheme: @ViewData["ChallengeScheme"]</p>
     <p class="mt-4">Session Cookie Name: @ViewData["CookieName"]</p>
 
-    <h3 class="mt-4">TenantContext Values</h3>
+    <h3 class="mt-4">TenantInfo Values</h3>
 
     <table class="table">
         <thead>
@@ -27,28 +27,20 @@
 
         <tbody>
             <tr>
-            <td>@nameof(Model.Id)</td>
-            <td>@Model.Id</td>
+                <td>@nameof(Model.Id)</td>
+                <td>@Model.Id</td>
             </tr>
             <tr>
-            <td>@nameof(Model.Identifier)</td>
-            <td>@Model.Identifier</td>
+                <td>@nameof(Model.Identifier)</td>
+                <td>@Model.Identifier</td>
             </tr>
             <tr>
-            <td>@nameof(Model.Name)</td>
-            <td>@Model.Name</td>
+                <td>@nameof(Model.Name)</td>
+                <td>@Model.Name</td>
             </tr>
             <tr>
-            <td>@nameof(Model.ConnectionString)</td>
-            <td>@Model.ConnectionString</td>
-            </tr>
-            <tr>
-            <td>@nameof(Model.MultiTenantStrategyType)</td>
-            <td>@Model.MultiTenantStrategyType</td>
-            </tr>
-            <tr>
-            <td>@nameof(Model.MultiTenantStoreType)</td>
-            <td>@Model.MultiTenantStoreType</td>
+                <td>@nameof(Model.ConnectionString)</td>
+                <td>@Model.ConnectionString</td>
             </tr>
         </tbody>
     

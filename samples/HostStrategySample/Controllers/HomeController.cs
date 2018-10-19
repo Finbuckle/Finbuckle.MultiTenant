@@ -1,4 +1,4 @@
-﻿using Finbuckle.MultiTenant.AspNetCore;
+﻿using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HostStrategySample.Controllers
@@ -7,8 +7,8 @@ namespace HostStrategySample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContext();
-            return View(tc);
+            var ti = HttpContext.GetMultiTenantContext()?.TenantInfo;
+            return View(ti);
         }
     }
 }

@@ -29,30 +29,17 @@ using Xunit;
 
 public class MultiTenantOptionsCacheShould
 {
-    private IHttpContextAccessor CreateHttpContextAccessorMock(TenantContext tenantContext)
-    {
-        var httpContextMock = new Mock<HttpContext>();
-        object tc = tenantContext;
-        httpContextMock.Setup(c => c.Items.TryGetValue(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext, out tc)).Returns(true);
-
-        var mock = new Mock<IHttpContextAccessor>();
-        mock.SetupGet(c => c.HttpContext).Returns(httpContextMock.Object);
-
-        return mock.Object;
-    }
-
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
     public void AdjustedOptionsNameOnAdd(string name)
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var tca = new TestTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
-        {
-            o.Cookie.Name = context.Id;
-        });
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();
 
@@ -65,9 +52,35 @@ public class MultiTenantOptionsCacheShould
         Assert.False(result);
 
         // Change the TC id and confirm options can be added again.
-        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        ti.Id = "diff_id";
         result = cache.TryAdd(name, options);
         Assert.True(result);
+    }
+
+    [Fact]
+    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnAdd()
+    {
+        var tca = new TestMultiTenantContextAccessor(null);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options, ensure no exception caused by null MultiTenantContext.
+        var result = cache.TryAdd("", options);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnGetOrAdd()
+    {
+        var tca = new TestMultiTenantContextAccessor(null);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options, ensure no exception caused by null MultiTenantContext.
+        var result = cache.GetOrAdd("", () => options);
+        Assert.NotNull(result);
     }
 
     [Theory]
@@ -76,12 +89,11 @@ public class MultiTenantOptionsCacheShould
     [InlineData("name")]
     public void AdjustOptionsNameOnGetOrAdd(string name)
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var tca = new TestTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
-        {
-            o.Cookie.Name = context.Id;
-        });
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();
         options.Cookie.Name = "a_name";
@@ -97,7 +109,7 @@ public class MultiTenantOptionsCacheShould
         Assert.NotEqual(options2.Cookie.Name, result.Cookie.Name);
 
         // Confirm different tenant on same object is an add.
-        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        ti.Id = "diff_id";
         result = cache.GetOrAdd(name, () => options2);
         Assert.Equal(options2.Cookie.Name, result.Cookie.Name);
     }
@@ -105,12 +117,9 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowsIfGetOtAddFactoryIsNull()
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var tca = new TestTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
-        {
-            o.Cookie.Name = context.Id;
-        });
+        var tc = new MultiTenantContext();
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null));
     }
@@ -118,12 +127,10 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowIfContructorParamIsNull()
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var tca = new TestTenantContextAccessor(tc);
+        var tc = new MultiTenantContext();
+        var tca = new TestMultiTenantContextAccessor(tc);
 
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, null));
-
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null, (o, context) => o.Cookie.Name = ""));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null));
     }
 
     [Theory]
@@ -132,12 +139,11 @@ public class MultiTenantOptionsCacheShould
     [InlineData("name")]
     public void RemoveOptionsForAllTenants(string name)
     {
-        var tc = new TenantContext("test-id-123", null, null, null, null, null);
-        var tca = new TestTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca, (o, context) =>
-        {
-            o.Cookie.Name = context.Id;
-        });
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
 
         var options = new CookieAuthenticationOptions();
 
@@ -145,11 +151,12 @@ public class MultiTenantOptionsCacheShould
         var result = cache.TryAdd(name, options);
         Assert.True(result);
 
-        tc.GetType().GetProperty("Id").SetValue(tc, "diff_id");
+        // Add under a different tenant.
+        ti.Id = "diff_id";
         result = cache.TryAdd(name, options);
         Assert.True(result);
 
-        // Remove all options.
+        // Remove all options and assert empty.
         result = cache.TryRemove(name);
         Assert.True(result);
         Assert.Empty((IEnumerable)cache.GetType().BaseType.

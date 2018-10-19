@@ -14,11 +14,11 @@
 
 using System;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// Marks a class as multitenant when used with a database context
-    /// derived from <c>MultiTenantDbContext</c> or <c>MultiTenantIdentityDbContext</c>.
+    /// derived from MultiTenantDbContext or MultiTenantIdentityDbContext.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class MultiTenantAttribute : Attribute

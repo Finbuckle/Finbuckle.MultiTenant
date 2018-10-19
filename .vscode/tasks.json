@@ -18,14 +18,13 @@
         },
         {
             "label": "test",
-            "command": "find ./* -name '*Test.csproj' -print0 | xargs -0 -I {} dotnet test {}",
+            "command": "find ./* -name '*Test.csproj' -print0 | xargs -0 -I {} dotnet test {} | grep Total",
             "type": "shell",
             "group": {
                 "kind": "test",
                 "isDefault": true
             },
             "presentation": {
-                "panel": "new",
                 "reveal": "always"
             }
         }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -13,10 +12,10 @@ namespace IdentityDataIsolationSample.Data
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            var tenantContext = new TenantContext(null, null, null, "Data Source=Data/SharedIdentity.db", null, null);
+            var tenantInfo = new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            return new ApplicationDbContext(tenantContext, optionsBuilder.Options);
+            return new ApplicationDbContext(tenantInfo, optionsBuilder.Options);
         }
     }
 

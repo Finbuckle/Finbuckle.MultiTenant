@@ -12,29 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class FinbuckleMultiTenantServiceCollectionExtensions
     {
         /// <summary>
-        /// Configure <c>Finbuckle.MultiTenant</c> services for the application.
+        /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
-        /// <param name="services">The <c>IServiceCollection<c/> instance the extension method applies to.</param>
-        /// <returns>An new instance of <c>MultiTenantBuilder</c>.</returns>
-        public static MultiTenantBuilder AddMultiTenant(this IServiceCollection services)
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
+        public static FinbuckeMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.TryAddScoped<TenantContext>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetTenantContext());
-            services.TryAddSingleton<ITenantContextAccessor, TenantContextAccessor>();
+            services.AddHttpContextAccessor();
+            services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
+            services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
 
-            return new MultiTenantBuilder(services);
+            return new FinbuckeMultiTenantBuilder(services);
         }
     }
 }

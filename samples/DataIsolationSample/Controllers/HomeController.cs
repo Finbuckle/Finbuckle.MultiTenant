@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using DataIsolationSample.Data;
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using DataIsolationSample.Models;
@@ -21,7 +21,7 @@ namespace DataIsolationSample.Controllers
         {
             // Get the list of to do items. This will only return items for the current tenant.
             IEnumerable<ToDoItem> toDoItems = null;
-            if(HttpContext.GetTenantContext() != null)
+            if(HttpContext.GetMultiTenantContext().TenantInfo != null)
             {
                 toDoItems = dbContext.ToDoItems.ToList();
             }

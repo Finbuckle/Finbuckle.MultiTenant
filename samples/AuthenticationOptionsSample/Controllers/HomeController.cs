@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -16,8 +14,8 @@ namespace AuthenticationOptionsSample.Controllers
     {
         public IActionResult Index()
         {
-            var tc = HttpContext.GetTenantContext();
-            var title = (tc?.Name ?? "No tenant") + " - ";
+            var ti = HttpContext.GetMultiTenantContext()?.TenantInfo;
+            var title = (ti?.Name ?? "No tenant") + " - ";
 
             ViewData["style"] = "navbar-light bg-light";
 
@@ -33,7 +31,7 @@ namespace AuthenticationOptionsSample.Controllers
 
             ViewData["Title"] = title;
 
-            if (tc != null)
+            if (ti != null)
             {
                 var cookieOptionsMonitor = HttpContext.RequestServices.GetService<IOptionsMonitor<CookieAuthenticationOptions>>();
                 var cookieName = cookieOptionsMonitor.Get(CookieAuthenticationDefaults.AuthenticationScheme).Cookie.Name;
@@ -43,12 +41,13 @@ namespace AuthenticationOptionsSample.Controllers
                 ViewData["ChallengeScheme"] = schemes.GetDefaultChallengeSchemeAsync().Result.Name;
             }
 
-            return View(tc);
+            return View(ti);
         }
 
         [Authorize]
-        public IActionResult Authenticate([FromServices] IAuthorizationService auth)
+        public IActionResult Authenticate()
         {
+
             return RedirectToAction("Index");
         }
 

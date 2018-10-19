@@ -1,11 +1,10 @@
 ﻿
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
@@ -35,24 +34,37 @@ namespace AuthenticationOptionsSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
-                AddCookie(CookieAuthenticationDefaults.AuthenticationScheme).
+                AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                {
+                    // Required for Safari 12 issue and OpenID Connect.
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                }).
                 AddFacebook("Facebook", options =>
                 {
-                    options.AppId = "default"; // Required here, but overridden by tenant config.
-                    options.AppSecret = "default"; // Required here, but overridden by tenant config.
+                    // These configuration settings should be set via user-secrets or environment variables!
+                    options.AppId = Configuration.GetValue<string>("FacebookAppId");
+                    options.AppSecret = Configuration.GetValue<string>("FacebookAppSecret");
                     options.Scope.Add("email");
                     options.Fields.Add("name");
                     options.Fields.Add("email");
-                }).AddOpenIdConnect("OpenIdConnect", options =>
+                }).
+                AddGoogle("Google", options =>
                 {
-                    options.ClientId = "default"; // Required here, but overridden by tenant config.
-                    options.Authority = "https://default"; // Required here, but overridden by tenant config.
-                    options.RequireHttpsMetadata = false; // For testing only.
+                    // These configuration settings should be set via user-secrets or environment variables!
+                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
+                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
+                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
+                }).
+                AddOpenIdConnect("OpenIdConnect", options =>
+                {
+                    // These configuration settings should be set via user-secrets or environment variables!
+                    options.ClientId = Configuration.GetValue<string>("OpenIdConnectClientId");
+                    options.Authority = Configuration.GetValue<string>("OpenIdConnectAuthority");
                 });
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
-                WithRouteStrategy().
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantContext) =>
                 {
@@ -70,34 +82,6 @@ namespace AuthenticationOptionsSample
                     // Note the paths set take our routing strategy into account.
                     options.LoginPath = "/" + tenantContext.Identifier + "/Home/Login";
                     options.Cookie.Path = "/" + tenantContext.Identifier;
-                }).
-                WithPerTenantOptions<OpenIdConnectOptions>((options, tenantContext) =>
-                {
-                    // Set the OpenIdConnect options if the tenant specifies it.
-                    if (tenantContext.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
-                    {
-                        // You must configure register with the OpenId Connect server and configure
-                        // the tenant accordingly!
-                        if ((string)challengeScheme == "OpenIdConnect")
-                        {
-                            options.ClientId = (string)tenantContext.Items["ClientId"];
-                            options.Authority = (string)tenantContext.Items["Authority"];
-                        }
-                    }
-                }).
-                WithPerTenantOptions<FacebookOptions>((options, tenantContext) =>
-                {
-                    // Set the Facebook options if the tenant specifies it.
-                    if (tenantContext.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
-                    {
-                        // You must configure register with a Facebook app and configure
-                        // the tenant accordingly!
-                        if ((string)challengeScheme == "Facebook")
-                        {
-                            options.AppId = (string)tenantContext.Items["FacebookAppId"];
-                            options.AppSecret = (string)tenantContext.Items["FacebookAppSecret"];
-                        }
-                    }
                 });
         }
 
@@ -108,10 +92,10 @@ namespace AuthenticationOptionsSample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMultiTenant(ConfigRoutes);
-
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseMultiTenant();
             app.UseAuthentication();
-
             app.UseMvc(ConfigRoutes);
         }
 

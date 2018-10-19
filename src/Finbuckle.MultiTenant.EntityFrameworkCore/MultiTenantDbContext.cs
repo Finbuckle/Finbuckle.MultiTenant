@@ -19,43 +19,34 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// A database context that enforces tenant integrity on entity types
-    /// marked with the <c>MultiTenant</c> attribute.
+    /// marked with the MultiTenant attribute.
     /// </summary>
-    public class MultiTenantDbContext : DbContext
+    public abstract class MultiTenantDbContext : DbContext
     {
-        protected internal TenantContext TenantContext { get; protected set; }
+        protected internal TenantInfo TenantInfo { get; protected set; }
         
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
-        protected string ConnectionString => TenantContext.ConnectionString;
+        protected string ConnectionString => TenantInfo.ConnectionString;
 
-        protected MultiTenantDbContext(TenantContext tenantContext)
+        protected MultiTenantDbContext(TenantInfo tenantInfo)
         {
-            this.TenantContext = tenantContext;
-        }
-        
-        protected MultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
-        {
-            this.TenantContext = tenantContext;
+            this.TenantInfo = tenantInfo;
         }
 
-        [Obsolete("This constructor is obsolete and will be removed in future versions.")]
-        protected MultiTenantDbContext(string connectionString, DbContextOptions options) : base(options)
+        protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
-            TenantContext = new TenantContext(null, null, null, connectionString, null, null);
-        }
-
-        protected MultiTenantDbContext()
-        {
+            this.TenantInfo = tenantInfo;
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -85,7 +76,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, TenantContext);
+            Shared.SetupModel(modelBuilder, TenantInfo);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -94,7 +85,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -113,7 +104,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

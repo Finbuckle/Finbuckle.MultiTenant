@@ -14,11 +14,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Core.Abstractions;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -38,25 +38,72 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void ResolveTenantRequest()
+    public void SetTenantInfo()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
-        var tc = new TenantContext("initech", "initech", null, null, null, null);
-        sp.GetService<IMultiTenantStore>().TryAdd(tc);
+        var ti = new TenantInfo("initech", "initech", null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
 
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
-        Assert.Equal("initech", resolveTenantContext.Id);
+        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.NotNull(resolvedTenantContext.TenantInfo);
+        Assert.Equal("initech", resolvedTenantContext.TenantInfo.Id);
+        Assert.Equal("initech", resolvedTenantContext.TenantInfo.Identifier);
+        Assert.NotNull(resolvedTenantContext.TenantInfo.MultiTenantContext);
     }
 
     [Fact]
-    public void SetContextItemToNullIfNoTenant()
+    public void SetStrategyInfo()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+        var ti = new TenantInfo("initech", "initech", null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
+
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        
+        Assert.NotNull(resolvedTenantContext.StrategyInfo);
+        Assert.NotNull(resolvedTenantContext.StrategyInfo.Strategy);
+        Assert.Equal(typeof(StaticStrategy), resolvedTenantContext.StrategyInfo.StrategyType);
+        Assert.NotNull(resolvedTenantContext.StrategyInfo.MultiTenantContext);
+    }
+
+    [Fact]
+    public void SetStoreInfo()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+        var ti = new TenantInfo("initech", "initech", null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
+
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        
+        Assert.NotNull(resolvedTenantContext.StoreInfo);
+        Assert.NotNull(resolvedTenantContext.StoreInfo.Store);
+        Assert.Equal(typeof(MultiTenantStoreWrapper<InMemoryStore>), resolvedTenantContext.StoreInfo.StoreType);
+        Assert.NotNull(resolvedTenantContext.StoreInfo.MultiTenantContext);
+    }
+
+    [Fact]
+    public void SetMultiTenantContextItemsIfNoTenant()
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
@@ -69,15 +116,17 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolveTenantContext = (TenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextTenantContext];
-        Assert.Null(resolveTenantContext);
+        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.Null(multiTenantContext.TenantInfo);
+        Assert.NotNull(multiTenantContext.StoreInfo);
+        Assert.NotNull(multiTenantContext.StrategyInfo);
     }
 
     internal class NullStrategy : IMultiTenantStrategy
     {
-        public string GetIdentifier(object context)
+        public async Task<string> GetIdentifierAsync(object context)
         {
-           return null;
+           return await Task.FromResult<string>(null);
         }
     }
 
@@ -86,7 +135,7 @@ public class MultiTenantMiddlewareShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>().WithRemoteAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton).WithRemoteAuthentication();
         
         // Substitute in the mock...
         services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
@@ -99,7 +148,10 @@ public class MultiTenantMiddlewareShould
         
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifier(context));
+        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context));
+
+        // Check that the remote strategy was set in the multitenant context.
+        Assert.IsAssignableFrom<RemoteAuthenticationStrategy>(context.GetMultiTenantContext().StrategyInfo.Strategy);
     }
 
     [Fact]
@@ -107,7 +159,7 @@ public class MultiTenantMiddlewareShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>();
+        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton);
         
         // Add in the mock...
         var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
@@ -119,6 +171,6 @@ public class MultiTenantMiddlewareShould
         
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifier(context), Times.Never);
+        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context), Times.Never);
     }
 }

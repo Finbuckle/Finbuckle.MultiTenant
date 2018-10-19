@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿
+using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +20,7 @@ namespace BasePathStrategySample
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore")).
+                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
                 WithBasePathStrategy();
         }
 
@@ -29,8 +31,8 @@ namespace BasePathStrategySample
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
             app.UseMultiTenant();
-
             app.UseMvc(routes => routes.MapRoute("Default", "{first_segment=}/{controller=Home}/{action=Index}"));
         }
     }

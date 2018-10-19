@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using IdentityDataIsolationSample.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
@@ -36,6 +36,15 @@ namespace IdentityDataIsolationSample
             services.AddDefaultIdentity<MultiTenantIdentityUser>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddAuthentication()
+                .AddGoogle("Google", options =>
+                {
+                    // These configuration settings should be set via user-secrets or environment variables!
+                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
+                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
+                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
+                });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
                 {
@@ -52,16 +61,16 @@ namespace IdentityDataIsolationSample
                 });
 
             services.AddMultiTenant()
-                .WithRouteStrategy()
-                .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryMultiTenantStore"))
-                .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantContext) =>
+                .WithRouteStrategy(ConfigRoutes)
+                .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
+                .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                {
                    // Since we are using the route strategy configure each tenant
                    // to have a different cookie name and adjust the paths.
-                   options.Cookie.Name = $"{tenantContext.Id}_{options.Cookie.Name}";
-                   options.LoginPath = $"/{tenantContext.Identifier}/Home/Login";
-                   options.LogoutPath = $"/{tenantContext.Identifier}";
-                   options.Cookie.Path = $"/{tenantContext.Identifier}";
+                   options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
+                   options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
+                   options.LogoutPath = $"/{tenantInfo.Identifier}";
+                   options.Cookie.Path = $"/{tenantInfo.Identifier}";
                });
         }
 
@@ -74,7 +83,7 @@ namespace IdentityDataIsolationSample
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMultiTenant(ConfigRoutes);
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

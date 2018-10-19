@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -24,20 +25,20 @@ public class MultiTenantModelCacheKeyFactoryShould
     public class TestDbContext : DbContext{}
     public class TestMultiTenantDbContext : MultiTenantDbContext
     {
-        public TestMultiTenantDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        public TestMultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
 
     public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext
     {
-        public TestMultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        public TestMultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
 
     [Fact]
-    public void ReturnTypeForNonMultiTenantContext()
+    public void ReturnTypeForNonMultiTenantDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestDbContext();
@@ -48,11 +49,11 @@ public class MultiTenantModelCacheKeyFactoryShould
     }
 
     [Fact]
-    public void ReturnTypePlusTenantIdForMultiTenantContext()
+    public void ReturnTypePlusTenantIdForMultiTenantDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestMultiTenantDbContext(
-            new TenantContext("test", null, null, null, null, null),
+            new TenantInfo("test", null, null, null, null),
             new DbContextOptions<TestMultiTenantDbContext>());
 
         dynamic key = factory.Create(dbContext);
@@ -63,11 +64,11 @@ public class MultiTenantModelCacheKeyFactoryShould
     }
 
     [Fact]
-    public void ReturnTypePlusTenantIdForMultiTenantIdentityContext()
+    public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
         var dbContext = new TestMultiTenantIdentityDbContext(
-            new TenantContext("test", null, null, null, null, null),
+            new TenantInfo("test", null, null, null, null),
             new DbContextOptions<TestMultiTenantIdentityDbContext>());
 
         dynamic key = factory.Create(dbContext);

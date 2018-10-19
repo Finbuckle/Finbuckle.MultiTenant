@@ -16,10 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,50 +26,50 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
-    public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
 
     /// <summary>
     /// A database context compatiable with Identity that enforces tenant integrity on entity types
-    /// marked with the <c>MultiTenant</c> attribute.
+    /// marked with the MultiTenant attribute.
     /// </summary>
-    public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
+    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
         where TUser : MultiTenantIdentityUser
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
 
-    public class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
         where TUser : MultiTenantIdentityUser<TKey>
         where TRole : MultiTenantIdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(tenantContext, options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
     }
 
-    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
         where TUserClaim : IdentityUserClaim<TKey>
@@ -80,19 +79,20 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected internal TenantContext TenantContext { get; protected set; }
+        protected internal TenantInfo TenantInfo { get; protected set; }
 
-        private ImmutableList<IEntityType> tenantScopeEntityTypes = null;
+        private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
-        protected string ConnectionString => TenantContext.ConnectionString;
+        protected string ConnectionString => TenantInfo.ConnectionString;
 
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo)
         {
+            this.TenantInfo = tenantInfo;
         }
 
-        protected MultiTenantIdentityDbContext(TenantContext tenantContext, DbContextOptions options) : base(options)
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
-            this.TenantContext = tenantContext;
+            this.TenantInfo = tenantInfo;
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -103,14 +103,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             get
             {
-                if (tenantScopeEntityTypes == null)
+                if (multiTenantEntityTypes == null)
                 {
-                    tenantScopeEntityTypes = Model.GetEntityTypes().
+                    multiTenantEntityTypes = Model.GetEntityTypes().
                        Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
                        ToImmutableList();
                 }
 
-                return tenantScopeEntityTypes;
+                return multiTenantEntityTypes;
             }
         }
 
@@ -124,7 +124,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, TenantContext);
+            Shared.SetupModel(builder, TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
             // Consider a more general solution in the future.
@@ -153,7 +153,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
@@ -172,7 +172,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (ChangeTracker.AutoDetectChangesEnabled)
                 ChangeTracker.DetectChanges();
 
-            Shared.EnforceTenantId(TenantContext, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
+            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
 
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;

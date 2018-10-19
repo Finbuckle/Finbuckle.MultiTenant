@@ -69,6 +69,38 @@
             }
         },
         {
+            "name": "EFCoreStoreSample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceRoot}/samples/EFCoreStoreSample/bin/Debug/netcoreapp2.1/EFCoreStoreSample.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/samples/EFCoreStoreSample",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "launchBrowser": {
+                "enabled": true,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceRoot}/samples/EFCoreStoreSample/Views"
+            }
+        },
+        {
             "name": "HostStrategySample",
             "type": "coreclr",
             "request": "launch",

@@ -14,38 +14,27 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// <c>Finbuckle.MultiTenant.AspNetCore</c> extensions to <c>HttpContext</c>.
+    /// Finbuckle.MultiTenant.AspNetCore extensions to HttpContext.
     /// </summary>
     public static class HttpContextExtensions
     {
         /// <summary>
-        /// Asyncronously retrieves the current <c>TenantContext</c> or null if there is no valid tenant context.
+        /// Returns the current TenantContext or null if there is none.
         /// </summary>
-        /// <param name="context">The <c>HttpContext<c/> instance the extension method applies to.</param>
-        /// <returns>The <c>TenantContext</c> instance for the current tenant.</returns>
-        [Obsolete("This method is obsolete. Use GetTenantContext instead.")]
-        public static async Task<TenantContext> GetTenantContextAsync(this HttpContext context)
-        {            
-            return await Task.FromResult(context.GetTenantContext());
-        }
-
-        /// <summary>
-        /// Returns the current <c>TenantContext</c> or null if there is none.
-        /// </summary>
-        /// <param name="context">The <c>HttpContext<c/> instance the extension method applies to.</param>
-        /// <returns>The <c>TenantContext</c> instance for the current tenant.</returns>
-        public static TenantContext GetTenantContext(this HttpContext context)
+        /// <param name="context">The HttpContext<c/> instance the extension method applies to.</param>
+        /// <returns>The TenantContext instance for the current tenant.</returns>
+        public static MultiTenantContext GetMultiTenantContext(this HttpContext context)
         {
             object tenantContext = null;
-            context.Items.TryGetValue(Constants.HttpContextTenantContext, out tenantContext);
+            context.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out tenantContext);
             
-            return (TenantContext)tenantContext;
+            return (MultiTenantContext)tenantContext;
         }
     }
 }

@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using DataIsolationSample.Models;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +21,7 @@ namespace DataIsolationSample.Data
 {
     public class ToDoDbContext : MultiTenantDbContext
     {
-        public ToDoDbContext(TenantContext tenantContext) : base(tenantContext)
+        public ToDoDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
