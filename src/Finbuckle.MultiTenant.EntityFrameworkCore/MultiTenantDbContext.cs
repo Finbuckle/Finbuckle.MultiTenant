@@ -31,7 +31,7 @@ namespace Finbuckle.MultiTenant
     /// A database context that enforces tenant integrity on entity types
     /// marked with the MultiTenant attribute.
     /// </summary>
-    public class MultiTenantDbContext : DbContext
+    public abstract class MultiTenantDbContext : DbContext
     {
         protected internal TenantInfo TenantInfo { get; protected set; }
         
@@ -43,14 +43,10 @@ namespace Finbuckle.MultiTenant
         {
             this.TenantInfo = tenantInfo;
         }
-        
+
         protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
             this.TenantInfo = tenantInfo;
-        }
-
-        protected MultiTenantDbContext()
-        {
         }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;

@@ -45,8 +45,9 @@ namespace AuthenticationOptionsSample.Controllers
         }
 
         [Authorize]
-        public IActionResult Authenticate([FromServices] IAuthorizationService auth)
+        public IActionResult Authenticate()
         {
+
             return RedirectToAction("Index");
         }
 

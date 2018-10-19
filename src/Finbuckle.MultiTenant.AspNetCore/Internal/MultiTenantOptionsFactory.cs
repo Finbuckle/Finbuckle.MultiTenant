@@ -62,7 +62,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             // Configure tenant options.
-            if(multiTenantContextAccessor.MultiTenantContext != null)
+            if(multiTenantContextAccessor.MultiTenantContext?.TenantInfo != null)
             {
                 tenantConfig(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }

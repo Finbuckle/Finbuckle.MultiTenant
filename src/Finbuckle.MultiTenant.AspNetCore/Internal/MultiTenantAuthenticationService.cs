@@ -13,12 +13,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public override async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            // Add tenant identifier to the properties so on the callback we can use it to set the tenant context.
-            var tenantContext = context.GetMultiTenantContext();
-            if (tenantContext != null)
+            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
+            var multiTenantContext = context.GetMultiTenantContext();
+            if (multiTenantContext.TenantInfo != null)
             {
-                properties = new AuthenticationProperties();
-                properties.Items.Add("tenantIdentifier", tenantContext.TenantInfo.Identifier);
+                properties = properties ?? new AuthenticationProperties();
+                properties.Items.Add("tenantIdentifier", multiTenantContext.TenantInfo.Identifier);
             }
 
             await base.ChallengeAsync(context, scheme, properties);

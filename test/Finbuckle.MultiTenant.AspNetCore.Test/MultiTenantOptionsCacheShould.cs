@@ -57,6 +57,32 @@ public class MultiTenantOptionsCacheShould
         Assert.True(result);
     }
 
+    [Fact]
+    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnAdd()
+    {
+        var tca = new TestMultiTenantContextAccessor(null);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options, ensure no exception caused by null MultiTenantContext.
+        var result = cache.TryAdd("", options);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnGetOrAdd()
+    {
+        var tca = new TestMultiTenantContextAccessor(null);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options, ensure no exception caused by null MultiTenantContext.
+        var result = cache.GetOrAdd("", () => options);
+        Assert.NotNull(result);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData(null)]

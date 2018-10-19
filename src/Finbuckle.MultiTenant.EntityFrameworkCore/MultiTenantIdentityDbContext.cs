@@ -28,9 +28,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant
 {
-    public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
@@ -43,10 +43,10 @@ namespace Finbuckle.MultiTenant
     /// A database context compatiable with Identity that enforces tenant integrity on entity types
     /// marked with the MultiTenant attribute.
     /// </summary>
-    public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
+    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
         where TUser : MultiTenantIdentityUser
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
@@ -55,12 +55,12 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    public class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
         where TUser : MultiTenantIdentityUser<TKey>
         where TRole : MultiTenantIdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
@@ -69,7 +69,7 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    public class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
         where TUserClaim : IdentityUserClaim<TKey>
@@ -85,8 +85,9 @@ namespace Finbuckle.MultiTenant
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 
-        protected MultiTenantIdentityDbContext()
+        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo)
         {
+            this.TenantInfo = tenantInfo;
         }
 
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
