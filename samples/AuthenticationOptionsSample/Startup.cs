@@ -60,12 +60,6 @@ namespace AuthenticationOptionsSample
                     // These configuration settings should be set via user-secrets or environment variables!
                     options.ClientId = Configuration.GetValue<string>("OpenIdConnectClientId");
                     options.Authority = Configuration.GetValue<string>("OpenIdConnectAuthority");
-
-                    // The below are needed due to a Safari 12 issue:
-                    // https://bugs.webkit.org/show_bug.cgi?id=188165
-                    // options.ClientSecret = "clientsecret";
-                    // options.ResponseType = "code";
-                    // options.ResponseMode = "query";
                 });
 
             services.AddMultiTenant().

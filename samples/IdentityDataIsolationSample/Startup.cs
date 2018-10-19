@@ -36,6 +36,15 @@ namespace IdentityDataIsolationSample
             services.AddDefaultIdentity<MultiTenantIdentityUser>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddAuthentication()
+                .AddGoogle("Google", options =>
+                {
+                    // These configuration settings should be set via user-secrets or environment variables!
+                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
+                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
+                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
+                });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
                 {
