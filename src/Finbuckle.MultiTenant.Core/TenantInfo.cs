@@ -30,7 +30,7 @@ namespace Finbuckle.MultiTenant
             ConnectionString = connectionString;
             if (items != null)
             {
-                Items = Items;
+                Items = items;
             }
         }
 
