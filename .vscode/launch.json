@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/AuthenticationOptionsSample/bin/Debug/netcoreapp2.1/AuthenticationOptionsSample.dll",
+            "program": "${workspaceRoot}/samples/AuthenticationOptionsSample/bin/Debug/netcoreapp2.2/AuthenticationOptionsSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/AuthenticationOptionsSample",
             "stopAtEntry": false,
@@ -42,7 +42,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/BasePathStrategySample/bin/Debug/netcoreapp2.1/BasePathStrategySample.dll",
+            "program": "${workspaceRoot}/samples/BasePathStrategySample/bin/Debug/netcoreapp2.2/BasePathStrategySample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/BasePathStrategySample",
             "stopAtEntry": false,
@@ -74,7 +74,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/EFCoreStoreSample/bin/Debug/netcoreapp2.1/EFCoreStoreSample.dll",
+            "program": "${workspaceRoot}/samples/EFCoreStoreSample/bin/Debug/netcoreapp2.2/EFCoreStoreSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/EFCoreStoreSample",
             "stopAtEntry": false,
@@ -106,7 +106,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/HostStrategySample/bin/Debug/netcoreapp2.1/HostStrategySample.dll",
+            "program": "${workspaceRoot}/samples/HostStrategySample/bin/Debug/netcoreapp2.2/HostStrategySample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/HostStrategySample",
             "stopAtEntry": false,
@@ -138,7 +138,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/RouteStrategySample/bin/Debug/netcoreapp2.1/RouteStrategySample.dll",
+            "program": "${workspaceRoot}/samples/RouteStrategySample/bin/Debug/netcoreapp2.2/RouteStrategySample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/RouteStrategySample",
             "stopAtEntry": false,
@@ -170,7 +170,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/StaticStrategySample/bin/Debug/netcoreapp2.1/StaticStrategySample.dll",
+            "program": "${workspaceRoot}/samples/StaticStrategySample/bin/Debug/netcoreapp2.2/StaticStrategySample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/StaticStrategySample",
             "stopAtEntry": false,
@@ -202,7 +202,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/DataIsolationSample/bin/Debug/netcoreapp2.1/DataIsolationSample.dll",
+            "program": "${workspaceRoot}/samples/DataIsolationSample/bin/Debug/netcoreapp2.2/DataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/DataIsolationSample",
             "stopAtEntry": false,
@@ -234,7 +234,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/IdentityDataIsolationSample/bin/Debug/netcoreapp2.1/IdentityDataIsolationSample.dll",
+            "program": "${workspaceRoot}/samples/IdentityDataIsolationSample/bin/Debug/netcoreapp2.2/IdentityDataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceRoot}/samples/IdentityDataIsolationSample",
             "stopAtEntry": false,
