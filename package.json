@@ -1,0 +1,26 @@
+{
+  "name": "finbuckle.multitenant",
+  "version": "2.0.0",
+  "description": "Finbuckle.MultiTenant is a .NET Standard library for multitenant support designed for ASP.NET Core 2. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achandlerwhite/Finbuckle.MultiTenant.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achandlerwhite/Finbuckle.MultiTenant/issues"
+  },
+  "homepage": "https://github.com/achandlerwhite/Finbuckle.MultiTenant#readme",
+  "standard-version": {
+    "postbump": "echo $(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g')"
+  },
+  "dependencies": {}
+}
