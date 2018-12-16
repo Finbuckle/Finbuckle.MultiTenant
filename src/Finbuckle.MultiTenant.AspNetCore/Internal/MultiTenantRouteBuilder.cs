@@ -45,9 +45,6 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public IRouter Build()
         {
-            // Insert attribute based routes.
-            Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(ServiceProvider));
-
             var routeCollection = new RouteCollection();
 
             foreach (var route in Routes)

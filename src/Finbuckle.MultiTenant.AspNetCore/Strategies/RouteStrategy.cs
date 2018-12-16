@@ -64,7 +64,11 @@ namespace Finbuckle.MultiTenant.Strategies
             if (router == null)
             {
                 var rb = new MultiTenantRouteBuilder(httpContext.RequestServices);
+                // Apply explicit routes.
                 configRoutes(rb);
+                // Insert attribute based routes.
+                rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(httpContext.RequestServices));
+
                 router = rb.Build();
             }
 
