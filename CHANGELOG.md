@@ -1,6 +1,6 @@
 ## Version History
 
-**2.0.1
+**2.0.1**
 * Fixed bug where the `TenantInfo` constructor did not save the passed `Items` collection.
 * Tested for compatibility with ASP.NET Core 2.2.
 * Updated samples for ASP.NET Core 2.2.
