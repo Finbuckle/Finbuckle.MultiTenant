@@ -1,5 +1,11 @@
 ## Version History
 
+**2.0.1
+* Fixed bug where the `TenantInfo` constructor did not save the passed `Items` collection.
+* Tested for compatibility with ASP.NET Core 2.2.
+* Updated samples for ASP.NET Core 2.2.
+* Cleaned up library dependencies to target ASP.NET Core 2.1 or greater.
+
 **2.0.0 General Changes**
 * Changed `TenantContext` to `MultiTenantContext` which includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties.
 * Namespace changes (e.g. use of `Microsoft.Extensions.DependencyInjection` namespace for `Configure` and `ConfigureServices` methods).
