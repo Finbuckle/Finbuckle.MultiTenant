@@ -32,28 +32,50 @@ namespace Finbuckle.MultiTenant.Strategies
 
         public HostStrategy(string template, ILogger<HostStrategy> logger)
         {
-            // Check for valid template. Template cannot have "*" on each side of __tenant__ placeholder.
-            if (string.IsNullOrWhiteSpace(template) ||
-                Regex.Match(template, @"^.*\*.*\.__tenant__\..*\*.*$").Success)
+            // New in 2.1, match whole domain if just "__tenant__".
+            if (template == "__tenant__")
             {
-                throw new MultiTenantException("Invalid host template.");
+                template = template.Replace("__tenant__", @"(?<identifier>.+)");
+            }
+            else
+            {
+                // Check for valid template.
+                // Template cannot be null or whitespace.
+                if (string.IsNullOrWhiteSpace(template))
+                {
+                    throw new MultiTenantException("Template cannot be null or whitespace.");
+                }
+                // Wildcard "*" must be only occur once in template.
+                if (Regex.Match(template, @"\*(?=.*\*)").Success)
+                {
+                    throw new MultiTenantException("Wildcard \"*\" must be only occur once in template.");
+                }
+                // Wildcard "*" must be only token in template segment.
+                if (Regex.Match(template, @"\*[^\.]|[^\.]\*").Success)
+                {
+                    throw new MultiTenantException("\"*\" wildcard must be only token in template segment.");
+                }
+                // Wildcard "?" must be only token in template segment.
+                if (Regex.Match(template, @"\?[^\.]|[^\.]\?").Success)
+                {
+                    throw new MultiTenantException("\"?\" wildcard must be only token in template segment.");
+                }
+
+                template = template.Trim().Replace(".", @"\.");
+                string wildcardSegmentsPattern = @"(\.[^\.]+)*";
+                string singleSegmentPattern = @"[^\.]+";
+                if (template.Substring(template.Length - 3, 3) == @"\.*")
+                {
+                    template = template.Substring(0, template.Length - 3) + wildcardSegmentsPattern;
+                }
+
+                wildcardSegmentsPattern = @"([^\.]+\.)*";
+                template = template.Replace(@"*\.", wildcardSegmentsPattern);
+                template = template.Replace("?", singleSegmentPattern);
+                template = template.Replace("__tenant__", @"(?<identifier>[^\.]+)");
             }
 
-            template = template.Trim().Replace(".", @"\.");
-            string wildcardSegmentsPattern = @"(\.[^\.]+)#";
-            string singleSegmentPattern = @"[^\.]+";
-            if (template.Substring(template.Length - 3, 3) == @"\.*")
-            {
-                template = template.Substring(0, template.Length - 3) + wildcardSegmentsPattern;
-            }
-
-            wildcardSegmentsPattern = @"([^\.]+\.)#";
-            template = template.Replace(@"*\.", wildcardSegmentsPattern);
-            template = template.Replace("?", singleSegmentPattern);
-            template = template.Replace("__tenant__", @"(?<identifier>[^\.]+)");
-            template = $"^{template}$".Replace("#", "*");
-
-            this.regex = template;
+            this.regex = $"^{template}$";;
             this.logger = logger;
         }
 
@@ -73,7 +95,7 @@ namespace Finbuckle.MultiTenant.Strategies
             string identifier = null;
 
             var match = Regex.Match(host.Host, regex,
-                RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase,
+                RegexOptions.ExplicitCapture,
                 TimeSpan.FromMilliseconds(100));
 
             if (match.Success)
