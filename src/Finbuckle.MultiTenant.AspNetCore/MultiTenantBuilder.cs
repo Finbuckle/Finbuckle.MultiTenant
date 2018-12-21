@@ -60,10 +60,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Necessary to apply tenant options in between configuration and postconfiguration
             services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
-            {
-                return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                    CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantInfo });
-            });
+                {
+                    return (IOptionsFactory<TOptions>)ActivatorUtilities.
+                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantInfo });
+                });
 
             services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
 
@@ -257,7 +257,7 @@ namespace Microsoft.Extensions.DependencyInjection
             => WithStrategy(ServiceLifetime.Singleton, sp => new BasePathStrategy(sp.GetService<ILogger<BasePathStrategy>>()));
 
         /// <summary>
-        /// Adds and configures a RouteMultiTenantStrategy with a route parameter "__tenant__" to the application.
+        /// Adds and configures a RouteMultiTenantStrategy with a route parameter "\_\_tenant\_\_" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckeMultiTenantBuilder WithRouteStrategy(Action<IRouteBuilder> configRoutes)
@@ -284,7 +284,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a HostMultiTenantStrategy with template "__tenant__.*" to the application.
+        /// Adds and configures a HostMultiTenantStrategy with template "\_\_tenant\_\_.*" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckeMultiTenantBuilder WithHostStrategy()
