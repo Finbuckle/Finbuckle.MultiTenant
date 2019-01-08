@@ -88,6 +88,7 @@ The host strategy uses a template string which defines how the strategy will fin
   - `*.__tenant__.?` selects the main domain as the tenant identifier and ignores any subdomains and the top level domain.
   - `__tenant__.example.com` will always use the subdomain for the tenant identifier, but only if there are no prior subdomains and the overall host ends with "example.com".
   - `*.__tenant.__.?.?` is similar to the above example except it will select the first subdomain even if others exist and doesn't require ".com".
+  - As a special case, a pattern string of just `__tenant__` will use the entire host as the tenant identifier, as opposed to a single segment.
 
 Configure by calling `WithHostStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. A template pattern can be specified with the overloaded version:
 
