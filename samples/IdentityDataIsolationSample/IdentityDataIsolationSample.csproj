@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <UserSecretsId>IdentityDataIsolationSample-bc2b0e78-974b-4b3d-abd4-aa5cd3ef828c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
