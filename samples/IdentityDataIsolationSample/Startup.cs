@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Identity.UI;
 
 namespace IdentityDataIsolationSample
 {
@@ -33,7 +34,9 @@ namespace IdentityDataIsolationSample
             // string since these vary by tenant.
             services.AddDbContext<ApplicationDbContext>();
 
-            services.AddDefaultIdentity<MultiTenantIdentityUser>()
+            services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
+                    .AddDefaultTokenProviders()
+                    .AddDefaultUI(UIFramework.Bootstrap4)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddAuthentication()
@@ -45,7 +48,7 @@ namespace IdentityDataIsolationSample
                     options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
                 {
                     // Since we are using the route multitenant strategy we must add the
@@ -63,15 +66,24 @@ namespace IdentityDataIsolationSample
             services.AddMultiTenant()
                 .WithRouteStrategy(ConfigRoutes)
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
+                .WithRemoteAuthentication()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                {
                    // Since we are using the route strategy configure each tenant
                    // to have a different cookie name and adjust the paths.
                    options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
-                   options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
+                   // See below for why this is commented out.
+                   //options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
                    options.LogoutPath = $"/{tenantInfo.Identifier}";
                    options.Cookie.Path = $"/{tenantInfo.Identifier}";
                });
+
+            // Required due to a bug in ASP.NET Core Identity (https://github.com/aspnet/Identity/issues/2019)
+            services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>
+            {
+                // This will result in a path of /_tenant_/Identity/Account/Login
+                options.LoginPath = $"{options.Cookie.Path}{options.LoginPath}";
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
