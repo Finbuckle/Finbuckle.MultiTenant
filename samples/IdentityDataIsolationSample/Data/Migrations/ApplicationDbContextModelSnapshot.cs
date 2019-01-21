@@ -14,9 +14,9 @@ namespace IdentityDataIsolationSample.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846");
+                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028");
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityRole", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRole", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -43,7 +43,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -66,7 +66,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUser", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUser", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -120,7 +120,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -143,13 +143,18 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ProviderKey");
+                    b.Property<string>("LoginProvider")
+                        .IsRequired();
 
                     b.Property<string>("ProviderDisplayName");
+
+                    b.Property<string>("ProviderKey")
+                        .IsRequired();
 
                     b.Property<string>("TenantId")
                         .IsRequired()
@@ -158,14 +163,17 @@ namespace IdentityDataIsolationSample.Migrations
                     b.Property<string>("UserId")
                         .IsRequired();
 
-                    b.HasKey("LoginProvider", "ProviderKey");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("LoginProvider", "ProviderKey", "TenantId")
+                        .IsUnique();
 
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserRole<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId");
 
@@ -182,7 +190,7 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserToken<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId");
 
@@ -201,46 +209,46 @@ namespace IdentityDataIsolationSample.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityRole")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserRole<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityRole")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUserToken<string>", b =>
+            modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.EntityFrameworkCore.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

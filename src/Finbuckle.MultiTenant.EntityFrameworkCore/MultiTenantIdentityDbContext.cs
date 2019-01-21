@@ -127,24 +127,34 @@ namespace Finbuckle.MultiTenant
             Shared.SetupModel(builder, TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
-            // Consider a more general solution in the future.
-            if(Shared.HasMultiTenantAttribute(typeof(TUser)))
+            if (Shared.HasMultiTenantAttribute(typeof(TUser)))
             {
                 var props = new List<IProperty>(new[] { builder.Entity<TUser>().Metadata.FindProperty("NormalizedUserName") });
                 builder.Entity<TUser>().Metadata.RemoveIndex(props);
-                
+
                 builder.Entity<TUser>(b =>
                     b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
             }
 
-            if(Shared.HasMultiTenantAttribute(typeof(TRole)))
+            if (Shared.HasMultiTenantAttribute(typeof(TRole)))
             {
                 var props = new List<IProperty>(new[] { builder.Entity<TRole>().Metadata.FindProperty("NormalizedName") });
                 builder.Entity<TRole>().Metadata.RemoveIndex(props);
 
                 builder.Entity<TRole>(b =>
                     b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
-            }            
+            }
+
+            // Adjust private key on UserLogin.
+            if (Shared.HasMultiTenantAttribute(typeof(TUserLogin)))
+            {
+                var pk = builder.Entity<TUserLogin>().Metadata.FindPrimaryKey();
+                builder.Entity<TUserLogin>().Metadata.RemoveKey(pk.Properties);
+
+                // Create a new ID and a unique index to replace the old pk.
+                builder.Entity<TUserLogin>(b => b.Property<string>("Id").ValueGeneratedOnAdd());
+                builder.Entity<TUserLogin>(b => b.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
+            }
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
