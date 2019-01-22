@@ -29,7 +29,8 @@ public class TestDbContext : MultiTenantDbContext
     public TestDbContext(TenantInfo tenantInfo,
         DbContextOptions options) :
         base(tenantInfo, options)
-    { }
+    {
+    }
 
     public TestDbContext(TenantInfo tenantInfo) : base(tenantInfo)
     {
@@ -125,3 +126,16 @@ public class ThingWithHigherTenantIdMaxLength
     [MaxLength(100)]
     public string TenantId { get; set; }
 }
+
+public class TestIdentityDbContext : MultiTenantIdentityDbContext
+    {
+        public TestIdentityDbContext(TenantInfo tenantContext)
+            : base(tenantContext)
+        {
+        }
+
+        public TestIdentityDbContext(TenantInfo tenantContext, DbContextOptions options)
+            : base(tenantContext, options)
+        {
+        }
+    }
