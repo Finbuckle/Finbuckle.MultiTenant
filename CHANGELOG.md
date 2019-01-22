@@ -1,4 +1,8 @@
 ## Version History
+**2.0.2**
+* Fixed bug in Identity where `UserLogins` primary key was not adjusted for multitenant usage.
+* Updated and Fixed the IdentityDataIsolation sample project.
+* General code and test cleanup.
 
 **2.0.1**
 * Fixed bug where the `TenantInfo` constructor did not save the passed `Items` collection.

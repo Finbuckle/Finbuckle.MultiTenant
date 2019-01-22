@@ -1,4 +1,4 @@
-# Finbuckle.MultiTenant 2.0.1
+# Finbuckle.MultiTenant 2.0.2
 
 Finbuckle.MultiTenant is a .NET Standard library for multitenant support designed for ASP.NET Core 2. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.
 
