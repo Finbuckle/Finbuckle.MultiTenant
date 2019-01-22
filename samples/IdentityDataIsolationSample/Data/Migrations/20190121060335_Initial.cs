@@ -96,6 +96,7 @@ namespace IdentityDataIsolationSample.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
+                    Id = table.Column<string>(nullable: false),
                     LoginProvider = table.Column<string>(nullable: false),
                     ProviderKey = table.Column<string>(nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
@@ -104,7 +105,7 @@ namespace IdentityDataIsolationSample.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.PrimaryKey("PK_AspNetUserLogins", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AspNetUserLogins_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -179,6 +180,12 @@ namespace IdentityDataIsolationSample.Migrations
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_LoginProvider_ProviderKey_TenantId",
+                table: "AspNetUserLogins",
+                columns: new[] { "LoginProvider", "ProviderKey", "TenantId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
