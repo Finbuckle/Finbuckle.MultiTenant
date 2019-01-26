@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SharedLoginSample.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,15 +32,6 @@ namespace SharedLoginSample
                     .AddDefaultUI(UIFramework.Bootstrap4)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddAuthentication()
-                .AddGoogle("Google", options =>
-                {
-                    // These configuration settings should be set via user-secrets or environment variables!
-                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
-                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
-                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
-                });
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
                 {
@@ -55,7 +39,7 @@ namespace SharedLoginSample
                     // route parameter to the Pages conventions used by Identity.
                     options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account", model =>
                     {
-                        foreach(var selector in model.Selectors)
+                        foreach (var selector in model.Selectors)
                         {
                             selector.AttributeRouteModel.Template =
                                 AttributeRouteModel.CombineTemplates("{__tenant__}", selector.AttributeRouteModel.Template);
@@ -66,23 +50,23 @@ namespace SharedLoginSample
             services.AddMultiTenant()
                 .WithRouteStrategy(ConfigRoutes)
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
-                .WithRemoteAuthentication()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-               {
+                {
                    // Since we are using the route strategy configure each tenant
                    // to have a different cookie name and adjust the paths.
                    options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
                    // See below for why this is commented out.
                    //options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
-                   options.LogoutPath = $"/{tenantInfo.Identifier}";
+                   //options.LogoutPath = $"/{tenantInfo.Identifier}";
                    options.Cookie.Path = $"/{tenantInfo.Identifier}";
-               });
+                });
 
             // Required due to a bug in ASP.NET Core Identity (https://github.com/aspnet/Identity/issues/2019)
             services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>
             {
                 // This will result in a path of /_tenant_/Identity/Account/Login
                 options.LoginPath = $"{options.Cookie.Path}{options.LoginPath}";
+                options.LogoutPath = $"{options.Cookie.Path}{options.LogoutPath}";
             });
         }
 
@@ -93,7 +77,6 @@ namespace SharedLoginSample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseMultiTenant();
             app.UseAuthentication();
@@ -102,6 +85,7 @@ namespace SharedLoginSample
 
         private static void ConfigRoutes(Microsoft.AspNetCore.Routing.IRouteBuilder routes)
         {
+            routes.MapRoute("SharedLogin", "SharedLogin", new { controller = "Home", action = "SharedLogin" });
             routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
         }
     }

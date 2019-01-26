@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using IdentityDataIsolationSample.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +48,7 @@ namespace IdentityDataIsolationSample
                     // route parameter to the Pages conventions used by Identity.
                     options.Conventions.AddAreaFolderRouteModelConvention("Identity", "/Account", model =>
                     {
-                        foreach(var selector in model.Selectors)
+                        foreach (var selector in model.Selectors)
                         {
                             selector.AttributeRouteModel.Template =
                                 AttributeRouteModel.CombineTemplates("{__tenant__}", selector.AttributeRouteModel.Template);
@@ -68,21 +61,22 @@ namespace IdentityDataIsolationSample
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
                 .WithRemoteAuthentication()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-               {
-                   // Since we are using the route strategy configure each tenant
-                   // to have a different cookie name and adjust the paths.
-                   options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
-                   // See below for why this is commented out.
-                   //options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
-                   options.LogoutPath = $"/{tenantInfo.Identifier}";
-                   options.Cookie.Path = $"/{tenantInfo.Identifier}";
-               });
+                {
+                    // Since we are using the route strategy configure each tenant
+                    // to have a different cookie name and adjust the paths.
+                    options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
+                    // See below for why this is commented out.
+                    //options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
+                    //options.LogoutPath = $"/{tenantInfo.Identifier}";
+                    options.Cookie.Path = $"/{tenantInfo.Identifier}";
+                });
 
             // Required due to a bug in ASP.NET Core Identity (https://github.com/aspnet/Identity/issues/2019)
             services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>
             {
                 // This will result in a path of /_tenant_/Identity/Account/Login
                 options.LoginPath = $"{options.Cookie.Path}{options.LoginPath}";
+                options.LogoutPath = $"{options.Cookie.Path}{options.LogoutPath}";
             });
         }
 
@@ -93,7 +87,6 @@ namespace IdentityDataIsolationSample
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseMultiTenant();
             app.UseAuthentication();
