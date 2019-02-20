@@ -69,3 +69,6 @@ The configuration section should use this json format:
   }
 }
 ```
+
+## EFCore Store
+Documentation in progress. See the EFCoreStoreSample project in the mean time.
