@@ -26,7 +26,7 @@ Contains information about the multitenant store used to create the `MultiTenant
 
 ## MultiTenant Strategies
 Responsible for determining and returning a tenant identifier string for the current request.
-* Several strategies are provided based on subdomain, route, etc. See [MultiTenant Strategies](Strategies) for more information.
+* Several strategies are provided based on host, route, etc. See [MultiTenant Strategies](Strategies) for more information.
 * Custom strategies implementing `IMultiTenantStrategy` can be used as well.
 
 ## MultiTenant Stores

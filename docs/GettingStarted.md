@@ -4,7 +4,7 @@
 
 Install the Finbuckle.MultiTenant NuGet package with your method of choice.
 
-.NET CLI
+.NET Core CLI
 ```bash
 $ dotnet add package Finbuckle.MultiTenant
 ```
@@ -16,7 +16,7 @@ Package Manager
 
 ## Usage
 
-Configure the services by calling `AddMultiTenant` and its builder methods in your app's `ConfigureServices` method. Here we are usign the host strategy and in-memory store, but Finbuckle.MultiTenant comes with several other multitenant [strategies]() and [stores]().
+Configure the services by calling `AddMultiTenant` followed by its builder methods in your app's `ConfigureServices` method. Here we are using the host strategy and in-memory store, but Finbuckle.MultiTenant comes with several other multitenant [strategies](Strategies) and [stores](Stores).
 
 ```cs
 public void ConfigureServices(IServiceCollection services)
@@ -27,7 +27,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Configure the middleware by calling `UseMultiTenant` in your app's `Configure` method. Be sure to call it before calling `UseMvc` if using ASP.NET Core MVC.
+Configure the middleware by calling `UseMultiTenant` in your app's `Configure` method. Be sure to call it before calling `UseMvc` and other middleware which will use per-tenant funtionality.
 
 ```cs
 public void Configure(IApplicationBuilder app)
@@ -39,7 +39,7 @@ public void Configure(IApplicationBuilder app)
 }
 ```
 
-With the services and middleware configured, access information for the current tenant from the `TenantInfo` object. Here we are accessing it from the `GetMultiTenantContext` extension method, but there are [several ways] to obtain it. If the current tenant could not be determined then `TenantInfo` will be null.
+With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext` object accessed from the `GetMultiTenantContext` extension method. If the current tenant could not be determined then `TenantInfo` will be null.
 
 ```cs
 using Finbuckle.MultiTenant;
@@ -56,9 +56,9 @@ if(tenantInfo != null)
 }
 ```
 
-The `TenantInfo` object holds [basic details]() about a tenant, and its `Items` property provides extensibility. This enables you to customize your app on a on a per-tenant basis in any way you want.
+The `TenantInfo` property holds basic details about a tenant and enables customization of your app on a on a per-tenant basis in any way you want.
 
-Finbuckle.MultiTenant provides built-in functionality for [per-tenant options](), [per-tenant authentication](), and [per-tenant data isolation]().
+Finbuckle.MultiTenant uses `TenantInfo` internally to provide built-in functionality such as [per-tenant options](Options), [per-tenant authentication](Authentication), and [per-tenant data isolation](EFCore).
 
 ## Compiling from Source
 
@@ -73,15 +73,8 @@ $ cd Finbuckle.MultiTenant
 $ dotnet build
 ```
 
-## Running Tests
-
-Run the xUnit tests from the command line with `dotnet test` from the solution directory.
+Run the unit tests from the command line with `dotnet test` from the solution directory.
 
 ```bash
 $ dotnet test
-```
-
-For cleaner output filter the command to run on only the test projects.
-```bash
-$ find . -name '*Test.csproj' -print0 | xargs -0 -I{} dotnet test {}
 ```
