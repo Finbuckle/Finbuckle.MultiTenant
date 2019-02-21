@@ -1,6 +1,4 @@
 ### Introduction
->{.small} This document assumes a shared or hybrid database model for tenant data isolation.
-
 Data isolation is one of the most important considerations in a multitenant app. Whether each tenant has its own database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant supports each of these models by associating a connection string with each tenant. Tenant's using the same connection string will share a database and accordingly those with a unique connection string will have separate databases.
 
 In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data belonging to other tenant's. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where" clauses all over an app. Applying the `MultiTenant` data attribute to an entity and using the `MultiTenantDbContext` as a base for class for an app's own database context tells Finbuckle.MultiTenant to ensure isolation of both queries and create/update/delete commands.
@@ -44,9 +42,9 @@ public class BloggingDbContext : MultiTenantDbContext
 }
 ```
 
->{.small} If the derived database context overrides OnModelCreating is it critical that the base class OnModelCreating is called within.
+>{.small} If the derived database context overrides OnModelCreating is it critical that the base class OnModelCreating is called.
 
-Finally, add the `MultiTenant` data annotation to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
+Finally, add the `[MultiTenant]` data annotation to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
 
 ```
 [MultiTenant]
@@ -66,13 +64,7 @@ When the context is initialized, a shadow property named `TenantId` is added to 
 
 ### Configuring with ASP.NET Core
 
-If using ASP.NET Core [configure Finbuckle.MultiTenant](https://www.finbuckle.com/Blog/10/getting-started-asp-net-core-finbuckle-multitenant) with the desired [MultiTenant Store](https://www.finbuckle.com/Blog/13/multitenant-stores-finbuckle-multitenant) and [MultiTenant Strategy](https://www.finbuckle.com/Blog/12/multitenant-strategies-finbuckle-multitenant):
-
-First, add the `Finbuckle.MultiTenant.AspNetCore` package to your project:
-
-```{.bash}
-dotnet add package Finbuckle.MultiTenant.AspNetCore
-```
+If using ASP.NET Core [configure Finbuckle.MultiTenant](GettingStarted) as desired.
 
 Next, add the desired services in the `ConfigureServices` method of your `Startup` class. If using dependency injection for the database context make sure to call `AddDbContext<T>`. Dependency injection will also inject the `TenantContext` into the database context constructor:
 
@@ -95,22 +87,6 @@ public class Startup
 ```
 
 >{.small} Do not use any of the configuration methods that sets a database provider or connection string if using the `AddDbContext` delegate overload&mdash;the delegate will not have access to the current `TenantContext` or its connection string.
-
-Optionally, configure the middleware in the `Configure` method of your `Startup` class:
-
-```
-public class Startup
-{
-    ...
-    public void Configure(IappBuilder app, IHostingEnvironment env)
-    {
-        ...        
-        app.UseMultiTenant();
-        ...
-    }
-    ...
-}
-```
 
 ### Adding Data
 Added entities are automatically associated with the current `TenantContext`. If an entity is associated with a different `TenantContext` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:

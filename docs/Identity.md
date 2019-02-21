@@ -1,10 +1,8 @@
 ### Introduction
 
->{.small} As of version 1.0.0 Finbuckle.MultiTenant only supports ASP.NET Core Identity when the user entity derives from `IdentityUser`, which uses a string type as the key.
+Finbuckle.MultiTenant has limited support for data isolation with ASP.Net Core Identity. It works similarly to [normal Finbuckle.Multitenant Entity Framework Core data isolation](EFCore) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`.
 
->{.small} This document assumes a shared or hybrid database model for tenant data isolation.
-
-Finbuckle.MultiTenant has limited support for data isolation with ASP.Net Core Identity. It works similarly to [normal Finbuckle.Multitenant Entity Framework Core data isolation](/Blog/14/tenant-data-isolation-entity-framework-core-finbuckle-multitenant) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`.
+See the[IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample) project for a comprehensive example on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. This sample illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
 
 ### Configuration
 Add the `Finbuckle.MultiTenant.EntityFrameworkCore` and package to the project:
@@ -26,7 +24,7 @@ public class MyIdentityDbContext : MultiTenantIdentityDbContext<appUser>
 
 >{.small} `TUser` must derive from `IdentityUser` which uses a string for its primary key.
 
-Add the `MultiTenant` data annotation to the User entity classes:
+Add the `[MultiTenant]` data annotation to the User entity classes:
 
 ```
 [MultiTenant]
@@ -46,4 +44,4 @@ Many identity options will be limited to the current tenant. For example, the op
 
 Internally, ASP.NET Core Identity uses regular ASP.NET Core authentication. It uses a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration), but under the hood the end result is the same in that `CookieAuthenticationOptions` are being configured and consumed.
 
-Finbuckle.Multitenant can customize these options per tenant so that user sessions are unique per tenant. See [Tenant-Scoped Authentication in ASP.NET Core 2.0+ with Finbuckle.MultiTenant](/Blog/9/tenant-scoped-authentication-asp-net-core-2-0-finbuckle-multitenant) for information on how to customize authentication options per tenant.
+Finbuckle.Multitenant can customize these options per tenant so that user sessions are unique per tenant. See [per-tenant cookie authentication options](Authentication#cookie-authentication-options) for information on how to customize authentication options per tenant.
