@@ -1,8 +1,8 @@
 # Per-Tenant Options
 
-Finbuckle.MultiTenant integrates with the standard ASP.NET Core [Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps customize options distinctly for each tenant. A specialized variantion of this is [per-tenant authentication](Authentication).
+Finbuckle.MultiTenant integrates with the standard ASP.NET Core [Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps customize options distinctly for each tenant. A specialized variation of this is [per-tenant authentication](Authentication).
 
-Per-tenant options will work with *any* options class when using `IOptions<TOpsions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` for dependency injection or service resolution. This includes an app's own code *and* code internal to ASP.NET Core or other libraries that use the Options pattern. Use with caution: ASP.NET Core and other libraries may internally cache options or exhibit other unexpected behavior resulting in the wrong option values!
+Per-tenant options will work with *any* options class when using `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` for dependency injection or service resolution. This includes an app's own code *and* code internal to ASP.NET Core or other libraries that use the Options pattern. Use with caution: ASP.NET Core and other libraries may internally cache options or exhibit other unexpected behavior resulting in the wrong option values!
 
 Consider a typical scenario in ASP.Net Core, starting with a simple class:
 
