@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Options;
@@ -24,26 +25,60 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
     /// </summary>
-    internal class MultiTenantOptionsCache<TOptions> : OptionsCache<TOptions> where TOptions : class
+    internal class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
     {
         private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
 
         // The object is just a dummy because there is no ConcurrentSet<T> class.
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
-            new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
+        //private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
+        //  new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
 
-        public  MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
+        private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>>();
+
+        public MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
         {
             this.multiTenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
         }
 
         /// <summary>
-        /// Gets a named options instance, or adds a new instance created with createOptions.
+        /// Clears all cached options for the current tenant.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="createOptions"></param>
-        /// <returns></returns>
-        public override TOptions GetOrAdd(string name, Func<TOptions> createOptions)
+        public void Clear()
+        {
+            var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+            var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
+
+            cache.Clear();
+        }
+
+        /// <summary>
+        /// Clears all cached options for the given tenant.
+        /// </summary>
+        /// <param name="tenantId">The Id of the tenant which will have its options cleared.</param>
+        public void Clear(string tenantId)
+        {
+            tenantId = tenantId ?? "";
+            var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
+
+            cache.Clear();
+        }
+
+        /// <summary>
+        /// Clears all cached options for all tenants and no tenant.
+        /// </summary>
+        public void ClearAll()
+        {
+            foreach(var cache in map.Values)
+                cache.Clear();
+        }
+
+        /// <summary>
+        /// Gets a named options instance for the current tenant, or adds a new instance created with createOptions.
+        /// </summary>
+        /// <param name="name">The options name.</param>
+        /// <param name="createOptions">The factory function for creating the options instance.</param>
+        /// <returns>The existing or new options instance.</returns>
+        public TOptions GetOrAdd(string name, Func<TOptions> createOptions)
         {
             if (createOptions == null)
             {
@@ -51,115 +86,39 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
 
             name = name ?? Options.DefaultName;
-            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id, name);
-            return base.GetOrAdd(adjustedOptionsName, () => MultiTenantFactoryWrapper(name, adjustedOptionsName, createOptions));
+            var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+            var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
+
+            return cache.GetOrAdd(name, createOptions);
         }
 
         /// <summary>
-        /// Tries to adds a new option to the cache, will return false if the name already exists.
+        /// Tries to adds a new option to the cache for the current tenant.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public override bool TryAdd(string name, TOptions options)
+        /// <param name="name">The options name.</param>
+        /// <param name="options">The options instance.</param>
+        /// <returns>True if the options was added to the cache for the current tenant.</returns>
+        public bool TryAdd(string name, TOptions options)
         {
             name = name ?? Options.DefaultName;
+            var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+            var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
-            var adjustedOptionsName = AdjustOptionsName(multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id, name);
-
-            if (base.TryAdd(adjustedOptionsName, options))
-            {
-                CacheAdjustedOptionsName(name, adjustedOptionsName);
-                return true;
-            }
-
-            return false;
+            return cache.TryAdd(name, options);
         }
 
         /// <summary>
-        /// Try to remove an options instance. Removes for all tenants.
+        /// Try to remove an options instance for the current tenant.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public override bool TryRemove(string name)
+        /// <param name="name">The options name.</param>
+        /// <returns>True if the options was removed from the cache for the current tenant.</returns>
+        public bool TryRemove(string name)
         {
             name = name ?? Options.DefaultName;
-            var result = false;
+            var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+            var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
-            if (!_adjustedOptionsNames.TryGetValue(name, out var adjustedOptionsNames))
-                return false;
-
-            List<string> removedNames = new List<string>();
-            foreach (var adjustedOptionsName in adjustedOptionsNames)
-            {
-                if (base.TryRemove(adjustedOptionsName.Key))
-                {
-                    removedNames.Add(adjustedOptionsName.Key);
-                    result = true;
-                }
-            }
-
-            foreach (var removedName in removedNames)
-            {
-                adjustedOptionsNames.TryRemove(removedName, out var dummy);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Concatenates a prefix string to the options name string.
-        /// </summary>
-        /// <remarks>
-        /// If the prefix is null, an empty string is used. If name is null, the Options.DefaultName is used.
-        /// </remarks>
-        /// <param name="prefix"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private string AdjustOptionsName(string prefix, string name)
-        {
-            if (name == null)
-            {
-                throw new MultiTenantException("", new ArgumentNullException(nameof(name)));
-            }
-
-            // Hash so that prefix + option name can't cause a collision. 
-            byte[] buffer = Encoding.UTF8.GetBytes(prefix ?? "");
-            var sha1 = System.Security.Cryptography.SHA1.Create();
-            var hash = sha1.ComputeHash(buffer);
-            prefix = Convert.ToBase64String(hash);
-
-            return (prefix) + (name);
-        }
-
-        /// <summary>
-        /// Creates an options instance, adjusted them according to the TenantContext, and caches the adjusted name.
-        /// </summary>
-        /// <param name="optionsName"></param>
-        /// <param name="adjustedOptionsName"></param>
-        /// <param name="createOptions"></param>
-        /// <returns></returns>
-        private TOptions MultiTenantFactoryWrapper(string optionsName, string adjustedOptionsName, Func<TOptions> createOptions)
-        {
-            if (createOptions == null)
-            {
-                throw new ArgumentNullException(nameof(createOptions));
-            }
-
-            var options = createOptions();
-            CacheAdjustedOptionsName(optionsName, adjustedOptionsName);
-
-            return options;
-        }
-
-        /// <summary>
-        /// Caches an object's adjusted name indexed by the original name.
-        /// </summary>
-        /// <param name="optionsName"></param>
-        /// <param name="adjustedOptionsName"></param>
-        private void CacheAdjustedOptionsName(string optionsName, string adjustedOptionsName)
-        {
-            _adjustedOptionsNames.GetOrAdd(optionsName, new ConcurrentDictionary<string, object>()).TryAdd(adjustedOptionsName, null);
+            return cache.TryRemove(name);
         }
     }
 }

@@ -16,15 +16,10 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Moq;
 using Xunit;
 
 public class MultiTenantOptionsCacheShould
@@ -33,7 +28,7 @@ public class MultiTenantOptionsCacheShould
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void AdjustedOptionsNameOnAdd(string name)
+    public void AddNamedOptionsForCurrentTenantOnlyOnAdd(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
@@ -51,14 +46,14 @@ public class MultiTenantOptionsCacheShould
         result = cache.TryAdd(name, options);
         Assert.False(result);
 
-        // Change the TC id and confirm options can be added again.
+        // Change the tenant id and confirm options can be added again.
         ti.Id = "diff_id";
         result = cache.TryAdd(name, options);
         Assert.True(result);
     }
 
     [Fact]
-    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnAdd()
+    public void HandleNullMultiTenantContextOnAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
@@ -71,7 +66,7 @@ public class MultiTenantOptionsCacheShould
     }
 
     [Fact]
-    public void HandleNullMultiTenantContextWhenAdjustedOptionsNameOnGetOrAdd()
+    public void HandleNullMultiTenantContextOnGetOrAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
         var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
@@ -87,7 +82,7 @@ public class MultiTenantOptionsCacheShould
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void AdjustOptionsNameOnGetOrAdd(string name)
+    public void GetOrAddNamedOptionForCurrentTenantOnly(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
@@ -102,20 +97,20 @@ public class MultiTenantOptionsCacheShould
 
         // Add new options.
         var result = cache.GetOrAdd(name, () => options);
-        Assert.Equal(options.Cookie.Name, result.Cookie.Name);
+        Assert.Same(options, result);
 
-        // Get the existing object.
+        // Get the existing options if exists.
         result = cache.GetOrAdd(name, () => options2);
-        Assert.NotEqual(options2.Cookie.Name, result.Cookie.Name);
+        Assert.NotSame(options2, result);
 
-        // Confirm different tenant on same object is an add.
+        // Confirm different tenant on same object is an add (ie it didn't exist there).
         ti.Id = "diff_id";
         result = cache.GetOrAdd(name, () => options2);
-        Assert.Equal(options2.Cookie.Name, result.Cookie.Name);
+        Assert.Same(options2, result);
     }
 
     [Fact]
-    public void ThrowsIfGetOtAddFactoryIsNull()
+    public void ThrowsIfGetOrAddFactoryIsNull()
     {
         var tc = new MultiTenantContext();
         var tca = new TestMultiTenantContextAccessor(tc);
@@ -137,7 +132,7 @@ public class MultiTenantOptionsCacheShould
     [InlineData("")]
     [InlineData(null)]
     [InlineData("name")]
-    public void RemoveOptionsForAllTenants(string name)
+    public void RemoveNamedOptionsForCurrentTenantOnly(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
         var tc = new MultiTenantContext();
@@ -155,12 +150,144 @@ public class MultiTenantOptionsCacheShould
         ti.Id = "diff_id";
         result = cache.TryAdd(name, options);
         Assert.True(result);
+        result = cache.TryAdd("diffname", options);
+        Assert.True(result);
 
-        // Remove all options and assert empty.
+        // Remove named options for current tenant.
         result = cache.TryRemove(name);
         Assert.True(result);
-        Assert.Empty((IEnumerable)cache.GetType().BaseType.
-            GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance).
-            GetValue(cache));
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
+            GetValue(cache);
+
+        dynamic tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+
+        // Assert named options removed and other options on tenant left as-is.
+        Assert.False(tenantInternalCache.Keys.Contains(name ?? ""));
+        Assert.True(tenantInternalCache.Keys.Contains("diffname"));
+
+        // Assert other tenant not affected.
+        ti.Id = "test-id-123";
+        tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+        Assert.True(tenantInternalCache.ContainsKey(name ?? ""));
+    }
+
+    [Fact]
+    public void ClearOptionsForCurrentTenantOnly()
+    {
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options.
+        var result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Add under a different tenant.
+        ti.Id = "diff_id";
+        result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Clear options on first tenant.
+        ti.Id = "test-id-123";
+        cache.Clear();
+
+        // Assert options cleared on this tenant.
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
+            GetValue(cache);
+
+        dynamic tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+        Assert.True(tenantInternalCache.IsEmpty);
+
+        // Assert options still exist on other tenant.
+        ti.Id = "diff_id";
+        tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+        Assert.False(tenantInternalCache.IsEmpty);
+    }
+
+    [Fact]
+    public void ClearOptionsForTenantIdOnly()
+    {
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options.
+        var result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Add under a different tenant.
+        ti.Id = "diff_id";
+        result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Clear options on first tenant.
+        cache.Clear("test-id-123");
+
+        // Assert options cleared on this tenant.
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
+            GetValue(cache);
+
+        dynamic tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache["test-id-123"]);
+        Assert.True(tenantInternalCache.IsEmpty);
+
+        // Assert options still exist on other tenant.
+        tenantInternalCache = tenantCache["diff_id"].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache["diff_id"]);
+        Assert.False(tenantInternalCache.IsEmpty);
+    }
+
+    [Fact]
+    public void ClearAllOptionsForClearAll()
+    {
+        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var tc = new MultiTenantContext();
+        tc.TenantInfo = ti;
+        var tca = new TestMultiTenantContextAccessor(tc);
+        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+
+        var options = new CookieAuthenticationOptions();
+
+        // Add new options.
+        var result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Add under a different tenant.
+        ti.Id = "diff_id";
+        result = cache.TryAdd("", options);
+        Assert.True(result);
+
+        // Clear all options.
+        cache.ClearAll();
+
+        // Assert options cleared on this tenant.
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
+            GetValue(cache);
+
+        dynamic tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+        Assert.True(tenantInternalCache.IsEmpty);
+
+        // Assert options cleared on other tenant.
+        ti.Id = "diff_id";
+        tenantInternalCache = tenantCache[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)
+            .GetValue(tenantCache[ti.Id]);
+        Assert.True(tenantInternalCache.IsEmpty);
     }
 }

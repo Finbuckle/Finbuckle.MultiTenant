@@ -1,6 +1,6 @@
 # MultiTenant Stores
 
-A multiTenant store is responsible for retrieving information about the tenant based on an identifier string produced by the [multiTenant strategy](Strategies). The retrieved information is then used to create a `TenantContext` object.
+A multiTenant store is responsible for retrieving information about the tenant based on an identifier string produced by the [MultiTenant strategy](Strategies). The retrieved information is then used to create a `TenantContext` object.
 
 Finbuckle.MultiTenant provides a simple thread safe in-memory implementation based on `ConcurrentDictionary<string, object>` which can be configured from an `appSettings.json` file. Custom stores can be created by implementing `IMultiTenantStore`.
 
