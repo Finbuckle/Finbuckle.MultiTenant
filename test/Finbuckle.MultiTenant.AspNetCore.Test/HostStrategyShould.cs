@@ -49,7 +49,7 @@ public class HostStrategyShould
     [InlineData("www.example.r.f", "?.__tenant__.?.*", "example")] // 2nd segment of 3+
     [InlineData("example.ok.test", "*.__tenant__.?.?", "example")] // 3rd last segment
     [InlineData("w.example.ok.test", "*.?.__tenant__.?.?", "example")] // 3rd last of 4+ segments
-    [InlineData("example.com", "__tenant__", "example.com")] // match entire domaon (2.1)
+    [InlineData("example.com", "__tenant__", "example.com")] // match entire domain (2.1)
 
     public async void ReturnExpectedIdentifier(string host, string template, string expected)
     {
