@@ -39,7 +39,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             while (context != null && currentType != typeof(object))
             {
                 if (currentType.IsGenericType &&
-                    currentType.GetGenericTypeDefinition() == typeof(MultiTenantIdentityDbContext<>))
+                    (currentType.GetGenericTypeDefinition() == typeof(MultiTenantIdentityDbContext<>) ||
+                    currentType.GetGenericTypeDefinition() == typeof(MultiTenantIdentityDbContext<,,>) ||
+                    currentType.GetGenericTypeDefinition() == typeof(MultiTenantIdentityDbContext<,,,,,,,>)))
                 {
                     return true;
                 }
