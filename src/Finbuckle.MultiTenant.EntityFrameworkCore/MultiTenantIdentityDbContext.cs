@@ -40,7 +40,7 @@ namespace Finbuckle.MultiTenant
     }
 
     /// <summary>
-    /// A database context compatiable with Identity that enforces tenant integrity on entity types
+    /// A database context compatible with Identity that enforces tenant integrity on entity types
     /// marked with the MultiTenant attribute.
     /// </summary>
     public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
