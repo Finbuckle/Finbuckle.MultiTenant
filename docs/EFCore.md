@@ -1,11 +1,13 @@
-### Introduction
+# Data Isolation with Entity Framework Core
+
+## Introduction
 Data isolation is one of the most important considerations in a multitenant app. Whether each tenant has its own database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant supports each of these models by associating a connection string with each tenant. Tenant's using the same connection string will share a database and accordingly those with a unique connection string will have separate databases.
 
-In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data belonging to other tenant's. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where" clauses all over an app. Applying the `MultiTenant` data attribute to an entity and using the `MultiTenantDbContext` as a base for class for an app's own database context tells Finbuckle.MultiTenant to ensure isolation of both queries and create/update/delete commands.
+In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data belonging to other tenant's. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where" clauses all over an app. Applying the `[MultiTenant]` attribute to an entity and using the `MultiTenantDbContext` as a base for class for an app's own database context tells Finbuckle.MultiTenant to ensure isolation of both queries and create/update/delete commands.
 
 Internally Finbuckle.MultiTenant uses the `HasQueryFilter` function to set a filter on `TenantId` for the current tenant for all queries. For create/update/delete commands the framework checks entities during `SaveChanges` or `SaveChangesAsync` to ensure matches. This behavior can be modified as documented below.
 
-### Configuration
+## Configuration
 Add the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
 ```{.bash}
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
@@ -44,7 +46,7 @@ public class BloggingDbContext : MultiTenantDbContext
 
 >{.small} If the derived database context overrides OnModelCreating is it critical that the base class OnModelCreating is called.
 
-Finally, add the `[MultiTenant]` data annotation to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
+Finally, add the `[MultiTenant]` attribute to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
 
 ```
 [MultiTenant]
@@ -62,7 +64,7 @@ public class Post
 
 When the context is initialized, a shadow property named `TenantId` is added to the data model for these classes. This property is used internally to filter all requests and commands. If there already is a defined string property named "TenantId" then Finbuckle.Multitenant will use the existing property.
 
-### Configuring with ASP.NET Core
+## Configuring with ASP.NET Core
 
 If using ASP.NET Core [configure Finbuckle.MultiTenant](GettingStarted) as desired.
 
@@ -86,9 +88,9 @@ public class Startup
 }
 ```
 
->{.small} Do not use any of the configuration methods that sets a database provider or connection string if using the `AddDbContext` delegate overload&mdash;the delegate will not have access to the current `TenantContext` or its connection string.
+Do not use any of the configuration methods that sets a database provider or connection string if using the `AddDbContext` delegate overload&mdash;the delegate will not have access to the current `TenantContext` or its connection string.
 
-### Adding Data
+## Adding Data
 Added entities are automatically associated with the current `TenantContext`. If an entity is associated with a different `TenantContext` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
 ```
@@ -105,7 +107,7 @@ db.Blogs.Add(myBlog);
 await db.SaveChangesAsync(); // Throws MultiTenantException.
 ```
 
-### Querying Data
+## Querying Data
 Queries only return results associated to the `TenantContext`:
 
 ```
@@ -126,9 +128,9 @@ var db = new BloggingDbContext(myTenantContext, null);
 var tenantBlogs = db.Blogs.IgnoreQueryFilters().ToList(); 
 ```
 
-The query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or `ThenInclude` are not filtered, but if all entity classes involved in a query have the `MultiTenant` data annotation then all results are associated to the same `TenantContext`.
+The query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute then all results are associated to the same tenant.
 
-### Updating and Deleting Data
+## Updating and Deleting Data
 Updated or deleted entities are checked to make sure they are associated with the `TenantContext`. If an entity is associated with a different `TenantContext` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
 ```
@@ -148,7 +150,7 @@ db.Blogs.Remove(myBlog);
 await db.SaveChangesAsync(); // Throws MultiTenantException.
 ```
 
-### Tenant Mismatch Mode
+## Tenant Mismatch Mode
 
 Normally Finbuckle.MultiTenant will automatically coordinate the `TenantId` property of each entity. However in certain situations the `TenantId` can be manually set.
 
@@ -158,7 +160,7 @@ By default attempting to add or update an entity with a different `TenantId` pro
 * TenantMismatchMode.Ignore - The entity is added or updated without modifying its `TenantId`.
 * TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantContext`.
 
-### Tenant Not Set Mode
+## Tenant Not Set Mode
 
 If the `TenantId` on an entity is manually set to null the default behavior is to overwrite the `TenantId` for adde entities or to throw a `MultiTenantException` for updated entities. This occurs during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSetMode' property on the database context:
 

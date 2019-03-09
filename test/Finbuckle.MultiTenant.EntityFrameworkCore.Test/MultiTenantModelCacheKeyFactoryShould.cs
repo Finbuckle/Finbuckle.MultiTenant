@@ -30,13 +30,6 @@ public class MultiTenantModelCacheKeyFactoryShould
         }
     }
 
-    public class TestMultiTenantIdentityDbContext : MultiTenantIdentityDbContext
-    {
-        public TestMultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
-        {
-        }
-    }
-
     [Fact]
     public void ReturnTypeForNonMultiTenantDbContext()
     {
@@ -67,14 +60,60 @@ public class MultiTenantModelCacheKeyFactoryShould
     public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext()
     {
         var factory = new MultiTenantModelCacheKeyFactory();
-        var dbContext = new TestMultiTenantIdentityDbContext(
+        var dbContext = new TestIdentityDbContext(
             new TenantInfo("test", null, null, null, null),
-            new DbContextOptions<TestMultiTenantIdentityDbContext>());
+            new DbContextOptions<TestIdentityDbContext>());
 
         dynamic key = factory.Create(dbContext);
 
         Assert.IsType<(Type, string)>(key);
-        Assert.Equal(typeof(TestMultiTenantIdentityDbContext), key.Item1);
+        Assert.Equal(typeof(TestIdentityDbContext), key.Item1);
+        Assert.Equal("test", key.Item2);
+    }
+
+    [Fact]
+    public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext_TUser()
+    {
+        // Test that it works for the MultiTenantIdentityDbContext<TUser>
+        var factory = new MultiTenantModelCacheKeyFactory();
+        var dbContext = new TestIdentityDbContext_TUser(
+            new TenantInfo("test", null, null, null, null),
+            new DbContextOptions<TestIdentityDbContext_TUser>());
+
+        dynamic key = factory.Create(dbContext);
+
+        Assert.IsType<(Type, string)>(key);
+        Assert.Equal(typeof(TestIdentityDbContext_TUser), key.Item1);
+        Assert.Equal("test", key.Item2);
+    }
+
+    [Fact]
+    public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext_TUser_TRole_String()
+    {
+        var factory = new MultiTenantModelCacheKeyFactory();
+        var dbContext = new TestIdentityDbContext_TUser_TRole_String(
+            new TenantInfo("test", null, null, null, null),
+            new DbContextOptions<TestIdentityDbContext_TUser_TRole_String>());
+
+        dynamic key = factory.Create(dbContext);
+
+        Assert.IsType<(Type, string)>(key);
+        Assert.Equal(typeof(TestIdentityDbContext_TUser_TRole_String), key.Item1);
+        Assert.Equal("test", key.Item2);
+    }
+
+    [Fact]
+    public void ReturnTypePlusTenantIdForMultiTenantIdentityDbContext_AllGenericParams()
+    {
+        var factory = new MultiTenantModelCacheKeyFactory();
+        var dbContext = new TestIdentityDbContext_AllGenericParams(
+            new TenantInfo("test", null, null, null, null),
+            new DbContextOptions<TestIdentityDbContext_AllGenericParams>());
+
+        dynamic key = factory.Create(dbContext);
+
+        Assert.IsType<(Type, string)>(key);
+        Assert.Equal(typeof(TestIdentityDbContext_AllGenericParams), key.Item1);
         Assert.Equal("test", key.Item2);
     }
 }
