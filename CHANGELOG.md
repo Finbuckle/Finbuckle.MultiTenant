@@ -1,4 +1,11 @@
-## Version History
+## Version 
+**3.0.0**
+* Allow resetting option cache per-tenant. This is a breaking change.
+* Host strategy can match entire domain as a special case (prior it only matched a single host segment).
+* Added a sample project demonstrating a common login page shared by all tenants.
+* Overhauled documentation.
+* Updated unit and integration tests.
+
 **2.0.2**
 * Fixed bug in Identity where `UserLogins` primary key was not adjusted for multitenant usage.
 * Updated and Fixed the IdentityDataIsolation sample project.
