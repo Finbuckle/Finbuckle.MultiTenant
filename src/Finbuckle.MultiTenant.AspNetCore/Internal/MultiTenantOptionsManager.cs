@@ -16,6 +16,7 @@
 //    https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options/OptionsManager.cs
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
@@ -51,8 +52,13 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             name = name ?? Options.DefaultName;
 
-            // Store the options in our instance cache
+            // Store the options in our instance cache.
             return _cache.GetOrAdd(name, () => _factory.Create(name));
+        }
+
+        public void Reset()
+        {
+            _cache.Clear();
         }
     }
 }

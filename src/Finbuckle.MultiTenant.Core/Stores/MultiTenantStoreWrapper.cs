@@ -71,6 +71,11 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
         {
+            if (identifier == null)
+            {
+                throw new ArgumentNullException(nameof(identifier));
+            }
+
             TenantInfo result = null;
 
             try

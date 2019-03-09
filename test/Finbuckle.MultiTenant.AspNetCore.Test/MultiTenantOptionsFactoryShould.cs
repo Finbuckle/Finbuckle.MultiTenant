@@ -13,18 +13,10 @@
 //    limitations under the License.
 
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Reflection;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Moq;
 using Xunit;
 
 public class MultiTenantOptionsFactoryShould
