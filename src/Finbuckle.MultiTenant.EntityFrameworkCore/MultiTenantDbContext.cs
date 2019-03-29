@@ -76,7 +76,7 @@ namespace Finbuckle.MultiTenant
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, TenantInfo);
+            Shared.SetupModel(modelBuilder, () => TenantInfo);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

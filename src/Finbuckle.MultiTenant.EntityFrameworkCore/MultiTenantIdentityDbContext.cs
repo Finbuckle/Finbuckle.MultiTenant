@@ -124,7 +124,7 @@ namespace Finbuckle.MultiTenant
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, TenantInfo);
+            Shared.SetupModel(builder, () => TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
             if (Shared.HasMultiTenantAttribute(typeof(TUser)))

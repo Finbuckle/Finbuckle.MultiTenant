@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </remarks>
         /// <param name="modelBuilder"></param>
         /// <param name="tenantInfo"></param>
-        public static void SetupModel(ModelBuilder modelBuilder, TenantInfo tenantInfo)
+        public static void SetupModel(ModelBuilder modelBuilder, Expression<Func<TenantInfo>> currentTenantInfoExpression)
         {
             foreach (var t in modelBuilder.Model.GetEntityTypes().
                 Where(t => HasMultiTenantAttribute(t.ClrType)))
@@ -59,7 +59,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                     throw new MultiTenantException($"{t.ClrType} unable to add TenantId property", e);
                 }
 
-                // build expression tree for e => EF.Property<string>(e, "TenantId") == tenantId
+                // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
                 // where e is one of our entity types
                 // will need this ParameterExpression for next step and for final step
                 var entityParamExp = Expression.Parameter(t.ClrType, "e");
@@ -69,8 +69,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var efPropertyExp = Expression.Call(typeof(EF), "Property", new[] { typeof(string) }, entityParamExp, tenantIdExp);
                 var leftExp = efPropertyExp;
 
-                // build expression tree for EF.Property<string>(e, "TenantId") == tenantId
-                var rightExp = Expression.Constant(tenantInfo?.Id, typeof(string));
+                // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id
+                var rightExp = Expression.Property(currentTenantInfoExpression.Body, nameof(TenantInfo.Id));
                 var equalExp = Expression.Equal(leftExp, rightExp);
 
                 // build the final expression tree
