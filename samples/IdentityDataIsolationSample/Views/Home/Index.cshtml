@@ -49,12 +49,13 @@
                 and manage account via the default Identity UI within each tenant.
             </p>
             <p>
-                Note, this app has been updated to ASP.NET Core 2.2 but has MVC compatibility set to "CompatibilityVersion.Version_2_1" due to problems with endpoint routing and Pages (used by ASP.NET Core Identity default UI).
+                Note, this app has MVC endpoint routing disabled due to problems with endpoint routing and Pages (used by ASP.NET Core Identity default UI).
+                This is only required when using the route MultiTenant strategy.
             </p>
             <p>
                 The Finbuckle and MegaCorp tenants share a common SQLite database, but Initech has its own separate datasebase.
                 Both of these databases need to be created by applying the latest migration via <em>dotnet ef database update</em> or similar.
-                To apply the migration to each database adjust the connection string used in the <em>Data/DesignTimeFactoy.cs</em> file in
+                To apply the migration to each database adjust the connection string used in the <em>Data/DesignTimeFactory.cs</em> file in
                 between migrations.
             </p>
         }
