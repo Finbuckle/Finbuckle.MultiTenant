@@ -67,13 +67,7 @@ namespace Finbuckle.MultiTenant
                 return multiTenantEntityTypes;
             }
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.ReplaceService<IModelCacheKeyFactory, MultiTenantModelCacheKeyFactory>();
-            base.OnConfiguring(optionsBuilder);
-        }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             Shared.SetupModel(modelBuilder, () => TenantInfo);
