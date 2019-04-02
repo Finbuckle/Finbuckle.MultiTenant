@@ -25,16 +25,16 @@ namespace Finbuckle.MultiTenant
     public static class HttpContextExtensions
     {
         /// <summary>
-        /// Returns the current TenantContext or null if there is none.
+        /// Returns the current MultiTenantContext or null if there is none.
         /// </summary>
         /// <param name="context">The HttpContext<c/> instance the extension method applies to.</param>
-        /// <returns>The TenantContext instance for the current tenant.</returns>
+        /// <returns>The MultiTenantContext instance for the current tenant.</returns>
         public static MultiTenantContext GetMultiTenantContext(this HttpContext context)
         {
-            object tenantContext = null;
-            context.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out tenantContext);
+            object multiTenantContext = null;
+            context.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
             
-            return (MultiTenantContext)tenantContext;
+            return (MultiTenantContext)multiTenantContext;
         }
     }
 }

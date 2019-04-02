@@ -129,52 +129,52 @@ public class ThingWithHigherTenantIdMaxLength
 
 public class TestIdentityDbContext : MultiTenantIdentityDbContext
 {
-    public TestIdentityDbContext(TenantInfo tenantContext)
-        : base(tenantContext)
+    public TestIdentityDbContext(TenantInfo tenantInfo)
+        : base(tenantInfo)
     {
     }
 
-    public TestIdentityDbContext(TenantInfo tenantContext, DbContextOptions options)
-        : base(tenantContext, options)
+    public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
+        : base(tenantInfo, options)
     {
     }
 }
 
 public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
 {
-    public TestIdentityDbContext_TUser(TenantInfo tenantContext)
-        : base(tenantContext)
+    public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
+        : base(tenantInfo)
     {
     }
 
-    public TestIdentityDbContext_TUser(TenantInfo tenantContext, DbContextOptions options)
-        : base(tenantContext, options)
+    public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
+        : base(tenantInfo, options)
     {
     }
 }
 
 public class TestIdentityDbContext_TUser_TRole_String : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string>
 {
-    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantContext)
-        : base(tenantContext)
+    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo)
+        : base(tenantInfo)
     {
     }
 
-    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantContext, DbContextOptions options)
-        : base(tenantContext, options)
+    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo, DbContextOptions options)
+        : base(tenantInfo, options)
     {
     }
 }
 
 public class TestIdentityDbContext_AllGenericParams : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string, MultiTenantIdentityUserClaim<string>, MultiTenantIdentityUserRole<string>, MultiTenantIdentityUserLogin<string>, MultiTenantIdentityRoleClaim<string>, MultiTenantIdentityUserToken<string>>
 {
-    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantContext)
-        : base(tenantContext)
+    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo)
+        : base(tenantInfo)
     {
     }
 
-    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantContext, DbContextOptions options)
-        : base(tenantContext, options)
+    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo, DbContextOptions options)
+        : base(tenantInfo, options)
     {
     }
 }

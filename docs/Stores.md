@@ -1,12 +1,12 @@
 # MultiTenant Stores
 
-A multiTenant store is responsible for retrieving information about the tenant based on an identifier string produced by the [MultiTenant strategy](Strategies). The retrieved information is then used to create a `TenantContext` object.
+A multiTenant store is responsible for retrieving information about the tenant based on an identifier string produced by the [MultiTenant strategy](Strategies). The retrieved information is then used to create a `TenantInfo` object.
 
 Finbuckle.MultiTenant provides a simple thread safe in-memory implementation based on `ConcurrentDictionary<string, object>` which can be configured from an `appSettings.json` file. Custom stores can be created by implementing `IMultiTenantStore`.
 
 ## Accessing the Store at Runtime
 
-The multitenant store can be accessed at runtime to add, remote, or retreieve a `TenantContext` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
+The multitenant store can be accessed at runtime to add, remote, or retreieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
 
 The multitenant store is registered as a singleton in the app's service collection. Access it via dependecy injection by including an `IMultiTenantStore` constructor parameter, action method parameter marked with `[FromService]`, or the `HttpContext.RequestServices` service provider instance.
 
@@ -24,7 +24,7 @@ services.AddMultiTenant().WithStore( sp => return new MyStore());
 ```
 
 ## In-Memory Store
-Uses a `ConcurrentDictionary<string, TenantContext>` as the underlying store. By default the tenant identifier matching is case insensitive. This can be overridden by passing false to the constructor's `ignoreCase` paramater.
+Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store. By default the tenant identifier matching is case insensitive. This can be overridden by passing false to the constructor's `ignoreCase` paramater.
 
 If using with `Finbuckle.MultiTenant.AspNetCore`, configure by calling `WithInMemoryStore` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class.
 

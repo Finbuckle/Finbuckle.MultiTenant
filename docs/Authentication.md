@@ -32,13 +32,13 @@ public class Startup
 }
  ```
 
-Call `WithPerTenantOptions<CookieAuthenticationOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `CookieAuthenticationOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, CookieAuthenticationOptions>` which will modify the options instance using information from the `TenantContext`. In this case we are appending the tenant's ID to the cookie name:
+Call `WithPerTenantOptions<CookieAuthenticationOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `CookieAuthenticationOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, CookieAuthenticationOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are appending the tenant's ID to the cookie name:
 
 ```cs
 services.AddMultiTenant()...
-    .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantContext) =>
+    .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
     {
-        o.Cookie.Name += tenantContext.Id;
+        o.Cookie.Name += tenantInfo.Id;
     });
 ```
 
@@ -62,14 +62,14 @@ These customizations apply to all authentication schemes using `AuthenticationCo
 
 In the `Startup` class, configure JWT Bearer authentication as usual. The ASP.NET Core documentation does not cover this, but the official code repository contains a [sample project](https://github.com/aspnet/Security/tree/master/samples/JwtBearerSample).
 
- Call `WithPerTenantOptions<JwtBearerOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `JwtBearerOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, JwtBearerOptions>` which will modify the options instance using information from the `TenantContext`. In this case we are setting the authority from the `Items` collection in the `TenantContext`:
+ Call `WithPerTenantOptions<JwtBearerOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `JwtBearerOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, JwtBearerOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are setting the authority from the `Items` collection in the `TenantInfo`:
 
 ```cs
 services.AddMultiTenant()...
-    .WithPerTenantOptions<JwtBearerOptions>((o, tenantContext) =>
+    .WithPerTenantOptions<JwtBearerOptions>((o, tenantInfo) =>
     {
         // Assume tenants are configured with an authority string to use here.
-        o.Authority = (string)tenantContext.Items["JwtAuthority"];
+        o.Authority = (string)tenantInfo.Items["JwtAuthority"];
     });
 ```
 The following properties should be especially considered for per-tenant customization:
@@ -87,18 +87,18 @@ See the [AuthenticationOptionsSamples](https://github.com/Finbuckle/Finbuckle.Mu
 
 In the `Startup` class, configure OpenID Connect authentication as usual. The ASP.NET Core documentation does not cover this, but the official code repository contains a [sample project](https://github.com/aspnet/Security/tree/master/samples/OpenIdConnectSample).
 
- Call `WithRemoteAuthentication` and `WithPerTenantOptions<OpenIdConnectOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `OpenIdConnectOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, OpenIdConnectOptions>` which will modify the options instance using information from the `TenantContext`. In this case we are setting the authority from the `Items` collection in the `TenantContext`:
+ Call `WithRemoteAuthentication` and `WithPerTenantOptions<OpenIdConnectOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `OpenIdConnectOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, OpenIdConnectOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are setting the authority from the `Items` collection in the `TenantInfo`:
 
 ```cs
 services.AddMultiTenant()...
     .WithRemoteAuthentication() // Important!
-    .WithPerTenantOptions<OpenIdConnectOptions>((o, tenantContext) =>
+    .WithPerTenantOptions<OpenIdConnectOptions>((o, tenantInfo) =>
     {
         // Assume tenants are configured with a client Id string to use here.
-        o.ClientId = (string)tenantContext.Items["ClientId"];
+        o.ClientId = (string)tenantInfo.Items["ClientId"];
 
         // Assume tenants are configured with an authority string to use here.
-        o.Authority = (string)tenantContext.Items["Authority"];
+        o.Authority = (string)tenantInfo.Items["Authority"];
     });
 ```
 The following properties should be especially considered for per-tenant customization:

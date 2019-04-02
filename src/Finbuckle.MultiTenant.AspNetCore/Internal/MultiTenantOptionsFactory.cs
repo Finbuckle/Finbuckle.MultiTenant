@@ -38,11 +38,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="setups">The configuration actions to run.</param>
         /// <param name="postConfigures">The initialization actions to run.</param>
-        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TenantInfo> tenantConfig, IMultiTenantContextAccessor tenantContextAccessor)
+        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TenantInfo> tenantConfig, IMultiTenantContextAccessor multiTenantContextAccessor)
         {
             _setups = setups;
             this.tenantConfig = tenantConfig;
-            this.multiTenantContextAccessor = tenantContextAccessor;
+            this.multiTenantContextAccessor = multiTenantContextAccessor;
             _postConfigures = postConfigures;
         }
 

@@ -9,8 +9,8 @@ namespace SharedLoginSample.Data
 {
     public class ApplicationDbContext : MultiTenantIdentityDbContext
     {
-        public ApplicationDbContext(TenantInfo tenantContext, DbContextOptions<ApplicationDbContext> options)
-            : base(tenantContext, options)
+        public ApplicationDbContext(TenantInfo tenantInfo, DbContextOptions<ApplicationDbContext> options)
+            : base(tenantInfo, options)
         {
         }
 

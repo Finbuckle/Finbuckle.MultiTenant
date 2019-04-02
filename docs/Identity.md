@@ -12,13 +12,13 @@ Add the `Finbuckle.MultiTenant.EntityFrameworkCore` and package to the project:
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
-Derive the database context from `MultiTenantIdentityDbContext<TUser>` instead of `IdentityDbContext<TUser>`. Make sure to forward the `TenantContext` and `DbContextOptions<T>` into the base constructor:
+Derive the database context from `MultiTenantIdentityDbContext<TUser>` instead of `IdentityDbContext<TUser>`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor:
 
 ```
 public class MyIdentityDbContext : MultiTenantIdentityDbContext<appUser>
 {
-    public MyIdentityDbContext(TenantContext tenantContext, DbContextOptions<MyIdentityDbContext> options) :
-        base(tenantContext, options)
+    public MyIdentityDbContext(TenantInfo tenantInfo, DbContextOptions<MyIdentityDbContext> options) :
+        base(tenantInfo, options)
     { }
     ...
 }

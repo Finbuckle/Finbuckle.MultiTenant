@@ -35,9 +35,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>>();
 
-        public MultiTenantOptionsCache(IMultiTenantContextAccessor tenantContextAccessor)
+        public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
         {
-            this.multiTenantContextAccessor = tenantContextAccessor ?? throw new ArgumentNullException(nameof(tenantContextAccessor));
+            this.multiTenantContextAccessor = multiTenantContextAccessor ?? throw new ArgumentNullException(nameof(multiTenantContextAccessor));
         }
 
         /// <summary>

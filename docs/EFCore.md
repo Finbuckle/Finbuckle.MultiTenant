@@ -13,22 +13,22 @@ Add the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
-Derive the database context from `MultiTenantDbContext`. Make sure to forward the `TenantContext` and `DbContextOptions<T>` into the base constructor:
+Derive the database context from `MultiTenantDbContext`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor:
 
 ```
 public class BloggingDbContext : MultiTenantDbContext
 {
-    public BloggingDbContext(TenantContext tenantContext, DbContextOptions<BloggingDbContext> options) :
-        base(tenantContext, options) { }
+    public BloggingDbContext(TenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
+        base(tenantInfo, options) { }
 
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
 }
 ```
 
-There is also a base constructor which takes a connection string parameter instead of a `TenantContext`. Use this for [design time context creation](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation) for use with migrations or other tools. This will effectively behave as if the `TenantContext` is null for any queries or commands.
+There is also a base constructor which takes a connection string parameter instead of a `TenantInfo`. Use this for [design time context creation](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation) for use with migrations or other tools. This will effectively behave as if the `TenantInfo` is null for any queries or commands.
 
-If using multiple databases and relying on the `ConnectionString` property of the `TenantContext` then the database context will need to configures itself in its `OnConfiguring` method using its inherited `ConnectionString` property. This property returns the connection string for the current `TenantContext`:
+If using multiple databases and relying on the `ConnectionString` property of the `TenantInfo` then the database context will need to configures itself in its `OnConfiguring` method using its inherited `ConnectionString` property. This property returns the connection string for the current `TenantInfo`:
 
 ```
 public class BloggingDbContext : MultiTenantDbContext
@@ -68,7 +68,7 @@ When the context is initialized, a shadow property named `TenantId` is added to 
 
 If using ASP.NET Core [configure Finbuckle.MultiTenant](GettingStarted) as desired.
 
-Next, add the desired services in the `ConfigureServices` method of your `Startup` class. If using dependency injection for the database context make sure to call `AddDbContext<T>`. Dependency injection will also inject the `TenantContext` into the database context constructor:
+Next, add the desired services in the `ConfigureServices` method of your `Startup` class. If using dependency injection for the database context make sure to call `AddDbContext<T>`. Dependency injection will also inject the `TenantInfo` into the database context constructor:
 
 ```
 public class Startup
@@ -88,35 +88,35 @@ public class Startup
 }
 ```
 
-Do not use any of the configuration methods that sets a database provider or connection string if using the `AddDbContext` delegate overload&mdash;the delegate will not have access to the current `TenantContext` or its connection string.
+Do not use any of the configuration methods that sets a database provider or connection string if using the `AddDbContext` delegate overload&mdash;the delegate will not have access to the current `TenantInfo` or its connection string.
 
 ## Adding Data
-Added entities are automatically associated with the current `TenantContext`. If an entity is associated with a different `TenantContext` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
+Added entities are automatically associated with the current `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
 ```
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };;
-var db = new BloggingDbContext(myTenantContext, null);
+var db = new BloggingDbContext(myTenantInfo, null);
 db.Blogs.Add(myBlog));
 db.SaveChanges();
 
 
 // Try to add the same blog to a different tenant.
-db = new BloggingDbContext(yourTenantContext, null);
+db = new BloggingDbContext(yourTenantInfo, null);
 db.Blogs.Add(myBlog);
 await db.SaveChangesAsync(); // Throws MultiTenantException.
 ```
 
 ## Querying Data
-Queries only return results associated to the `TenantContext`:
+Queries only return results associated to the `TenantInfo`:
 
 ```
 // Will only return "My Blog".
-var db = new BloggingDbContext(myTenantContext, null);
+var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlog = db.Blogs.First();
 
 // Will only return "Your Blog".
-db = new BloggingDbContext(yourTenantContext, null);
+db = new BloggingDbContext(yourTenantInfo, null);
 var tenantBlogs = db.Blogs.First(); 
 ```
 
@@ -124,24 +124,24 @@ var tenantBlogs = db.Blogs.First();
 
 ```
 // TenantBlogs will contain all blogs, regardless of tenant.
-var db = new BloggingDbContext(myTenantContext, null);
+var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlogs = db.Blogs.IgnoreQueryFilters().ToList(); 
 ```
 
 The query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute then all results are associated to the same tenant.
 
 ## Updating and Deleting Data
-Updated or deleted entities are checked to make sure they are associated with the `TenantContext`. If an entity is associated with a different `TenantContext` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
+Updated or deleted entities are checked to make sure they are associated with the `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
 ```
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };
-var db = new BloggingDbContext(myTenantContext);
+var db = new BloggingDbContext(myTenantInfo);
 db.Blogs.Add(myBlog));
 db.SaveChanges();
 
 // Modify and attach the same blog to a different tenant.
-db = new BloggingDbContext(yourTenantContext, null);
+db = new BloggingDbContext(yourTenantInfo, null);
 db.Blogs.Attach(myBlog);
 myBlog.Title = "My Changed Blog";
 await db.SaveChangesAsync(); // Throws MultiTenantException.
@@ -158,11 +158,11 @@ By default attempting to add or update an entity with a different `TenantId` pro
 
 * TenantMismatchMode.Throw - A `MultiTenantException' is thrown (default).
 * TenantMismatchMode.Ignore - The entity is added or updated without modifying its `TenantId`.
-* TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantContext`.
+* TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
 
 ## Tenant Not Set Mode
 
 If the `TenantId` on an entity is manually set to null the default behavior is to overwrite the `TenantId` for adde entities or to throw a `MultiTenantException` for updated entities. This occurs during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSetMode' property on the database context:
 
-* TenantMismatchMode.Throw - For added entities the null `TenantId` will be overwritten to match the database context's current `TenantContext`. For updated entities a `MultiTenantException` is thrown (default).
-* TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantContext`.
+* TenantMismatchMode.Throw - For added entities the null `TenantId` will be overwritten to match the database context's current `TenantInfo`. For updated entities a `MultiTenantException` is thrown (default).
+* TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
