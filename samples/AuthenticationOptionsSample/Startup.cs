@@ -66,22 +66,22 @@ namespace AuthenticationOptionsSample
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
                 WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
-                WithPerTenantOptions<AuthenticationOptions>((options, tenantContext) =>
+                WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
                     // Allow each tenant to have a different default challenge scheme.
-                    if (tenantContext.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
+                    if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
                     {
                         options.DefaultChallengeScheme = (string)challengeScheme;
                     }
                 }).
-                WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantContext) =>
+                WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                 {
                     // Set a unique cookie name for this tenant.
-                    options.Cookie.Name = tenantContext.Id + "-cookie";
+                    options.Cookie.Name = tenantInfo.Id + "-cookie";
 
                     // Note the paths set take our routing strategy into account.
-                    options.LoginPath = "/" + tenantContext.Identifier + "/Home/Login";
-                    options.Cookie.Path = "/" + tenantContext.Identifier;
+                    options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
+                    options.Cookie.Path = "/" + tenantInfo.Identifier;
                 });
         }
 

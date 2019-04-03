@@ -1,13 +1,13 @@
 # MultiTenant Strategies
 
-A multitenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier string which is used to create a `TenantContext` object with information from the [MultiTenant store](Stores).
+A multitenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier string which is used to create a `TenantInfo` object with information from the [MultiTenant store](Stores).
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy`. Internally strategies are registered as singleton services.
 
 ## IMultiTenantStrategy
 All multitenant strategies derive from `IMultiTenantStrategy` and must implement the `GetIdentifier` method. 
 
-If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a null `TenantContext`.
+If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a null `TenantInfo`.
 
 Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<T>` or `WithStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The templated version will use dependency injection and any passed parameters to construct the implementation instance. The non-templated version accepts a `Func<IServiceProvider, IMultiTenantStrategy>` factory method for even more customization.
 
@@ -29,7 +29,7 @@ services.AddMultiTenant().WithStaticStrategy("MyTenant")...
 ```
 
 ## Base Path Strategy 
-Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when retreiving the `TenantContext`.
+Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when retreiving the `TenantInfo`.
 
 Configure by calling `WithBasePathStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class:
 
@@ -81,7 +81,7 @@ public class Startup
 ``` 
 
 ## Host Strategy
-Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when retrieving the `TenantContext`. This strategy is included in `Finbuckle.MultiTenant.AspNetCore`. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`.
+Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when retrieving the `TenantInfo`. This strategy is included in `Finbuckle.MultiTenant.AspNetCore`. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`.
 
 The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifer using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
   - `__tenant__.*` is the default if no pattern is provided and selects the first domain segment for the tenant identifier.

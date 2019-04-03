@@ -51,14 +51,14 @@ Call `WithPerTenantOptions<TOptions>` after `AddMultiTenant` in the `ConfigureSe
 
 ```cs
 services.AddMultiTenant()...
-    .WithPerTenantOptions<MyOptions>((options, tenantContext) =>
+    .WithPerTenantOptions<MyOptions>((options, tenantInfo) =>
     {
-        options.MyOption1 = (int)tenantContext.Items["someValue"];
-        options.MyOption2 = (int)tenantContext.Items["anotherValue"];
+        options.MyOption1 = (int)tenantInfo.Items["someValue"];
+        options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
     });
 ```
 
-The type parameter `TOptions` is the options type being customized per-tenant. The method parameter is an `Action<TOptions, TenantContext>`. This action will modify the options instance *after* the options normal configuration and *before* its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions).
+The type parameter `TOptions` is the options type being customized per-tenant. The method parameter is an `Action<TOptions, TenantInfo>`. This action will modify the options instance *after* the options normal configuration and *before* its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions).
 
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
