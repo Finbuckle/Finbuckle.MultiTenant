@@ -2,13 +2,12 @@
     <PropertyGroup>
         <GenerateFullPaths>true</GenerateFullPaths>
 
-        <Version>3.0.0</Version>
+        <Version>3.0.1</Version>
         <Authors>Andrew White</Authors>
         <Copyright>Copyright ©2018 Andrew White</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://www.finbuckle.com</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
-        <PackageTags>finbuckle;multitenant;aspnetcore;efcore</PackageTags>
         <PackageOutputPath>/Users/acw/Dev/Nuget</PackageOutputPath>
     </PropertyGroup>
 
