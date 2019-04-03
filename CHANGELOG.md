@@ -1,4 +1,9 @@
 ## Version 
+**3.0.1**
+* Refactored  the global query filter used in `MultiTenantDbContext` and `MultiTenantIdentityDbContext` (Thanks @GordonBlahut!) for better performance and code quality.
+* Removed custom `IModelCacheKeyFactory` as it is no longer needed due to the global query filter changes.
+* Updated documentation and samples.
+
 **3.0.0**
 * Allow resetting option cache per-tenant. This is a breaking change.
 * Host strategy can match entire domain as a special case (prior it only matched a single host segment).
