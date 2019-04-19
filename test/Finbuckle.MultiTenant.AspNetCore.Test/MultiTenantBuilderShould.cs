@@ -318,8 +318,19 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithRemoteAuthentication();
         var sp = services.BuildServiceProvider();
 
-        var authService = sp.GetRequiredService<IAuthenticationService>();
-        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>();
+        var authService = sp.GetRequiredService<IAuthenticationService>(); // Throw fails
+        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throw fails
+    }
+
+    [Fact]
+    public void AddDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithDelegateStrategy(c => Task.FromResult("Hi"));
+        var sp = services.BuildServiceProvider();
+
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<DelegateStrategy>(resolver);
     }
 
     [Fact]
@@ -329,9 +340,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>() as StaticStrategy;
+        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<StaticStrategy>(resolver);
-        Assert.Equal("initech", resolver.identifier);
     }
 
     [Fact]

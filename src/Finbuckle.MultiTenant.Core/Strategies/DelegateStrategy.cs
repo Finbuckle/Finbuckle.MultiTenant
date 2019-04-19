@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2019 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Logging;
@@ -19,25 +20,28 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Strategies
 {
     /// <summary>
-    /// IMultiTenantStrategy implementation that always resolves the same identifier.
+    /// IMultiTenantStrategy implementation that executes a given delegate.
     /// </summary>
-    public class StaticStrategy : IMultiTenantStrategy
+    public class DelegateStrategy : IMultiTenantStrategy
     {
-        internal readonly string identifier;
-        private readonly ILogger<StaticStrategy> logger;
+        private readonly Func<object, Task<string>> doStrategy;
+        private readonly ILogger<DelegateStrategy> logger;
 
-        public StaticStrategy(string identifier) : this(identifier, null)
+        public DelegateStrategy(Func<object, Task<string>> implementation) :
+            this(implementation, null)
         {
         }
 
-        public StaticStrategy(string identifier, ILogger<StaticStrategy> logger)
+        public DelegateStrategy(Func<object, Task<string>> doStrategy, ILogger<DelegateStrategy> logger)
         {
-            this.identifier = identifier;
+            this.doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
             this.logger = logger;
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
+            var identifier = await doStrategy(context);
+
             Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
 
             return await Task.FromResult(identifier);

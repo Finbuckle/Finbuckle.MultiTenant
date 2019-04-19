@@ -24,6 +24,7 @@ using Finbuckle.MultiTenant.Strategies;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.AspNetCore.Routing;
 using Finbuckle.MultiTenant;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -235,7 +236,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a StaticMultiTenantStrategy to the application.
+        /// Adds and configures a StaticStrategy to the application.
         /// </summary>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
@@ -250,21 +251,21 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a BasePathMultiTenantStrategy to the application.
+        /// Adds and configures a BasePathStrategy to the application.
         /// </summary>
-        /// <returnsThe same MultiTenantBuilder passed into the method.></returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.></returns>
         public FinbuckeMultiTenantBuilder WithBasePathStrategy()
             => WithStrategy(ServiceLifetime.Singleton, sp => new BasePathStrategy(sp.GetService<ILogger<BasePathStrategy>>()));
 
         /// <summary>
-        /// Adds and configures a RouteMultiTenantStrategy with a route parameter "\_\_tenant\_\_" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter "\_\_tenant\_\_" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckeMultiTenantBuilder WithRouteStrategy(Action<IRouteBuilder> configRoutes)
             => WithRouteStrategy("__tenant__", configRoutes);
 
         /// <summary>
-        /// Adds and configures a RouteMultiTenantStrategy to the application.
+        /// Adds and configures a RouteStrategy to the application.
         /// </summary>
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
@@ -284,14 +285,14 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a HostMultiTenantStrategy with template "\_\_tenant\_\_.*" to the application.
+        /// Adds and configures a HostStrategy with template "\_\_tenant\_\_.*" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckeMultiTenantBuilder WithHostStrategy()
             => WithHostStrategy("__tenant__.*");
 
         /// <summary>
-        /// Adds and configures a HostMultiTenantStrategy to the application.
+        /// Adds and configures a HostStrategy to the application.
         /// </summary>
         /// <param name="template">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
@@ -303,6 +304,20 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return WithStrategy(ServiceLifetime.Singleton, sp => new HostStrategy(template, sp.GetService<ILogger<HostStrategy>>()));
+        }
+
+        /// <summary>
+        /// Adds and configures a DelegateStrategy to the application.
+        /// </summary>
+        /// <param name="doStrategy">The delegate implementing the strategy.</returns>
+        public FinbuckeMultiTenantBuilder WithDelegateStrategy(Func<object, Task<string>> doStrategy)
+        {
+            if (doStrategy == null)
+            {
+                throw new ArgumentNullException(nameof(doStrategy));
+            }
+
+            return WithStrategy(ServiceLifetime.Singleton, sp => new DelegateStrategy(doStrategy, sp.GetService<ILogger<DelegateStrategy>>()));
         }
 
         /// <summary>
