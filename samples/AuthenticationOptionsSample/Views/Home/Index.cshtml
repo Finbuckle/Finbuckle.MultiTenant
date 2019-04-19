@@ -63,6 +63,9 @@ else
                 <li>Set per-tenant cookie options so sessions are unique per tenant.</li>
             </ul>
         </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
         <pre><code>services.AddMultiTenant()... // Setup host and strategy...
     WithRemoteAuthentication(). // Important!
     WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
