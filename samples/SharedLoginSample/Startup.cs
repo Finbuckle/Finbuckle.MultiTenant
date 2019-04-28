@@ -32,7 +32,8 @@ namespace SharedLoginSample
                     .AddDefaultUI(UIFramework.Bootstrap4)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddMvcOptions(options => options.EnableEndpointRouting = false)
                 .AddRazorPagesOptions(options =>
                 {
                     // Since we are using the route multitenant strategy we must add the

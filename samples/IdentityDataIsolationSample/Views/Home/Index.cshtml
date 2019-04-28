@@ -76,9 +76,9 @@
             </p>
             <pre><code>// Setup Identity as usual. Note the MultiTenant User and Role type parameters.
 services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
-        .AddDefaultTokenProviders()
-        .AddDefaultUI(UIFramework.Bootstrap4)
-        .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddDefaultTokenProviders()
+    .AddDefaultUI(UIFramework.Bootstrap4)
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Configure MVC:
 // Endpoint routing and Identity don't play well together
@@ -112,7 +112,7 @@ services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.Applicatio
 options.LoginPath = $"{options.Cookie.Path}{options.LoginPath}";
 options.LogoutPath = $"{options.Cookie.Path}{options.LogoutPath}";
 });</code></pre>
-            <p>Click the tenant links on the navbar to see the sample action!</p>
+            <p>Click the links on the navbar to it in action!</p>
             </div>
         }
     </div>
