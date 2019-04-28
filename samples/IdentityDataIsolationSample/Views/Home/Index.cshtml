@@ -1,13 +1,14 @@
-﻿@{
+﻿@model TenantInfo
+
+@{
     ViewData["Title"] = "Home Page";
-    var tenantInfo = Context.GetMultiTenantContext()?.TenantInfo;
 }
 
 @using Finbuckle.MultiTenant.AspNetCore
 
 <div class="row">
     <div class="col">
-        @if (tenantInfo != null)
+        @if (Model != null)
         {
             <h3 class="mt-4">TenantInfo Values</h3>
 
@@ -81,11 +82,10 @@ services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Configure MVC:
-// Endpoint routing and Identity don't play well together
-// in ASP.NET Core 2.2 so we disable it. We also modify the
-// Identity razor settings to use our tenant route parameter.
+// We modify the Identity razor settings to use our tenant route parameter.
 // This is needed only because we use the RouteStrategy and
 // aren't using the default MVC routes.
+// This also requires that we disable endpoint routing in ASP.NET Core 2.2.
 services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
     .AddMvcOptions(options => options.EnableEndpointRouting = false)
     .AddRazorPagesOptions(options =>
