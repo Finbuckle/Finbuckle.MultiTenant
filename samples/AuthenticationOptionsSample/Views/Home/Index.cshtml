@@ -2,8 +2,6 @@
 
 @if(Model != null)
 {
-    <h6 class="text-warning">This demo requires external configuration to work properly! See the comments in Startup.cs for more details.</h6>
-
     @if(!User.Identity.IsAuthenticated)
     {
         <a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a>
@@ -84,8 +82,7 @@ else
         // Note the paths set take our routing strategy into account.
         options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
         options.Cookie.Path = "/" + tenantInfo.Identifier;
-    });
-        </code></pre>
+    });</code></pre>
         <p>Click the links in the top right to see the strategy in action!</p>
     </div>
 }
