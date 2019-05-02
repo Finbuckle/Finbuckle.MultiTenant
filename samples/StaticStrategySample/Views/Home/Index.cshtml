@@ -36,9 +36,20 @@
         </tbody>
     
     </table>
-}
-else
-{
-    <span class="text-muted">No tenant found.</span>
-    <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#static-strategy"></a>
+    
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#static-strategy">static multitenant strategy</a>.</p>
+        <hr class="my-4">
+        <p>
+            For each request the <em>finbuckle</em> is used as the tenant id to resolve the tenant.
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>// In ConfigureServices:
+services.AddMultiTenant()... // Set up a store...
+    WithStaticStrategy("finbuckle");</code></pre>
+    </div> 
+    <a href=""></a>
 }
