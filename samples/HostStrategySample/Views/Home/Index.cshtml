@@ -11,7 +11,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Property</th>
+                <th style="width:25%">Property</th>
                 <th>Value</th>
             </tr>
         </thead>
@@ -39,5 +39,24 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#host-strategy">host multitenant strategy.</a></p>
+        <hr class="my-4">
+        <p>
+            For each request the the first host segment (i.e. the subdomain) is used to resolve the tenant.
+            A pattern can be passed to `WithHostStrategy` to select a different part of the host.
+            <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#host-strategy">See the documentation for more details.</a>
+        </p>
+        <p>
+            Note that a local machine running the sample must be configured to allow subdomains on localhost.
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>services.AddMultiTenant().
+    WithInMemoryStore(...).
+    WithHostStrategy();</code></pre>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div>
 }

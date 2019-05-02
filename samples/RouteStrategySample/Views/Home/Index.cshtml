@@ -11,7 +11,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Property</th>
+                <th style="width:25%">Property</th>
                 <th>Value</th>
             </tr>
         </thead>
@@ -39,5 +39,35 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#route-strategy">route multitenant strategy</a>.</p>
+        <hr class="my-4">
+        <p>
+            For each request the <em>__tenant__</em> route parameter is used to resolve the tenant.
+        </p>
+        <p>
+            In ASP.NET Core 2.x the only way to share the route between Finbuckle.MultiTenant and ASP.NET Core MVC
+            is to pass the same route to each. The easiest way to do this is the declate a static private function
+            and pass it to both. See the example below.
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>// In ConfigureServices:
+services.AddMultiTenant()... // Set up a store...
+    WithRouteStrategy(ConfigRoutes);
+
+// In Configure:
+// Note this is the same route delegate used in WithRouteStrategy()
+app.UseMvc(ConfigRoutes); 
+
+// And the delegate itself:
+private void ConfigRoutes(IRouteBuilder routes)
+{
+    routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
+}</code></pre>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div> 
+    <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#route-strategy"></a>
 }

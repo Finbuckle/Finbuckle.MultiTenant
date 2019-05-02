@@ -2,11 +2,9 @@
 
 @if(Model != null)
 {
-    <h6 class="text-warning">This demo requires external configuration to work properly! See the comments in Startup.cs for more details.</h6>
-
     @if(!User.Identity.IsAuthenticated)
     {
-        <a asp-action="Authenticate" class="btn btn-primary">Login</a>
+        <a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a>
     } else
     {
         <a asp-action="Logout" class="btn btn-secondary">Logout</a>
@@ -20,7 +18,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Property</th>
+                <th style="width:25%">Property</th>
                 <th>Value</th>
             </tr>
         </thead>
@@ -48,5 +46,43 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights <a href="https://www.finbuckle.com/MultiTenant/Docs/Authentication">per-tenant authentication options</a>.</p>
+        <hr class="my-4">
+        <p>
+            Note: This demo requires external configuration for the OpenID Connect,
+            Google, and Facebook logins to work correctly. See the comments in `Startup.cs` for more details. 
+        </p>
+        <p>In this sample we:
+            <ul>
+                <li>Setup remote authentication for OpenId Connect and OAuth support.</li>
+                <li>Set the default authentication scheme for each tenant based on a value in its `TenantInfo.Items` collection.</li>
+                <li>Set per-tenant cookie options so sessions are unique per tenant.</li>
+            </ul>
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>services.AddMultiTenant()... // Setup host and strategy...
+    WithRemoteAuthentication(). // Important!
+    WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
+    {
+        // Allow each tenant to have a different default challenge scheme.
+        if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
+        {
+            options.DefaultChallengeScheme = (string)challengeScheme;
+        }
+    }).
+    WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
+    {
+        // Set a unique cookie name for this tenant.
+        options.Cookie.Name = tenantInfo.Id + "-cookie";
+
+        // Note the paths set take our routing strategy into account.
+        options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
+        options.Cookie.Path = "/" + tenantInfo.Identifier;
+    });</code></pre>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div>
 }

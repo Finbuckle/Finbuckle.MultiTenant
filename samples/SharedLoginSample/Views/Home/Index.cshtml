@@ -14,7 +14,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Property</th>
+                        <th style="width:25%">Property</th>
                         <th>Value</th>
                     </tr>
                 </thead>
@@ -42,31 +42,33 @@
         
         }
         else
-        {
-            <p>
-                This sample demonstrates using a shared login page for all tenants. ASP.NET Core Identity is used,
-                and each tenant still has its normal ASP.NET Identity register/login pages as well (similar to the IdentityDataIsolation sample).
-            </p>
-            <p>
-                The shared login page uses the email domain to determine the intended tenant. It then attempts to sign in and redirect the user to
-                the route corresponding to the tenant. It uses a simple dictionary to find the tenant from the email domain.
-                A real app would probably query a database or call an API. Check the <em>SharedLogin</em> action in the <em>Home</em> controller to see the code.
-            </p>
-            <p>
-                <strong>A few setup steps are needed:</strong>
-            </p>
-            <p>
-                The tenants share a common SQLite database for ASP.NET Core Identity. This database needs to be created by applying the latest migration via
-                <em>dotnet ef database update</em> or similar.
-            </p>
-            <p>
-                In order to sign in from the shared login page, users need to be registered. Select a tenant on the navbar and register a few users with email addresses ending in @@finbuckle.com, @@megacorp.com, or @@initech.com (matching the tenant).
-                For this sample, it is not important if these are real email addresses.
-            </p>
-            <p>
-                Note, this app has been updated to ASP.NET Core 2.2 but has MVC compatibility set to "CompatibilityVersion.Version_2_1" due to problems with endpoint routing and Pages (used by ASP.NET Core Identity default UI).
-            </p>
-            
+        {  
+            <div class="jumbotron">
+                <h1 class="display-4">Hello, world!</h1>
+                <p class="lead">This sample is a proof-of-concept demonstrating a shared login page for all tenants.</p>
+                <hr class="my-4">
+                <p>
+                    ASP.NET Core Identity is used for user registration and login.
+                    See the <a href="https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample">IdentityDataIsolation sample</a> for more details on
+                    on how Finbuckle.MultiTenant isolates tenants within ASP.NET Core Identity.
+                </p>
+                <p>
+                    The shared login page uses the email domain to determine the intended tenant. It then attempts to sign in and redirect the user to
+                    the route corresponding to the tenant. It uses a simple dictionary to find the tenant from the email domain.
+                    A real app would probably query a database or call an API. Check the <em>SharedLogin</em> action in the <em>Home</em> controller to see the code.
+                </p>
+                <p>
+                    <strong>A few setup steps are needed:</strong>
+                </p>
+                <p>
+                    The tenants share a common SQLite database for ASP.NET Core Identity. This database needs to be created by applying the latest migration via
+                    <em>dotnet ef database update</em> or similar.
+                </p>
+                <p>
+                    In order to sign in from the shared login page, users need to be registered. Select a tenant on the navbar and register a few users with email addresses ending in @@finbuckle.com, @@megacorp.com, or @@initech.com (matching the tenant).
+                    For this sample, it is not important if these are real email addresses.
+                </p>
+            </div>
         }
     </div>
 </div>

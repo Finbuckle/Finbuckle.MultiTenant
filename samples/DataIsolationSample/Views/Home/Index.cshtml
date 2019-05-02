@@ -31,5 +31,22 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/EFCore">per-tenant data with EFCore</a>.</p>
+        <hr class="my-4">
+        <p>
+            The <code>MultiTenantDbContext</code> constructor takes a <code>TenantInfo</code> parameter which ASP.NET Core
+            provides via dependency injection depending on the current tenant.
+        </p>
+        <p>
+            Two of the tenants share a single database with a connection string of <em>Data Source=Data/ToDoList.db</em>.
+            The database context only returns results for the current tenant (without the need for the app use <em>where</em>).
+        </p>
+        <p>
+            The third tenant uses a completely different database per its connection string of "Data Source=Data/Initech_ToDoList.db".
+            Either way tenant data is isolated when reading/inserting/updating/deleting.
+        </p>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div> 
 }

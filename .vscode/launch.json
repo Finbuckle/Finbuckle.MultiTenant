@@ -69,6 +69,38 @@
             }
         },
         {
+            "name": "DataIsolationSample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceRoot}/samples/DataIsolationSample/bin/Debug/netcoreapp2.2/DataIsolationSample.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/samples/DataIsolationSample",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "launchBrowser": {
+                "enabled": true,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceRoot}/samples/DataIsolationSample/Views"
+            }
+        },
+        {
             "name": "EFCoreStoreSample",
             "type": "coreclr",
             "request": "launch",
@@ -130,6 +162,39 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceRoot}/samples/HostStrategySample/Views"
+            }
+        },
+        ,
+        {
+            "name": "IdentityDataIsolationSample",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceRoot}/samples/IdentityDataIsolationSample/bin/Debug/netcoreapp2.2/IdentityDataIsolationSample.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/samples/IdentityDataIsolationSample",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "launchBrowser": {
+                "enabled": true,
+                "args": "${auto-detect-url}",
+                "windows": {
+                    "command": "cmd.exe",
+                    "args": "/C start ${auto-detect-url}"
+                },
+                "osx": {
+                    "command": "open"
+                },
+                "linux": {
+                    "command": "xdg-open"
+                }
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceRoot}/samples/IdentityDataIsolationSample/Views"
             }
         },
         {
@@ -194,70 +259,6 @@
             },
             "sourceFileMap": {
                 "/Views": "${workspaceRoot}/samples/StaticStrategySample/Views"
-            }
-        },
-        {
-            "name": "DataIsolationSample",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/DataIsolationSample/bin/Debug/netcoreapp2.2/DataIsolationSample.dll",
-            "args": [],
-            "cwd": "${workspaceRoot}/samples/DataIsolationSample",
-            "stopAtEntry": false,
-            "internalConsoleOptions": "openOnSessionStart",
-            "launchBrowser": {
-                "enabled": true,
-                "args": "${auto-detect-url}",
-                "windows": {
-                    "command": "cmd.exe",
-                    "args": "/C start ${auto-detect-url}"
-                },
-                "osx": {
-                    "command": "open"
-                },
-                "linux": {
-                    "command": "xdg-open"
-                }
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/DataIsolationSample/Views"
-            }
-        },
-        {
-            "name": "IdentityDataIsolationSample",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceRoot}/samples/IdentityDataIsolationSample/bin/Debug/netcoreapp2.2/IdentityDataIsolationSample.dll",
-            "args": [],
-            "cwd": "${workspaceRoot}/samples/IdentityDataIsolationSample",
-            "stopAtEntry": false,
-            "internalConsoleOptions": "openOnSessionStart",
-            "launchBrowser": {
-                "enabled": true,
-                "args": "${auto-detect-url}",
-                "windows": {
-                    "command": "cmd.exe",
-                    "args": "/C start ${auto-detect-url}"
-                },
-                "osx": {
-                    "command": "open"
-                },
-                "linux": {
-                    "command": "xdg-open"
-                }
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceRoot}/samples/IdentityDataIsolationSample/Views"
             }
         },
         {

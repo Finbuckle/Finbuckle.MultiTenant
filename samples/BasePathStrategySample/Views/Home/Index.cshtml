@@ -11,7 +11,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Property</th>
+                <th style="width:25%">Property</th>
                 <th>Value</th>
             </tr>
         </thead>
@@ -39,5 +39,19 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#base-path-strategy">base path multitenant strategy</a>.</p>
+        <hr class="my-4">
+        <p>
+            For each request the base/first path segment is used to resolve the tenant.
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>services.AddMultiTenant().
+    WithInMemoryStore(...).
+    WithBasePathStrategy();</code></pre>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div> 
 }

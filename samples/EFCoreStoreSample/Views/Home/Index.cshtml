@@ -4,10 +4,6 @@
     ViewData["Title"] = "EFCoreStore Sample";
 }
 
-<p>TenantInfo pulled from EFCore database.</p>
-<p>See the AppDbContext and AppTenantInfo class for implementation details.</p>
-<p>Select a tenant in the top right menu to see its details from the database.</p>
-
 @if(Model != null)
 {
     <h3 class="mt-4">TenantInfo Values</h3>
@@ -15,7 +11,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Property</th>
+                <th style="width:25%">Property</th>
                 <th>Value</th>
             </tr>
         </thead>
@@ -43,5 +39,17 @@
 }
 else
 {
-    <span class="text-muted">No tenant found.</span>
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Stores#efcore-store">EFCore multitenant store</a>.</p>
+        <hr class="my-4">
+        <p>The TenantInfo is pulled from AN EFCore database.</p>
+        <p>See the AppDbContext and AppTenantInfo classes for implementation details.</p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+        <pre><code>services.AddMultiTenant()... // Set up a strategy.
+    WithEFCoreStore<AppDbContext, AppTenantInfo>()</code></pre>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div> 
 }

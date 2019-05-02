@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityDataIsolationSample.Controllers
@@ -7,7 +8,7 @@ namespace IdentityDataIsolationSample.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return View(HttpContext.GetMultiTenantContext()?.TenantInfo);
         }
     }
 }
