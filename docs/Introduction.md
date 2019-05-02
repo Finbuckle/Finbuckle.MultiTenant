@@ -19,6 +19,8 @@ sample and the code comments in the `Startup` class.
 
 [EFCoreStoreSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/EFCoreStoreSample)
 
+[DelegateStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DelegateStrategySample)
+
 [HostStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/HostStrategySample)
 
 [IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample)
