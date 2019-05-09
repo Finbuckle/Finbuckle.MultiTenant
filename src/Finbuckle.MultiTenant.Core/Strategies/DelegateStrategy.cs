@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.Strategies
     {
         private readonly Func<object, Task<string>> doStrategy;
 
-        public DelegateStrategy(Func<object, Task<string>> implementation)
+        public DelegateStrategy(Func<object, Task<string>> doStrategy)
         {
             this.doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
         }
