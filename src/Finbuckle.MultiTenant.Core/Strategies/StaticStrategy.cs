@@ -24,22 +24,14 @@ namespace Finbuckle.MultiTenant.Strategies
     public class StaticStrategy : IMultiTenantStrategy
     {
         internal readonly string identifier;
-        private readonly ILogger<StaticStrategy> logger;
-
-        public StaticStrategy(string identifier) : this(identifier, null)
-        {
-        }
-
-        public StaticStrategy(string identifier, ILogger<StaticStrategy> logger)
+        
+        public StaticStrategy(string identifier)
         {
             this.identifier = identifier;
-            this.logger = logger;
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
-            Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
-
             return await Task.FromResult(identifier);
         }
     }

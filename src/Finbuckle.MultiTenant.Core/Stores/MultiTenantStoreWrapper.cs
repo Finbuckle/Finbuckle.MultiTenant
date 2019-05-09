@@ -33,7 +33,7 @@ namespace Finbuckle.MultiTenant.Stores
         private readonly TStore store;
         private readonly ILogger logger;
 
-        public MultiTenantStoreWrapper(TStore store, ILogger<MultiTenantStoreWrapper<TStore>> logger)
+        public MultiTenantStoreWrapper(TStore store, ILogger<TStore> logger)
         {
             this.store = store;
             this.logger = logger;

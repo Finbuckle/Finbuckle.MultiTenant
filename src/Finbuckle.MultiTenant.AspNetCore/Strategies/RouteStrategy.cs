@@ -27,14 +27,9 @@ namespace Finbuckle.MultiTenant.Strategies
     {
         internal readonly string tenantParam;
         internal IRouter router;
-        private readonly ILogger<RouteStrategy> logger;
         internal readonly Action<IRouteBuilder> configRoutes;
 
-        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes) : this(tenantParam, configRoutes, null)
-        {
-        }
-
-        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes, ILogger<RouteStrategy> logger)
+        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
@@ -48,14 +43,13 @@ namespace Finbuckle.MultiTenant.Strategies
 
             this.tenantParam = tenantParam;
             this.configRoutes = configRoutes;
-            this.logger = logger;
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext))
                 throw new MultiTenantException(null,
-                    new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
+                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var httpContext = context as HttpContext;
 
@@ -78,7 +72,6 @@ namespace Finbuckle.MultiTenant.Strategies
 
             object identifier = null;
             routeContext.RouteData?.Values.TryGetValue(tenantParam, out identifier);
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
             return identifier as string;
         }

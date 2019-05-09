@@ -28,7 +28,7 @@ namespace Finbuckle.MultiTenant.Strategies
         internal readonly TStrategy strategy;
         private readonly ILogger logger;
 
-        public MultiTenantStrategyWrapper(TStrategy strategy, ILogger<MultiTenantStrategyWrapper<TStrategy>> logger)
+        public MultiTenantStrategyWrapper(TStrategy strategy, ILogger<TStrategy> logger)
         {
             this.strategy = strategy;
             this.logger = logger;
