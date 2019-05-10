@@ -98,7 +98,7 @@ public class MultiTenantMiddlewareShould
         
         Assert.NotNull(resolvedTenantContext.StoreInfo);
         Assert.NotNull(resolvedTenantContext.StoreInfo.Store);
-        Assert.Equal(typeof(MultiTenantStoreWrapper<InMemoryStore>), resolvedTenantContext.StoreInfo.StoreType);
+        Assert.Equal(typeof(InMemoryStore), resolvedTenantContext.StoreInfo.StoreType);
         Assert.NotNull(resolvedTenantContext.StoreInfo.MultiTenantContext);
     }
 

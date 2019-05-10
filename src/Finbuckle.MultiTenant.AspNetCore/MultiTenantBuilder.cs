@@ -152,7 +152,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where TTenantInfo : class, IEFCoreStoreTenantInfo, new()
         {
             this.services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
-            return WithStore<MultiTenantStoreWrapper<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>>(ServiceLifetime.Scoped);
+            return WithStore<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
         }
 
         /// <summary>

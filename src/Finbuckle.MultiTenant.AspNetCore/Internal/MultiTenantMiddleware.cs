@@ -12,7 +12,9 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -43,21 +45,37 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 var storeInfo = new StoreInfo();
                 storeInfo.MultiTenantContext = multiTenantContext;
                 storeInfo.Store = store;
-                storeInfo.StoreType = store.GetType();
+                if (store.GetType().IsGenericType &&
+                    store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<>))
+                {
+                    storeInfo.StoreType = store.GetType().GetGenericArguments().First();
+                }
+                else
+                {
+                    storeInfo.StoreType = store.GetType();
+                }
                 multiTenantContext.StoreInfo = storeInfo;
 
                 var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
                 var strategyInfo = new StrategyInfo();
                 strategyInfo.MultiTenantContext = multiTenantContext;
                 strategyInfo.Strategy = strategy;
-                strategyInfo.StrategyType = strategy.GetType();
+                if (strategy.GetType().IsGenericType &&
+                    strategy.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStrategyWrapper<>))
+                {
+                    strategyInfo.StrategyType = strategy.GetType().GetGenericArguments().First();
+                }
+                else
+                {
+                    strategyInfo.StrategyType = strategy.GetType();
+                }
                 multiTenantContext.StrategyInfo = strategyInfo;
 
                 context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
                 // Try the registered strategy.
                 var identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
-                
+
                 TenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
@@ -69,7 +87,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
                     strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
-                    
+
                     // Adjust the strategy info in the multitenant context.
                     strategyInfo.Strategy = strategy;
                     strategyInfo.StrategyType = strategy.GetType();

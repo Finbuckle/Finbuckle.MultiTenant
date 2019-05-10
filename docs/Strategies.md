@@ -4,12 +4,12 @@ A multitenant strategy is responsible for defining how the tenant is determined.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`. Internally strategies are registered as singleton services.
 
-## IMultiTenantStrategy
-All multitenant strategies derive from `IMultiTenantStrategy` and must implement the `GetIdentifier` method. 
+## IMultiTenantStrategy and Custom Strategies
+All multitenant strategies derive from `IMultiTenantStrategy` and must implement the `GetIdentifierAsync` method. 
 
 If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a null `TenantInfo`.
 
-Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<T>` or `WithStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The templated version will use dependency injection and any passed parameters to construct the implementation instance. The non-templated version accepts a `Func<IServiceProvider, IMultiTenantStrategy>` factory method for even more customization.
+Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The first override uses dependency injection along with any passed parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic logging and exception handling.
 
 ```cs
 // Register a custom strategy with the templated method.
