@@ -6,3 +6,4 @@
 *.csproj text
 *.md text
 *.json text
+*.props text
