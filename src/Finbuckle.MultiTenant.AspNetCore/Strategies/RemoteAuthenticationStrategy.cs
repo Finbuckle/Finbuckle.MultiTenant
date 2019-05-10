@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.Strategies
             var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
             var handlers = httpContext.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
 
-            foreach (var scheme in schemes.GetRequestHandlerSchemesAsync().Result)
+            foreach (var scheme in await schemes.GetRequestHandlerSchemesAsync())
             {
                 var optionType = scheme.HandlerType.GetProperty("Options").PropertyType;
                 
@@ -77,7 +77,7 @@ namespace Finbuckle.MultiTenant.Strategies
                             && httpContext.Request.Body.CanRead)
                         {
                             var formOptions = new FormOptions { BufferBody = true };
-                            var form = await httpContext.Request.ReadFormAsync(formOptions).ConfigureAwait(false);
+                            var form = await httpContext.Request.ReadFormAsync(formOptions);
                             state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
                         }
 

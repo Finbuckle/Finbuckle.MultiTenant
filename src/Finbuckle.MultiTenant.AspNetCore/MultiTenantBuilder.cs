@@ -341,6 +341,17 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Adds and configures a fallback tenant identifier if the strategy or remote authentication
+        /// fail to resolve a tenant.
+        /// </summary>
+        /// <param name="doStrategy">The delegate implementing the strategy.</returns>
+        public FinbuckeMultiTenantBuilder WithFallbackTenantIdentifier(string fallbackTenantIndentifier)
+        {
+            services.Configure<FallbackTenantIdentifierOptions>(options => options.FallbackTenantIdentifier = fallbackTenantIndentifier);
+            return this;
+        }
+
+        /// <summary>
         /// Adds and configures a IMultiTenantStrategy to the applicationusing default dependency injection.
         /// </summary>
         /// <param name="lifetime">The service lifetime.</param>

@@ -103,7 +103,7 @@ namespace Finbuckle.MultiTenant
             var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
             ChangeTracker.AutoDetectChangesEnabled = false;
 
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
+            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 
             ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
 

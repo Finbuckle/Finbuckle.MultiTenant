@@ -19,6 +19,7 @@ using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -40,45 +41,17 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (!context.Items.ContainsKey(Constants.HttpContextMultiTenantContext))
             {
                 var multiTenantContext = new MultiTenantContext();
-
-                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
-                var storeInfo = new StoreInfo();
-                storeInfo.MultiTenantContext = multiTenantContext;
-                storeInfo.Store = store;
-                if (store.GetType().IsGenericType &&
-                    store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<>))
-                {
-                    storeInfo.StoreType = store.GetType().GetGenericArguments().First();
-                }
-                else
-                {
-                    storeInfo.StoreType = store.GetType();
-                }
-                multiTenantContext.StoreInfo = storeInfo;
-
-                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
-                var strategyInfo = new StrategyInfo();
-                strategyInfo.MultiTenantContext = multiTenantContext;
-                strategyInfo.Strategy = strategy;
-                if (strategy.GetType().IsGenericType &&
-                    strategy.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStrategyWrapper<>))
-                {
-                    strategyInfo.StrategyType = strategy.GetType().GetGenericArguments().First();
-                }
-                else
-                {
-                    strategyInfo.StrategyType = strategy.GetType();
-                }
-                multiTenantContext.StrategyInfo = strategyInfo;
-
                 context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
                 // Try the registered strategy.
-                var identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
+                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
+                var identifier = await strategy.GetIdentifierAsync(context);
 
+                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
                 TenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
+                    SetStrategyInfo(multiTenantContext, strategy);
                     tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                 }
 
@@ -87,24 +60,49 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
                     strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
-
-                    // Adjust the strategy info in the multitenant context.
-                    strategyInfo.Strategy = strategy;
-                    strategyInfo.StrategyType = strategy.GetType();
-
-                    identifier = await strategy.GetIdentifierAsync(context).ConfigureAwait(false);
-
+                    identifier = await strategy.GetIdentifierAsync(context);
                     if (identifier != null)
                     {
+                        SetStrategyInfo(multiTenantContext, strategy);
                         tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                     }
                 }
 
-                // Set the tenant info in the multitenant context if applicable.
+                // Finally try the fallback identifier, if applicable.
+                if (tenantInfo == null)
+                {
+                    var options = context.RequestServices.GetService<IOptionsSnapshot<FallbackTenantIdentifierOptions>>();
+                    identifier = options.Value.FallbackTenantIdentifier;
+
+                    strategy = new StaticStrategy(identifier);
+                    identifier = await strategy.GetIdentifierAsync(context);
+                    if (identifier != null)
+                    {
+                        SetStrategyInfo(multiTenantContext, strategy);
+                        tenantInfo = await store.TryGetByIdentifierAsync(identifier);
+                    }
+                }
+
                 if (tenantInfo != null)
                 {
+                    // Set the tenant info.
                     multiTenantContext.TenantInfo = tenantInfo;
                     tenantInfo.MultiTenantContext = multiTenantContext;
+
+                    // Set the store info.
+                    var storeInfo = new StoreInfo();
+                    storeInfo.MultiTenantContext = multiTenantContext;
+                    storeInfo.Store = store;
+                    if (store.GetType().IsGenericType &&
+                        store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<>))
+                    {
+                        storeInfo.StoreType = store.GetType().GetGenericArguments().First();
+                    }
+                    else
+                    {
+                        storeInfo.StoreType = store.GetType();
+                    }
+                    multiTenantContext.StoreInfo = storeInfo;
                 }
             }
 
@@ -112,6 +110,23 @@ namespace Finbuckle.MultiTenant.AspNetCore
             {
                 await next(context);
             }
+        }
+
+        private static void SetStrategyInfo(MultiTenantContext multiTenantContext, IMultiTenantStrategy strategy)
+        {
+            var strategyInfo = new StrategyInfo();
+            strategyInfo.MultiTenantContext = multiTenantContext;
+            strategyInfo.Strategy = strategy;
+            if (strategy.GetType().IsGenericType &&
+                strategy.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStrategyWrapper<>))
+            {
+                strategyInfo.StrategyType = strategy.GetType().GetGenericArguments().First();
+            }
+            else
+            {
+                strategyInfo.StrategyType = strategy.GetType();
+            }
+            multiTenantContext.StrategyInfo = strategyInfo;
         }
     }
 }
