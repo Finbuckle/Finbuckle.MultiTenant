@@ -140,7 +140,7 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStore()
     {
         var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore(ServiceLifetime.Singleton, null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStore<InMemoryStore>(ServiceLifetime.Singleton, factory: null));
     }
 
     [Fact]
@@ -150,8 +150,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+        var resolver = sp.CreateScope().ServiceProvider.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>>(resolver);
     }
 
     [Fact]
@@ -160,10 +160,10 @@ public class MultiTenantBuilderShould
         var services = new ServiceCollection();
         services.AddDbContext<TestEFCoreStoreDbContext>(o => o.UseInMemoryDatabase(nameof(AddEFCoreStoreWithExistingDbContext)));
         services.AddMultiTenant().WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
-        var sp = services.BuildServiceProvider();
+        var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
         var resolver = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>(resolver);
+        Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>>(resolver);
     }
 
     [Fact]
@@ -329,8 +329,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithDelegateStrategy(c => Task.FromResult("Hi"));
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<DelegateStrategy>(resolver);
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<DelegateStrategy>>(strategy);
     }
 
     [Fact]
@@ -340,8 +340,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<StaticStrategy>(resolver);
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<StaticStrategy>>(strategy);
     }
 
     [Fact]
@@ -359,8 +359,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithBasePathStrategy();
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<BasePathStrategy>(resolver);
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<BasePathStrategy>>(strategy);
     }
 
     [Fact]
@@ -370,8 +370,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithHostStrategy();
         var sp = services.BuildServiceProvider();
 
-        var resolver = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<HostStrategy>(resolver);
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<HostStrategy>>(strategy);
     }
 
     [Fact]
@@ -389,9 +389,8 @@ public class MultiTenantBuilderShould
         services.AddMultiTenant().WithRouteStrategy("routeParam", cr => cr.MapRoute("test", "test"));
         var sp = services.BuildServiceProvider();
 
-        var strategy = sp.GetRequiredService<IMultiTenantStrategy>() as RouteStrategy;
-        Assert.IsType<RouteStrategy>(strategy);
-        Assert.Equal("routeParam", strategy.tenantParam);
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
     }
 
     [Fact]
@@ -482,6 +481,6 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStrategy()
     {
         var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStrategy(ServiceLifetime.Singleton, null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null));
     }
 }

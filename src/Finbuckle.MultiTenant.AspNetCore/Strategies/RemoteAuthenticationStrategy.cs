@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.Strategies
         {
             if(!(context is HttpContext))
                 throw new MultiTenantException(null,
-                    new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
+                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var httpContext = context as HttpContext;
 

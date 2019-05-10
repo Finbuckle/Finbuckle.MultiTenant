@@ -22,26 +22,13 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class BasePathStrategy : IMultiTenantStrategy
     {
-        private readonly ILogger<BasePathStrategy> logger;
-
-        public BasePathStrategy()
-        {
-        }
-
-        public BasePathStrategy(ILogger<BasePathStrategy> logger)
-        {
-            this.logger = logger;
-        }
-
         public async Task<string> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext))
                 throw new MultiTenantException(null,
-                    new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
+                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var path = (context as HttpContext).Request.Path;
-
-            Utilities.TryLogInfo(logger, $"Path:  \"{path.Value ?? "<null>"}\"");
 
             var pathSegments =
                 path.Value.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
@@ -50,8 +37,6 @@ namespace Finbuckle.MultiTenant.Strategies
                 return null;
 
             string identifier = pathSegments[0];
-
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
 
             return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }

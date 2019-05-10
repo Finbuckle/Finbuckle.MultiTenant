@@ -24,13 +24,8 @@ namespace Finbuckle.MultiTenant.Strategies
     public class HostStrategy : IMultiTenantStrategy
     {
         private readonly string regex;
-        private readonly ILogger<HostStrategy> logger;
 
-        public HostStrategy(string template) : this(template, null)
-        {
-        }
-
-        public HostStrategy(string template, ILogger<HostStrategy> logger)
+        public HostStrategy(string template)
         {
             // New in 2.1, match whole domain if just "__tenant__".
             if (template == "__tenant__")
@@ -75,19 +70,16 @@ namespace Finbuckle.MultiTenant.Strategies
                 template = template.Replace("__tenant__", @"(?<identifier>[^\.]+)");
             }
 
-            this.regex = $"^{template}$";;
-            this.logger = logger;
+            this.regex = $"^{template}$";
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext))
                 throw new MultiTenantException(null,
-                    new ArgumentException("\"context\" type must be of type HttpContext", nameof(context)));
+                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var host = (context as HttpContext).Request.Host;
-
-            Utilities.TryLogInfo(logger, $"Host:  \"{host.Host ?? "<null>"}\"");
 
             if (host.HasValue == false)
                 return null;
@@ -103,9 +95,7 @@ namespace Finbuckle.MultiTenant.Strategies
                 identifier = match.Groups["identifier"].Value;
             }
 
-            Utilities.TryLogInfo(logger, $"Found identifier:  \"{identifier ?? "<null>"}\"");
-
-            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
+            return await Task.FromResult(identifier);
         }
     }
 }

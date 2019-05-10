@@ -2,7 +2,7 @@
 
 A multiTenant store is responsible for retrieving information about the tenant based on an identifier string produced by the [MultiTenant strategy](Strategies). The retrieved information is then used to create a `TenantInfo` object.
 
-Finbuckle.MultiTenant provides a simple thread safe in-memory implementation based on `ConcurrentDictionary<string, object>` which can be configured from an `appSettings.json` file. Custom stores can be created by implementing `IMultiTenantStore`.
+Finbuckle.MultiTenant provides a simple thread safe in-memory implementation based on `ConcurrentDictionary<string, object>` and an Entity Framework Core based implementation to query tenant information from a database.
 
 ## Accessing the Store at Runtime
 
@@ -10,10 +10,10 @@ The multitenant store can be accessed at runtime to add, remote, or retreieve a 
 
 The multitenant store is registered as a singleton in the app's service collection. Access it via dependecy injection by including an `IMultiTenantStore` constructor parameter, action method parameter marked with `[FromService]`, or the `HttpContext.RequestServices` service provider instance.
 
-## IMultiTenantStore
+## IMultiTenantStore and Custom Stores
 All multitenant stores derive from `IMultiTenantStore` and must implement `TryAdd`, `TryRemove`, and `GetByIdentifierAsync` methods. `GetByIdentifierAsync` should return null if there is no suitable tenant match.
 
-A custom implementation of `IMultiTenantStore` can be configured by calling `WithStore<T>` or `WithStore` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The templated version will use dependency injection and any passed parameters to construct the implementation instance. The non-templated version accepts a `Func<IServiceProvider, IMultiTenantStore>` factory method for even more customization.
+A custom implementation of `IMultiTenantStore` can be configured by calling `WithStore<TSore>`after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The first overload uses dependency injection along with any passed parameters to construct the implementation instance. The second overload accepts a `Func<IServiceProvider, TStore>` factory method for even more customization. The library internally decorates any `IMultiTenantStore` with a wrapper providing basic logging and exception handling.
 
 ```cs
 // Register a custom store with the templated method.

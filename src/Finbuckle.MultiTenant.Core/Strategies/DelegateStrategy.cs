@@ -25,25 +25,15 @@ namespace Finbuckle.MultiTenant.Strategies
     public class DelegateStrategy : IMultiTenantStrategy
     {
         private readonly Func<object, Task<string>> doStrategy;
-        private readonly ILogger<DelegateStrategy> logger;
 
-        public DelegateStrategy(Func<object, Task<string>> implementation) :
-            this(implementation, null)
-        {
-        }
-
-        public DelegateStrategy(Func<object, Task<string>> doStrategy, ILogger<DelegateStrategy> logger)
+        public DelegateStrategy(Func<object, Task<string>> doStrategy)
         {
             this.doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
-            this.logger = logger;
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
             var identifier = await doStrategy(context);
-
-            Utilities.TryLogInfo(logger, $"Found identifier: \"{identifier ?? "<null>"}\"");
-
             return await Task.FromResult(identifier);
         }
     }
