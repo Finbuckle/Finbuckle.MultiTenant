@@ -1,0 +1,8 @@
+* text=auto
+
+*.cs text
+*.cshtml text
+*.sln text
+*.csproj text
+*.md text
+*.json text
