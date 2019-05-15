@@ -72,14 +72,17 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 if (tenantInfo == null)
                 {
                     var options = context.RequestServices.GetService<IOptionsSnapshot<FallbackTenantIdentifierOptions>>();
-                    identifier = options.Value.FallbackTenantIdentifier;
-
-                    strategy = new StaticStrategy(identifier);
-                    identifier = await strategy.GetIdentifierAsync(context);
-                    if (identifier != null)
+                    if (options != null)
                     {
-                        SetStrategyInfo(multiTenantContext, strategy);
-                        tenantInfo = await store.TryGetByIdentifierAsync(identifier);
+                        identifier = options.Value.FallbackTenantIdentifier;
+
+                        strategy = new DelegateStrategy(o => Task.FromResult(identifier));
+                        identifier = await strategy.GetIdentifierAsync(context);
+                        if (identifier != null)
+                        {
+                            SetStrategyInfo(multiTenantContext, strategy);
+                            tenantInfo = await store.TryGetByIdentifierAsync(identifier);
+                        }
                     }
                 }
 

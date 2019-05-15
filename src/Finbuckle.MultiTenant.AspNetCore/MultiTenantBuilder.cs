@@ -96,7 +96,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using using default dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using default dependency injection.
         /// </summary>>
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
@@ -347,6 +347,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="doStrategy">The delegate implementing the strategy.</returns>
         public FinbuckeMultiTenantBuilder WithFallbackTenantIdentifier(string fallbackTenantIndentifier)
         {
+            if (fallbackTenantIndentifier == null)
+            {
+                throw new ArgumentNullException(nameof(fallbackTenantIndentifier));
+            }
+
             services.Configure<FallbackTenantIdentifierOptions>(options => options.FallbackTenantIdentifier = fallbackTenantIndentifier);
             return this;
         }
