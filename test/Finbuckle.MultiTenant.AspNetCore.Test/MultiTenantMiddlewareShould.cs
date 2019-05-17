@@ -160,7 +160,7 @@ public class MultiTenantMiddlewareShould
         Assert.Null(multiTenantContext.TenantInfo);
         Assert.Null(multiTenantContext.StoreInfo);
         Assert.NotNull(multiTenantContext.StrategyInfo);
-        Assert.IsType<DelegateStrategy>(multiTenantContext.StrategyInfo.Strategy);
+        Assert.IsType<FallbackStrategy>(multiTenantContext.StrategyInfo.Strategy);
     }
 
     [Fact]
@@ -189,25 +189,5 @@ public class MultiTenantMiddlewareShould
 
         // Check that the remote strategy was set in the multitenant context.
         Assert.IsAssignableFrom<RemoteAuthenticationStrategy>(context.GetMultiTenantContext().StrategyInfo.Strategy);
-    }
-
-    [Fact]
-    public void SkipRemoteAuthenticationResolutionIfNotUsingWithRemoteAuthentication()
-    {
-        var services = new ServiceCollection();
-        services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithDelegateStrategy(o => Task.FromResult<string>(null));
-        
-        // Add in the mock...
-        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
-        services.AddSingleton<RemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
-        var sp = services.BuildServiceProvider();
-
-        var mock = CreateHttpContextMock(sp);
-        var context = mock.Object;
-        
-        var mw = new MultiTenantMiddleware(null);
-        mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context), Times.Never);
     }
 }
