@@ -39,18 +39,18 @@ public class MultiTenantBuilderShould
     public void AddFallbackTenantIdentifier()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant().WithFallbackTenantIdentifier("test");
+        services.AddMultiTenant().WithFallbackStrategy("test");
         var sp = services.BuildServiceProvider();
 
-        var options = sp.GetRequiredService<IOptions<FallbackTenantIdentifierOptions>>();
-        Assert.Equal("test", options.Value.FallbackTenantIdentifier);
+        var strategy = sp.GetRequiredService<FallbackStrategy>();
+        Assert.Equal("test", strategy.identifier);
     }
 
     [Fact]
     public void ThrowIfFallbackTenantIdentifierIsNull()
     {
         var services = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithFallbackTenantIdentifier(null));
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithFallbackStrategy(null));
     }
 
     [Theory]

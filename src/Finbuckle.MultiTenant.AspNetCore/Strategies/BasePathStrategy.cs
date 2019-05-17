@@ -14,9 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {

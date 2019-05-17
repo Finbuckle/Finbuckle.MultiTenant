@@ -90,7 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
-            services.TryAddSingleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>();
+            services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
             return this;
         }
@@ -341,19 +341,17 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a fallback tenant identifier if the strategy or remote authentication
+        /// Adds and configures a fallback strategy for if the main strategy or remote authentication
         /// fail to resolve a tenant.
         /// </summary>
-        /// <param name="doStrategy">The delegate implementing the strategy.</returns>
-        public FinbuckeMultiTenantBuilder WithFallbackTenantIdentifier(string fallbackTenantIndentifier)
+        public FinbuckeMultiTenantBuilder WithFallbackStrategy(string identifier)
         {
-            if (fallbackTenantIndentifier == null)
+            if (identifier == null)
             {
-                throw new ArgumentNullException(nameof(fallbackTenantIndentifier));
+                throw new ArgumentNullException(nameof(identifier));
             }
 
-            services.Configure<FallbackTenantIdentifierOptions>(options => options.FallbackTenantIdentifier = fallbackTenantIndentifier);
-            return this;
+            return WithStrategy<FallbackStrategy>(ServiceLifetime.Singleton, new[] {identifier});
         }
 
         /// <summary>

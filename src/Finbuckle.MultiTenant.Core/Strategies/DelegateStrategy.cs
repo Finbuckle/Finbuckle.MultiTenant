@@ -14,14 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
-using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    /// <summary>
-    /// IMultiTenantStrategy implementation that executes a given delegate.
-    /// </summary>
     public class DelegateStrategy : IMultiTenantStrategy
     {
         private readonly Func<object, Task<string>> doStrategy;

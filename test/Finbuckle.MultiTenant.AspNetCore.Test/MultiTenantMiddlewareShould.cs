@@ -143,11 +143,11 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void HandleFallbackTenantIdentifier()
+    public void HandleFallbackStrategy()
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech").WithFallbackTenantIdentifier("default");
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech").WithFallbackStrategy("default");
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);
@@ -172,12 +172,12 @@ public class MultiTenantMiddlewareShould
 
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddSingleton<IRemoteAuthenticationStrategy>(remoteResolverMock.Object);
+        services.AddSingleton<RemoteAuthenticationStrategy>(remoteResolverMock.Object);
         services.AddMultiTenant().WithInMemoryStore().WithDelegateStrategy(o => Task.FromResult<string>(null)).WithRemoteAuthentication();
         
         // Substitute in the mocks...
-        var removed = services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
-        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        var removed = services.Remove(ServiceDescriptor.Singleton<RemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
+        services.AddSingleton<RemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
         
         var sp = services.BuildServiceProvider();
         var mock = CreateHttpContextMock(sp);
@@ -200,7 +200,7 @@ public class MultiTenantMiddlewareShould
         
         // Add in the mock...
         var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
-        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        services.AddSingleton<RemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);

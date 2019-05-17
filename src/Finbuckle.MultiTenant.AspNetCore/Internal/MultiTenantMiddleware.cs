@@ -59,30 +59,28 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 if (tenantInfo == null &&
                     context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
                 {
-                    strategy = (IMultiTenantStrategy)context.RequestServices.GetRequiredService<IRemoteAuthenticationStrategy>();
-                    identifier = await strategy.GetIdentifierAsync(context);
-                    if (identifier != null)
-                    {
-                        SetStrategyInfo(multiTenantContext, strategy);
-                        tenantInfo = await store.TryGetByIdentifierAsync(identifier);
-                    }
-                }
+                    strategy = context.RequestServices.GetRequiredService<RemoteAuthenticationStrategy>();
 
-                // Finally try the fallback identifier, if applicable.
-                if (tenantInfo == null)
-                {
-                    var options = context.RequestServices.GetService<IOptionsSnapshot<FallbackTenantIdentifierOptions>>();
-                    if (options != null)
+                    if (strategy != null)
                     {
-                        identifier = options.Value.FallbackTenantIdentifier;
-
-                        strategy = new DelegateStrategy(o => Task.FromResult(identifier));
                         identifier = await strategy.GetIdentifierAsync(context);
                         if (identifier != null)
                         {
                             SetStrategyInfo(multiTenantContext, strategy);
                             tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                         }
+                    }
+                }
+
+                // Finally try the fallback identifier, if applicable.
+                if (tenantInfo == null)
+                {
+                    strategy = context.RequestServices.GetService<FallbackStrategy>();
+                    if (strategy != null)
+                    {
+                        identifier = await strategy.GetIdentifierAsync(context);
+                        SetStrategyInfo(multiTenantContext, strategy);
+                        tenantInfo = await store.TryGetByIdentifierAsync(identifier);
                     }
                 }
 

@@ -25,11 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public interface IRemoteAuthenticationStrategy
-    {
-    }
-
-    public class RemoteAuthenticationStrategy : IMultiTenantStrategy, IRemoteAuthenticationStrategy
+    public class RemoteAuthenticationStrategy : IMultiTenantStrategy
     {
         public async virtual Task<string> GetIdentifierAsync(object context)
         {

@@ -21,9 +21,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    /// <summary>
-    /// A basic multitenant store that runs in local memory. Ignores string case by default.
-    /// </summary>
     public class InMemoryStore : IMultiTenantStore
     {
         private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;

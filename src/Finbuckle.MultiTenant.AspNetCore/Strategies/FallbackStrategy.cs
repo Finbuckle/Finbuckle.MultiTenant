@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2019 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,22 +12,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Threading.Tasks;
-
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class StaticStrategy : IMultiTenantStrategy
+    public class FallbackStrategy : StaticStrategy
     {
-        internal readonly string identifier;
-        
-        public StaticStrategy(string identifier)
+        public FallbackStrategy(string identifier) : base(identifier)
         {
-            this.identifier = identifier;
-        }
-
-        public async Task<string> GetIdentifierAsync(object context)
-        {
-            return await Task.FromResult(identifier);
         }
     }
 }
