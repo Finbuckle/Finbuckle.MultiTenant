@@ -56,10 +56,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 }
 
                 // Resolve for remote authentication callbacks if applicable.
-                if (tenantInfo == null &&
-                    context.RequestServices.GetService<IAuthenticationSchemeProvider>() is MultiTenantAuthenticationSchemeProvider)
+                if (tenantInfo == null)
                 {
-                    strategy = context.RequestServices.GetRequiredService<RemoteAuthenticationStrategy>();
+                    strategy = context.RequestServices.GetService<RemoteAuthenticationStrategy>();
 
                     if (strategy != null)
                     {

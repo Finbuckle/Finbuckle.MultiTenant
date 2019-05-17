@@ -351,7 +351,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            return WithStrategy<FallbackStrategy>(ServiceLifetime.Singleton, new[] {identifier});
+            services.TryAddSingleton<FallbackStrategy>(sp => new FallbackStrategy(identifier));
+        
+            return this;
         }
 
         /// <summary>
