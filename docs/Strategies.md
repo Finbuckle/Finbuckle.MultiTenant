@@ -24,7 +24,7 @@ services.AddMultiTenant().WithStrategy( sp => return new MyStrat())...
 ## Static Strategy
 Always uses the same identifier to resolve the tenant.
 
-If using with ASP.NET Core, configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution:
+Configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution:
 
 ```cs
 // Make sure to include a multitenant store!
@@ -123,3 +123,25 @@ services.AddMultiTenant().
         return Task.FromResult(tenantId.ToString());
     })...
 ```
+
+## Fallback Strategy
+
+Returns a static tenant identifier string if the main strategy (and the remove authentication strategy, if applicable) fails to resolve a tenant with the tenant store. If the store does not have an entry for the fallback tenant identifier then this strategy has no effect.
+
+This strategy is intended be used in conjunction with other strategies.
+
+Configure by calling `WithFallbackStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution.
+
+```cs
+// If the called with e.g. "not_a_tenant.mysite.com" and the identifer "not_a_tenant"
+// is not in the store, then the identifier "defaultTenant" will be used as a fallback.
+// Make sure to include a multitenant store!
+services.AddMultiTenant().WithHostStrategy().WithFallbackStrategy("defaultTenant");
+```
+
+## Remote Authentication Strategy
+
+This is a special strategy used for per-tenant authentication when remote authentication such as Open
+ID Connect or OAuth (e.g. Log in via Facebook) are used.
+
+This strategy is intended be used in conjunction with other strategies. It is configured when `WithRemoteAuthentication` is called after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. See [Per-Tenant Authentication](Authentication) for more details.

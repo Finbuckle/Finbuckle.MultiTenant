@@ -90,13 +90,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
-            services.TryAddSingleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>();
+            services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
             return this;
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using using default dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using default dependency injection.
         /// </summary>>
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
@@ -338,6 +338,22 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return WithStrategy<DelegateStrategy>(ServiceLifetime.Singleton, new object[] { doStrategy });
+        }
+
+        /// <summary>
+        /// Adds and configures a fallback strategy for if the main strategy or remote authentication
+        /// fail to resolve a tenant.
+        /// </summary>
+        public FinbuckeMultiTenantBuilder WithFallbackStrategy(string identifier)
+        {
+            if (identifier == null)
+            {
+                throw new ArgumentNullException(nameof(identifier));
+            }
+
+            services.TryAddSingleton<FallbackStrategy>(sp => new FallbackStrategy(identifier));
+        
+            return this;
         }
 
         /// <summary>

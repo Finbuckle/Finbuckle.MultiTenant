@@ -103,7 +103,27 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public void SetMultiTenantContextItemsIfNoTenant()
+    public void HandleTenantIdentifierNotFound()
+    {
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithDelegateStrategy(o => Task.FromResult<string>(null));
+        var sp = services.BuildServiceProvider();
+
+        var mock = CreateHttpContextMock(sp);
+        var context = mock.Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.Null(multiTenantContext.TenantInfo);
+        Assert.Null(multiTenantContext.StoreInfo);
+        Assert.Null(multiTenantContext.StrategyInfo);
+    }
+
+    [Fact]
+    public void HandleTenantIdentifierNotFoundInStore()
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
@@ -118,59 +138,56 @@ public class MultiTenantMiddlewareShould
 
         var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
         Assert.Null(multiTenantContext.TenantInfo);
-        Assert.NotNull(multiTenantContext.StoreInfo);
+        Assert.Null(multiTenantContext.StoreInfo);
         Assert.NotNull(multiTenantContext.StrategyInfo);
     }
 
-    internal class NullStrategy : IMultiTenantStrategy
+    [Fact]
+    public void HandleFallbackStrategy()
     {
-        public async Task<string> GetIdentifierAsync(object context)
-        {
-           return await Task.FromResult<string>(null);
-        }
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech").WithFallbackStrategy("default");
+        var sp = services.BuildServiceProvider();
+
+        var mock = CreateHttpContextMock(sp);
+        var context = mock.Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.Null(multiTenantContext.TenantInfo);
+        Assert.Null(multiTenantContext.StoreInfo);
+        Assert.NotNull(multiTenantContext.StrategyInfo);
+        Assert.IsType<FallbackStrategy>(multiTenantContext.StrategyInfo.Strategy);
     }
 
     [Fact]
     public void HandleRemoteAuthenticationResolutionIfUsingWithRemoteAuthentication()
     {
+        // Create remote strategy mock
+        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
+        remoteResolverMock.Setup<Task<string>>(o => o.GetIdentifierAsync(It.IsAny<object>())).Returns(Task.FromResult("initech"));
+
         var services = new ServiceCollection();
         services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton).WithRemoteAuthentication();
+        services.AddSingleton<RemoteAuthenticationStrategy>(remoteResolverMock.Object);
+        services.AddMultiTenant().WithInMemoryStore().WithDelegateStrategy(o => Task.FromResult<string>(null)).WithRemoteAuthentication();
         
-        // Substitute in the mock...
-        services.Remove(ServiceDescriptor.Singleton<IRemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
-        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
-        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        // Substitute in the mocks...
+        var removed = services.Remove(ServiceDescriptor.Singleton<RemoteAuthenticationStrategy, RemoteAuthenticationStrategy>());
+        services.AddSingleton<RemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
+        
         var sp = services.BuildServiceProvider();
-
         var mock = CreateHttpContextMock(sp);
         var context = mock.Object;
-        
+
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
         remoteResolverMock.Verify(r => r.GetIdentifierAsync(context));
 
         // Check that the remote strategy was set in the multitenant context.
         Assert.IsAssignableFrom<RemoteAuthenticationStrategy>(context.GetMultiTenantContext().StrategyInfo.Strategy);
-    }
-
-    [Fact]
-    public void SkipRemoteAuthenticationResolutionIfNotUsingWithRemoteAuthentication()
-    {
-        var services = new ServiceCollection();
-        services.AddAuthentication();
-        services.AddMultiTenant().WithInMemoryStore().WithStrategy<NullStrategy>(ServiceLifetime.Singleton);
-        
-        // Add in the mock...
-        var remoteResolverMock = new Mock<RemoteAuthenticationStrategy>();
-        services.AddSingleton<IRemoteAuthenticationStrategy>(_sp => remoteResolverMock.Object);
-        var sp = services.BuildServiceProvider();
-
-        var mock = CreateHttpContextMock(sp);
-        var context = mock.Object;
-        
-        var mw = new MultiTenantMiddleware(null);
-        mw.Invoke(context).Wait();
-        remoteResolverMock.Verify(r => r.GetIdentifierAsync(context), Times.Never);
     }
 }

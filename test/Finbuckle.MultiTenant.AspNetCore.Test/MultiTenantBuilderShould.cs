@@ -13,7 +13,6 @@
 //    limitations under the License.
 
 using System;
-//using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -28,44 +27,30 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Routing;
+using Finbuckle.MultiTenant.AspNetCore;
 
 public class MultiTenantBuilderShould
 {
     // Used in some tests.
     public int TestProperty { get; set; }
 
-    private static IWebHostBuilder GetTestHostBuilder(string identifier)
+    [Fact]
+    public void AddFallbackTenantIdentifier()
     {
-        return new WebHostBuilder()
-                    .ConfigureServices(services =>
-                    {
-                        services.AddMultiTenant().WithStaticStrategy(identifier).WithInMemoryStore();
-                        services.AddMvc();
-                    })
-                    .Configure(app =>
-                    {
-                        app.UseMultiTenant();
-                        app.Run(async context =>
-                        {
-                            await context.Response.WriteAsync(context.RequestServices.GetRequiredService<TenantInfo>().Identifier);
-                        });
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithFallbackStrategy("test");
+        var sp = services.BuildServiceProvider();
 
-                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAddAsync(new TenantInfo(identifier, identifier, null, null, null)).Wait();
-                    });
+        var strategy = sp.GetRequiredService<FallbackStrategy>();
+        Assert.Equal("test", strategy.identifier);
     }
 
     [Fact]
-    public async Task AddTenantInfoService()
+    public void ThrowIfFallbackTenantIdentifierIsNull()
     {
-        IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant");
-
-        using (var server = new TestServer(hostBuilder))
-        {
-            var client = server.CreateClient();
-            var response = await client.GetStringAsync("/");
-            Assert.Equal("test_tenant", response);
-        }
+        var services = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => services.AddMultiTenant().WithFallbackStrategy(null));
     }
 
     [Theory]
@@ -101,7 +86,38 @@ public class MultiTenantBuilderShould
         }
     }
 
-    // TODO: Test case where optional parameters are passed to WithStore<T>.
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStore<TestNullStore2>(lifetime, new[] { new object() });
+
+        var sp = services.BuildServiceProvider();
+
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var scope = sp.CreateScope();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(store, store2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(store, store2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(store, store2);
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                Assert.NotSame(store, store2);
+                break;
+        }
+    }
 
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]
@@ -296,7 +312,7 @@ public class MultiTenantBuilderShould
     public void AddPerTenantOptions()
     {
         var services = new ServiceCollection();
-        // Note: using MultiTenansBuilderShould as our test options class.
+        // Note: using MultiTenantBuilderShould as our test options class.
         services.AddMultiTenant().WithPerTenantOptions<MultiTenantBuilderShould>((o, tc) => o.TestProperty = 1);
         var sp = services.BuildServiceProvider();
 
@@ -419,6 +435,39 @@ public class MultiTenantBuilderShould
     {
         var services = new ServiceCollection();
         services.AddMultiTenant().WithStrategy<BasePathStrategy>(lifetime);
+
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var scope = sp.CreateScope();
+        var strategy2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                Assert.Same(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Scoped:
+                Assert.NotSame(strategy, strategy2);
+                break;
+
+            case ServiceLifetime.Transient:
+                Assert.NotSame(strategy, strategy2);
+                strategy = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
+                Assert.NotSame(strategy, strategy2);
+                break;
+        }
+    }
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithStrategy<RouteStrategy>(lifetime, new object[] { "__tenant__", new Action<IRouteBuilder>((rb) => {}) });
 
         var sp = services.BuildServiceProvider();
 

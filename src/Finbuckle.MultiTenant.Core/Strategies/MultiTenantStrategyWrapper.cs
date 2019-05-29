@@ -19,9 +19,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    /// <summary>
-    /// A multitenant strategy wrapper that handles exception handling and logging.
-    /// </summary>
     public class MultiTenantStrategyWrapper<TStrategy> : IMultiTenantStrategy
         where TStrategy : IMultiTenantStrategy
     {

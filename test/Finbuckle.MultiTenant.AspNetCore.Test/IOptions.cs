@@ -12,22 +12,6 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Threading.Tasks;
-
-namespace Finbuckle.MultiTenant.Strategies
+internal interface IOptions
 {
-    public class StaticStrategy : IMultiTenantStrategy
-    {
-        internal readonly string identifier;
-        
-        public StaticStrategy(string identifier)
-        {
-            this.identifier = identifier;
-        }
-
-        public async Task<string> GetIdentifierAsync(object context)
-        {
-            return await Task.FromResult(identifier);
-        }
-    }
 }

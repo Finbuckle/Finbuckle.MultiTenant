@@ -14,8 +14,6 @@
 
 using System;
 using Microsoft.AspNetCore.Http;
-using Finbuckle.MultiTenant.Core;
-using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 

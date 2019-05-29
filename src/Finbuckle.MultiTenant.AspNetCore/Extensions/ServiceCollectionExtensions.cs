@@ -28,7 +28,6 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckeMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
             services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
 
             return new FinbuckeMultiTenantBuilder(services);

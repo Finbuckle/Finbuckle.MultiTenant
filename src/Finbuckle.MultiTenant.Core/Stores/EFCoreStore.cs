@@ -25,10 +25,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-
-    /// <summary>
-    /// A multitenant store that uses EFCore.
-    /// </summary>
     public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
         where TTenantInfo : class, IEFCoreStoreTenantInfo, new()

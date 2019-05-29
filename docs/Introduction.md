@@ -11,22 +11,24 @@ Check out the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTe
 In addition to this documentation a variey of sample projects are available. Be sure to read the information on the index page of each
 sample and the code comments in the `Startup` class.
 
-[AuthenticationOptionsSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample)
+[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample)
 
-[BasePathStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/BasePathStrategySample)
+[Base Path Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/BasePathStrategySample)
 
-[DataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DataIsolationSample) 
+[Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DataIsolationSample) 
 
-[EFCoreStoreSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/EFCoreStoreSample)
+[EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/EFCoreStoreSample)
 
-[DelegateStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DelegateStrategySample)
+[Fallback Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/FallbackStrategySample)
 
-[HostStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/HostStrategySample)
+[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DelegateStrategySample)
 
-[IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample)
+[Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/HostStrategySample)
 
-[RouteStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/RouteStrategySample)  
+[Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample)
 
-[SharedLoginSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/SharedLoginSample)  
+[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/RouteStrategySample)  
 
-[StaticStrategySample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/StaticStrategySample)
+[Shared Login Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/SharedLoginSample)  
+
+[Static Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/StaticStrategySample)
