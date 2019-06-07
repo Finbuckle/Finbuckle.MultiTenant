@@ -50,7 +50,7 @@ var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
 if(tenantInfo != null)
 {
     var tenantId = tenantInfo.Id;
-    var identifier = tenantinfo.Identifier;
+    var identifier = tenantInfo.Identifier;
     var name = tenantInfo.Name;
     var something = tenantInfo.Items["something"];
 }
