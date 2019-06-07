@@ -156,7 +156,7 @@ Normally Finbuckle.MultiTenant will automatically coordinate the `TenantId` prop
 
 By default attempting to add or update an entity with a different `TenantId` property throws a `MultiTenantException` during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantMismatchMode` property on the database context:
 
-* TenantMismatchMode.Throw - A `MultiTenantException' is thrown (default).
+* TenantMismatchMode.Throw - A `MultiTenantException` is thrown (default).
 * TenantMismatchMode.Ignore - The entity is added or updated without modifying its `TenantId`.
 * TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
 
@@ -164,5 +164,5 @@ By default attempting to add or update an entity with a different `TenantId` pro
 
 If the `TenantId` on an entity is manually set to null the default behavior is to overwrite the `TenantId` for adde entities or to throw a `MultiTenantException` for updated entities. This occurs during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSetMode' property on the database context:
 
-* TenantMismatchMode.Throw - For added entities the null `TenantId` will be overwritten to match the database context's current `TenantInfo`. For updated entities a `MultiTenantException` is thrown (default).
-* TenantMismatchMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
+* TenantNotSetMode.Throw - For added entities the null `TenantId` will be overwritten to match the database context's current `TenantInfo`. For updated entities a `MultiTenantException` is thrown (default).
+* TenantNotSetMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
