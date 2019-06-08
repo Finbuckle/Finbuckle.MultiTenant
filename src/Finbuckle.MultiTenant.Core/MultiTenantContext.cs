@@ -19,7 +19,7 @@ using Finbuckle.MultiTenant.Core;
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
-    /// Contains information for a specific tenant.
+    /// Contains information for the multitenant tenant, store, and strategy.
     /// </summary>
     public class MultiTenantContext
     {

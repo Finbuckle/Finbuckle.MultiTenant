@@ -72,16 +72,13 @@ namespace SharedLoginSample.Controllers
                     goto SkipToEnd;
                 }
 
-                // Manually set the MultiTenantContext using magic reflection...
-                // I should add a better way to set this in the future.
-                var multiTenantContext = HttpContext.GetMultiTenantContext();
-                multiTenantContext.GetType().GetProperty("TenantInfo").SetValue(multiTenantContext, tenantInfo);
-
-                // A lot of services were generated earlier in the pipeline without a tenant. We will establish a fresh
-                // service provider so that DI will take TenantInfo into account for things like options.
+                // Save the original TenantInfo and service provider.
+                var originalTenantInfo = HttpContext.GetMultiTenantContext()?.TenantInfo;
                 var orignalServiceProvider = HttpContext.RequestServices;
-                HttpContext.RequestServices = orignalServiceProvider.CreateScope().ServiceProvider;
 
+                // Set the new TenantInfo and reset the service provider.
+                HttpContext.TrySetTenantInfo(tenantInfo, resetServiceProvider: true);
+                
                 // Now sign in and redirect (using Identity in this example). Since TenantInfo is set the options that the signin
                 // uses internally will be for this tenant.
                 var signInManager = HttpContext.RequestServices 
@@ -96,7 +93,7 @@ namespace SharedLoginSample.Controllers
                 // In case an error signing in, reset the TenantInfo and ServiceProvider so that the
                 // view in unaffected.
                 HttpContext.RequestServices = orignalServiceProvider;
-                multiTenantContext.GetType().GetProperty("TenantInfo").SetValue(multiTenantContext, null);
+                HttpContext.TrySetTenantInfo(originalTenantInfo, resetServiceProvider: false);
             }
 
         // We should only reach this if there was a problem signing in. The view will dispay the errors.
