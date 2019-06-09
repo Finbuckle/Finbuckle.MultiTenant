@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install the Finbuckle.MultiTenant NuGet package with your method of choice.
+Install the Finbuckle.MultiTenant NuGet package.
 
 .NET Core CLI
 ```bash
@@ -14,20 +14,20 @@ Package Manager
 > Install-Package Finbuckle.MultiTenant
 ```
 
-## Usage
+## Basics
 
-Configure the services by calling `AddMultiTenant` followed by its builder methods in your app's `ConfigureServices` method. Here we are using the host strategy and in-memory store, but Finbuckle.MultiTenant comes with several other multitenant [strategies](Strategies) and [stores](Stores).
+Configure the services by calling `AddMultiTenant` followed by its builder methods in the app's `ConfigureServices` method. Here we are using the host strategy and in-memory store, but Finbuckle.MultiTenant comes with several other multitenant [strategies](Strategies) and [stores](Stores).
 
 ```cs
 public void ConfigureServices(IServiceCollection services)
 {
     ...
-    services.AddMultiTenant().WithHostStrategy().WithInMemoryStore();
+    services.AddMultiTenant().WithStrategy(...).WithInMemoryStore(...);
     ...
 }
 ```
 
-Configure the middleware by calling `UseMultiTenant` in your app's `Configure` method. Be sure to call it before calling `UseMvc` and other middleware which will use per-tenant funtionality.
+Configure the middleware by calling `UseMultiTenant` in the app's `Configure` method. Be sure to call it before calling `UseMvc` and other middleware which will use per-tenant functionality.
 
 ```cs
 public void Configure(IApplicationBuilder app)
@@ -56,7 +56,7 @@ if(tenantInfo != null)
 }
 ```
 
-The `TenantInfo` property holds basic details about a tenant and enables customization of your app on a on a per-tenant basis in any way you want.
+The `TenantInfo` property holds basic details about a tenant and enables customization of the app on a on a per-tenant basis in any way you want.
 
 Finbuckle.MultiTenant uses `TenantInfo` internally to provide built-in functionality such as [per-tenant options](Options), [per-tenant authentication](Authentication), and [per-tenant data isolation](EFCore).
 

@@ -83,12 +83,12 @@ public class Startup
         routes.MapRoute("Defaut", "{__tenant__}/{controller=Home}/{action=Index}");
     }
 }
-``` 
+```
 
 ## Host Strategy
 Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`.
 
-The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifer using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
+The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifier using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
   - `__tenant__.*` is the default if no pattern is provided and selects the first domain segment for the tenant identifier.
   - `*.__tenant__.?` selects the main domain as the tenant identifier and ignores any subdomains and the top level domain.
   - `__tenant__.example.com` will always use the subdomain for the tenant identifier, but only if there are no prior subdomains and the overall host ends with "example.com".

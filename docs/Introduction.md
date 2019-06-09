@@ -8,7 +8,7 @@ Finbuckle.MultiTenant is a multitenancy library for ASP.NET Core 2.1+. It provid
 Check out the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant) to ask a question, make a request, or check out the code!
 
 ## Sample Projects
-In addition to this documentation a variey of sample projects are available. Be sure to read the information on the index page of each
+In addition to this documentation a variety of sample projects are available. Be sure to read the information on the index page of each
 sample and the code comments in the `Startup` class.
 
 [Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample)

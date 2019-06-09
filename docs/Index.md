@@ -4,6 +4,8 @@
 
 [Core Concepts](CoreConcepts)
 
+[Configuration and Usage](ConfigurationAndUsage)
+
 [MultiTenant Strategies](Strategies)
 
 [MultiTenant Stores](Stores)

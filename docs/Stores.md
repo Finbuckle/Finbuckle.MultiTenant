@@ -6,9 +6,9 @@ Finbuckle.MultiTenant provides a simple thread safe in-memory implementation bas
 
 ## Accessing the Store at Runtime
 
-The multitenant store can be accessed at runtime to add, remote, or retreieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
+The multitenant store can be accessed at runtime to add, remote, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
 
-The multitenant store is registered as a singleton in the app's service collection. Access it via dependecy injection by including an `IMultiTenantStore` constructor parameter, action method parameter marked with `[FromService]`, or the `HttpContext.RequestServices` service provider instance.
+The multitenant store is registered as a singleton in the app's service collection. Access it via dependency injection by including an `IMultiTenantStore` constructor parameter, action method parameter marked with `[FromService]`, or the `HttpContext.RequestServices` service provider instance.
 
 ## IMultiTenantStore and Custom Stores
 All multitenant stores derive from `IMultiTenantStore` and must implement `TryAdd`, `TryRemove`, and `GetByIdentifierAsync` methods. `GetByIdentifierAsync` should return null if there is no suitable tenant match.
@@ -24,7 +24,7 @@ services.AddMultiTenant().WithStore( sp => return new MyStore());
 ```
 
 ## In-Memory Store
-Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store. By default the tenant identifier matching is case insensitive. This can be overridden by passing false to the constructor's `ignoreCase` paramater.
+Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store. By default the tenant identifier matching is case insensitive. This can be overridden by passing false to the constructor's `ignoreCase` parameter.
 
 If using with `Finbuckle.MultiTenant.AspNetCore`, configure by calling `WithInMemoryStore` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class.
 
@@ -43,7 +43,7 @@ A `ConfigurationSection` can also be used to configure the store:
 services.AddMultiTenant().WithInMemoryStore(Configuration.GetSection("InMemoryStoreConfig"))...
 ```
 
-The configuration section should use this json format:
+The configuration section should use this JSON format:
 
 ```json
 {
