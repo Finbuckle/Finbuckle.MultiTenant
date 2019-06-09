@@ -15,7 +15,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 
 Derive the database context from `MultiTenantDbContext`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor:
 
-```
+```cs
 public class BloggingDbContext : MultiTenantDbContext
 {
     public BloggingDbContext(TenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
@@ -30,7 +30,7 @@ There is also a base constructor which takes a connection string parameter inste
 
 If using multiple databases and relying on the `ConnectionString` property of the `TenantInfo` then the database context will need to configures itself in its `OnConfiguring` method using its inherited `ConnectionString` property. This property returns the connection string for the current `TenantInfo`:
 
-```
+```cs
 public class BloggingDbContext : MultiTenantDbContext
 {
    ...
@@ -48,7 +48,7 @@ public class BloggingDbContext : MultiTenantDbContext
 
 Finally, add the `[MultiTenant]` attribute to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
 
-```
+```cs
 [MultiTenant]
 public class Blog
 {
@@ -68,9 +68,9 @@ When the context is initialized, a shadow property named `TenantId` is added to 
 
 If using ASP.NET Core [configure Finbuckle.MultiTenant](GettingStarted) as desired.
 
-Next, add the desired services in the `ConfigureServices` method of your `Startup` class. If using dependency injection for the database context make sure to call `AddDbContext<T>`. Dependency injection will also inject the `TenantInfo` into the database context constructor:
+Next, add the desired services in the `ConfigureServices` method of the app's `Startup` class. If using dependency injection for the database context make sure to call `AddDbContext<T>`. Dependency injection will also inject the `TenantInfo` into the database context constructor:
 
-```
+```cs
 public class Startup
 {
     ...
@@ -93,7 +93,7 @@ Do not use any of the configuration methods that sets a database provider or con
 ## Adding Data
 Added entities are automatically associated with the current `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
-```
+```cs
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };;
 var db = new BloggingDbContext(myTenantInfo, null);
@@ -110,7 +110,7 @@ await db.SaveChangesAsync(); // Throws MultiTenantException.
 ## Querying Data
 Queries only return results associated to the `TenantInfo`:
 
-```
+```cs
 // Will only return "My Blog".
 var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlog = db.Blogs.First();
@@ -122,7 +122,7 @@ var tenantBlogs = db.Blogs.First();
 
 `IgnoreQueryFilters` can be used to bypass the filter for LINQ queries:
 
-```
+```cs
 // TenantBlogs will contain all blogs, regardless of tenant.
 var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlogs = db.Blogs.IgnoreQueryFilters().ToList(); 
@@ -133,7 +133,7 @@ The query filter is applied only at the root level of a query. Any entity classe
 ## Updating and Deleting Data
 Updated or deleted entities are checked to make sure they are associated with the `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`:
 
-```
+```cs
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };
 var db = new BloggingDbContext(myTenantInfo);

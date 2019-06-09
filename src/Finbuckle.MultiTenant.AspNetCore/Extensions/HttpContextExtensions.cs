@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant
 {
@@ -27,14 +28,34 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Returns the current MultiTenantContext or null if there is none.
         /// </summary>
-        /// <param name="context">The HttpContext<c/> instance the extension method applies to.</param>
-        /// <returns>The MultiTenantContext instance for the current tenant.</returns>
-        public static MultiTenantContext GetMultiTenantContext(this HttpContext context)
+        public static MultiTenantContext GetMultiTenantContext(this HttpContext httpContext)
         {
             object multiTenantContext = null;
-            context.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
+            httpContext.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
             
             return (MultiTenantContext)multiTenantContext;
+        }
+
+        /// <summary>
+        /// Sets the provided TenantInfo on the MultiTenantContext.
+        /// Sets StrategyInfo and StoreInfo on the MultiTenant Context to null.
+        /// Optionally resets the current dependency injection service provider.
+        /// </summary>
+        public static bool TrySetTenantInfo(this HttpContext httpContext, TenantInfo tenantInfo, bool resetServiceProvider)
+        {
+            var multitenantContext = httpContext.GetMultiTenantContext();
+
+            if(multitenantContext == null)
+                return false;
+
+            if(resetServiceProvider)
+                httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
+
+            multitenantContext.TenantInfo = tenantInfo;
+            multitenantContext.StrategyInfo = null;
+            multitenantContext.StoreInfo = null;
+
+            return true;
         }
     }
 }

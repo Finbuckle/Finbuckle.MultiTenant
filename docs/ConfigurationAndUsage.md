@@ -1,0 +1,91 @@
+# Configuration and Usage
+
+## Configuration
+Finbuckle.MultiTenant uses the standard builder pattern for its configuration in the `ConfigureServices` method of the app's `Startup` class. Order doesn't matter, but both a multitenant store and a multitenant strategy are required.
+
+```cs
+public void ConfigureServices(IServiceCollection services)
+{
+    ...
+    services.AddMultiTenant().WithStore(...).WithStrategy(...)...
+    ...
+}
+```
+
+### AddMultiTenant
+`AddMultiTenant` is an extension method on `IServiceCollection` which registers the basic dependencies needed by the library. It returns a `MultiTenantBuilder` instance on which the methods below can be called for further configuration. Each of these methods returns the same `MultiTenantBuilder` instance allowing for chaining method calls.
+
+### WithStore Variants
+Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used. See [MultiTenant Stores](Stores) for more information on each type.
+
+- WithStore&lt;TStore&gt;
+- WithEFCoreStore
+- WithInMemoryStore
+
+### WithStrategy Variants
+Adds and configures an IMultiTenantStore to the application. Only the last strategy configured will be used with the exception of the fallback strategy. See [MultiTenant Strategies](Strategies) for more information on each type.
+
+- WithStrategy&lt;TStrategy&gt;
+- WithBasePathStrategy
+- WithDelegateStrategy
+- WithFallbackStrategy
+- WithHostStrategy
+- WithRouteStrategy
+- WithStaticStrategy
+
+### WithPerTenantOptions<TOptions>
+Adds per-tenant configuration for an options class. See [Per-Tenant Options](Options) for more details.
+
+### WithRemoteAuthentication
+Configures support for multitenant OAuth and OpenIdConnect. See the relevant sections in [Per-Tenant Authentication](Authentication) for more details.
+
+## Usage
+Most of the capability enabled by Finbuckle.MultiTenant is utilized through its middleware and use the [Options pattern with per-tenant options](Options). The middleware will resolve the app's current tenant on each request using the configured strategies and stores, and the per-tenant options will alter the app's behavior as dependency injection passes the options to app components.
+
+In addition, there are a few methods available for directly accessing and settings the tenant information if needed.
+
+### UseMultiTenant
+Configures the middleware handling tenant resolution via the multitenant strategy and the multitenant store. `UseMultiTenant` should be called before `UseAuthentication` and `UseMvc` in the `Configure` method of the app's `Startup` class. Additionally, if any other middleware uses per-tenant options then that middleware should come after `UseMultiTenant`.
+
+```cs
+public void Configure(IApplicationBuilder app)
+{
+    ...
+    app.UseMultiTenant(); // Before UseAuthentication and UseMvc!
+    ...
+    app.UseAuthentication();
+    ...
+    app.UseMvc();
+}
+```
+
+### GetMultiTenantContext
+Extension method of `HttpContext` that returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null.
+
+```cs
+var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
+
+if(tenantInfo != null)
+{
+    var tenantId = tenantInfo.Id;
+    var identifier = tenantInfo.Identifier;
+    var name = tenantInfo.Name;
+    var something = tenantInfo.Items["something"];
+}
+```
+
+### TrySetTenantInfo
+Extension method of `HttpContext` that tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
+
+```cs
+var newTenantInfo = new TenantInfo(...);
+
+if(HttpContext.TrySetTenantInfo(newTenantInfo, resetServiceProvider: true))
+{
+    // This will be the new tenant.
+    var tenant = HttpContext.GetMultiTenantContext().TenantIno;
+
+    // This will regenerate the options class.
+    var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
+}
+```

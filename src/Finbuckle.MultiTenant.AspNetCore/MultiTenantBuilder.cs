@@ -96,7 +96,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using default dependency injection.
+        /// Adds and configures a IMultiTenantStore to the application using default dependency injection.
         /// </summary>>
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
@@ -106,7 +106,7 @@ namespace Microsoft.Extensions.DependencyInjection
             => WithStore<TStore>(lifetime, sp => ActivatorUtilities.CreateInstance<TStore>(sp, parameters));
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
+        /// Adds and configures a IMultiTenantStore to the application using a factory method.
         /// </summary>
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
@@ -125,7 +125,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
+        /// Adds and configures a IMultiTenantStore to the application using a factory method.
         /// </summary>
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
