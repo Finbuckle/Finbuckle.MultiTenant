@@ -16,14 +16,14 @@ public void ConfigureServices(IServiceCollection services)
 `AddMultiTenant` is an extension method on `IServiceCollection` which registers the basic dependencies needed by the library. It returns a `MultiTenantBuilder` instance on which the methods below can be called for further configuration. Each of these methods returns the same `MultiTenantBuilder` instance allowing for chaining method calls.
 
 ### WithStore Variants
-Adds and configures an IMultiTenantStore to the application. Only a the last store configured will be used. See [MultiTenant Stores](Stores) for more information on each type.
+Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used. See [MultiTenant Stores](Stores) for more information on each type.
 
 - WithStore&lt;TStore&gt;
 - WithEFCoreStore
 - WithInMemoryStore
 
 ### WithStrategy Variants
-Adds and configures an IMultiTenantStore to the application. Only a the last strategy configured will be used with the exception of the fallback strategy. See [MultiTenant Strategies](Strategies) for more information on each type.
+Adds and configures an IMultiTenantStore to the application. Only the last strategy configured will be used with the exception of the fallback strategy. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - WithStrategy&lt;TStrategy&gt;
 - WithBasePathStrategy
@@ -59,8 +59,8 @@ public void Configure(IApplicationBuilder app)
 }
 ```
 
-### HttpContext.GetMultiTenantContext
-This extension method returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null;
+### GetMultiTenantContext
+Extension method of `HttpContext` that returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null;
 
-### HttpContext.TrySetTenantInfo
-Tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any services already resolved will be resolved again under the current tenant when needed. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
+### TrySetTenantInfo
+Extension method of `HttpContext` that tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any services already resolved will be resolved again under the current tenant when needed. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
