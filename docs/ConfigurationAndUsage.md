@@ -60,7 +60,32 @@ public void Configure(IApplicationBuilder app)
 ```
 
 ### GetMultiTenantContext
-Extension method of `HttpContext` that returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null;
+Extension method of `HttpContext` that returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null.
+
+```cs
+var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
+
+if(tenantInfo != null)
+{
+    var tenantId = tenantInfo.Id;
+    var identifier = tenantInfo.Identifier;
+    var name = tenantInfo.Name;
+    var something = tenantInfo.Items["something"];
+}
+```
 
 ### TrySetTenantInfo
-Extension method of `HttpContext` that tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any services already resolved will be resolved again under the current tenant when needed. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
+Extension method of `HttpContext` that tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
+
+```cs
+var newTenantInfo = new TenantInfo(...);
+
+if(HttpContext.TrySetTenantInfo(newTenantInfo, resetServiceProvider: true))
+{
+    // This will be the new tenant.
+    var tenant = HttpContext.GetMultiTenantContext().TenantIno;
+
+    // This will regenerate the options class.
+    var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
+}
+```

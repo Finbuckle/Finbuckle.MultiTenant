@@ -42,9 +42,6 @@ public void Configure(IApplicationBuilder app)
 With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext` object accessed from the `GetMultiTenantContext` extension method. If the current tenant could not be determined then `TenantInfo` will be null.
 
 ```cs
-using Finbuckle.MultiTenant;
-...
-
 var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
 
 if(tenantInfo != null)
