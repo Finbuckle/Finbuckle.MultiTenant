@@ -2,9 +2,10 @@
     <PropertyGroup>
         <GenerateFullPaths>true</GenerateFullPaths>
 
-        <Version>3.0.1</Version>
+        <Version>3.1.0</Version>
         <Authors>Andrew White</Authors>
-        <Copyright>Copyright ©2018 Andrew White</Copyright>
+        <Copyright>Copyright ©2019 Andrew White</Copyright>
+        <PackageIconUrl>https://www.finbuckle.com/images/favicon-64x64.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://www.finbuckle.com</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
