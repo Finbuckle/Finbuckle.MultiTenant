@@ -121,6 +121,45 @@ public class MultiTenantDbContextShould
     }
 
     [Fact]
+    public void RespectExistingQueryFilter()
+    {
+        try
+        {
+            _connection.Open();
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
+            using (var db = new TestDbContextWithExistingGlobalFilter(tenant1, _options))
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+
+                var blog1 = new Blog { Title = "abc" };
+                db.Blogs.Add(blog1);
+                var post1 = new Post { Title = "post in abc", Blog = blog1 };
+                db.Posts.Add(post1);
+                var post2 = new Post { Title = "Filtered Title", Blog = blog1 };
+                db.Posts.Add(post2);
+                db.SaveChanges();
+            }
+
+            int postCount1 = 0;
+            int postCount2 = 0;
+            using (var db = new TestDbContextWithExistingGlobalFilter(tenant1, _options))
+            {
+                postCount1 = db.Posts.Count();
+                postCount2 = db.Posts.IgnoreQueryFilters().Count();
+            }
+
+            Assert.Equal(1, postCount1);
+            Assert.Equal(2, postCount2);
+        }
+        finally
+        {
+            _connection.Close();
+        }
+    }
+
+    [Fact]
     public void HandleTenantNotSetWhenAdding()
     {
         try

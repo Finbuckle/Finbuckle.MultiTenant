@@ -60,9 +60,16 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 }
 
                 // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
+
                 // where e is one of our entity types
                 // will need this ParameterExpression for next step and for final step
                 var entityParamExp = Expression.Parameter(t.ClrType, "e");
+
+                // override to match existing query paraameter if applicable
+                if(r.Metadata.QueryFilter != null)
+                {
+                    entityParamExp = r.Metadata.QueryFilter.Parameters.First();
+                }
 
                 // build up expression tree for EF.Property<string>(e, "TenantId")
                 var tenantIdExp = Expression.Constant("TenantId", typeof(string));
@@ -71,11 +78,18 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
                 // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id
                 var rightExp = Expression.Property(currentTenantInfoExpression.Body, nameof(TenantInfo.Id));
-                var equalExp = Expression.Equal(leftExp, rightExp);
+                var predicate = Expression.Equal(leftExp, rightExp);
+
+                // combine with existing filter
+                if(r.Metadata.QueryFilter != null)
+                {
+                    var originalFilter = r.Metadata.QueryFilter;
+                    predicate = Expression.AndAlso(originalFilter.Body, predicate);
+                }
 
                 // build the final expression tree
                 var delegateType = Expression.GetDelegateType(t.ClrType, typeof(bool));
-                var lambdaExp = Expression.Lambda(delegateType, equalExp, entityParamExp);
+                var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
 
                 // set the filter
                 r.HasQueryFilter(lambdaExp);

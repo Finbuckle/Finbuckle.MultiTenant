@@ -37,6 +37,24 @@ public class TestDbContext : MultiTenantDbContext
     }
 }
 
+public class TestDbContextWithExistingGlobalFilter : TestDbContext
+{
+    public TestDbContextWithExistingGlobalFilter(TenantInfo tenantInfo) : base(tenantInfo)
+    {
+    }
+
+    public TestDbContextWithExistingGlobalFilter(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Post>().HasQueryFilter(p => p.Title == "Filtered Title");
+
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
 public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext
 {
     public DbSet<ThingWithIntTenantId> Thing2s { get; set; }
