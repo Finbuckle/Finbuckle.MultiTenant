@@ -44,7 +44,23 @@ public class BloggingDbContext : MultiTenantDbContext
 }
 ```
 
->{.small} If the derived database context overrides OnModelCreating is it critical that the base class OnModelCreating is called.
+If the derived database context overrides OnModelCreating is it critical that the base class OnModelCreating is called last:
+
+```cs
+public class BloggingDbContext : MultiTenantDbContext
+{
+...
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // set a global query filter, e.g. to support soft delete
+        modelBuilder.Entity<Post>().HasQueryFilter(p => !p.IsDeleted);
+        
+        // call the base library implementation AFTER the above
+        base.OnModelCreating(modelBuilder);
+    }
+...
+}
+```
 
 Finally, add the `[MultiTenant]` attribute to entity classes which should be isolated per tenant. If an entity is common to all tenants, then do not apply the attribute:
 
