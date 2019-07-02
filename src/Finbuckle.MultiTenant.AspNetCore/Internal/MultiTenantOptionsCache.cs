@@ -14,10 +14,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
@@ -25,7 +21,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
     /// </summary>
-    internal class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
     {
         private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
 

@@ -15,8 +15,6 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options/OptionsManager.cs
 
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
