@@ -30,12 +30,12 @@ namespace Finbuckle.MultiTenant.Stores
     public class MultiTenantStoreWrapper<TStore> : IMultiTenantStore
         where TStore : IMultiTenantStore
     {
-        private readonly TStore store;
+        public TStore Store { get; }
         private readonly ILogger logger;
 
         public MultiTenantStoreWrapper(TStore store, ILogger<TStore> logger)
         {
-            this.store = store;
+            this.Store = store;
             this.logger = logger;
         }
 
@@ -50,7 +50,7 @@ namespace Finbuckle.MultiTenant.Stores
 
             try
             {
-                result = await store.TryGetAsync(id);
+                result = await Store.TryGetAsync(id);
             }
             catch (Exception e)
             {
@@ -81,7 +81,7 @@ namespace Finbuckle.MultiTenant.Stores
 
             try
             {
-                result = await store.TryGetByIdentifierAsync(identifier);
+                result = await Store.TryGetByIdentifierAsync(identifier);
             }
             catch (Exception e)
             {
@@ -136,7 +136,7 @@ namespace Finbuckle.MultiTenant.Stores
                     goto end;
                 }
 
-                result = await store.TryAddAsync(tenantInfo);
+                result = await Store.TryAddAsync(tenantInfo);
 
             }
             catch (Exception e)
@@ -169,7 +169,7 @@ namespace Finbuckle.MultiTenant.Stores
 
             try
             {
-                result = await store.TryRemoveAsync(id);
+                result = await Store.TryRemoveAsync(id);
             }
             catch (Exception e)
             {
@@ -212,7 +212,7 @@ namespace Finbuckle.MultiTenant.Stores
                     goto end;
                 }
 
-                result = await store.TryUpdateAsync(tenantInfo);
+                result = await Store.TryUpdateAsync(tenantInfo);
 
             }
             catch (Exception e)
