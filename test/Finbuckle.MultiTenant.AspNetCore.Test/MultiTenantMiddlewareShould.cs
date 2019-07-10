@@ -72,12 +72,16 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
         
-        Assert.NotNull(resolvedTenantContext.StrategyInfo);
-        Assert.NotNull(resolvedTenantContext.StrategyInfo.Strategy);
-        Assert.Equal(typeof(StaticStrategy), resolvedTenantContext.StrategyInfo.StrategyType);
-        Assert.NotNull(resolvedTenantContext.StrategyInfo.MultiTenantContext);
+        Assert.NotNull(resolvedContext.StrategyInfo);
+        Assert.NotNull(resolvedContext.StrategyInfo.Strategy);
+
+        // Test that the wrapper strategy was "unwrapped"
+        Assert.Equal(typeof(StaticStrategy), resolvedContext.StrategyInfo.StrategyType);
+        Assert.IsType<StaticStrategy>(resolvedContext.StrategyInfo.Strategy);
+        
+        Assert.NotNull(resolvedContext.StrategyInfo.MultiTenantContext);
     }
 
     [Fact]
@@ -94,12 +98,16 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
         
-        Assert.NotNull(resolvedTenantContext.StoreInfo);
-        Assert.NotNull(resolvedTenantContext.StoreInfo.Store);
-        Assert.Equal(typeof(InMemoryStore), resolvedTenantContext.StoreInfo.StoreType);
-        Assert.NotNull(resolvedTenantContext.StoreInfo.MultiTenantContext);
+        Assert.NotNull(resolvedContext.StoreInfo);
+        Assert.NotNull(resolvedContext.StoreInfo.Store);
+
+         // Test that the wrapper store was "unwrapped"
+        Assert.Equal(typeof(InMemoryStore), resolvedContext.StoreInfo.StoreType);
+        Assert.IsType<InMemoryStore>(resolvedContext.StoreInfo.Store);
+
+        Assert.NotNull(resolvedContext.StoreInfo.MultiTenantContext);
     }
 
     [Fact]

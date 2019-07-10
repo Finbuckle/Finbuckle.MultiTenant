@@ -22,12 +22,13 @@ namespace Finbuckle.MultiTenant.Strategies
     public class MultiTenantStrategyWrapper<TStrategy> : IMultiTenantStrategy
         where TStrategy : IMultiTenantStrategy
     {
-        internal readonly TStrategy strategy;
+        public TStrategy Strategy { get; }
+
         private readonly ILogger logger;
 
         public MultiTenantStrategyWrapper(TStrategy strategy, ILogger<TStrategy> logger)
         {
-            this.strategy = strategy;
+            this.Strategy = strategy;
             this.logger = logger;
         }
 
@@ -42,7 +43,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             try
             {
-                identifier = await strategy.GetIdentifierAsync(context);
+                identifier = await Strategy.GetIdentifierAsync(context);
             }
             catch (Exception e)
             {
@@ -53,7 +54,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             if(identifier != null)
             {
-                identifier = await strategy.GetIdentifierAsync(context);
+                identifier = await Strategy.GetIdentifierAsync(context);
                 Utilities.TryLogInfo(logger, $"{typeof(TStrategy)}.GetIdentifierAsync: Found identifier: \"{identifier}\".");
             }
             else

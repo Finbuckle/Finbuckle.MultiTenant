@@ -96,10 +96,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     if (store.GetType().IsGenericType &&
                         store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<>))
                     {
+                        storeInfo.Store = (IMultiTenantStore)store.GetType().GetProperty("Store").GetValue(store);
                         storeInfo.StoreType = store.GetType().GetGenericArguments().First();
                     }
                     else
                     {
+                        storeInfo.Store = store;
                         storeInfo.StoreType = store.GetType();
                     }
                     multiTenantContext.StoreInfo = storeInfo;
@@ -120,10 +122,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
             if (strategy.GetType().IsGenericType &&
                 strategy.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStrategyWrapper<>))
             {
+                strategyInfo.Strategy = (IMultiTenantStrategy)strategy.GetType().GetProperty("Strategy").GetValue(strategy);
                 strategyInfo.StrategyType = strategy.GetType().GetGenericArguments().First();
             }
             else
             {
+                strategyInfo.Strategy = strategy;
                 strategyInfo.StrategyType = strategy.GetType();
             }
             multiTenantContext.StrategyInfo = strategyInfo;
