@@ -6,7 +6,7 @@ Finbuckle.MultiTenant provides a simple thread safe in-memory implementation bas
 
 ## Accessing the Store at Runtime
 
-The multitenant store can be accessed at runtime to add, remote, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
+The multitenant store can be accessed at runtime to add, remove, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
 
 There are two ways to access the store. First, via the `Store` property on the `StoreInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()`. This property returns the actual store used to retrieve the tenant information for the current context.
 
