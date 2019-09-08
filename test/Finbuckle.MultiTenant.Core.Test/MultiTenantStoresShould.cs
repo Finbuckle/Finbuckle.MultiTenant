@@ -14,7 +14,6 @@
 
 using System;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
 public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore
@@ -147,6 +146,15 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore
         
         var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(new TenantInfo(null, null, null, null, null)).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
+    }
+
+    [Fact]
+    public virtual void ReturnFalseWhenUpdatingIfTenantIdIsNotFound()
+    {
+        var store = CreateTestStore();
+        
+        var result = store.TryUpdateAsync(new TenantInfo("not-found", null, null, null, null)).Result;
+        Assert.False(result);
     }
 
     [Fact]
