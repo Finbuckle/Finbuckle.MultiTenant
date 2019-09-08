@@ -12,7 +12,6 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
@@ -26,7 +25,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
         return PopulateTestStore(store);
     }
 
-    // Note, basic store functionality tested in MultiTenantStoreWrapperShould.cs
+    // Note, basic store functionality tested in MultiTenantStoresShould.cs
 
     private IMultiTenantStore CreateCaseSensitiveTestStore()
     {

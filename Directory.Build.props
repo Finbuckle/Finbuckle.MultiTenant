@@ -1,7 +1,5 @@
 <Project>
     <PropertyGroup>
-        <GenerateFullPaths>true</GenerateFullPaths>
-
         <Version>3.1.0</Version>
         <Authors>Andrew White</Authors>
         <Copyright>Copyright ©2019 Andrew White</Copyright>

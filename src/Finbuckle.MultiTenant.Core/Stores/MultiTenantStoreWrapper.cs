@@ -13,13 +13,8 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Core;
-using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Stores
@@ -205,10 +200,10 @@ namespace Finbuckle.MultiTenant.Stores
 
             try
             {
-                var existing = await TryGetAsync(tenantInfo.Identifier);
-                if (existing != null)
+                var existing = await TryGetAsync(tenantInfo.Id);
+                if (existing == null)
                 {
-                    Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryUpdateAsync: Tenant Identifier: \"{tenantInfo.Identifier}\" already exists.");
+                    Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryUpdateAsync: Tenant Id: \"{tenantInfo.Id}\" not found.");
                     goto end;
                 }
 
