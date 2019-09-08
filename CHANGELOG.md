@@ -1,4 +1,11 @@
-## Version 
+## Version
+**3.2.0**
+* Added support for any preexisting global query filters in `MultiTenantDbContext` and `MultiTenantIdentityDbContext`. Thanks @nbarbettini!
+* Exposed the inner stores and strategies as a property on the respective `StoreInfo` and `StrategyInfo` properties of `MultiTenantContext`. Previously you could only access the wrapper object for each. Thanks @WalternativE!
+* Fixed certain methods on `MultiTenantOptionsCache` to be external as originally intended. Thanks @chernihiv!
+* Fix a bug with `TryUpdateAsync` in the wrapper store. Thanks @steebwba!
+* Updated documentation and fixed typos. Thanks @MesfinMo!
+
 **3.1.0**
 * Added a strategy wrapper that handles validation and logging for the active strategy. When implementing `IMultiTenantStrategy` basic validation and logging are automatically provided.
 * Added the delegate strategy that accepts a lambda to return the tenant identifier. Configure by calling `WithDelegateStrategy(...)`.
