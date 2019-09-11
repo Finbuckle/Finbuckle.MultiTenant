@@ -53,8 +53,7 @@ namespace Finbuckle.MultiTenant.Strategies
             }
 
             if(identifier != null)
-            {
-                identifier = await Strategy.GetIdentifierAsync(context);
+            {                
                 Utilities.TryLogInfo(logger, $"{typeof(TStrategy)}.GetIdentifierAsync: Found identifier: \"{identifier}\".");
             }
             else
