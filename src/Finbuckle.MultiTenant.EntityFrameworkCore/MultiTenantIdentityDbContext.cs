@@ -123,8 +123,7 @@ namespace Finbuckle.MultiTenant
             // Adjust "unique" constraints on Username and Rolename.
             if (Shared.HasMultiTenantAttribute(typeof(TUser)))
             {
-                var props = new List<IProperty>(new[] { builder.Entity<TUser>().Metadata.FindProperty("NormalizedUserName") });
-                builder.Entity<TUser>().Metadata.RemoveIndex(props);
+                RemoveIndex<TUser>(builder, "NormalizedUserName");
 
                 builder.Entity<TUser>(b =>
                     b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
@@ -132,8 +131,7 @@ namespace Finbuckle.MultiTenant
 
             if (Shared.HasMultiTenantAttribute(typeof(TRole)))
             {
-                var props = new List<IProperty>(new[] { builder.Entity<TRole>().Metadata.FindProperty("NormalizedName") });
-                builder.Entity<TRole>().Metadata.RemoveIndex(props);
+                RemoveIndex<TRole>(builder, "NormalizedName");
 
                 builder.Entity<TRole>(b =>
                     b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
@@ -149,6 +147,20 @@ namespace Finbuckle.MultiTenant
                 builder.Entity<TUserLogin>(b => b.Property<string>("Id").ValueGeneratedOnAdd());
                 builder.Entity<TUserLogin>(b => b.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
             }
+        }
+
+        private static void RemoveIndex<T>(ModelBuilder builder, string propName) where T : class
+        {
+        #if NETSTANDARD2_1
+            var prop = builder.Entity<T>().Metadata.FindProperty(propName);
+            var index = builder.Entity<T>().Metadata.FindIndex(prop);
+            builder.Entity<T>().Metadata.RemoveIndex(index);
+        #elif NETSTANDARD2_0
+            var props = new List<IProperty>(new[] { builder.Entity<T>().Metadata.FindProperty(propName) });
+            builder.Entity<T>().Metadata.RemoveIndex(props);
+        #else
+            #error No valid path!
+        #endif
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

@@ -22,13 +22,9 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
-using Finbuckle.MultiTenant.AspNetCore;
 
 public class MultiTenantBuilderShould
 {
