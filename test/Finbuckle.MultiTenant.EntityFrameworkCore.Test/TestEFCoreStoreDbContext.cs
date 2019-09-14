@@ -14,7 +14,6 @@
 
 using System.Data.Common;
 using Finbuckle.MultiTenant.Stores;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>

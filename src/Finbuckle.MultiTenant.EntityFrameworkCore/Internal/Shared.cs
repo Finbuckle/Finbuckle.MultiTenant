@@ -13,7 +13,6 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -46,7 +45,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             foreach (var t in modelBuilder.Model.GetEntityTypes().
                 Where(t => HasMultiTenantAttribute(t.ClrType)))
-                
+
             {
                 var r = modelBuilder.Entity(t.ClrType);
 
@@ -66,9 +65,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var entityParamExp = Expression.Parameter(t.ClrType, "e");
 
                 // override to match existing query paraameter if applicable
-                if(r.Metadata.QueryFilter != null)
+                if (GetQueryFilter(r) != null)
                 {
-                    entityParamExp = r.Metadata.QueryFilter.Parameters.First();
+                    entityParamExp = GetQueryFilter(r).Parameters.First();
                 }
 
                 // build up expression tree for EF.Property<string>(e, "TenantId")
@@ -81,9 +80,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var predicate = Expression.Equal(leftExp, rightExp);
 
                 // combine with existing filter
-                if(r.Metadata.QueryFilter != null)
+                if (GetQueryFilter(r) != null)
                 {
-                    var originalFilter = r.Metadata.QueryFilter;
+                    var originalFilter = GetQueryFilter(r);
                     predicate = Expression.AndAlso(originalFilter.Body, predicate);
                 }
 
@@ -94,6 +93,17 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 // set the filter
                 r.HasQueryFilter(lambdaExp);
             }
+        }
+
+        private static LambdaExpression GetQueryFilter(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder r)
+        {
+            #if NETSTANDARD2_1
+                return r.Metadata.GetQueryFilter();
+            #elif NETSTANDARD2_0
+                return r.Metadata.QueryFilter;
+            #else
+                #error No valid path!
+            #endif
         }
 
         public static bool HasMultiTenantAttribute(Type t)
