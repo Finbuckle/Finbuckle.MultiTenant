@@ -10,14 +10,12 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
       <ItemGroup>
-        <!-- <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-preview9.19423.6" /> -->
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0-preview9.19424.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.0.0-rc1.19457.4" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
       <ItemGroup>
-        <!-- <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" /> -->
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.0" />
       </ItemGroup>
     </When>
   </Choose>
