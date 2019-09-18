@@ -17,10 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant.Options
 {
     /// <summary>
     /// Implementation of IOptionsFactory.
@@ -55,7 +54,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 {
                     namedSetup.Configure(name, options);
                 }
-                else if (name == Options.DefaultName)
+                else if (name == Microsoft.Extensions.Options.Options.DefaultName)
                 {
                     setup.Configure(options);
                 }

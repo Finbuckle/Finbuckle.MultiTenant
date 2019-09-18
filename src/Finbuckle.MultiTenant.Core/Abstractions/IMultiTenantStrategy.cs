@@ -12,12 +12,20 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Core;
+using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant
 {
-    public interface IMultiTenantContextAccessor
+    /// <summary>
+    /// The interface for determining the tenant idenfitider.
+    /// </summary>
+    public interface IMultiTenantStrategy
     {
-        MultiTenantContext MultiTenantContext { get; }
+        /// <summary>
+        ///  Method for implemenations to control how the identifier is determined.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        Task<string> GetIdentifierAsync(object context);
     }
 }

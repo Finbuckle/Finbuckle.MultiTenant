@@ -12,13 +12,24 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Data.Common;
-using Finbuckle.MultiTenant.Stores;
-using Microsoft.EntityFrameworkCore;
+using System;
+using Finbuckle.MultiTenant.Strategies;
+using Xunit;
 
-public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
+public class StaticStrategyShould
 {
-    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
+    [Theory]
+    [InlineData("initech")]
+    [InlineData("Initech")] // maintain case
+    [InlineData("")] // empty string
+    [InlineData("    ")] // whitespace
+    [InlineData(null)] // null
+    public async void ReturnExpectedIdentifier(string staticIdentifier)
     {
+        var strategy = new StaticStrategy(staticIdentifier);
+
+        var identifier = await strategy.GetIdentifierAsync(new Object());
+
+        Assert.Equal(staticIdentifier, identifier);
     }
 }

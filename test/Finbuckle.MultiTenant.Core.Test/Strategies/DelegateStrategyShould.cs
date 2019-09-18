@@ -13,10 +13,7 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Xunit;
 

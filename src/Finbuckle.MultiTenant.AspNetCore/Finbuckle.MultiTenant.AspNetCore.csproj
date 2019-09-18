@@ -1,18 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
 
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
-  
+
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+  </ItemGroup>
+
+  <!-- <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="[2.1.0,3)" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="[2.1.0,3)" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="[2.1.0,3)" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="[2.1.0,3)" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="[2.1.0,3)" />
     <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
-  </ItemGroup>
+  </ItemGroup> -->
 </Project>

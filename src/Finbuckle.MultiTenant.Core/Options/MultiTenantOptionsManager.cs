@@ -17,7 +17,7 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant.Options
 {
     /// <summary>
     /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
@@ -42,13 +42,13 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             get
             {
-                return Get(Options.DefaultName);
+                return Get(Microsoft.Extensions.Options.Options.DefaultName);
             }
         }
 
         public virtual TOptions Get(string name)
         {
-            name = name ?? Options.DefaultName;
+            name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
 
             // Store the options in our instance cache.
             return _cache.GetOrAdd(name, () => _factory.Create(name));

@@ -13,12 +13,10 @@
 //    limitations under the License.
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -34,9 +32,9 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.TryAdd(name, options);
@@ -56,9 +54,9 @@ public class MultiTenantOptionsCacheShould
     public void HandleNullMultiTenantContextOnAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options, ensure no exception caused by null MultiTenantContext.
         var result = cache.TryAdd("", options);
@@ -69,9 +67,9 @@ public class MultiTenantOptionsCacheShould
     public void HandleNullMultiTenantContextOnGetOrAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options, ensure no exception caused by null MultiTenantContext.
         var result = cache.GetOrAdd("", () => options);
@@ -88,12 +86,10 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
-        options.Cookie.Name = "a_name";
-        var options2 = new CookieAuthenticationOptions();
-        options2.Cookie.Name = "diff_name";
+        var options = new InMemoryStoreOptions();
+        var options2 = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.GetOrAdd(name, () => options);
@@ -114,7 +110,7 @@ public class MultiTenantOptionsCacheShould
     {
         var tc = new MultiTenantContext();
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null));
     }
@@ -125,7 +121,7 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         var tca = new TestMultiTenantContextAccessor(tc);
 
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<CookieAuthenticationOptions>(null));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<InMemoryStoreOptions>(null));
     }
 
     [Theory]
@@ -138,9 +134,9 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.TryAdd(name, options);
@@ -156,7 +152,7 @@ public class MultiTenantOptionsCacheShould
         // Remove named options for current tenant.
         result = cache.TryRemove(name);
         Assert.True(result);
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<InMemoryStoreOptions>>)cache.GetType().
             GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
             GetValue(cache);
 
@@ -181,9 +177,9 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.TryAdd("", options);
@@ -199,7 +195,7 @@ public class MultiTenantOptionsCacheShould
         cache.Clear();
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<InMemoryStoreOptions>>)cache.GetType().
             GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
             GetValue(cache);
 
@@ -221,9 +217,9 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.TryAdd("", options);
@@ -238,7 +234,7 @@ public class MultiTenantOptionsCacheShould
         cache.Clear("test-id-123");
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<InMemoryStoreOptions>>)cache.GetType().
             GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
             GetValue(cache);
 
@@ -259,9 +255,9 @@ public class MultiTenantOptionsCacheShould
         var tc = new MultiTenantContext();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<CookieAuthenticationOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
 
-        var options = new CookieAuthenticationOptions();
+        var options = new InMemoryStoreOptions();
 
         // Add new options.
         var result = cache.TryAdd("", options);
@@ -276,7 +272,7 @@ public class MultiTenantOptionsCacheShould
         cache.ClearAll();
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<CookieAuthenticationOptions>>)cache.GetType().
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<InMemoryStoreOptions>>)cache.GetType().
             GetField("map", BindingFlags.NonPublic | BindingFlags.Instance).
             GetValue(cache);
 

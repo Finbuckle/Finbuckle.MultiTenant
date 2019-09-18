@@ -21,6 +21,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
+public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
+{
+    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
+    {
+    }
+}
+
+public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
+{
+    public string Id { get; set; }
+    public string Identifier { get; set; }
+    public string Name { get; set; }
+    public string ConnectionString { get; set; }
+}
+
 public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
 {
     protected override IMultiTenantStore CreateTestStore()
