@@ -16,7 +16,7 @@ using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant.Options
 {
     /// <summary>
     /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
@@ -81,7 +81,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 throw new ArgumentNullException(nameof(createOptions));
             }
 
-            name = name ?? Options.DefaultName;
+            name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
             var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
             var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
@@ -96,7 +96,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>True if the options was added to the cache for the current tenant.</returns>
         public bool TryAdd(string name, TOptions options)
         {
-            name = name ?? Options.DefaultName;
+            name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
             var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
             var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
@@ -110,7 +110,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <returns>True if the options was removed from the cache for the current tenant.</returns>
         public bool TryRemove(string name)
         {
-            name = name ?? Options.DefaultName;
+            name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
             var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
             var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 

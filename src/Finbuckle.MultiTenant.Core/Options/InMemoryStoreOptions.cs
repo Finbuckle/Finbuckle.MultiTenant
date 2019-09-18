@@ -12,21 +12,25 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant.Options
 {
     /// <summary>
-    /// The interface for determining the tenant idenfitider.
+    /// Holds data for configuring an InMemoryStore.
     /// </summary>
-    public interface IMultiTenantStrategy
+    public class InMemoryStoreOptions
     {
-        /// <summary>
-        ///  Method for implemenations to control how the identifier is determined.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        Task<string> GetIdentifierAsync(object context);
+        public string DefaultConnectionString { get; set; }
+        public TenantConfiguration[] TenantConfigurations { get; set; }
+
+        public class TenantConfiguration
+        {
+            public string Id { get; set; }
+            public string Identifier { get; set; }
+            public string Name { get; set; }
+            public string ConnectionString { get; set; }
+            public Dictionary<string, string> Items { get; set; }
+        }
     }
 }

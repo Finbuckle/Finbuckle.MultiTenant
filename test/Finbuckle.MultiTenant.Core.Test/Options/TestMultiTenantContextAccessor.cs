@@ -12,27 +12,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.Strategies;
-using Xunit;
 
-public class StaticStrategyShould
+public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor
 {
-    [Theory]
-    [InlineData("initech")]
-    [InlineData("Initech")] // maintain case
-    [InlineData("")] // empty string
-    [InlineData("    ")] // whitespace
-    [InlineData(null)] // null
-    public async void ReturnExpectedIdentifier(string staticIdentifier)
+    private readonly MultiTenantContext multiTenantContext;
+
+    public TestMultiTenantContextAccessor(MultiTenantContext multiTenantContext)
     {
-        var strategy = new StaticStrategy(staticIdentifier);
-
-        var identifier = await strategy.GetIdentifierAsync(new Object());
-
-        Assert.Equal(staticIdentifier, identifier);
+        this.multiTenantContext = multiTenantContext;
     }
+
+    public MultiTenantContext MultiTenantContext => multiTenantContext;
 }

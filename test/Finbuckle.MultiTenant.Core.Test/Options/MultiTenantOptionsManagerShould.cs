@@ -13,15 +13,12 @@
 //    limitations under the License.
 
 using System;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.DependencyInjection;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
-public partial class MultiTenantOptionsManagerShould
+public class MultiTenantOptionsManagerShould
 {
     [Theory]
     [InlineData("OptionName1")]
@@ -74,5 +71,28 @@ public partial class MultiTenantOptionsManagerShould
         manager.Reset();
 
         mock.Verify(i => i.Clear(), Times.Once);
+    }
+
+    public class TestOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    {
+        public virtual void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual TOptions GetOrAdd(string name, Func<TOptions> createOptions)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool TryAdd(string name, TOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool TryRemove(string name)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

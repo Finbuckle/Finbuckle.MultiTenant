@@ -14,8 +14,7 @@
 
 using System;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -34,17 +33,17 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
-        services.Configure<CookieAuthenticationOptions>(name, o => o.Cookie.Name = $"{name}_begin");
-        services.PostConfigure<CookieAuthenticationOptions>(name, o => o.Cookie.Name += "end");
+        services.Configure<InMemoryStoreOptions>(name, o => o.DefaultConnectionString = $"{name}_begin");
+        services.PostConfigure<InMemoryStoreOptions>(name, o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
+        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions>>(sp, new [] { tenantConfig });
 
         var options = factory.Create(name);
-        Assert.Equal($"{name}_begin_{ti.Id}_end", options.Cookie.Name);
+        Assert.Equal($"{name}_begin_{ti.Id}_end", options.DefaultConnectionString);
     }
 
     [Fact]
@@ -54,17 +53,17 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
-        services.Configure<CookieAuthenticationOptions>(o => o.Cookie.Name = "begin");
-        services.PostConfigure<CookieAuthenticationOptions>(o => o.Cookie.Name += "end");
+        services.Configure<InMemoryStoreOptions>(o => o.DefaultConnectionString = "begin");
+        services.PostConfigure<InMemoryStoreOptions>(o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
+        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions>>(sp, new [] { tenantConfig });
 
         var options = factory.Create("");
-        Assert.Equal($"beginend", options.Cookie.Name);
+        Assert.Equal($"beginend", options.DefaultConnectionString);
     }
 
     [Fact]
@@ -74,16 +73,16 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor>(_sp => tca);
-        services.Configure<CookieAuthenticationOptions>(o => o.Cookie.Name = "begin");
-        services.PostConfigure<CookieAuthenticationOptions>(o => o.Cookie.Name += "end");
+        services.Configure<InMemoryStoreOptions>(o => o.DefaultConnectionString = "begin");
+        services.PostConfigure<InMemoryStoreOptions>(o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<CookieAuthenticationOptions, TenantInfo> tenantConfig = (o, _ti) => o.Cookie.Name += $"_{_ti.Id}_";
+        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<CookieAuthenticationOptions>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions>>(sp, new [] { tenantConfig });
 
         var options = factory.Create("");
-        Assert.Equal($"beginend", options.Cookie.Name);
+        Assert.Equal($"beginend", options.DefaultConnectionString);
     }
 }

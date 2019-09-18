@@ -12,12 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Data.Common;
 using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

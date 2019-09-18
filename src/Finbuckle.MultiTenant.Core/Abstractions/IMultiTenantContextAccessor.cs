@@ -12,12 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Stores;
-
-public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
+namespace Finbuckle.MultiTenant
 {
-    public string Id { get; set; }
-    public string Identifier { get; set; }
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
+    public interface IMultiTenantContextAccessor
+    {
+        MultiTenantContext MultiTenantContext { get; }
+    }
 }
