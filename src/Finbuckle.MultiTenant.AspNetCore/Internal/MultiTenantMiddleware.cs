@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
@@ -30,9 +31,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
     {
         private readonly RequestDelegate next;
 
-        public MultiTenantMiddleware(RequestDelegate next)
+        internal static IServiceProvider ApplicationServices { get; set; }
+
+        public MultiTenantMiddleware(RequestDelegate next, IServiceProvider applicationService)
         {
             this.next = next;
+            ApplicationServices = applicationService;
         }
 
         public async Task Invoke(HttpContext context)
