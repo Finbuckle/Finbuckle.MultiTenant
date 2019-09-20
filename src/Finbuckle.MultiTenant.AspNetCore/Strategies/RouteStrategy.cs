@@ -57,11 +57,11 @@ namespace Finbuckle.MultiTenant.Strategies
             // Done here rather than at startup so that order doesn't matter in ConfigureServices.
             if (router == null)
             {
-                var rb = new MultiTenantRouteBuilder(httpContext.RequestServices);
+                var rb = new MultiTenantRouteBuilder(MultiTenantMiddleware.ApplicationServices);
                 // Apply explicit routes.
                 configRoutes(rb);
                 // Insert attribute based routes.
-                rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(httpContext.RequestServices));
+                rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(MultiTenantMiddleware.ApplicationServices));
 
                 router = rb.Build();
             }

@@ -48,7 +48,7 @@ public class MultiTenantMiddlewareShould
 
         var context = CreateHttpContextMock(sp).Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -68,8 +68,7 @@ public class MultiTenantMiddlewareShould
         sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
-
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -95,7 +94,7 @@ public class MultiTenantMiddlewareShould
 
         var context = CreateHttpContextMock(sp).Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -121,7 +120,7 @@ public class MultiTenantMiddlewareShould
         var mock = CreateHttpContextMock(sp);
         var context = mock.Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -141,7 +140,7 @@ public class MultiTenantMiddlewareShould
         var mock = CreateHttpContextMock(sp);
         var context = mock.Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -161,7 +160,7 @@ public class MultiTenantMiddlewareShould
         var mock = CreateHttpContextMock(sp);
         var context = mock.Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
 
         var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
@@ -191,7 +190,7 @@ public class MultiTenantMiddlewareShould
         var mock = CreateHttpContextMock(sp);
         var context = mock.Object;
 
-        var mw = new MultiTenantMiddleware(null);
+        var mw = new MultiTenantMiddleware(null, null);
         mw.Invoke(context).Wait();
         remoteResolverMock.Verify(r => r.GetIdentifierAsync(context));
 
