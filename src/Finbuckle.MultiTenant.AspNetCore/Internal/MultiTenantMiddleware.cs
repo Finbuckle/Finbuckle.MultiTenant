@@ -29,12 +29,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
     {
         private readonly RequestDelegate next;
 
-        internal static IServiceProvider ApplicationServices { get; set; }
-
         public MultiTenantMiddleware(RequestDelegate next, IServiceProvider applicationService)
         {
             this.next = next;
-            ApplicationServices = applicationService;
         }
 
         public async Task Invoke(HttpContext context)

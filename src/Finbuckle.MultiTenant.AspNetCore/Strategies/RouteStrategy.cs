@@ -12,15 +12,15 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+#if NETCOREAPP2_1 || NETCOREAPP2_2 // Entire file.
+
 using System;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
@@ -87,3 +87,5 @@ namespace Finbuckle.MultiTenant.Strategies
         }
     }
 }
+
+#endif

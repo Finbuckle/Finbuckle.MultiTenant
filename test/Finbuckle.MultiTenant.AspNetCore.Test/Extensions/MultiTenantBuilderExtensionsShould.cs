@@ -22,6 +22,9 @@ using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Moq;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 public class MultiTenantBuilderExtensionsShould
 {
@@ -75,6 +78,8 @@ public class MultiTenantBuilderExtensionsShould
     public void AddRouteStrategy()
     {
         var services = new ServiceCollection();
+        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
+        services.AddSingleton<IActionDescriptorCollectionProvider>(adcp);
         var builder = new FinbuckleMultiTenantBuilder(services);
         builder.WithRouteStrategy("routeParam", cr => cr.MapRoute("test", "test"));
         var sp = services.BuildServiceProvider();

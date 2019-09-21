@@ -1,12 +1,16 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     internal class MultiTenantAuthenticationService : AuthenticationService
     {
-        public MultiTenantAuthenticationService(IAuthenticationSchemeProvider schemes, IAuthenticationHandlerProvider handlers, IClaimsTransformation transform) : base(schemes, handlers, transform)
+        public MultiTenantAuthenticationService(IAuthenticationSchemeProvider schemes,
+                                                IAuthenticationHandlerProvider handlers,
+                                                IClaimsTransformation transform,
+                                                IOptions<AuthenticationOptions> options) : base(schemes, handlers, transform, options)
         {
         }
 
