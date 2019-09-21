@@ -22,6 +22,7 @@ using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,7 +80,8 @@ public class RouteStrategyShould
     public void ThrowIfContextIsNotHttpContext()
     {
         var context = new Object();
-        var strategy = new RouteStrategy("__tenant__", configTestRoute);
+        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
+        var strategy = new RouteStrategy("__tenant__", configTestRoute, adcp);
 
         Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
     }
@@ -104,6 +106,7 @@ public class RouteStrategyShould
     [InlineData(" ")]
     public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
     {
-        Assert.Throws<ArgumentException>(() => new RouteStrategy(testString, configTestRoute));
+        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
+        Assert.Throws<ArgumentException>(() => new RouteStrategy(testString, configTestRoute, adcp));
     }
 }

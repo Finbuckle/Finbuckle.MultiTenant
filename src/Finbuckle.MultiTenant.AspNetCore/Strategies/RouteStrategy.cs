@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -28,8 +29,10 @@ namespace Finbuckle.MultiTenant.Strategies
         internal readonly string tenantParam;
         internal IRouter router;
         internal readonly Action<IRouteBuilder> configRoutes;
+        private readonly IActionDescriptorCollectionProvider actionDescriptorCollectionProvider;
+        private int actionDescriptorsVersion = -1;
 
-        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes)
+        public RouteStrategy(string tenantParam, Action<IRouteBuilder> configRoutes, IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
@@ -43,6 +46,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             this.tenantParam = tenantParam;
             this.configRoutes = configRoutes;
+            this.actionDescriptorCollectionProvider = actionDescriptorCollectionProvider ?? throw new ArgumentNullException(nameof(actionDescriptorCollectionProvider));
         }
 
         public async Task<string> GetIdentifierAsync(object context)
@@ -53,15 +57,21 @@ namespace Finbuckle.MultiTenant.Strategies
 
             var httpContext = context as HttpContext;
 
+            // Detect if app model changed (eg Razor Pages file update)
+            if (actionDescriptorsVersion != actionDescriptorCollectionProvider.ActionDescriptors.Version)
+            {
+                actionDescriptorsVersion = actionDescriptorCollectionProvider.ActionDescriptors.Version;
+                router = null;
+            }
+
             // Create the IRouter if not yet created.
-            // Done here rather than at startup so that order doesn't matter in ConfigureServices.
             if (router == null)
             {
-                var rb = new MultiTenantRouteBuilder(MultiTenantMiddleware.ApplicationServices);
+                var rb = new MultiTenantRouteBuilder(httpContext.RequestServices);
                 // Apply explicit routes.
                 configRoutes(rb);
                 // Insert attribute based routes.
-                rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(MultiTenantMiddleware.ApplicationServices));
+                rb.Routes.Insert(0, AttributeRouting.CreateAttributeMegaRoute(httpContext.RequestServices));
 
                 router = rb.Build();
             }
