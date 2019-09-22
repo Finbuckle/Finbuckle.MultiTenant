@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.2;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
 
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
@@ -18,16 +18,11 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.0.0-rc1.19457.4" />
       </ItemGroup>
     </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.2' " >
+    <When Condition=" '$(TargetFramework)' == 'netstandard2.0' " >
       <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' " >
-      <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.1.0" />
       </ItemGroup>
     </When>
   </Choose>
