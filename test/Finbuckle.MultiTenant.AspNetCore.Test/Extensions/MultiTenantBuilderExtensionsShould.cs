@@ -185,18 +185,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder(services);
         Assert.Throws<ArgumentException>(()
-            => builder.WithRouteStrategy(null, rb => rb.GetType()));
-    }
-
-    [Fact]
-    public void ThrowIfNullRouteConfigAddingRouteStrategy()
-    {
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        Assert.Throws<ArgumentNullException>(()
             => builder.WithRouteStrategy(null));
-        Assert.Throws<ArgumentNullException>(()
-            => builder.WithRouteStrategy("param", null));
     }
 }
 
