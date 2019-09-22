@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#if NETCOREAPP2_1 || NETCOREAPP2_2 // Entire file.
+#if NETCOREAPP2_1 || NETCOREAPP2_2
 
 using System;
 using System.Threading.Tasks;
@@ -84,6 +84,45 @@ namespace Finbuckle.MultiTenant.Strategies
             routeContext.RouteData?.Values.TryGetValue(tenantParam, out identifier);
 
             return identifier as string;
+        }
+    }
+}
+
+#else
+
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+
+namespace Finbuckle.MultiTenant.Strategies
+{
+    public class RouteStrategy : IMultiTenantStrategy
+    {
+        internal readonly string tenantParam;
+
+        public RouteStrategy(string tenantParam)
+        {
+            if (string.IsNullOrWhiteSpace(tenantParam))
+            {
+                throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam));
+            }
+
+            this.tenantParam = tenantParam;
+        }
+
+        public async Task<string> GetIdentifierAsync(object context)
+        {
+
+            if (!(context is HttpContext))
+                throw new MultiTenantException(null,
+                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
+
+            var httpContext = context as HttpContext;
+
+            object identifier = null;
+            httpContext.Request.RouteValues.TryGetValue(tenantParam, out identifier);
+
+            return await Task.FromResult(identifier as string);
         }
     }
 }

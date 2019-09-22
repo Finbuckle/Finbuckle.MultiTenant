@@ -12,15 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+#if NETCOREAPP2_2 || NETCOREAPP2_1
+
 using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Microsoft.Extensions.Options;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Moq;
@@ -108,3 +106,98 @@ public class MultiTenantBuilderExtensionsShould
             => builder.WithRouteStrategy("param", null));
     }
 }
+
+#else
+
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Strategies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Moq;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+
+public class MultiTenantBuilderExtensionsShould
+{
+    [Fact]
+    public void AddRemoteAuthenticationServices()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        services.AddAuthentication();
+        builder.WithRemoteAuthentication();
+        var sp = services.BuildServiceProvider();
+
+        var authService = sp.GetRequiredService<IAuthenticationService>(); // Throw fails
+        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throw fails
+    }
+
+    [Fact]
+    public void AddBasePathStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        builder.WithBasePathStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<BasePathStrategy>>(strategy);
+    }
+
+    [Fact]
+    public void AddHostStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        builder.WithHostStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<HostStrategy>>(strategy);
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingHostStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        Assert.Throws<ArgumentException>(()
+            => builder.WithHostStrategy(null));
+    }
+
+    [Fact]
+    public void AddRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        builder.WithRouteStrategy("routeParam");
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
+    }
+
+    [Fact]
+    public void ThrowIfNullParamAddingRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        Assert.Throws<ArgumentException>(()
+            => builder.WithRouteStrategy(null, rb => rb.GetType()));
+    }
+
+    [Fact]
+    public void ThrowIfNullRouteConfigAddingRouteStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        Assert.Throws<ArgumentNullException>(()
+            => builder.WithRouteStrategy(null));
+        Assert.Throws<ArgumentNullException>(()
+            => builder.WithRouteStrategy("param", null));
+    }
+}
+
+#endif

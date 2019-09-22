@@ -12,12 +12,11 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+#if NETCOREAPP2_2 || NETCOREAPP2_1
+
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -110,3 +109,103 @@ public class RouteStrategyShould
         Assert.Throws<ArgumentException>(() => new RouteStrategy(testString, configTestRoute, adcp));
     }
 }
+
+#else
+
+using System;
+using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Strategies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Xunit;
+
+public class RouteStrategyShould
+{
+    internal void configTestRoute(Microsoft.AspNetCore.Routing.IRouteBuilder routes)
+    {
+        routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
+    }
+
+    [Theory]
+    [InlineData("/initech", "initech", "initech")]
+    [InlineData("/", "initech", "")]
+    public async Task ReturnExpectedIdentifier(string path, string identifier, string expected)
+    {
+        Action<IRouteBuilder> configRoutes = (IRouteBuilder rb) => rb.MapRoute("testRoute", "{__tenant__}");
+        IWebHostBuilder hostBuilder = GetTestHostBuilder(identifier, configRoutes);
+
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync(path);
+            Assert.Equal(expected, response);
+        }
+    }
+
+    private static IWebHostBuilder GetTestHostBuilder(string identifier, Action<IRouteBuilder> configRoutes)
+    {
+        return new WebHostBuilder()
+                    .ConfigureServices(services =>
+                    {
+                        services.AddMultiTenant().WithRouteStrategy(configRoutes).WithInMemoryStore();
+                        services.AddMvc();
+                    })
+                    .Configure(app =>
+                    {
+                        app.UseMultiTenant();
+                        app.Run(async context =>
+                        {
+                            if (context.GetMultiTenantContext().TenantInfo != null)
+                            {
+                                await context.Response.WriteAsync(context.GetMultiTenantContext().TenantInfo.Id);
+                            }
+                        });
+
+                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
+                        store.TryAddAsync(new TenantInfo(identifier, identifier, null, null, null)).Wait();
+                    });
+    }
+
+    [Fact]
+    public void ThrowIfContextIsNotHttpContext()
+    {
+        var context = new Object();
+        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
+        var strategy = new RouteStrategy("__tenant__", configTestRoute, adcp);
+
+        Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
+    }
+
+    [Fact]
+    public async Task ReturnNullIfNoRouteParamMatch()
+    {
+        Action<IRouteBuilder> configRoutes = (IRouteBuilder rb) => rb.MapRoute("testRoute", "{controller}");
+        IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant", configRoutes);
+
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync("/test_tenant");
+            Assert.Equal("", response);
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
+    {
+        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
+        Assert.Throws<ArgumentException>(() => new RouteStrategy(testString, configTestRoute, adcp));
+    }
+}
+
+#endif
