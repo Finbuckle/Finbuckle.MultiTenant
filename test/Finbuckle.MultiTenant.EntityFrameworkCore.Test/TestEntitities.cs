@@ -14,8 +14,6 @@
 
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Finbuckle.MultiTenant.Core;
 using System.ComponentModel.DataAnnotations;
 using Finbuckle.MultiTenant;
 

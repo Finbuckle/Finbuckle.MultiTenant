@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 
 namespace Finbuckle.MultiTenant.AspNetCore

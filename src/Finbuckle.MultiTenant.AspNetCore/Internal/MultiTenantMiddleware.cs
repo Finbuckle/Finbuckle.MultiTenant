@@ -17,10 +17,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -31,12 +29,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
     {
         private readonly RequestDelegate next;
 
-        internal static IServiceProvider ApplicationServices { get; set; }
-
         public MultiTenantMiddleware(RequestDelegate next, IServiceProvider applicationService)
         {
             this.next = next;
-            ApplicationServices = applicationService;
         }
 
         public async Task Invoke(HttpContext context)
