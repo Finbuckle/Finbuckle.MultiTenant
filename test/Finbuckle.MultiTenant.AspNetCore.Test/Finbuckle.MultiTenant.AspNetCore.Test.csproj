@@ -19,7 +19,7 @@
     <When Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
       <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0-rc1.19457.4" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">

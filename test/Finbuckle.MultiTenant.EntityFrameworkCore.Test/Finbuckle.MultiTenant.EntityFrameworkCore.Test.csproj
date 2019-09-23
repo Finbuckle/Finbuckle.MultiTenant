@@ -13,7 +13,7 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0-rc1.19456.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.2' OR '$(TargetFramework)' == 'netcoreapp2.1' ">
