@@ -17,33 +17,37 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.AspNe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{78DD95B5-E466-4ED0-8824-36F78AB08174}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticStrategySample", "samples\StaticStrategySample\StaticStrategySample.csproj", "{4C8D453C-46F6-40A7-9DD1-E5D4C35BA2E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticStrategySample", "samples\ASP.NET Core 2\StaticStrategySample\StaticStrategySample.csproj", "{4C8D453C-46F6-40A7-9DD1-E5D4C35BA2E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasePathStrategySample", "samples\BasePathStrategySample\BasePathStrategySample.csproj", "{1BB62455-E955-4F06-B5A5-ED20D86C5012}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasePathStrategySample", "samples\ASP.NET Core 2\BasePathStrategySample\BasePathStrategySample.csproj", "{1BB62455-E955-4F06-B5A5-ED20D86C5012}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteStrategySample", "samples\RouteStrategySample\RouteStrategySample.csproj", "{144E4275-03C2-4582-8897-40D354973CB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteStrategySample", "samples\ASP.NET Core 2\RouteStrategySample\RouteStrategySample.csproj", "{144E4275-03C2-4582-8897-40D354973CB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostStrategySample", "samples\HostStrategySample\HostStrategySample.csproj", "{7DE21B6E-3A23-458F-AACF-B24251C45145}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostStrategySample", "samples\ASP.NET Core 2\HostStrategySample\HostStrategySample.csproj", "{7DE21B6E-3A23-458F-AACF-B24251C45145}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Core", "src\Finbuckle.MultiTenant.Core\Finbuckle.MultiTenant.Core.csproj", "{91057C7C-F9D3-42AF-86FC-6507BB75ADFD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Core.Test", "test\Finbuckle.MultiTenant.Core.Test\Finbuckle.MultiTenant.Core.Test.csproj", "{4B3A1C30-D42B-43F0-8541-4AB5B51CD05C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationOptionsSample", "samples\AuthenticationOptionsSample\AuthenticationOptionsSample.csproj", "{AE28E953-59A3-4E8A-AEF2-88DBA1DB9564}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticationOptionsSample", "samples\ASP.NET Core 2\AuthenticationOptionsSample\AuthenticationOptionsSample.csproj", "{AE28E953-59A3-4E8A-AEF2-88DBA1DB9564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataIsolationSample", "samples\DataIsolationSample\DataIsolationSample.csproj", "{58453662-5F28-408F-B30D-2736C621A664}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataIsolationSample", "samples\ASP.NET Core 2\DataIsolationSample\DataIsolationSample.csproj", "{58453662-5F28-408F-B30D-2736C621A664}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant", "src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj", "{9BA8381A-5E44-4571-9CF1-F4469ECEBB02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityDataIsolationSample", "samples\IdentityDataIsolationSample\IdentityDataIsolationSample.csproj", "{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityDataIsolationSample", "samples\ASP.NET Core 2\IdentityDataIsolationSample\IdentityDataIsolationSample.csproj", "{AA57B76D-83F5-49E2-AF15-D00F13BEB38C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreStoreSample", "samples\EFCoreStoreSample\EFCoreStoreSample.csproj", "{BB05A5AD-B639-4153-AFD5-A79D0D2B8599}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreStoreSample", "samples\ASP.NET Core 2\EFCoreStoreSample\EFCoreStoreSample.csproj", "{BB05A5AD-B639-4153-AFD5-A79D0D2B8599}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLoginSample", "samples\SharedLoginSample\SharedLoginSample.csproj", "{496A332B-570A-40BD-A6ED-BE87999EBB58}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLoginSample", "samples\ASP.NET Core 2\SharedLoginSample\SharedLoginSample.csproj", "{496A332B-570A-40BD-A6ED-BE87999EBB58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelegateStrategySample", "samples\DelegateStrategySample\DelegateStrategySample.csproj", "{B265A105-44F2-4FE3-828C-EC1EB62D1A39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelegateStrategySample", "samples\ASP.NET Core 2\DelegateStrategySample\DelegateStrategySample.csproj", "{B265A105-44F2-4FE3-828C-EC1EB62D1A39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallbackStrategySample", "samples\FallbackStrategySample\FallbackStrategySample.csproj", "{D286E1C0-9788-4C85-8C8B-B0E90B75A185}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallbackStrategySample", "samples\ASP.NET Core 2\FallbackStrategySample\FallbackStrategySample.csproj", "{D286E1C0-9788-4C85-8C8B-B0E90B75A185}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core 3", "ASP.NET Core 3", "{BD5BD485-39EB-4174-84CC-0BC0E7366462}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteStrategySample", "samples\ASP.NET Core 3\RouteStrategySample\RouteStrategySample.csproj", "{4EEDD9EF-4DDC-486C-8387-97E2960E2324}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -274,6 +278,18 @@ Global
 		{D286E1C0-9788-4C85-8C8B-B0E90B75A185}.Release|x64.Build.0 = Release|Any CPU
 		{D286E1C0-9788-4C85-8C8B-B0E90B75A185}.Release|x86.ActiveCfg = Release|Any CPU
 		{D286E1C0-9788-4C85-8C8B-B0E90B75A185}.Release|x86.Build.0 = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|x64.Build.0 = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Debug|x86.Build.0 = Debug|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|x64.ActiveCfg = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|x64.Build.0 = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|x86.ActiveCfg = Release|Any CPU
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -294,6 +310,8 @@ Global
 		{496A332B-570A-40BD-A6ED-BE87999EBB58} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 		{B265A105-44F2-4FE3-828C-EC1EB62D1A39} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 		{D286E1C0-9788-4C85-8C8B-B0E90B75A185} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
+		{BD5BD485-39EB-4174-84CC-0BC0E7366462} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
+		{4EEDD9EF-4DDC-486C-8387-97E2960E2324} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
