@@ -2,7 +2,9 @@
 Current version: 3.2.0
 [Version History](https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/master/CHANGELOG.md)
 
-Finbuckle.MultiTenant is a multitenancy library for ASP.NET Core 2.1+. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.
+Finbuckle.MultiTenant is a multitenancy library for ASP.NET%20Core. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.
+
+ASP.NET Core 2.1, 2.2, and 3.0 are supported.
 
 ## Community
 Check out the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant) to ask a question, make a request, or check out the code!
@@ -11,24 +13,30 @@ Check out the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTe
 In addition to this documentation a variety of sample projects are available. Be sure to read the information on the index page of each
 sample and the code comments in the `Startup` class.
 
-[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample)
+**ASP.NET Core 3.0 Samples**
 
-[Base Path Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/BasePathStrategySample)
+[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/RouteStrategySample)  
 
-[Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DataIsolationSample) 
+**ASP.NET Core 2.2 Samples**
 
-[EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/EFCoreStoreSample)
+[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/AuthenticationOptionsSample)
 
-[Fallback Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/FallbackStrategySample)
+[Base Path Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/BasePathStrategySample)
 
-[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/DelegateStrategySample)
+[Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DataIsolationSample) 
 
-[Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/HostStrategySample)
+[EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/EFCoreStoreSample)
 
-[Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample)
+[Fallback Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/FallbackStrategySample)
 
-[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/RouteStrategySample)  
+[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DelegateStrategySample)
 
-[Shared Login Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/SharedLoginSample)  
+[Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/HostStrategySample)
 
-[Static Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/StaticStrategySample)
+[Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/IdentityDataIsolationSample)
+
+[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/RouteStrategySample)  
+
+[Shared Login Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/SharedLoginSample)  
+
+[Static Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/StaticStrategySample)

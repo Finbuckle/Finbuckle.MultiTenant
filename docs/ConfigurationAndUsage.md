@@ -23,7 +23,7 @@ Adds and configures an IMultiTenantStore to the application. Only the last store
 - WithInMemoryStore
 
 ### WithStrategy Variants
-Adds and configures an IMultiTenantStore to the application. Only the last strategy configured will be used with the exception of the fallback strategy. See [MultiTenant Strategies](Strategies) for more information on each type.
+Adds and configures an IMultiTenantStore to the application. Multiple strategies can be registered and each will be used in the order configured, with the exception of the fallback strategy which is always last. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - WithStrategy&lt;TStrategy&gt;
 - WithBasePathStrategy
@@ -45,11 +45,12 @@ Most of the capability enabled by Finbuckle.MultiTenant is utilized through its 
 In addition, there are a few methods available for directly accessing and settings the tenant information if needed.
 
 ### UseMultiTenant
-Configures the middleware handling tenant resolution via the multitenant strategy and the multitenant store. `UseMultiTenant` should be called before `UseAuthentication` and `UseMvc` in the `Configure` method of the app's `Startup` class. Additionally, if any other middleware uses per-tenant options then that middleware should come after `UseMultiTenant`.
+Configures the middleware handling tenant resolution via the multitenant strategy and the multitenant store. `UseMultiTenant` should be called before `UseAuthentication` and `UseMvc` in the `Configure` method of the app's `Startup` class. Additionally, if any other middleware uses per-tenant options then that middleware should come after `UseMultiTenant`. In ASP.NET Core 3 or later `UseRouting` should come before `UseMultiTenant` if the route strategy is used.
 
 ```cs
 public void Configure(IApplicationBuilder app)
 {
+    app.UseRouting(); // In ASP.NET Core 3 this should be before UseMultiTenant!
     ...
     app.UseMultiTenant(); // Before UseAuthentication and UseMvc!
     ...

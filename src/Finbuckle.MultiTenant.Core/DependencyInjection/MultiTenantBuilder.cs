@@ -13,16 +13,13 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Finbuckle.MultiTenant.Strategies;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Options;
-using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -130,27 +127,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy),
+            Services.Add(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy),
                 sp => new MultiTenantStrategyWrapper<TStrategy>(factory(sp), sp.GetService<ILogger<TStrategy>>()), lifetime));
-
-            return this;
-        }
-
-        /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
-        /// </summary>
-        /// <param name="lifetime">The service lifetime.</param>
-        /// <param name="factory">A delegate that will create and configure the strategy.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        [Obsolete]
-        public FinbuckleMultiTenantBuilder WithStrategy(ServiceLifetime lifetime, Func<IServiceProvider, IMultiTenantStrategy> factory)
-        {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy), factory, lifetime));
 
             return this;
         }

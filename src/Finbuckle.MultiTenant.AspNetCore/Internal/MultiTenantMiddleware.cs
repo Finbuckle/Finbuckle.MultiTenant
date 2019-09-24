@@ -29,7 +29,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     {
         private readonly RequestDelegate next;
 
-        public MultiTenantMiddleware(RequestDelegate next, IServiceProvider applicationService)
+        public MultiTenantMiddleware(RequestDelegate next)
         {
             this.next = next;
         }
@@ -42,10 +42,21 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 var multiTenantContext = new MultiTenantContext();
                 context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
-                // Try the registered strategy.
-                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
-                var identifier = await strategy.GetIdentifierAsync(context);
+                IMultiTenantStrategy strategy = null;
+                string identifier = null;
 
+                // Cycle through the strategies
+                foreach(var strat in context.RequestServices.GetServices<IMultiTenantStrategy>())
+                {
+                     // Try the registered strategy.
+                        identifier = await strat.GetIdentifierAsync(context);
+                        if(identifier != null)
+                        {
+                            strategy = strat;
+                            break;
+                        }
+                }
+               
                 var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
                 TenantInfo tenantInfo = null;
                 if (identifier != null)

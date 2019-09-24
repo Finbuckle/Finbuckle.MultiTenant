@@ -4,6 +4,8 @@ A multitenant strategy is responsible for defining how the tenant is determined.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`. Internally strategies are registered as singleton services.
 
+Multiple strategies can be registered after `AddMultiTenant` as described invidually below. Each strategy will be tried in the order configured until a non-null identifier is returned. The remaining strategies are skipped. Due to limitations the ASP.NET Core dependency injection containers only a single instance of each strategy type can be registered, i.e. `WithDelegateStrategy(...).WithDelegateStrategy(...)` will throw an exception on startup. A decent workaround is to define various types from `DelegateStrategy` or similar and register the derived types in the desired order.
+
 The `Strategy` property on the `StrategyInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()` returns the actual strategy used to resolve the tenant information for the current context.
 
 ## IMultiTenantStrategy and Custom Strategies
@@ -44,8 +46,56 @@ services.AddMultiTenant().WithBasePathStrategy()...
 ```
 
 ## Route Strategy
+Note: the route strategy has improved for ASP.NET Core 3!
+
 Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/contoso/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "contoso" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration.
 
+**ASP.NET Core 3 or higher**
+ The route strategy is made improved in ASP.NET Core 3 due to the new endpoint routing mechanism. Configure by calling `WithRouteStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. A different route parameter name can be specified with the overloaded version. Then in the app pipeline make sure to call `UseRouting` before `UseMultiTenant`:
+
+```cs
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Other services...
+
+        // Use the default route parameter name "__tenant__":
+        // Make sure to include a multitenant store!
+        services.AddMultiTenant().WithRouteStrategy()...
+        
+        // Alternatively set a different route parameter name of "MyTenantRouteParam":
+        // services.AddMultiTenant().WithRouteStrategy("MyTenantRouteParam")...
+        
+        // Other services...
+
+        services.AddMvc();
+
+        // Other services...
+    }
+
+    public void Configure(IappBuilder app, ...)
+    {
+        // Other middlware...
+
+        app.UseRouting(); // Important!
+
+        // Other middlware...
+
+        app.UseMultiTenant();
+        
+        // Other middlware...
+        
+        app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{__tenant__}/{controller=Home}/{action=Index}");
+            });
+    }
+}
+```
+
+
+**ASP.NET Core 2.1 or 2.2**
 Configure by calling `WithRouteStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. An `Action<IRouteBuilder>` parameter which configures the routing is passed in which should always match the routes configured with MVC.  A different route parameter name can be specified with the overloaded version:
 
 ```cs
@@ -130,7 +180,7 @@ services.AddMultiTenant().
 
 Returns a static tenant identifier string if the main strategy (and the remove authentication strategy, if applicable) fails to resolve a tenant with the tenant store. If the store does not have an entry for the fallback tenant identifier then this strategy has no effect.
 
-This strategy is intended be used in conjunction with other strategies.
+This strategy is intended be used in conjunction with other strategies and is always called last.
 
 Configure by calling `WithFallbackStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution.
 
