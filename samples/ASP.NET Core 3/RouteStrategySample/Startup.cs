@@ -33,7 +33,6 @@ namespace RouteStrategySample
             app.UseRouting();
             app.UseMultiTenant();
 
-            // Note this is the same route delegate used in WithRouteStrategy()
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");

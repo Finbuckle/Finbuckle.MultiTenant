@@ -127,7 +127,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy),
+            Services.Add(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy),
                 sp => new MultiTenantStrategyWrapper<TStrategy>(factory(sp), sp.GetService<ILogger<TStrategy>>()), lifetime));
 
             return this;
