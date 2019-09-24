@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelegateStrategySample", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallbackStrategySample", "samples\ASP.NET Core 2\FallbackStrategySample\FallbackStrategySample.csproj", "{D286E1C0-9788-4C85-8C8B-B0E90B75A185}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core 2", "ASP.NET Core 2", "{13881877-c9d2-4259-b061-3f041f1224fa}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASP.NET Core 3", "ASP.NET Core 3", "{BD5BD485-39EB-4174-84CC-0BC0E7366462}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteStrategySample", "samples\ASP.NET Core 3\RouteStrategySample\RouteStrategySample.csproj", "{4EEDD9EF-4DDC-486C-8387-97E2960E2324}"
