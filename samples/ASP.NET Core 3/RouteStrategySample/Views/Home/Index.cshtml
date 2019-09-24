@@ -54,17 +54,17 @@ else
         </p>
         <pre><code>// In ConfigureServices:
 services.AddMultiTenant()... // Set up a store...
-    WithRouteStrategy(ConfigRoutes);
+    WithRouteStrategy();
 
 // In Configure:
-// Note this is the same route delegate used in WithRouteStrategy()
-app.UseMvc(ConfigRoutes); 
-
-// And the delegate itself:
-private void ConfigRoutes(IRouteBuilder routes)
+// Make sure to call UseRouting before UseMultiTenant
+app.UseRouting();
+app.UseMultiTenant();
+app.UseEndpoints(endpoints => 
 {
-    routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
-}</code></pre>
+    endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
+}); 
+</code></pre>
         <p>Click the links on the navbar to see it in action!</p>
     </div> 
     <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#route-strategy"></a>
