@@ -12,14 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -43,10 +42,21 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 var multiTenantContext = new MultiTenantContext();
                 context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
-                // Try the registered strategy.
-                var strategy = context.RequestServices.GetRequiredService<IMultiTenantStrategy>();
-                var identifier = await strategy.GetIdentifierAsync(context);
+                IMultiTenantStrategy strategy = null;
+                string identifier = null;
 
+                // Cycle through the strategies
+                foreach(var strat in context.RequestServices.GetServices<IMultiTenantStrategy>())
+                {
+                     // Try the registered strategy.
+                        identifier = await strat.GetIdentifierAsync(context);
+                        if(identifier != null)
+                        {
+                            strategy = strat;
+                            break;
+                        }
+                }
+               
                 var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
                 TenantInfo tenantInfo = null;
                 if (identifier != null)

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
@@ -35,6 +36,125 @@ public class MultiTenantMiddlewareShould
         mock.Setup(c => c.Items).Returns(items);
 
         return mock;
+    }
+
+    public class TestStrat2 : DelegateStrategy
+    {
+        public TestStrat2(Func<object, Task<string>> doStrategy) : base(doStrategy)
+        {
+        }
+    }
+
+    public class TestStrat3 : DelegateStrategy
+    {
+        public TestStrat3(Func<object, Task<string>> doStrategy) : base(doStrategy)
+        {
+        }
+    }
+
+    public class TestStrat1 : DelegateStrategy
+    {
+        public TestStrat1(Func<object, Task<string>> doStrategy) : base(doStrategy)
+        {
+        }
+    }
+
+    [Fact]
+    public void CycleThroughStrategies()
+    {
+        var services = new ServiceCollection();
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        DateTime time1 = DateTime.Now;
+        DateTime time2 = DateTime.Now;
+        DateTime time3 = DateTime.Now;
+
+        services.AddMultiTenant().WithInMemoryStore()
+            .WithStrategy<TestStrat1>(ServiceLifetime.Singleton, _ =>
+            new TestStrat1(c => 
+            {
+                count1++;
+                time1 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>(null);
+            }))
+            .WithStrategy<TestStrat2>(ServiceLifetime.Singleton, _ =>
+            new TestStrat2(c => 
+            {
+                count2++;
+                time2 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>(null);
+            }))
+            .WithStrategy<TestStrat3>(ServiceLifetime.Singleton, _ =>
+            new TestStrat3(c => 
+            {
+                count3++;
+                time3 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>(null);
+            }));
+
+        var sp = services.BuildServiceProvider();
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        Assert.Equal(1, count1);
+        Assert.Equal(1, count2);
+        Assert.Equal(1, count3);
+        Assert.True(time1 < time2 && time2 < time3);
+    }
+
+    [Fact]
+    public void StopCycleThroughStrategiesWhenOneFound()
+    {
+        var services = new ServiceCollection();
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        DateTime time1 = DateTime.Now;
+        DateTime time2 = DateTime.Now;
+        DateTime time3 = DateTime.Now;
+
+        services.AddMultiTenant().WithInMemoryStore()
+            .WithStrategy<TestStrat1>(ServiceLifetime.Singleton, _ =>
+            new TestStrat1(c => 
+            {
+                count1++;
+                time1 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>(null);
+            }))
+            .WithStrategy<TestStrat2>(ServiceLifetime.Singleton, _ =>
+            new TestStrat2(c => 
+            {
+                count2++;
+                time2 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>("found");
+            }))
+            .WithStrategy<TestStrat3>(ServiceLifetime.Singleton, _ =>
+            new TestStrat3(c => 
+            {
+                count3++;
+                time3 = DateTime.Now;
+                Thread.Sleep(100);
+                return Task.FromResult<string>(null);
+            }));
+
+        var sp = services.BuildServiceProvider();
+        var context = CreateHttpContextMock(sp).Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        Assert.Equal(1, count1);
+        Assert.Equal(1, count2);
+        Assert.Equal(0, count3);
+        Assert.True(time1 < time2 && time3 < time2);
     }
 
     [Fact]
@@ -68,7 +188,6 @@ public class MultiTenantMiddlewareShould
         sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
 
         var context = CreateHttpContextMock(sp).Object;
-
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
@@ -156,6 +275,29 @@ public class MultiTenantMiddlewareShould
         var services = new ServiceCollection();
         services.AddAuthentication();
         services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech").WithFallbackStrategy("default");
+        var sp = services.BuildServiceProvider();
+
+        var mock = CreateHttpContextMock(sp);
+        var context = mock.Object;
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
+
+        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        Assert.Null(multiTenantContext.TenantInfo);
+        Assert.Null(multiTenantContext.StoreInfo);
+        Assert.NotNull(multiTenantContext.StrategyInfo);
+        Assert.IsType<FallbackStrategy>(multiTenantContext.StrategyInfo.Strategy);
+    }
+
+    [Fact]
+    public void AlwaysHandleFallbackStrategyLast()
+    {
+        var services = new ServiceCollection();
+        services.AddAuthentication();
+        services.AddMultiTenant().WithInMemoryStore()
+            .WithFallbackStrategy("default")
+            .WithDelegateStrategy(async o => await Task.FromResult<string>(null));
         var sp = services.BuildServiceProvider();
 
         var mock = CreateHttpContextMock(sp);

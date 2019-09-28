@@ -25,13 +25,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static FinbuckeMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
+        public static FinbuckleMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
             services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
             services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
 
-            return new FinbuckeMultiTenantBuilder(services);
+            return new FinbuckleMultiTenantBuilder(services);
         }
     }
 }

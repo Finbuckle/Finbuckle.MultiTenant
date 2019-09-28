@@ -1,4 +1,14 @@
 ## Version
+**4.0.0**
+* Added support for ASP.NET Core 3! Valid project targets are `netcoreapp3.0`, `netcoreapp2.0`, and `netcoreapp2.1`.
+* Added a sample app for ASP.NET 3 highlighting the route strategy improvements due to the endpoint routing mechanism.
+* Fixed a bug where route strategy could throw an exception when used with Razor Pages. Thanks @stardocs-services!
+* Support for configuring multiple multitenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
+* Refactored component assemblies for better depdency control. EFCore can be excluded by referencing `Finbuckle.MultiTenant.AspNetCore` instead of `Finbuckle.MultiTenant`.
+* Updated documentation.
+* Updated unit tests to check against all valid project targets.
+* Symbols package included for debugging.
+
 **3.2.0**
 * Added support for any preexisting global query filters in `MultiTenantDbContext` and `MultiTenantIdentityDbContext`. Thanks @nbarbettini!
 * Exposed the inner stores and strategies as a property on the respective `StoreInfo` and `StrategyInfo` properties of `MultiTenantContext`. Previously you could only access the wrapper object for each. Thanks @WalternativE!

@@ -13,21 +13,15 @@
 //    limitations under the License.
 
 using System;
-//using System.Reflection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Stores;
-using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Routing;
 
 public class MultiTenantAuthenticationSchemeProviderShould
@@ -38,7 +32,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     .ConfigureServices(services =>
                     {
                         services.AddMultiTenant()
-                            .WithRouteStrategy(rb => rb.MapRoute("testroute", "{__tenant__}"))
+                            .WithBasePathStrategy()
                             .WithInMemoryStore()
                             .WithRemoteAuthentication()
                             .WithPerTenantOptions<AuthenticationOptions>((ao, ti) =>

@@ -12,10 +12,8 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
 using Xunit;
 
 public class TenantInfoShould
