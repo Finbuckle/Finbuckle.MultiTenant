@@ -1,7 +1,7 @@
 ﻿using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
 
-namespace RouteStrategySample.Controllers
+namespace DelegateStrategySample.Controllers
 {
     public class HomeController : Controller
     {

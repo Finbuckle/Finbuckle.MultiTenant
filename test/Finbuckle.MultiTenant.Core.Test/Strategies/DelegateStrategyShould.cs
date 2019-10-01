@@ -29,13 +29,16 @@ public class DelegateStrategyShould
         Assert.Equal(1, i);
     }
 
-    [Fact]
-    public async Task ReturnDelegateResult()
+    [Theory]
+    [InlineData("initech-id")]
+    [InlineData("")]
+    [InlineData(null)]
+    public async Task ReturnDelegateResult(string identifier)
     {
-        var strategy = new DelegateStrategy(c => Task.FromResult("test_test"));
+        var strategy = new DelegateStrategy(async c => await Task.FromResult(identifier));
         var result = await strategy.GetIdentifierAsync(new object());
 
-        Assert.Equal("test_test", result);
+        Assert.Equal(identifier, result);
     }
     
     [Fact]

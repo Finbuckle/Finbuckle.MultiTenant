@@ -1,0 +1,128 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Authentication Options Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/AuthenticationOptionsSample/bin/Debug/netcoreapp2.2/AuthenticationOptionsSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/AuthenticationOptionsSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Delegate Strategy Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/DelegateStrategySample/bin/Debug/netcoreapp2.2/DelegateStrategySample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/DelegateStrategySample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Delegate Strategy Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/DelegateStrategySample/bin/Debug/netcoreapp3.0/DelegateStrategySample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/DelegateStrategySample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Identity Data Isolation Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/IdentityDataIsolationSample/bin/Debug/netcoreapp2.2/IdentityDataIsolationSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/IdentityDataIsolationSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Route Strategy Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/RouteStrategySample/bin/Debug/netcoreapp2.2/RouteStrategySample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/RouteStrategySample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Route Strategy Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/RouteStrategySample/bin/Debug/netcoreapp3.0/RouteStrategySample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/RouteStrategySample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        }
+    ]
+}
