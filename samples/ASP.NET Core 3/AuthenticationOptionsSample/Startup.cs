@@ -2,10 +2,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthenticationOptionsSample
 {
@@ -20,9 +19,7 @@ namespace AuthenticationOptionsSample
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().
-                AddMvcOptions(options => options.EnableEndpointRouting = false).
-                SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllersWithViews();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
                 AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -55,7 +52,7 @@ namespace AuthenticationOptionsSample
 
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
-                WithRouteStrategy(ConfigRoutes).
+                WithRouteStrategy().
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
@@ -76,23 +73,23 @@ namespace AuthenticationOptionsSample
                 });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseMultiTenant();
             app.UseAuthentication();
-            app.UseMvc(ConfigRoutes);
-        }
+            app.UseAuthorization();
 
-        private void ConfigRoutes(IRouteBuilder routes)
-        {
-            routes.MapRoute("Default", "{__tenant__=}/{controller=Home}/{action=Index}");
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
+            });
         }
     }
 }

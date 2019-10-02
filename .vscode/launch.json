@@ -25,6 +25,26 @@
             }
         },
         {
+            "name": "Authentication Options Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/AuthenticationOptionsSample/bin/Debug/netcoreapp3.0/AuthenticationOptionsSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/AuthenticationOptionsSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Delegate Strategy Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",
