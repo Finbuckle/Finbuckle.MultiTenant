@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +26,7 @@ namespace DelegateStrategySample
                 WithDelegateStrategy(async context =>
                 {
                     ((HttpContext)context).Request.Query.TryGetValue("tenant", out StringValues tenantId);
-                    return tenantId.ToString(); // ignore await warning or use await Task.FromResult(...)
+                    return await Task.FromResult(tenantId.ToString()); // ignore await warning or use await Task.FromResult(...)
                 });
         }
 
