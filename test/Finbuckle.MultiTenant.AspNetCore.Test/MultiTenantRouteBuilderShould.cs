@@ -12,4 +12,4 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// Note: MultiTenantOptionsManager is a trivial tweak of Microsoft's RouteBuilder implementation.
+// Note: MultiTenantRouteBuilder is a trivial tweak of Microsoft's RouteBuilder implementation.

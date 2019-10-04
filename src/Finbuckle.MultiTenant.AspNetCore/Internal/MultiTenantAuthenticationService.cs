@@ -12,24 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#if NETSTANDARD2_0
-
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
-    internal class MultiTenantAuthenticationService : AuthenticationService
+    internal class MultiTenantAuthenticationService : IAuthenticationService
     {
-        public MultiTenantAuthenticationService(IAuthenticationSchemeProvider schemes,
-                                                IAuthenticationHandlerProvider handlers,
-                                                IClaimsTransformation transform) : base(schemes, handlers, transform)
+        private readonly IAuthenticationService inner;
+
+        public MultiTenantAuthenticationService(IAuthenticationService inner)
         {
+            this.inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
         }
 
-        public override async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string scheme)
+            => inner.AuthenticateAsync(context, scheme);
+
+        public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext();
@@ -39,42 +41,16 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 properties.Items.Add("tenantIdentifier", multiTenantContext.TenantInfo.Identifier);
             }
 
-            await base.ChallengeAsync(context, scheme, properties);
+            return inner.ChallengeAsync(context, scheme, properties);
         }
+
+        public Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+            => inner.ForbidAsync(context, scheme, properties);
+
+        public Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
+            => inner.SignInAsync(context, scheme, principal, properties);
+
+        public Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+            => inner.SignOutAsync(context, scheme, properties);
     }
 }
-
-#else
-
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-
-namespace Finbuckle.MultiTenant.AspNetCore
-{
-    internal class MultiTenantAuthenticationService : AuthenticationService
-    {
-        public MultiTenantAuthenticationService(IAuthenticationSchemeProvider schemes,
-                                                IAuthenticationHandlerProvider handlers,
-                                                IClaimsTransformation transform,
-                                                IOptions<AuthenticationOptions> options) : base(schemes, handlers, transform, options)
-        {
-        }
-
-        public override async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
-        {
-            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
-            var multiTenantContext = context.GetMultiTenantContext();
-            if (multiTenantContext.TenantInfo != null)
-            {
-                properties = properties ?? new AuthenticationProperties();
-                properties.Items.Add("tenantIdentifier", multiTenantContext.TenantInfo.Identifier);
-            }
-
-            await base.ChallengeAsync(context, scheme, properties);
-        }
-    }
-}
-
-#endif
