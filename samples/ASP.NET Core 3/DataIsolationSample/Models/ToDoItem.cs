@@ -12,28 +12,17 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
-using Microsoft.EntityFrameworkCore;
 
-namespace DataIsolationSample.Data
+namespace DataIsolationSample.Models
 {
-    public class ToDoDbContext : MultiTenantDbContext
+    [MultiTenant]
+    public class ToDoItem
     {
-        public ToDoDbContext(TenantInfo tenantInfo) : base(tenantInfo)
-        {
-        }
+        public int Id { get; set; }
+        
+        public string Title { get; set; }
 
-        public ToDoDbContext(TenantInfo tenantInfo, DbContextOptions<ToDoDbContext> options) : base(tenantInfo, options)
-        {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(ConnectionString);
-            base.OnConfiguring(optionsBuilder);
-        }
-
-        public DbSet<ToDoItem> ToDoItems { get; set; }
+        public bool Completed { get; set; }
     }
 }

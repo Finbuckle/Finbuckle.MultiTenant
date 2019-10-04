@@ -3,7 +3,6 @@ using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,28 +20,32 @@ namespace DataIsolationSample
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllersWithViews();
 
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
-                WithRouteStrategy(ConfigRoutes);
+                WithRouteStrategy();
 
             // Register the db context, but do not specify a provider/connection string since
             // these vary by tenant.
             services.AddDbContext<ToDoDbContext>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
 
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseMultiTenant();
-            app.UseMvc(ConfigRoutes);
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
+            });
 
             SetupDb();
         }
