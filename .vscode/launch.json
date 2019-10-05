@@ -165,6 +165,49 @@
             }
         },
         {
+<<<<<<< HEAD
+            "name": "EFCore Store Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/EFCoreStoreSample/bin/Debug/netcoreapp2.2/EFCoreStoreSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/EFCoreStoreSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "EFCore Store Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/EFCoreStoreSample/bin/Debug/netcoreapp3.0/EFCoreStoreSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/EFCoreStoreSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+=======
+>>>>>>> 8e7d21adec7fd5d80e76eb8b21872a512edd758f
             "name": "Identity Data Isolation Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",

@@ -59,6 +59,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasePathStrategySample", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataIsolationSample", "samples\ASP.NET Core 3\DataIsolationSample\DataIsolationSample.csproj", "{E158E808-4484-47FF-ACA4-952D2586198D}"
 EndProject
+<<<<<<< HEAD
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreStoreSample", "samples\ASP.NET Core 3\EFCoreStoreSample\EFCoreStoreSample.csproj", "{EAEF5CE2-78AE-4E4B-9924-07C49F306A9D}"
+EndProject
+=======
+>>>>>>> 8e7d21adec7fd5d80e76eb8b21872a512edd758f
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -375,5 +380,6 @@ Global
 		{9A39BE81-9D3D-4AE7-AC6A-604ED31F01F4} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
 		{7381A5B6-5D07-4A5C-86AD-2F6561E86A0E} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
 		{E158E808-4484-47FF-ACA4-952D2586198D} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
+		{EAEF5CE2-78AE-4E4B-9924-07C49F306A9D} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
 	EndGlobalSection
 EndGlobal

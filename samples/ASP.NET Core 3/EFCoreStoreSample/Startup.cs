@@ -3,8 +3,6 @@ using EFCoreStoreSample.Data;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,23 +19,28 @@ namespace EFCoreStoreSample
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllersWithViews();
 
             services.AddMultiTenant()
                 .WithEFCoreStore<AppDbContext, AppTenantInfo>()
-                .WithRouteStrategy(ConfigRoutes);
+                .WithRouteStrategy();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseMultiTenant();
-            app.UseMvc(ConfigRoutes);
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
+            });
 
             // Seed the database the multitenant store will need.
             SetupStore(app.ApplicationServices);
@@ -50,11 +53,6 @@ namespace EFCoreStoreSample
 
             store.TryAddAsync(new TenantInfo("tenant-finbuckle-d043favoiaw", "finbuckle", "Finbuckle", "finbuckle_conn_string", null)).Wait();
             store.TryAddAsync(new TenantInfo("tenant-initech-341ojadsfa", "initech", "Initech LLC", "initech_conn_string", null)).Wait();
-        }
-
-        private void ConfigRoutes(IRouteBuilder routes)
-        {
-            routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
         }
     }
 }
