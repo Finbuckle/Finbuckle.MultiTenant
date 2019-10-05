@@ -265,6 +265,26 @@
             }
         },
         {
+            "name": "Identity Data Isolation Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/IdentityDataIsolationSample/bin/Debug/netcoreapp3.0/IdentityDataIsolationSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/IdentityDataIsolationSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Route Strategy Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",
