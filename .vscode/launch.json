@@ -165,7 +165,6 @@
             }
         },
         {
-<<<<<<< HEAD
             "name": "EFCore Store Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",
@@ -206,8 +205,6 @@
             }
         },
         {
-=======
->>>>>>> 8e7d21adec7fd5d80e76eb8b21872a512edd758f
             "name": "Identity Data Isolation Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",
