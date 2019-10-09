@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    static class FinbuckleServiceCollectionExtensions
+    public static class FinbuckleServiceCollectionExtensions
     {
-        public static bool DecorateService<TService, TImpl>(this IServiceCollection services)
+        public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
         {
             var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
             if (existingService == null)
@@ -29,7 +29,12 @@ namespace Microsoft.Extensions.DependencyInjection
                                            sp =>
                                            {
                                                TService inner = (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner);
+
+                                               var parameters2 = new object[parameters.Length + 1];
+                                               Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                                               parameters2[0] = inner;
+
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2);
                                            },
                                            existingService.Lifetime);
 
@@ -39,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                            sp =>
                                            {
                                                TService inner = (TService)existingService.ImplementationInstance;
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner);
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters);
                                            },
                                            existingService.Lifetime);
             }
@@ -49,7 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                            sp =>
                                            {
                                                TService inner = (TService)existingService.ImplementationFactory(sp);
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner);
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters);
                                            },
                                            existingService.Lifetime);
             }
