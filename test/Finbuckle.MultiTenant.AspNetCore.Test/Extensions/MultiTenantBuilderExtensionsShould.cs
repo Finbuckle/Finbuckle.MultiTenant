@@ -115,9 +115,6 @@ using Xunit;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Moq;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 public class MultiTenantBuilderExtensionsShould
 {

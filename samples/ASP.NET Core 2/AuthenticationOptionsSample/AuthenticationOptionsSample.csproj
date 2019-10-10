@@ -7,8 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-     <!-- <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" /> -->
-    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="2.0.0" /> -->
-    <ProjectReference Include="../../../src/*/*.csproj" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
   </ItemGroup>
 </Project>

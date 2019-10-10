@@ -36,8 +36,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
+            // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
 
+            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
             builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
             return builder;
@@ -130,8 +131,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
-
+            // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
+            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
             builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
             return builder;

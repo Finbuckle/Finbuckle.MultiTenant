@@ -21,7 +21,7 @@ namespace Finbuckle.MultiTenant
     /// <summary>
     /// Finbuckle.MultiTenant.AspNetCore extensions to HttpContext.
     /// </summary>
-    public static class HttpContextExtensions
+    public static class FinbuckleHttpContextExtensions
     {
         /// <summary>
         /// Returns the current MultiTenantContext or null if there is none.

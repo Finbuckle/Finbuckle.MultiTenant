@@ -4,7 +4,7 @@
 
 Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is used as the backing store. It works similarly to [normal Finbuckle.Multitenant Entity Framework Core data isolation](EFCore) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`.
 
-See the[IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample) project for a comprehensive example on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. This sample illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
+See the [IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample) project for a comprehensive example on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. This sample illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
 
 ## Configuration
 Add the `Finbuckle.MultiTenant.EntityFrameworkCore` and package to the project:

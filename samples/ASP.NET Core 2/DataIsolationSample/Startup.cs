@@ -1,12 +1,10 @@
-﻿using System;
-using DataIsolationSample.Data;
+﻿using DataIsolationSample.Data;
 using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

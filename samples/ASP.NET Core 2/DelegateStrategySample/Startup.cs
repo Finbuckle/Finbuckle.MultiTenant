@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,12 +21,13 @@ namespace DelegateStrategySample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddMultiTenant().
                 WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
-                WithDelegateStrategy(context =>
+                WithDelegateStrategy(async context =>
                 {
                     ((HttpContext)context).Request.Query.TryGetValue("tenant", out StringValues tenantId);
-                    return Task.FromResult(tenantId.ToString());
+                    return await Task.FromResult(tenantId.ToString()); // ignore await warning or use await Task.FromResult(...)
                 });
         }
 
