@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IdentityDataIsolationSample.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Initial_3_0_0 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

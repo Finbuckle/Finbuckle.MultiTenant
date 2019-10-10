@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// using System;
 using Finbuckle.MultiTenant;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -14,7 +11,7 @@ namespace IdentityDataIsolationSample.Data
         {
             // To prep each database uncomment the corresponding line below.
             var tenantInfo = new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null);
-            //var tenantInfo = new TenantInfo(null, null, null, "Data Source=Data/InitechIdentity.db", null);
+            // var tenantInfo = new TenantInfo(null, null, null, "Data Source=Data/InitechIdentity.db", null);
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
             return new ApplicationDbContext(tenantInfo, optionsBuilder.Options);

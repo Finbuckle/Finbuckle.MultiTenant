@@ -40,7 +40,7 @@ namespace Finbuckle.MultiTenant
             {
                 return id;
             }
-            set
+            internal set
             {
                 if (value != null)
                 {

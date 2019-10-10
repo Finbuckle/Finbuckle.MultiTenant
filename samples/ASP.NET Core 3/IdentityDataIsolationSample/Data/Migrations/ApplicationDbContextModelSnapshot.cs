@@ -14,24 +14,28 @@ namespace IdentityDataIsolationSample.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.1-servicing-10028");
+                .HasAnnotation("ProductVersion", "3.0.0");
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -46,17 +50,22 @@ namespace IdentityDataIsolationSample.Migrations
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RoleId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.HasKey("Id");
@@ -69,43 +78,58 @@ namespace IdentityDataIsolationSample.Migrations
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUser", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("AccessFailedCount");
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
-                    b.Property<bool>("EmailConfirmed");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<bool>("LockoutEnabled");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
-                    b.Property<string>("PasswordHash");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
 
-                    b.Property<bool>("PhoneNumberConfirmed");
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("SecurityStamp");
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
-                    b.Property<bool>("TwoFactorEnabled");
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UserName")
+                        .HasColumnType("TEXT")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -123,18 +147,23 @@ namespace IdentityDataIsolationSample.Migrations
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -146,22 +175,28 @@ namespace IdentityDataIsolationSample.Migrations
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("ProviderDisplayName");
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -175,12 +210,15 @@ namespace IdentityDataIsolationSample.Migrations
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("RoleId");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
                     b.HasKey("UserId", "RoleId");
@@ -192,17 +230,22 @@ namespace IdentityDataIsolationSample.Migrations
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserToken<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("TEXT");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
+                        .HasColumnType("TEXT")
                         .HasMaxLength(64);
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -211,47 +254,53 @@ namespace IdentityDataIsolationSample.Migrations
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Finbuckle.MultiTenant.MultiTenantIdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser")
+                    b.HasOne("Finbuckle.MultiTenant.MultiTenantIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

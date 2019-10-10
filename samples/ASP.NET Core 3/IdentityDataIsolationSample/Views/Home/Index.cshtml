@@ -49,24 +49,27 @@
             <hr class="my-4">
             <p>
                 Select a tenant from the navbar to change the current tenant. You can register, login, logout,
-                and manage account via the default Identity UI within each tenant.
+                and manage account via the default Identity UI within each tenant. Note that even with a shared
+                database a user can register with each tenant and will maintain separate login sessions. Finbuckle.MultiTenant
+                makes it appear like separate databases to Identity.
             </p>
             <p>
                 ASP.NET Core Identity uses a Razor page library to supply its UI. In this example the routing for
                 the Razor library is tweaked to use out tenant route parameter we use with the route strategy.
+                In addition, a LinkGenerator wrapper is used to ensure the __tenant__ route parameter is passed
+                to URLs generated in Identity pages.
             </p>
             <p>
                 The Finbuckle and MegaCorp tenants share a common SQLite database, but Initech has its own separate datasebase.
-                Both of these databases need to be created by applying the latest migration via <em>dotnet ef database update</em> or similar.
-                To apply the migration to each database adjust the connection string used in the <em>Data/DesignTimeFactory.cs</em> file in
-                between migrations.
+                Both of these databases will be created the first time the app runs. If using the dotnet-ef commad line tool
+                modify the Data/DesignTimeFactory.cs file accordingly so that each database gets updated. 
+            </p>
+            <p>
+                The ApplicationDbContect derives from MultiTenantIdentityDbContext, and it specifies the User ID value be generated on add.
             </p>
             <p>
                 The use of per-tenant cookie options in this sample is similar to that of the 
                 <a href="https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample">AuthenticationOptionsSample</a>.
-            </p>
-            <p>
-                Note: This demo requires external configuration for the OpenID Connect to work correctly. See the comments in `Startup.cs` for more details. 
             </p>
             <p>
                 See the complete configuration in <code>Startup.cs</code>.
@@ -79,7 +82,7 @@ services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
 // Configure MVC:
 // We modify the Identity razor settings to use our tenant route parameter.
 // This is needed only because we use the RouteStrategy and
-// aren't using the default MVC routes.
+// aren't using the default Identity routes.
 services.AddControllersWithViews()
     .AddRazorPagesOptions(options =>
     {
@@ -90,10 +93,15 @@ services.AddControllersWithViews()
             foreach (var selector in model.Selectors)
             {
                 selector.AttributeRouteModel.Template =
-                    AttributeRouteModel.CombineTemplates("{__tenant__}", selector.AttributeRouteModel.Template);
+                        AttributeRouteModel.CombineTemplates(
+                            "{__tenant__}",
+                            selector.AttributeRouteModel.Template);
             }
         });
     });
+
+// Wrap the default link generator with one that will preserve the tenant route parameter for links.
+services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
 
 services.AddMultiTenant()... // Similar to setup in the AuthenticationOptionsSample.
 </code></pre>

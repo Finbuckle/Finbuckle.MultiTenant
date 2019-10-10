@@ -7,11 +7,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" PrivateAssets="All" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
+    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
+    <ProjectReference Include="../../../src/*/*.csproj" />
   </ItemGroup>
-
 </Project>
