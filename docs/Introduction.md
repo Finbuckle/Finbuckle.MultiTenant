@@ -15,7 +15,23 @@ sample and the code comments in the `Startup` class.
 
 **ASP.NET Core 3.0 Samples**
 
-[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/RouteStrategySample)  
+[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/AuthenticationOptionsSample)
+
+[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/RouteStrategySample)
+
+[Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/DataIsolationSample) 
+
+[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/DelegateStrategySample)
+
+[EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample)
+
+[Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HostStrategySample)
+
+[Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/IdentityDataIsolationSample)
+
+[Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/RouteStrategySample)
+
+[Static Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/StaticStrategySample)
 
 **ASP.NET Core 2.2 Samples**
 
@@ -25,11 +41,11 @@ sample and the code comments in the `Startup` class.
 
 [Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DataIsolationSample) 
 
+[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DelegateStrategySample)
+
 [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/EFCoreStoreSample)
 
 [Fallback Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/FallbackStrategySample)
-
-[Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DelegateStrategySample)
 
 [Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/HostStrategySample)
 
