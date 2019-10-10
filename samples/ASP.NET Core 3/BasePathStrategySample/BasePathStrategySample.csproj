@@ -5,6 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../src/*/*.csproj" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
   </ItemGroup>
 </Project>

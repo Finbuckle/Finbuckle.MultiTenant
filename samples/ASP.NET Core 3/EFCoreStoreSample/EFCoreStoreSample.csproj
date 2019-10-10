@@ -7,6 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.0.0" />
-    <ProjectReference Include="../../../src/*/*.csproj" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
   </ItemGroup>
 </Project>

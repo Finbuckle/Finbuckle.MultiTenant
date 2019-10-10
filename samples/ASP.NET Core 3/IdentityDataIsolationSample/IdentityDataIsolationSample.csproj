@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" PrivateAssets="All" />
     <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
+    <!-- This samples needs the latest version from source. 4.1.0 likely in the future. -->
     <ProjectReference Include="../../../src/*/*.csproj" />
   </ItemGroup>
 </Project>

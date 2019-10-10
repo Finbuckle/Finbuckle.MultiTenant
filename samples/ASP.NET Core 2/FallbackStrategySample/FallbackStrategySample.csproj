@@ -6,6 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <ProjectReference Include="../../../src/*/*.csproj" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
   </ItemGroup>
 </Project>
