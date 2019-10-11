@@ -35,6 +35,7 @@ namespace Finbuckle.MultiTenant
     {
         protected internal TenantInfo TenantInfo { get; protected set; }
         
+        [Obsolete]
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
         protected string ConnectionString => TenantInfo.ConnectionString;
@@ -57,14 +58,7 @@ namespace Finbuckle.MultiTenant
         {
             get
             {
-                if (multiTenantEntityTypes == null)
-                {
-                    multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
-                       ToImmutableList();
-                }
-
-                return multiTenantEntityTypes;
+                return Model.GetEntityTypes().Where(et => Shared.HasMultiTenantAnnotation(et)).ToImmutableList();
             }
         }
         

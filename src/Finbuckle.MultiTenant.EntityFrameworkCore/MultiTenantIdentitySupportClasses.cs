@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Finbuckle.MultiTenant
 {
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUser : MultiTenantIdentityUser<string>
     {
         public MultiTenantIdentityUser()
@@ -33,7 +33,7 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUser<TKey> : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -46,7 +46,7 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityRole : MultiTenantIdentityRole<string>
     {
         public MultiTenantIdentityRole()
@@ -60,7 +60,7 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityRole<TKey> : IdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -73,31 +73,31 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUserToken<TKey> : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityRoleClaim<TKey> : IdentityRoleClaim<TKey>
         where TKey : IEquatable<TKey>
     {
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUserLogin<TKey> : IdentityUserLogin<TKey>
         where TKey : IEquatable<TKey>
     {
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUserRole<TKey> : IdentityUserRole<TKey>
         where TKey : IEquatable<TKey>
     {
     }
 
-    [MultiTenant]
+    [Obsolete("Prefer standard Identity entity types.")]
     public class MultiTenantIdentityUserClaim<TKey> : IdentityUserClaim<TKey>
         where TKey : IEquatable<TKey>
     {

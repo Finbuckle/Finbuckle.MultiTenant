@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Generic; // Need for netstandard2.0 section.
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -27,7 +27,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant
 {
-    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
@@ -42,8 +42,8 @@ namespace Finbuckle.MultiTenant
     /// A database context compatible with Identity that enforces tenant integrity on entity types
     /// marked with the MultiTenant attribute.
     /// </summary>
-    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
-        where TUser : MultiTenantIdentityUser
+    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
+        where TUser : IdentityUser
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
@@ -54,9 +54,9 @@ namespace Finbuckle.MultiTenant
         }
     }
 
-    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
-        where TUser : MultiTenantIdentityUser<TKey>
-        where TRole : MultiTenantIdentityRole<TKey>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
@@ -80,6 +80,7 @@ namespace Finbuckle.MultiTenant
     {
         protected internal TenantInfo TenantInfo { get; protected set; }
 
+        [Obsolete]
         private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
         protected string ConnectionString => TenantInfo.ConnectionString;
@@ -102,14 +103,7 @@ namespace Finbuckle.MultiTenant
         {
             get
             {
-                if (multiTenantEntityTypes == null)
-                {
-                    multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
-                       ToImmutableList();
-                }
-
-                return multiTenantEntityTypes;
+                return Model.GetEntityTypes().Where(et => Shared.HasMultiTenantAnnotation(et)).ToImmutableList();
             }
         }
 
@@ -117,49 +111,45 @@ namespace Finbuckle.MultiTenant
         {
             base.OnModelCreating(builder);
 
+            // Add multitenant annotation to each entity type
+            builder.Entity<TUser>(e => e.IsMultiTenant());
+            builder.Entity<TRole>(e => e.IsMultiTenant());
+            builder.Entity<TUserClaim>(e => e.IsMultiTenant());
+            builder.Entity<TUserRole>(e => e.IsMultiTenant());
+            builder.Entity<TUserLogin>(e => e.IsMultiTenant());
+            builder.Entity<TRoleClaim>(e => e.IsMultiTenant());
+            builder.Entity<TUserToken>(e => e.IsMultiTenant());
+
             Shared.SetupModel(builder, () => TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
-            if (Shared.HasMultiTenantAttribute(typeof(TUser)))
-            {
-                RemoveIndex<TUser>(builder, "NormalizedUserName");
+            RemoveIndex<TUser>(builder, "NormalizedUserName");
+            builder.Entity<TUser>(e => e.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
 
-                builder.Entity<TUser>(b =>
-                    b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
-            }
-
-            if (Shared.HasMultiTenantAttribute(typeof(TRole)))
-            {
-                RemoveIndex<TRole>(builder, "NormalizedName");
-
-                builder.Entity<TRole>(b =>
-                    b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
-            }
+            RemoveIndex<TRole>(builder, "NormalizedName");
+            builder.Entity<TRole>(e => e.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
 
             // Adjust private key on UserLogin.
-            if (Shared.HasMultiTenantAttribute(typeof(TUserLogin)))
-            {
-                var pk = builder.Entity<TUserLogin>().Metadata.FindPrimaryKey();
-                builder.Entity<TUserLogin>().Metadata.RemoveKey(pk.Properties);
+            var pk = builder.Entity<TUserLogin>().Metadata.FindPrimaryKey();
+            builder.Entity<TUserLogin>().Metadata.RemoveKey(pk.Properties);
 
-                // Create a new ID and a unique index to replace the old pk.
-                builder.Entity<TUserLogin>(b => b.Property<string>("Id").ValueGeneratedOnAdd());
-                builder.Entity<TUserLogin>(b => b.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
-            }
+            // Create a new ID and a unique index to replace the old pk.
+            builder.Entity<TUserLogin>(e => e.Property<string>("Id").ValueGeneratedOnAdd());
+            builder.Entity<TUserLogin>(e => e.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
         }
 
         private static void RemoveIndex<T>(ModelBuilder builder, string propName) where T : class
         {
-        #if NETSTANDARD2_1
+#if NETSTANDARD2_1
             var prop = builder.Entity<T>().Metadata.FindProperty(propName);
             var index = builder.Entity<T>().Metadata.FindIndex(prop);
             builder.Entity<T>().Metadata.RemoveIndex(index);
-        #elif NETSTANDARD2_0
+#elif NETSTANDARD2_0
             var props = new List<IProperty>(new[] { builder.Entity<T>().Metadata.FindProperty(propName) });
             builder.Entity<T>().Metadata.RemoveIndex(props);
-        #else
-            #error No valid path!
-        #endif
+#else
+#error No valid path!
+#endif
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

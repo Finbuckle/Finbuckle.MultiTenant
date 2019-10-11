@@ -19,6 +19,7 @@ using System.Reflection;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
@@ -43,15 +44,19 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <param name="tenantInfo"></param>
         public static void SetupModel(ModelBuilder modelBuilder, Expression<Func<TenantInfo>> currentTenantInfoExpression)
         {
-            foreach (var t in modelBuilder.Model.GetEntityTypes().
-                Where(t => HasMultiTenantAttribute(t.ClrType)))
+            // Annotate the types marked with the MultiTenant Data Attribute
+            foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => HasMultiTenantAttribute(t.ClrType)))
+            {
+                modelBuilder.Entity(t.ClrType).IsMultiTenant();
+            }
 
+            foreach(var t in modelBuilder.Model.GetEntityTypes().Where(t => HasMultiTenantAnnotation(t)))
             {
                 var r = modelBuilder.Entity(t.ClrType);
 
                 try
                 {
-                    r.Property<string>("TenantId").IsRequired().HasMaxLength(Constants.TenantIdMaxLength);
+                    r.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength);
                 }
                 catch (Exception e)
                 {
@@ -111,6 +116,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return t.GetCustomAttribute<MultiTenantAttribute>() != null;
         }
 
+        public static bool HasMultiTenantAnnotation(IEntityType t)
+        {
+            return (bool?)t.FindAnnotation(Constants.MultiTenantAnnotation)?.Value ?? false;
+        }
+
         /// <summary>
         /// Checks the TenantId on entities taking into account
         /// the tenantNotSetMode and the tenantMismatchMode.
@@ -132,18 +142,18 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             var changedMultiTenantEntities = changeTracker.Entries().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted).
-                Where(e => Shared.HasMultiTenantAttribute(e.Entity.GetType()));
+                Where(e => Shared.HasMultiTenantAnnotation(e.Metadata));
 
             // ensure tenant context is valid
             if (changedMultiTenantEntities.Any())
                 CheckTenantInfo(tenantInfo);
 
-            // get list of all added entities with TenantScope attribute
-            var addedTenantScopeEntities = changedMultiTenantEntities.
+            // get list of all added entities with MultiTenant annotation
+            var addedMultiTenantEntities = changedMultiTenantEntities.
                 Where(e => e.State == EntityState.Added);
 
             // handle Tenant Id mismatches for added entities
-            var mismatchedAdded = addedTenantScopeEntities.
+            var mismatchedAdded = addedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
                 (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
@@ -168,7 +178,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
 
             // for added entities TenantNotSetMode is always Overwrite
-            var notSetAdded = addedTenantScopeEntities.
+            var notSetAdded = addedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue == null);
 
             foreach (var e in notSetAdded)
@@ -176,12 +186,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 e.Property("TenantId").CurrentValue = tenantInfo.Id;
             }
 
-            // get list of all modified entities with TenantScope attribute
-            var modifiedTenantScopeEntities = changedMultiTenantEntities.
+            // get list of all modified entities with MultiTenant annotation
+            var modifiedMultiTenantEntities = changedMultiTenantEntities.
                 Where(e => e.State == EntityState.Modified);
 
             // handle Tenant Id mismatches for modified entities
-            var mismatchedModified = modifiedTenantScopeEntities.
+            var mismatchedModified = modifiedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
                 (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
@@ -206,7 +216,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
 
             // handle Tenant Id not set for modified entities
-            var notSetModified = modifiedTenantScopeEntities.
+            var notSetModified = modifiedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue == null);
 
             if (notSetModified.Any())
@@ -225,12 +235,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 }
             }
 
-            // get list of all deleted  entities with TenantScope attribute
-            var deletedTenantScopeEntities = changedMultiTenantEntities.
+            // get list of all deleted  entities with MultiTenant annotation
+            var deletedMultiTenantEntities = changedMultiTenantEntities.
                 Where(e => e.State == EntityState.Deleted);
 
             // handle Tenant Id mismatches for deleted entities
-            var mismatchedDeleted = deletedTenantScopeEntities.
+            var mismatchedDeleted = deletedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue != null &&
                 (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
@@ -252,7 +262,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
 
             // handle Tenant Id not set for deleted entities
-            var notSetDeleted = deletedTenantScopeEntities.
+            var notSetDeleted = deletedMultiTenantEntities.
                 Where(e => (string)e.Property("TenantId").CurrentValue == null);
 
             if (notSetDeleted.Any())
