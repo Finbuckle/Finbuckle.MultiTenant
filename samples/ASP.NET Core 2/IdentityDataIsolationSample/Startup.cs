@@ -27,19 +27,10 @@ namespace IdentityDataIsolationSample
             // string since these vary by tenant.
             services.AddDbContext<ApplicationDbContext>();
 
-            services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddDefaultTokenProviders()
                     .AddDefaultUI(UIFramework.Bootstrap4)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            services.AddAuthentication()
-                .AddGoogle("Google", options =>
-                {
-                    // These configuration settings should be set via user-secrets or environment variables!
-                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
-                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
-                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
-                });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddMvcOptions(options => options.EnableEndpointRouting = false)
@@ -60,7 +51,6 @@ namespace IdentityDataIsolationSample
             services.AddMultiTenant()
                 .WithRouteStrategy(ConfigRoutes)
                 .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
-                .WithRemoteAuthentication()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                 {
                     // Since we are using the route strategy configure each tenant

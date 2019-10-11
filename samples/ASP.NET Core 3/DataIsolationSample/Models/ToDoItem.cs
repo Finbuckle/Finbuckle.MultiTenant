@@ -16,7 +16,6 @@ using Finbuckle.MultiTenant;
 
 namespace DataIsolationSample.Models
 {
-    [MultiTenant]
     public class ToDoItem
     {
         public int Id { get; set; }

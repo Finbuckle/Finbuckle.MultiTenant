@@ -28,7 +28,7 @@ namespace IdentityDataIsolationSample
             // string since these vary by tenant.
             services.AddDbContext<ApplicationDbContext>();
 
-            services.AddDefaultIdentity<MultiTenantIdentityUser>()
+            services.AddDefaultIdentity<IdentityUser>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
