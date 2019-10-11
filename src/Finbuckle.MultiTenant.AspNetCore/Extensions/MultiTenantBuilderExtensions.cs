@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckeMultiTenantBuilderExtensions
+    public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
         /// Configures support for multitenant OAuth and OpenIdConnect.
@@ -121,7 +121,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckeMultiTenantBuilderExtensions
+    public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
         /// Configures support for multitenant OAuth and OpenIdConnect.
