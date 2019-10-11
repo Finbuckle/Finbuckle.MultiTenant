@@ -34,9 +34,6 @@ namespace Finbuckle.MultiTenant
     public abstract class MultiTenantDbContext : DbContext
     {
         protected internal TenantInfo TenantInfo { get; protected set; }
-        
-        [Obsolete]
-        private ImmutableList<IEntityType> multiTenantEntityTypes = null;
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 
