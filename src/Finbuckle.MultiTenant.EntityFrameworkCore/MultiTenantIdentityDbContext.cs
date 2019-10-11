@@ -108,15 +108,6 @@ namespace Finbuckle.MultiTenant
         {
             base.OnModelCreating(builder);
 
-            // Add multitenant annotation to each entity type
-            builder.Entity<TUser>(e => e.IsMultiTenant());
-            builder.Entity<TRole>(e => e.IsMultiTenant());
-            builder.Entity<TUserClaim>(e => e.IsMultiTenant());
-            builder.Entity<TUserRole>(e => e.IsMultiTenant());
-            builder.Entity<TUserLogin>(e => e.IsMultiTenant());
-            builder.Entity<TRoleClaim>(e => e.IsMultiTenant());
-            builder.Entity<TUserToken>(e => e.IsMultiTenant());
-
             Shared.SetupModel(builder, () => TenantInfo);
 
             // Adjust "unique" constraints on Username and Rolename.
