@@ -16,10 +16,11 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 
 public class TestDbContext : MultiTenantDbContext
 {
-    public DbSet<Config> Configs { get; set; }
+    public DbSet<NonMultiTenantThing> Configs { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<ThingWithTenantId> Things { get; set; }
@@ -53,6 +54,26 @@ public class TestDbContextWithExistingGlobalFilter : TestDbContext
     }
 }
 
+public class TestDbContextWithAnnotations : MultiTenantDbContext
+{
+    public DbSet<ThingToBeAnnotated> ThingsWithoutAttribute { get; set; }
+
+    public TestDbContextWithAnnotations(TenantInfo tenantInfo) : base(tenantInfo)
+    {
+    }
+
+    public TestDbContextWithAnnotations(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ThingToBeAnnotated>().IsMultiTenant();
+
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
 public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext
 {
     public DbSet<ThingWithIntTenantId> Thing2s { get; set; }
@@ -77,10 +98,9 @@ public class TestTenantIdConstraintsTypeDbContext : MultiTenantDbContext
     { }
 }
 
-
-public class Config
+public class NonMultiTenantThing
 {
-    public int ConfigId { get; set; }
+    public int Id { get; set; }
     public List<Blog> Blogs { get; set; }
 }
 
@@ -91,7 +111,7 @@ public class Blog
     public string Title { get; set; }
 
     public int? ConfigId { get; set; }
-    public Config Config { get; set; }
+    public NonMultiTenantThing Config { get; set; }
     public List<Post> Posts { get; set; }
 }
 
@@ -103,6 +123,11 @@ public class Post
 
     public int BlogId { get; set; }
     public Blog Blog { get; set; }
+}
+
+public class ThingToBeAnnotated
+{
+    public int Id { get; set; }
 }
 
 [MultiTenant]
@@ -156,41 +181,41 @@ public class TestIdentityDbContext : MultiTenantIdentityDbContext
     }
 }
 
-public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
-{
-    public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
-        : base(tenantInfo)
-    {
-    }
+// public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+// {
+//     public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
+//         : base(tenantInfo)
+//     {
+//     }
 
-    public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
-        : base(tenantInfo, options)
-    {
-    }
-}
+//     public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
+//         : base(tenantInfo, options)
+//     {
+//     }
+// }
 
-public class TestIdentityDbContext_TUser_TRole_String : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string>
-{
-    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo)
-        : base(tenantInfo)
-    {
-    }
+// public class TestIdentityDbContext_TUser_TRole_String : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string>
+// {
+//     public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo)
+//         : base(tenantInfo)
+//     {
+//     }
 
-    public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo, DbContextOptions options)
-        : base(tenantInfo, options)
-    {
-    }
-}
+//     public TestIdentityDbContext_TUser_TRole_String(TenantInfo tenantInfo, DbContextOptions options)
+//         : base(tenantInfo, options)
+//     {
+//     }
+// }
 
-public class TestIdentityDbContext_AllGenericParams : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string, MultiTenantIdentityUserClaim<string>, MultiTenantIdentityUserRole<string>, MultiTenantIdentityUserLogin<string>, MultiTenantIdentityRoleClaim<string>, MultiTenantIdentityUserToken<string>>
-{
-    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo)
-        : base(tenantInfo)
-    {
-    }
+// public class TestIdentityDbContext_AllGenericParams : MultiTenantIdentityDbContext<MultiTenantIdentityUser, MultiTenantIdentityRole, string, MultiTenantIdentityUserClaim<string>, MultiTenantIdentityUserRole<string>, MultiTenantIdentityUserLogin<string>, MultiTenantIdentityRoleClaim<string>, MultiTenantIdentityUserToken<string>>
+// {
+//     public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo)
+//         : base(tenantInfo)
+//     {
+//     }
 
-    public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo, DbContextOptions options)
-        : base(tenantInfo, options)
-    {
-    }
-}
+//     public TestIdentityDbContext_AllGenericParams(TenantInfo tenantInfo, DbContextOptions options)
+//         : base(tenantInfo, options)
+//     {
+//     }
+// }

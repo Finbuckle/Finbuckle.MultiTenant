@@ -55,7 +55,7 @@ public class MultiTenantDbContextShould
     }
 
     [Fact]
-    public void IdentifyOnlyMultiTenantAnnotatedProperties()
+    public void IdentifyMultiTenantAttributedProperties()
     {
         var tenant1 = new TenantInfo("abc", "abc", "abc",
             "DataSource=testdb.db", null);
@@ -66,7 +66,21 @@ public class MultiTenantDbContextShould
             Assert.Equal(3, types.Count());
             Assert.Contains(typeof(Blog), types);
             Assert.Contains(typeof(Post), types);
-            Assert.DoesNotContain(typeof(Config), types);
+            Assert.DoesNotContain(typeof(NonMultiTenantThing), types);
+        }
+    }
+
+    [Fact]
+    public void IdentifyMultiTenantAnnotatedProperties()
+    {
+        var tenant1 = new TenantInfo("abc", "abc", "abc",
+            "DataSource=testdb.db", null);
+        using (var db = new TestDbContextWithAnnotations(tenant1, _options))
+        {
+            var types = db.MultiTenantEntityTypes.Select(t => t.ClrType);
+
+            Assert.Equal(1, types.Count());
+            Assert.Contains(typeof(ThingToBeAnnotated), types);
         }
     }
 

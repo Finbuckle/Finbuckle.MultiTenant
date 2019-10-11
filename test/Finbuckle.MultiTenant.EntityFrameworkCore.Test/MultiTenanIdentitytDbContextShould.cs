@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -52,10 +53,10 @@ public class MultiTenantIdentityDbContextShould
         var c = new TestIdentityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindProperty("NormalizedUserName"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindProperty("TenantId"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityUser)).FindProperty("NormalizedUserName"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityUser)).FindProperty("TenantId"));
 
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindIndex(props);
+        var index = c.Model.FindEntityType(typeof(IdentityUser)).FindIndex(props);
         Assert.NotNull(index);
         Assert.True(index.IsUnique);
     }
@@ -68,10 +69,10 @@ public class MultiTenantIdentityDbContextShould
         var c = new TestIdentityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindProperty("NormalizedName"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindProperty("TenantId"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityRole)).FindProperty("NormalizedName"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityRole)).FindProperty("TenantId"));
 
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindIndex(props);
+        var index = c.Model.FindEntityType(typeof(IdentityRole)).FindIndex(props);
         Assert.NotNull(index);
         Assert.True(index.IsUnique);
     }
@@ -83,7 +84,7 @@ public class MultiTenantIdentityDbContextShould
             "DataSource=testdb.db", null);
         var c = new TestIdentityDbContext(tenant1, _options);
 
-        Assert.True(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("Id").IsPrimaryKey());
+        Assert.True(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("Id").IsPrimaryKey());
     }
 
     [Fact]
@@ -94,11 +95,11 @@ public class MultiTenantIdentityDbContextShould
         var c = new TestIdentityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("LoginProvider"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("ProviderKey"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("TenantId"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("LoginProvider"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("ProviderKey"));
+        props.Add(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("TenantId"));
 
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindIndex(props);
+        var index = c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindIndex(props);
         Assert.NotNull(index);
         Assert.True(index.IsUnique);
     }
