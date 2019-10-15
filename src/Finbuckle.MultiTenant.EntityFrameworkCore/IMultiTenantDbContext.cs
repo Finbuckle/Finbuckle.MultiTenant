@@ -12,10 +12,18 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-namespace Finbuckle.MultiTenant
+using System.Collections.Immutable;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+
+namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    internal interface IMultiTenantDbContext
+    public interface IMultiTenantDbContext
     {
         TenantInfo TenantInfo { get; }
+        TenantMismatchMode TenantMismatchMode { get; set; }
+        TenantNotSetMode TenantNotSetMode { get; set; }
+        IImmutableList<IEntityType> MultiTenantEntityTypes { get; }
+        DbContext Context { get; }
     }
 }

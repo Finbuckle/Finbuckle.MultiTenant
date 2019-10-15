@@ -12,40 +12,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// A database context that enforces tenant integrity on entity types
-    /// marked with the MultiTenant attribute.
+    /// marked with the MultiTenant annotation or attribute.
     /// </summary>
     public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     {
-        protected internal TenantInfo TenantInfo { get; protected set; }
-
-        protected string ConnectionString => TenantInfo.ConnectionString;
-
-        protected MultiTenantDbContext(TenantInfo tenantInfo)
-        {
-            this.TenantInfo = tenantInfo;
-        }
-
-        protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
-        {
-            this.TenantInfo = tenantInfo;
-        }
+        public TenantInfo TenantInfo { get; }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
@@ -59,48 +42,37 @@ namespace Finbuckle.MultiTenant
             }
         }
 
-        TenantInfo IMultiTenantDbContext.TenantInfo => TenantInfo;
+        public DbContext Context => this;
 
+        protected string ConnectionString => TenantInfo.ConnectionString;
+
+        protected MultiTenantDbContext(TenantInfo tenantInfo)
+        {
+            this.TenantInfo = tenantInfo;
+        }
+
+        protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
+        {
+            this.TenantInfo = tenantInfo;
+        }
+
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder);
+            modelBuilder.SetupMultiTenant();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = base.SaveChanges(acceptAllChangesOnSuccess);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }
