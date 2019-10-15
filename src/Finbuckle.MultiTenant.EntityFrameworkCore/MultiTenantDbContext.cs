@@ -31,7 +31,7 @@ namespace Finbuckle.MultiTenant
     /// A database context that enforces tenant integrity on entity types
     /// marked with the MultiTenant attribute.
     /// </summary>
-    public abstract class MultiTenantDbContext : DbContext
+    public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     {
         protected internal TenantInfo TenantInfo { get; protected set; }
 
@@ -58,10 +58,12 @@ namespace Finbuckle.MultiTenant
                 return Model.GetEntityTypes().Where(et => Shared.HasMultiTenantAnnotation(et)).ToImmutableList();
             }
         }
-        
+
+        TenantInfo IMultiTenantDbContext.TenantInfo => TenantInfo;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, () => TenantInfo);
+            Shared.SetupModel(modelBuilder);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

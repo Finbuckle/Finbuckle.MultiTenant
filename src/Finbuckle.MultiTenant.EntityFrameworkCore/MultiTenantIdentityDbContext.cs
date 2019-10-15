@@ -36,6 +36,13 @@ namespace Finbuckle.MultiTenant
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityUser>().IsMultiTenant();
+        }
     }
 
     /// <summary>
@@ -52,6 +59,13 @@ namespace Finbuckle.MultiTenant
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityRole>().IsMultiTenant();
+        }
     }
 
     public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
@@ -66,9 +80,20 @@ namespace Finbuckle.MultiTenant
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityUserClaim<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserRole<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserLogin<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityRoleClaim<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserToken<TKey>>().IsMultiTenant();
+        }
     }
 
-    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IMultiTenantDbContext
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
         where TUserClaim : IdentityUserClaim<TKey>
@@ -104,40 +129,13 @@ namespace Finbuckle.MultiTenant
             }
         }
 
+        TenantInfo IMultiTenantDbContext.TenantInfo => TenantInfo;
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            Shared.SetupModel(builder, () => TenantInfo);
-
-            // Adjust "unique" constraints on Username and Rolename.
-            RemoveIndex<TUser>(builder, "NormalizedUserName");
-            builder.Entity<TUser>(e => e.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
-
-            RemoveIndex<TRole>(builder, "NormalizedName");
-            builder.Entity<TRole>(e => e.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
-
-            // Adjust private key on UserLogin.
-            var pk = builder.Entity<TUserLogin>().Metadata.FindPrimaryKey();
-            builder.Entity<TUserLogin>().Metadata.RemoveKey(pk.Properties);
-
-            // Create a new ID and a unique index to replace the old pk.
-            builder.Entity<TUserLogin>(e => e.Property<string>("Id").ValueGeneratedOnAdd());
-            builder.Entity<TUserLogin>(e => e.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
-        }
-
-        private static void RemoveIndex<T>(ModelBuilder builder, string propName) where T : class
-        {
-#if NETSTANDARD2_1
-            var prop = builder.Entity<T>().Metadata.FindProperty(propName);
-            var index = builder.Entity<T>().Metadata.FindIndex(prop);
-            builder.Entity<T>().Metadata.RemoveIndex(index);
-#elif NETSTANDARD2_0
-            var props = new List<IProperty>(new[] { builder.Entity<T>().Metadata.FindProperty(propName) });
-            builder.Entity<T>().Metadata.RemoveIndex(props);
-#else
-#error No valid path!
-#endif
+            Shared.SetupModel(builder);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

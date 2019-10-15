@@ -42,65 +42,16 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </remarks>
         /// <param name="modelBuilder"></param>
         /// <param name="tenantInfo"></param>
-        public static void SetupModel(ModelBuilder modelBuilder, Expression<Func<TenantInfo>> currentTenantInfoExpression)
+        public static void SetupModel(ModelBuilder modelBuilder)
         {
             // Annotate the types marked with the MultiTenant Data Attribute
             foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => HasMultiTenantAttribute(t.ClrType)))
             {
                 modelBuilder.Entity(t.ClrType).IsMultiTenant();
             }
-
-            foreach(var t in modelBuilder.Model.GetEntityTypes().Where(t => HasMultiTenantAnnotation(t)))
-            {
-                var r = modelBuilder.Entity(t.ClrType);
-
-                try
-                {
-                    r.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength);
-                }
-                catch (Exception e)
-                {
-                    throw new MultiTenantException($"{t.ClrType} unable to add TenantId property", e);
-                }
-
-                // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
-
-                // where e is one of our entity types
-                // will need this ParameterExpression for next step and for final step
-                var entityParamExp = Expression.Parameter(t.ClrType, "e");
-
-                // override to match existing query paraameter if applicable
-                if (GetQueryFilter(r) != null)
-                {
-                    entityParamExp = GetQueryFilter(r).Parameters.First();
-                }
-
-                // build up expression tree for EF.Property<string>(e, "TenantId")
-                var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-                var efPropertyExp = Expression.Call(typeof(EF), "Property", new[] { typeof(string) }, entityParamExp, tenantIdExp);
-                var leftExp = efPropertyExp;
-
-                // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id
-                var rightExp = Expression.Property(currentTenantInfoExpression.Body, nameof(TenantInfo.Id));
-                var predicate = Expression.Equal(leftExp, rightExp);
-
-                // combine with existing filter
-                if (GetQueryFilter(r) != null)
-                {
-                    var originalFilter = GetQueryFilter(r);
-                    predicate = Expression.AndAlso(originalFilter.Body, predicate);
-                }
-
-                // build the final expression tree
-                var delegateType = Expression.GetDelegateType(t.ClrType, typeof(bool));
-                var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
-
-                // set the filter
-                r.HasQueryFilter(lambdaExp);
-            }
         }
 
-        private static LambdaExpression GetQueryFilter(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder r)
+        internal static LambdaExpression GetQueryFilter(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder r)
         {
             #if NETSTANDARD2_1
                 return r.Metadata.GetQueryFilter();
