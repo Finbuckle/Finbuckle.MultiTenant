@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+﻿//    Copyright 2018 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -10,18 +10,24 @@
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
-//    limitations under the 
+//    limitations under the License.
+
+using Microsoft.EntityFrameworkCore.Metadata;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    /// <summary>
-    /// Contains constant values for Finbuckle.MultiTenant.EntityFrameworkCore.
-    /// </summary>
-    internal static class Constants
+    public static class ModelExtensions
     {
         /// <summary>
-        /// The annotation name used for configuring MultiTenant entities.
+        /// Gets all MultiTenant entity types defined in the model.
         /// </summary>
-        public const string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
+        /// <param name="model">the model from which to list entities.</param>
+        /// <returns>MultiTenant entity types.</returns>
+        public static IEnumerable<IEntityType> GetMultiTenantEntityTypes(this IModel model)
+        {
+            return model.GetEntityTypes().Where(et => et.IsMultiTenant());
+        }
     }
 }

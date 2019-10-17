@@ -23,16 +23,16 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// Checks the TenantId on entities taking into account
         /// TenantNotSetMode and TenantMismatchMode.
         /// </summary>
-        public static void EnforceMultiTenant(this IMultiTenantDbContext context)
+        public static void EnforceMultiTenant<TContext>(this TContext context) where TContext : DbContext, IMultiTenantDbContext
         {
-            var changeTracker = context.Context.ChangeTracker;
+            var changeTracker = context.ChangeTracker;
             var tenantInfo = context.TenantInfo;
             var tenantMismatchMode = context.TenantMismatchMode;
             var tenantNotSetMode = context.TenantNotSetMode;
 
             var changedMultiTenantEntities = changeTracker.Entries().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted).
-                Where(e => Shared.HasMultiTenantAnnotation(e.Metadata));
+                Where(e => e.Metadata.IsMultiTenant());
 
             // ensure tenant context is valid
             if (changedMultiTenantEntities.Any())

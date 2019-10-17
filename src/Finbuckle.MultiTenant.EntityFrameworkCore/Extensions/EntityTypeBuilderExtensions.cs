@@ -30,17 +30,35 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             public IMultiTenantDbContext Context { get; }
         }
 
-        public static EntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
+        internal static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
         {
-            builder.HasAnnotation(Constants.MultiTenantAnnotation, true);
+#if NETSTANDARD2_1
+            return builder.Metadata.GetQueryFilter();
+#elif NETSTANDARD2_0
+            return builder.Metadata.QueryFilter;
+#else
+#error No valid path!
+#endif
+        }
+
+        /// <summary>
+        /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after 
+        /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
+        /// </summary>
+        /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
+        /// <param name="builder">The entity's type builder</param>
+        /// <returns>The original type builder reference for chaining</returns>
+        public static T IsMultiTenant<T>(this T builder) where T : EntityTypeBuilder
+        {
+            builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
 
             try
             {
                 builder.Property<string>("TenantId").IsRequired().HasMaxLength(Core.Constants.TenantIdMaxLength);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", e);
+                throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
             }
 
             // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
@@ -49,7 +67,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // will need this ParameterExpression for next step and for final step
             var entityParamExp = Expression.Parameter(builder.Metadata.ClrType, "e");
 
-            var existingQueryFilter = Shared.GetQueryFilter(builder);
+            var existingQueryFilter = builder.GetQueryFilter();
 
             // override to match existing query paraameter if applicable
             if (existingQueryFilter != null)
@@ -62,15 +80,16 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             var efPropertyExp = Expression.Call(typeof(EF), "Property", new[] { typeof(string) }, entityParamExp, tenantIdExp);
             var leftExp = efPropertyExp;
 
-            // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
             var scope = new ExpressionVariableScope();
-            var contextExpr = Expression.Constant(scope);
-            var getVariable = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
-            var access = Expression.MakeMemberAccess(contextExpr, getVariable);
+            var scopeConstantExp = Expression.Constant(scope);
 
-            var a = Expression.Property(access, nameof(IMultiTenantDbContext.TenantInfo));
+            // EF will rewrite the IMultiTenantDbContext reference to the correct context type
+            var contextVariableExp = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
+            var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextVariableExp);
 
-            var rightExp = Expression.Property(a, nameof(TenantInfo.Id));
+            // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
+            var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
+            var rightExp = Expression.Property(contextTenantInfoExp, nameof(TenantInfo.Id));
             var predicate = Expression.Equal(leftExp, rightExp);
 
             // combine with existing filter

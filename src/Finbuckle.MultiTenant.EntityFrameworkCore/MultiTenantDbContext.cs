@@ -38,11 +38,9 @@ namespace Finbuckle.MultiTenant
         {
             get
             {
-                return Model.GetEntityTypes().Where(et => Shared.HasMultiTenantAnnotation(et)).ToImmutableList();
+                return Model.GetMultiTenantEntityTypes().ToImmutableList();
             }
         }
-
-        public DbContext Context => this;
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 

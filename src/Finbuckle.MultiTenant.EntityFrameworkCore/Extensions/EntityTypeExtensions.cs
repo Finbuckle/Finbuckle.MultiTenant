@@ -1,4 +1,4 @@
-// Copyright 2019 Andrew White
+﻿// Copyright 2019 Andrew White
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,27 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    static class FinbuckleModelBuilderExtensions
+    public static class EntityTypeExtensions
     {
         /// <summary>
-        /// Configures any entity's with the [MultiTenant] attribute.
+        /// Whether or not the <see cref="IEntityType"/> is configured as MultiTenant.
         /// </summary>
-        public static ModelBuilder SetupMultiTenant(this ModelBuilder modelBuilder)
+        /// <param name="entityType">The entity type to test for MultiTenant configuration.</param>
+        /// <returns><see cref="true"/> if the entity type has MultiTenant configuration, <see cref="false"/> if not.</returns>
+        public static bool IsMultiTenant(this IEntityType entityType)
         {
-            // Annotate the types marked with the MultiTenant Data Attribute
-            foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => t.ClrType.HasMultiTenantAttribute()))
-            {
-                modelBuilder.Entity(t.ClrType).IsMultiTenant();
-            }
-
-            return modelBuilder;
+            return (bool?)entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
         }
     }
 }

@@ -24,6 +24,5 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         TenantMismatchMode TenantMismatchMode { get; set; }
         TenantNotSetMode TenantNotSetMode { get; set; }
         IImmutableList<IEntityType> MultiTenantEntityTypes { get; }
-        DbContext Context { get; }
     }
 }

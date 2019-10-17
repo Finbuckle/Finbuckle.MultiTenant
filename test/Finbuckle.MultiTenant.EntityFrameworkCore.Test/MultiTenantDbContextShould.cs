@@ -79,7 +79,7 @@ public class MultiTenantDbContextShould
         {
             var types = db.MultiTenantEntityTypes.Select(t => t.ClrType);
 
-            Assert.Equal(1, types.Count());
+            Assert.Single(types);
             Assert.Contains(typeof(ThingToBeAnnotated), types);
         }
     }
