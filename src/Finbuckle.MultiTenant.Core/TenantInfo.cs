@@ -22,6 +22,10 @@ namespace Finbuckle.MultiTenant
     {
         private string id;
 
+        public TenantInfo()
+        {
+        }
+
         public TenantInfo(string id, string identifier, string name, string connectionString, IDictionary<string, object> items)
         {
             Id = id;
