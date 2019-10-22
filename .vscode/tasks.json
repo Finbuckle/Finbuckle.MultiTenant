@@ -29,7 +29,7 @@
             ],
             "group": "test",
             "presentation": {
-                "reveal": "silent"
+                "reveal": "always"
             },
             "problemMatcher": "$msCompile"
         }
