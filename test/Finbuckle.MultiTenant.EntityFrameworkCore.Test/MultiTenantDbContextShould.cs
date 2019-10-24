@@ -16,6 +16,7 @@ using System.Data.Common;
 using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -61,7 +62,7 @@ public class MultiTenantDbContextShould
             "DataSource=testdb.db", null);
         using (var db = new TestDbContext(tenant1, _options))
         {
-            var types = db.MultiTenantEntityTypes.Select(t => t.ClrType);
+            var types = db.Model.GetMultiTenantEntityTypes().Select(t => t.ClrType);
 
             Assert.Equal(3, types.Count());
             Assert.Contains(typeof(Blog), types);
@@ -77,7 +78,7 @@ public class MultiTenantDbContextShould
             "DataSource=testdb.db", null);
         using (var db = new TestDbContextWithAnnotations(tenant1, _options))
         {
-            var types = db.MultiTenantEntityTypes.Select(t => t.ClrType);
+            var types = db.Model.GetMultiTenantEntityTypes().Select(t => t.ClrType);
 
             Assert.Single(types);
             Assert.Contains(typeof(ThingToBeAnnotated), types);
@@ -508,19 +509,19 @@ public class MultiTenantDbContextShould
             {
                 var entityType = db.Model.GetEntityTypes().Where(e=>e.ClrType == typeof(Post)).Single();
                 var maxLength = entityType.FindProperty("TenantId").GetMaxLength();
-                Assert.Equal(Constants.TenantIdMaxLength, maxLength);
+                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, maxLength);
 
                 entityType = db.Model.GetEntityTypes().Where(e=>e.ClrType == typeof(ThingWithTenantId)).Single();
                 maxLength = entityType.FindProperty("TenantId").GetMaxLength();
-                Assert.Equal(Constants.TenantIdMaxLength, maxLength);
+                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, maxLength);
 
                 entityType = db.Model.GetEntityTypes().Where(e=>e.ClrType == typeof(ThingWithHigherTenantIdMaxLength)).Single();
                 maxLength = entityType.FindProperty("TenantId").GetMaxLength();
-                Assert.Equal(Constants.TenantIdMaxLength, maxLength);
+                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, maxLength);
 
                 entityType = db.Model.GetEntityTypes().Where(e=>e.ClrType == typeof(ThingWithLowerTenantIdMaxLength)).Single();
                 maxLength = entityType.FindProperty("TenantId").GetMaxLength();
-                Assert.Equal(Constants.TenantIdMaxLength, maxLength);        
+                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, maxLength);        
             }
         }
         finally
