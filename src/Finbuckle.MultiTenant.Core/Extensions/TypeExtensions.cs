@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant
 {
     internal static class TypeExtensions
     {
