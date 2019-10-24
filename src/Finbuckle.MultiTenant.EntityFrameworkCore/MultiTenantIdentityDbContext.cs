@@ -133,7 +133,8 @@ namespace Finbuckle.MultiTenant
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
-        public IImmutableList<IEntityType> MultiTenantEntityTypes
+        [Obsolete]
+        internal IImmutableList<IEntityType> MultiTenantEntityTypes
         {
             get
             {

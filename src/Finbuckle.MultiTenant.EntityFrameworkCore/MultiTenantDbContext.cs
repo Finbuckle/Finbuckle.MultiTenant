@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -34,7 +35,8 @@ namespace Finbuckle.MultiTenant
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
-        public IImmutableList<IEntityType> MultiTenantEntityTypes
+        [Obsolete]
+        internal IImmutableList<IEntityType> MultiTenantEntityTypes
         {
             get
             {

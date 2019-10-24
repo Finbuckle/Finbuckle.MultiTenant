@@ -2,17 +2,17 @@
 
 ## Introduction
 
-Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is used as the backing store. It works similarly to [normal Finbuckle.Multitenant Entity Framework Core data isolation](EFCore) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`.
+Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`. The same functionality can also be added without deriving from `MultiTenantIdentityDbContext<TUser>` as described in [Data Isolation with Entity Framework Core](EFCore).
 
-See the [IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample) project for a comprehensive example on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. This sample illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
+See the Identity data isolation sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
 
 ## Configuration
-Add the `Finbuckle.MultiTenant.EntityFrameworkCore` and package to the project:
+Add the `Finbuckle.MultiTenant.` and package to the project:
 ```{.bash}
-dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
+dotnet add package Finbuckle.MultiTenant
 ```
 
-Derive the database context from `MultiTenantIdentityDbContext<TUser>` instead of `IdentityDbContext<TUser>`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor:
+Derive the database context from `MultiTenantIdentityDbContext<TUser>` instead of `IdentityDbContext<TUser>`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor. Also, `TUser` must derive from `IdentityUser` which uses a string for its primary key.
 
 ```
 public class MyIdentityDbContext : MultiTenantIdentityDbContext<appUser>
@@ -23,8 +23,6 @@ public class MyIdentityDbContext : MultiTenantIdentityDbContext<appUser>
     ...
 }
 ```
-
->{.small} `TUser` must derive from `IdentityUser` which uses a string for its primary key.
 
 Add the `[MultiTenant]` attribute to the User entity classes:
 
@@ -58,23 +56,15 @@ The [ASP.NET Core Identity data model](https://docs.microsoft.com/en-us/aspnet/c
 - `TRoleClaim`
 - `TUserRole`
 
-Default classes exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used as the generic parameters. The default for `TKey` is `string`. Apps can provide their own classes for any of these by using alternative forms of the database context which take varying number of generic type parameters. Simple use-cases derive from `IdentityDbContext` classes which require only a few generic parameters and plug in the default classes for the rest.
+Default entity types exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used as the generic parameters. The default for `TKey` is `string`. Apps can provide their own entity types for any of these by using alternative forms of the database context which take varying number of generic type parameters. Simple use-cases derive from `IdentityDbContext` entity types which require only a few generic parameters and plug in the default entity types for the rest.
 
-Finbuckle.MultiTenant supports this approach by providing classes derived from each default model class with the `[MultiTenant]` attribute applied to them. These classes are:
-- `MultiTenantIdentityUser`
-- `MultiTenantIdentityRole`
-- `MultiTenantIdentityUserClaim`
-- `MultiTenantIdentityUserToken`
-- `MultiTenantIdentityUserLogin`
-- `MultiTenantIdentityRoleClaim`
-- `MultiTenantIDentityUserRole`
 
-Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all of the default classes and `string` for `TKey`.
+Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all of the default entity types and `string` for `TKey`. All entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest.
+Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest. `TUser` will not be configured as multitenant by default. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as multitenant by default. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters. No entity types will be configured as multitenant.
 
-When providing non-default parameters it is recommended that provided the classes have the `[MultiTenant]` attribute or derive from a type with the attribute.
+When providing non-default parameters it is recommended that provided the entity types have the `[MultiTenant]` attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating`.
