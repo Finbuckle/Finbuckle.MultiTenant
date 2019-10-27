@@ -56,7 +56,6 @@ namespace Finbuckle.MultiTenant
             this.TenantInfo = tenantInfo;
         }
 
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.SetupMultiTenant();
