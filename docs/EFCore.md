@@ -43,7 +43,6 @@ protected override void OnModelCreating(ModelBuilder builder)
 }
 ```
 
-
 ### Using the fluent API
 Alternatively, the fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the same functionality for db contexts that do not derive from `MultiTenantDbContext`. Note that `SetupMultiTenant` is not needed.
 
@@ -176,19 +175,20 @@ In `OnModelCreating` use the `EntityTypeBuilder` fluent API extension method `Is
 ```cs
 protected override void OnModelCreating(ModelBuilder builder)
 {
-    // Configure an entity type to be multitenant.
-    builder.Entity<MyEntityType>().IsMultiTenant();
-    
+    // If necessary call the base class method.
+    // Recommendede to be called first.
+    base.OnModelCreating(builder);
+
     // Setup all entity types marked with the [MultiTenant] data attribute
     builder.SetupMultiTenant();
 
-    // If necessary call the base class method.
-    // Can also be called before the methods above.
-    base.OnModelCreating(builder);
+    // Configure an entity type to be multitenant.
+    builder.Entity<MyEntityType>().IsMultiTenant();
+
 }
 ```
 
-In `SaveChanges` and `SaveChangesAsync` call the `IMultiTenantDbContext` extension method `EnforceMultiTenant` before calling the base class method. This ensures proper data isolation and behavior for `TenantMismatchMode` and `TenantNotSetMode`.
+In `SaveChanges` and `SaveChangesAsync` call the `IMultiTenantDbContext` extension method `EnforceMultiTenant` **before** calling the base class method. This ensures proper data isolation and behavior for `TenantMismatchMode` and `TenantNotSetMode`.
 
 ```cs
 public override int SaveChanges(bool acceptAllChangesOnSuccess)
