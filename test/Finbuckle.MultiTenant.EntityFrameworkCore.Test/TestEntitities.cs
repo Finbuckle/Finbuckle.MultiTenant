@@ -168,15 +168,3 @@ public class ThingWithHigherTenantIdMaxLength
     public string TenantId { get; set; }
 }
 
-public class TestIdentityDbContext : MultiTenantIdentityDbContext
-{
-    public TestIdentityDbContext(TenantInfo tenantInfo)
-        : base(tenantInfo)
-    {
-    }
-
-    public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
-        : base(tenantInfo, options)
-    {
-    }
-}
