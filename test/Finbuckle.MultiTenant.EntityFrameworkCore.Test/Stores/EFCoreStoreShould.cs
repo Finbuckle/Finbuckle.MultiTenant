@@ -21,86 +21,89 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
+namespace EFCoreStoreShould
 {
-    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
+    public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
     {
-    }
-}
-
-public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
-{
-    public string Id { get; set; }
-    public string Identifier { get; set; }
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
-}
-
-public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
-{
-    protected override IMultiTenantStore CreateTestStore()
-    {
-        var connection = new SqliteConnection("DataSource=:memory:");
-        connection.Open();
-        var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
-                .Options;
-        var dbContext = new TestEFCoreStoreDbContext(options);
-        dbContext.Database.EnsureCreated();
-
-        var store = new MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
-            (new EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>(dbContext), null);
-
-        return PopulateTestStore(store);
+        public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
+        {
+        }
     }
 
-    // Note, basic store functionality tested in MultiTenantStoresShould.cs
-
-    [Fact]
-    public void AddTenantIdLengthConstraint()
+    public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
     {
-        var prop = GetModelProperty("Id");
-        Assert.Equal(Constants.TenantIdMaxLength, prop.GetMaxLength());
+        public string Id { get; set; }
+        public string Identifier { get; set; }
+        public string Name { get; set; }
+        public string ConnectionString { get; set; }
     }
 
-    private static IProperty GetModelProperty(string propName)
+    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
     {
-        var connection = new SqliteConnection("DataSource=:memory:");
-        var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
-                .Options;
-        var dbContext = new TestEFCoreStoreDbContext(options);
+        protected override IMultiTenantStore CreateTestStore()
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+            var options = new DbContextOptionsBuilder()
+                    .UseSqlite(connection)
+                    .Options;
+            var dbContext = new TestEFCoreStoreDbContext(options);
+            dbContext.Database.EnsureCreated();
 
-        var model = dbContext.Model.FindEntityType(typeof(TestTenantInfoEntity));
-        var prop = model.GetProperties().Where(p => p.Name == propName).Single();
-        return prop;
-    }
+            var store = new MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
+                (new EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>(dbContext), null);
 
-    [Fact]
-    public void AddTenantIdAsKey()
-    {
-        var prop = GetModelProperty("Id");
-        Assert.True(prop.IsPrimaryKey());
-    }
+            return PopulateTestStore(store);
+        }
 
-    [Fact]
-    public void AddIdentifierUniqueConstraint()
-    {
-        var prop = GetModelProperty("Identifier");
-        Assert.True(prop.IsIndex());
-    }
+        // Note, basic store functionality tested in MultiTenantStoresShould.cs
 
-    [Fact]
-    public void AddNameRequiredConstraint()
-    {
-        var prop = GetModelProperty("Name");
-        Assert.False(prop.IsNullable);
-    }
+        [Fact]
+        public void AddTenantIdLengthConstraint()
+        {
+            var prop = GetModelProperty("Id");
+            Assert.Equal(Constants.TenantIdMaxLength, prop.GetMaxLength());
+        }
 
-    [Fact]
-    public void AddConnectionStringRequiredConstraint()
-    {
-        var prop = GetModelProperty("ConnectionString");
-        Assert.False(prop.IsNullable);
+        private static IProperty GetModelProperty(string propName)
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            var options = new DbContextOptionsBuilder()
+                    .UseSqlite(connection)
+                    .Options;
+            var dbContext = new TestEFCoreStoreDbContext(options);
+
+            var model = dbContext.Model.FindEntityType(typeof(TestTenantInfoEntity));
+            var prop = model.GetProperties().Where(p => p.Name == propName).Single();
+            return prop;
+        }
+
+        [Fact]
+        public void AddTenantIdAsKey()
+        {
+            var prop = GetModelProperty("Id");
+            Assert.True(prop.IsPrimaryKey());
+        }
+
+        [Fact]
+        public void AddIdentifierUniqueConstraint()
+        {
+            var prop = GetModelProperty("Identifier");
+            Assert.True(prop.IsIndex());
+        }
+
+        [Fact]
+        public void AddNameRequiredConstraint()
+        {
+            var prop = GetModelProperty("Name");
+            Assert.False(prop.IsNullable);
+        }
+
+        [Fact]
+        public void AddConnectionStringRequiredConstraint()
+        {
+            var prop = GetModelProperty("ConnectionString");
+            Assert.False(prop.IsNullable);
+        }
     }
 }

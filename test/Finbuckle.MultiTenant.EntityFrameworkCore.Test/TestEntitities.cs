@@ -18,25 +18,23 @@ using System.ComponentModel.DataAnnotations;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 
-public class TestDbContext : MultiTenantDbContext
+public class TestBlogDbContext : MultiTenantDbContext
 {
-    public DbSet<NonMultiTenantThing> Configs { get; set; }
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
-    public DbSet<ThingWithTenantId> Things { get; set; }
 
-    public TestDbContext(TenantInfo tenantInfo,
+    public TestBlogDbContext(TenantInfo tenantInfo,
         DbContextOptions options) :
         base(tenantInfo, options)
     {
     }
 
-    public TestDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+    public TestBlogDbContext(TenantInfo tenantInfo) : base(tenantInfo)
     {
     }
 }
 
-public class TestDbContextWithExistingGlobalFilter : TestDbContext
+public class TestDbContextWithExistingGlobalFilter : TestBlogDbContext
 {
     public TestDbContextWithExistingGlobalFilter(TenantInfo tenantInfo) : base(tenantInfo)
     {
@@ -54,49 +52,29 @@ public class TestDbContextWithExistingGlobalFilter : TestDbContext
     }
 }
 
-public class TestDbContextWithAnnotations : MultiTenantDbContext
-{
-    public DbSet<ThingToBeAnnotated> ThingsWithoutAttribute { get; set; }
+// public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext
+// {
+//     public DbSet<ThingWithIntTenantId> Thing2s { get; set; }
 
-    public TestDbContextWithAnnotations(TenantInfo tenantInfo) : base(tenantInfo)
-    {
-    }
+//     public TestWrongTenantIdTypeDbContext(TenantInfo tenantInfo,
+//         DbContextOptions<TestWrongTenantIdTypeDbContext> options) :
+//         base(tenantInfo, options)
+//     { }
+// }
 
-    public TestDbContextWithAnnotations(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
-    {
-    }
+// public class TestTenantIdConstraintsTypeDbContext : MultiTenantDbContext
+// {
+//     public DbSet<Post> PostWithShadowTenantId { get; set; }
+//     public DbSet<ThingWithTenantId> ThingsWithTenantId { get; set; }
+//     public DbSet<ThingWithLowerTenantIdMaxLength> ThingsWithLowerTenantIdsMaxLength { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ThingToBeAnnotated>().IsMultiTenant();
+//     public DbSet<ThingWithHigherTenantIdMaxLength> ThingsWithHigherTenantIdsMaxLength { get; set; }
 
-        base.OnModelCreating(modelBuilder);
-    }
-}
-
-public class TestWrongTenantIdTypeDbContext : MultiTenantDbContext
-{
-    public DbSet<ThingWithIntTenantId> Thing2s { get; set; }
-
-    public TestWrongTenantIdTypeDbContext(TenantInfo tenantInfo,
-        DbContextOptions<TestWrongTenantIdTypeDbContext> options) :
-        base(tenantInfo, options)
-    { }
-}
-
-public class TestTenantIdConstraintsTypeDbContext : MultiTenantDbContext
-{
-    public DbSet<Post> PostWithShadowTenantId { get; set; }
-    public DbSet<ThingWithTenantId> ThingsWithTenantId { get; set; }
-    public DbSet<ThingWithLowerTenantIdMaxLength> ThingsWithLowerTenantIdsMaxLength { get; set; }
-
-    public DbSet<ThingWithHigherTenantIdMaxLength> ThingsWithHigherTenantIdsMaxLength { get; set; }
-
-    public TestTenantIdConstraintsTypeDbContext(TenantInfo tenantInfo,
-        DbContextOptions<TestTenantIdConstraintsTypeDbContext> options) :
-        base(tenantInfo, options)
-    { }
-}
+//     public TestTenantIdConstraintsTypeDbContext(TenantInfo tenantInfo,
+//         DbContextOptions<TestTenantIdConstraintsTypeDbContext> options) :
+//         base(tenantInfo, options)
+//     { }
+// }
 
 public class NonMultiTenantThing
 {
@@ -109,9 +87,6 @@ public class Blog
 {
     public int BlogId { get; set; }
     public string Title { get; set; }
-
-    public int? ConfigId { get; set; }
-    public NonMultiTenantThing Config { get; set; }
     public List<Post> Posts { get; set; }
 }
 
@@ -124,47 +99,3 @@ public class Post
     public int BlogId { get; set; }
     public Blog Blog { get; set; }
 }
-
-public class ThingToBeAnnotated
-{
-    public int Id { get; set; }
-}
-
-[MultiTenant]
-public class ThingWithTenantId
-{
-    public int Id { get; set; }
-    public string Title { get; set; }
-
-    public string TenantId { get; set; }
-}
-
-[MultiTenant]
-public class ThingWithIntTenantId
-{
-    public int Id { get; set; }
-    public string Title { get; set; }
-
-    public int TenantId { get; set; }
-}
-
-[MultiTenant]
-public class ThingWithLowerTenantIdMaxLength
-{
-    public int Id { get; set; }
-    public string Title { get; set; }
-
-    [MaxLength(10)]
-    public string TenantId { get; set; }
-}
-
-[MultiTenant]
-public class ThingWithHigherTenantIdMaxLength
-{
-    public int Id { get; set; }
-    public string Title { get; set; }
-
-    [MaxLength(100)]
-    public string TenantId { get; set; }
-}
-
