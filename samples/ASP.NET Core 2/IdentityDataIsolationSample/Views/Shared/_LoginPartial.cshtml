@@ -1,7 +1,7 @@
 @using Microsoft.AspNetCore.Identity
 
-@inject SignInManager<MultiTenantIdentityUser> SignInManager
-@inject UserManager<MultiTenantIdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 @if (Context.GetMultiTenantContext().TenantInfo != null)
 {
