@@ -24,7 +24,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <summary>
         /// Configures any entity's with the [MultiTenant] attribute.
         /// </summary>
-        public static ModelBuilder SetupMultiTenant(this ModelBuilder modelBuilder)
+        public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
         {
             // Annotate the types marked with the MultiTenant Data Attribute
             foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => t.ClrType.HasMultiTenantAttribute()))

@@ -157,7 +157,7 @@ namespace Finbuckle.MultiTenant
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.SetupMultiTenant();
+            builder.ConfigureMultiTenant();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

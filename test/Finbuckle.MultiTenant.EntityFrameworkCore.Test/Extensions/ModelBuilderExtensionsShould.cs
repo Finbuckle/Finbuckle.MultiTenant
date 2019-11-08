@@ -31,7 +31,7 @@ namespace ModelBuiikderExtensionShould
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.SetupMultiTenant();
+            builder.ConfigureMultiTenant();
         }
     }
 
