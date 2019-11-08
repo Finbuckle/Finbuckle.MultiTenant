@@ -15,27 +15,34 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant
 {
     /// <summary>
     /// A database context that enforces tenant integrity on entity types
-    /// marked with the MultiTenant attribute.
+    /// marked with the MultiTenant annotation or attribute.
     /// </summary>
-    public abstract class MultiTenantDbContext : DbContext
+    public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     {
-        protected internal TenantInfo TenantInfo { get; protected set; }
-        
-        private ImmutableList<IEntityType> multiTenantEntityTypes = null;
+        public TenantInfo TenantInfo { get; }
+
+        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+        [Obsolete]
+        internal IImmutableList<IEntityType> MultiTenantEntityTypes
+        {
+            get
+            {
+                return Model.GetMultiTenantEntityTypes().ToImmutableList();
+            }
+        }
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 
@@ -49,65 +56,22 @@ namespace Finbuckle.MultiTenant
             this.TenantInfo = tenantInfo;
         }
 
-        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
-
-        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
-
-        public IImmutableList<IEntityType> MultiTenantEntityTypes
-        {
-            get
-            {
-                if (multiTenantEntityTypes == null)
-                {
-                    multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
-                       ToImmutableList();
-                }
-
-                return multiTenantEntityTypes;
-            }
-        }
-        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Shared.SetupModel(modelBuilder, () => TenantInfo);
+            modelBuilder.ConfigureMultiTenant();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = base.SaveChanges(acceptAllChangesOnSuccess);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

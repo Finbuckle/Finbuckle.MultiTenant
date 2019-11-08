@@ -14,6 +14,7 @@
 
 using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataIsolationSample.Data
@@ -32,6 +33,13 @@ namespace DataIsolationSample.Data
         {
             optionsBuilder.UseSqlite(ConnectionString);
             base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ToDoItem>().IsMultiTenant();
+            
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<ToDoItem> ToDoItems { get; set; }

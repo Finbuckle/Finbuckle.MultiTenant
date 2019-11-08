@@ -31,7 +31,7 @@ services.AddMultiTenant().
 
 ## Cookie Authentication Options
 
-See the [AuthenticationOptionsSamples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample) in the Finbuckle.MultiTenant GitHub repository for a complete demonstration of per-tenant cookie options.
+See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant cookie options.
 
 In the `Startup` class, [configure cookie authentication as usual](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie) for ASP.NET Core 2.1+:
 
@@ -102,7 +102,7 @@ These customizations apply to all authentication schemes using `JwtBearerOptions
 
 ## OpenID Connect Authentication Options
 
-See the [AuthenticationOptionsSamples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample) in the Finbuckle.MultiTenant GitHub repository for a complete demonstration of per-tenant OpenID Connect options.
+See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant OpenID Connect options.
 
 In the `Startup` class, configure OpenID Connect authentication as usual. The ASP.NET Core documentation does not cover this, but the official code repository contains a [sample project](https://github.com/aspnet/Security/tree/master/samples/OpenIdConnectSample).
 
@@ -133,6 +133,6 @@ These customizations apply to all authentication schemes using `OpenIdConnectOpt
 
 ## Other Authentication Methods
 
-See the [AuthenticationOptionsSamples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample) in the Finbuckle.MultiTenant GitHub repository for a complete demonstration of per-tenant Facebook authentication options.
+See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant Facebook authentication options.
 
-Finbuckle.MultiTenant per-tenant options work with most of the [built-in ASP.NET Core 2.1+ authentication methods](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/), with the exception of Twitter which is not derived from the internal OAuth-based authentication handler. Social login and other external providers require that `WithRemoteAuthentication` be called after `AddMultiTenant` in the `ConfigureServices` method. Each authentication method has its own options class, but the general approach is the same.
+Finbuckle.MultiTenant per-tenant options work with most of the [built-in ASP.NET Core 2.1+ authentication methods](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/). Social login and other external providers require that `WithRemoteAuthentication` be called after `AddMultiTenant` in the `ConfigureServices` method. Each authentication method has its own options class, but the general approach is the same.

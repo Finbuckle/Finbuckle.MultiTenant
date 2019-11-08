@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckeMultiTenantBuilderExtensions
+    public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.

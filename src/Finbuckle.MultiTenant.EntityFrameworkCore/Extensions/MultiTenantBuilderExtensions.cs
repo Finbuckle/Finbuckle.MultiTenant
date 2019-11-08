@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckeMultiTenantBuilderExtensions
+    public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
         /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.

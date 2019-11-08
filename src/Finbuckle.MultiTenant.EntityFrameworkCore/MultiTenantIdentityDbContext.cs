@@ -13,7 +13,6 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -22,12 +21,18 @@ using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Finbuckle.MultiTenant
 {
-    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<MultiTenantIdentityUser>
+    /// <summary>
+    /// An Identity database context that enforces tenant integrity on entity types
+    /// marked with the MultiTenant annotation or attribute.
+    /// <remarks>
+    /// All Identity entity types are multitenant by default.
+    /// </remarks>
+    /// </summary>
+    public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
@@ -35,15 +40,26 @@ namespace Finbuckle.MultiTenant
 
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityUser>().IsMultiTenant();
         }
     }
 
     /// <summary>
-    /// A database context compatible with Identity that enforces tenant integrity on entity types
-    /// marked with the MultiTenant attribute.
+    /// An Identity database context that enforces tenant integrity on entity types
+    /// marked with the MultiTenant annotation or attribute.
+    /// <remarks>
+    /// TUser is not multitenant by default.
+    /// All other Identity entity types are multitenant by default.
+    /// </remarks>
     /// </summary>
-    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, MultiTenantIdentityRole, string>
-        where TUser : MultiTenantIdentityUser
+    public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
+        where TUser : IdentityUser
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
         {
@@ -52,11 +68,26 @@ namespace Finbuckle.MultiTenant
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityRole>().IsMultiTenant();
+        }
     }
 
-    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, MultiTenantIdentityUserClaim<TKey>, MultiTenantIdentityUserRole<TKey>, MultiTenantIdentityUserLogin<TKey>, MultiTenantIdentityRoleClaim<TKey>, MultiTenantIdentityUserToken<TKey>>
-        where TUser : MultiTenantIdentityUser<TKey>
-        where TRole : MultiTenantIdentityRole<TKey>
+    /// <summary>
+    /// An Identity database context that enforces tenant integrity on entity types
+    /// marked with the MultiTenant annotation or attribute.
+    /// <remarks>
+    /// TUser and TRole are not multitenant by default.
+    /// All other Identity entity types are multitenant by default.
+    /// </remarks>
+    /// </summary>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+        where TUser : IdentityUser<TKey>
+        where TRole : IdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
@@ -66,9 +97,27 @@ namespace Finbuckle.MultiTenant
         protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<IdentityUserClaim<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserRole<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserLogin<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityRoleClaim<TKey>>().IsMultiTenant();
+            builder.Entity<IdentityUserToken<TKey>>().IsMultiTenant();
+        }
     }
 
-    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>
+    /// <summary>
+    /// An Identity database context that enforces tenant integrity on entity types
+    /// marked with the MultiTenant annotation or attribute.
+    /// <remarks>
+    /// No Identity entity types are multitenant by default.
+    /// </remarks>
+    /// </summary>
+    public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IMultiTenantDbContext
         where TUser : IdentityUser<TKey>
         where TRole : IdentityRole<TKey>
         where TUserClaim : IdentityUserClaim<TKey>
@@ -78,9 +127,20 @@ namespace Finbuckle.MultiTenant
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected internal TenantInfo TenantInfo { get; protected set; }
+        public TenantInfo TenantInfo { get; }
 
-        private ImmutableList<IEntityType> multiTenantEntityTypes = null;
+        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+        [Obsolete]
+        internal IImmutableList<IEntityType> MultiTenantEntityTypes
+        {
+            get
+            {
+                return Model.GetMultiTenantEntityTypes().ToImmutableList();
+            }
+        }
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 
@@ -94,109 +154,23 @@ namespace Finbuckle.MultiTenant
             this.TenantInfo = tenantInfo;
         }
 
-        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
-
-        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
-
-        public IImmutableList<IEntityType> MultiTenantEntityTypes
-        {
-            get
-            {
-                if (multiTenantEntityTypes == null)
-                {
-                    multiTenantEntityTypes = Model.GetEntityTypes().
-                       Where(t => Shared.HasMultiTenantAttribute(t.ClrType)).
-                       ToImmutableList();
-                }
-
-                return multiTenantEntityTypes;
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            Shared.SetupModel(builder, () => TenantInfo);
-
-            // Adjust "unique" constraints on Username and Rolename.
-            if (Shared.HasMultiTenantAttribute(typeof(TUser)))
-            {
-                RemoveIndex<TUser>(builder, "NormalizedUserName");
-
-                builder.Entity<TUser>(b =>
-                    b.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique());
-            }
-
-            if (Shared.HasMultiTenantAttribute(typeof(TRole)))
-            {
-                RemoveIndex<TRole>(builder, "NormalizedName");
-
-                builder.Entity<TRole>(b =>
-                    b.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique());
-            }
-
-            // Adjust private key on UserLogin.
-            if (Shared.HasMultiTenantAttribute(typeof(TUserLogin)))
-            {
-                var pk = builder.Entity<TUserLogin>().Metadata.FindPrimaryKey();
-                builder.Entity<TUserLogin>().Metadata.RemoveKey(pk.Properties);
-
-                // Create a new ID and a unique index to replace the old pk.
-                builder.Entity<TUserLogin>(b => b.Property<string>("Id").ValueGeneratedOnAdd());
-                builder.Entity<TUserLogin>(b => b.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique());
-            }
-        }
-
-        private static void RemoveIndex<T>(ModelBuilder builder, string propName) where T : class
-        {
-        #if NETSTANDARD2_1
-            var prop = builder.Entity<T>().Metadata.FindProperty(propName);
-            var index = builder.Entity<T>().Metadata.FindIndex(prop);
-            builder.Entity<T>().Metadata.RemoveIndex(index);
-        #elif NETSTANDARD2_0
-            var props = new List<IProperty>(new[] { builder.Entity<T>().Metadata.FindProperty(propName) });
-            builder.Entity<T>().Metadata.RemoveIndex(props);
-        #else
-            #error No valid path!
-        #endif
+            builder.ConfigureMultiTenant();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = base.SaveChanges(acceptAllChangesOnSuccess);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
-            CancellationToken cancellationToken = default(CancellationToken))
+                                                         CancellationToken cancellationToken = default(CancellationToken))
         {
-            // Emulate AutoDetectChanges so that EnforceTenantId has complete data to work with.
-            if (ChangeTracker.AutoDetectChangesEnabled)
-                ChangeTracker.DetectChanges();
-
-            Shared.EnforceTenantId(TenantInfo, ChangeTracker, TenantNotSetMode, TenantMismatchMode);
-
-            var origAutoDetectChange = ChangeTracker.AutoDetectChangesEnabled;
-            ChangeTracker.AutoDetectChangesEnabled = false;
-
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-
-            ChangeTracker.AutoDetectChangesEnabled = origAutoDetectChange;
-
-            return result;
+            this.EnforceMultiTenant();
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
 }

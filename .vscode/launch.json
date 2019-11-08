@@ -324,7 +324,6 @@
                 "/Views": "${workspaceFolder}/Views"
             }
         },
-        ,
         {
             "name": "Static Strategy Sample (netcoreapp2.2)",
             "type": "coreclr",

@@ -2,52 +2,37 @@
 
 ## Introduction
 
-Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is used as the backing store. It works similarly to [normal Finbuckle.Multitenant Entity Framework Core data isolation](EFCore) except the database context derives from `MultiTenantIdentityDbContext<TUser>` instead of `MultiTenantDbContext`.
+Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except Identity calls into the database instead of your own code.
 
-See the [IdentityDataIsolationSample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/IdentityDataIsolationSample) project for a comprehensive example on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. This sample illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
+See the Identity data isolation sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrates how to isolate the tenant Identity data and integrate the Identity UI to work with a route multitenant strategy.
 
 ## Configuration
-Add the `Finbuckle.MultiTenant.EntityFrameworkCore` and package to the project:
-```{.bash}
-dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
-```
+Configuring an Identity db context to be multitenant is identical to that of a regular db context as described in [Data Isolation With Entity Framework Core](EFCore) with a few extra specifics to keep in mind.
 
-Derive the database context from `MultiTenantIdentityDbContext<TUser>` instead of `IdentityDbContext<TUser>`. Make sure to forward the `TenantInfo` and `DbContextOptions<T>` into the base constructor:
+The simplest approach is to derive a db context from `MultiTenantIdentitybContext` (which itself derives from `IdentityDbContext`) and configure Identity to use the derived context.
 
-```
-public class MyIdentityDbContext : MultiTenantIdentityDbContext<appUser>
-{
-    public MyIdentityDbContext(TenantInfo tenantInfo, DbContextOptions<MyIdentityDbContext> options) :
-        base(tenantInfo, options)
-    { }
-    ...
-}
-```
+When customizing the Identity data model, for example deriving a user entity type class from `IdenityUser`, to designate the customized entity type as multitenant either:
+- Add the `[MultiTenant]` data attribute to the entity type class, or
+- use the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating` method (to ensure the Identity model exists).
 
->{.small} `TUser` must derive from `IdentityUser` which uses a string for its primary key.
+If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is required that base class `OnModelCreating` method is called **before** any multitenant extension methods.
 
-Add the `[MultiTenant]` attribute to the User entity classes:
+## Caveats
+Internally Finbuckle.MultiTenant's EFCore funtionality relies on a global query filter. Calling the `Find` method on an `DBSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multitenant.
 
-```
-[MultiTenant]
-public class appUser : IdentityUser
-{
-    ...
-}
-```
-
-ASP.NET Core Identity class methods on `UserManager<TUser>` or `UserStore<TUser>` that search for a specific user will be isolated to users of the current tenant, with the exception of `FindByIdAsync` which will search users of all tenants.
+Due to this limitation the Idenity method `UserManager<TUser>.FindByIdAsync` will bypass the filter and search across all tenants in the database. The `IdentityUser` class uses a GUID for the user id so there is negligable risk of data spillover, however a different implementation of `IdentityUser<TKey>` will need to ensure global uniqueness for the user id.
 
 ## Identity Options
+Identity options can be configured for the `IdentityOptions` class as described in (Per-Tenant Options). Any option that internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as describeed above. If in doubt check the Identity source code to be sure.
 
-Many identity options will be limited to the current tenant. For example, the option to require a unique email address per user will only require that an email be unique within the users for the current tenant. The exception is any option that internally relies on `UserManager<TUser>.FindByIdAsync`.
+The Identity option to require a unique email address per user will require email addresses be unique only within the current tenant, i.e. per-tenant options are not required for this.
 
 ## Authentication
 Internally, ASP.NET Core Identity uses regular ASP.NET Core authentication. It uses a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration), but under the hood the end result is the same in that `CookieAuthenticationOptions` are being configured and consumed.
 
 Finbuckle.Multitenant can customize these options per tenant so that user sessions are unique per tenant. See [per-tenant cookie authentication options](Authentication#cookie-authentication-options) for information on how to customize authentication options per tenant.
 
-## Support for Identity Model Types
+## Identity Model Customization with MultiTenantIdenitityDbContext
 The [ASP.NET Core Identity data model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-2.2#the-identity-model) relies on several types which are passed to the database context as generic parameters: 
 - `TUser`
 - `TRole`
@@ -58,23 +43,14 @@ The [ASP.NET Core Identity data model](https://docs.microsoft.com/en-us/aspnet/c
 - `TRoleClaim`
 - `TUserRole`
 
-Default classes exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used as the generic parameters. The default for `TKey` is `string`. Apps can provide their own classes for any of these by using alternative forms of the database context which take varying number of generic type parameters. Simple use-cases derive from `IdentityDbContext` classes which require only a few generic parameters and plug in the default classes for the rest.
+Default entity types exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used as the generic parameters. The default for `TKey` is `string`. Apps can provide their own entity types for any of these by using alternative forms of the database context which take varying number of generic type parameters. Simple use-cases derive from `IdentityDbContext` types which require only a few generic parameters and plug in the default entity types for the rest.
 
-Finbuckle.MultiTenant supports this approach by providing classes derived from each default model class with the `[MultiTenant]` attribute applied to them. These classes are:
-- `MultiTenantIdentityUser`
-- `MultiTenantIdentityRole`
-- `MultiTenantIdentityUserClaim`
-- `MultiTenantIdentityUserToken`
-- `MultiTenantIdentityUserLogin`
-- `MultiTenantIdentityRoleClaim`
-- `MultiTenantIDentityUserRole`
+Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all of the default entity types and `string` for `TKey`. All entity types will be configured as multitenant.
 
-Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all of the default classes and `string` for `TKey`.
+Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest. `TUser` will not be configured as multitenant by default, and it is up to the programmer to do so as desribed above. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as multitenant by default, and it is up to the programmer to do so as desribed above if desired. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters. No entity types will be configured as multitenant, and it is up to the programmer to do so as desribed above if desired.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters.
-
-When providing non-default parameters it is recommended that provided the classes have the `[MultiTenant]` attribute or derive from a type with the attribute.
+When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]` attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the base class `OnModelCreating`.

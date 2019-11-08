@@ -12,94 +12,181 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-public class MultiTenantIdentityDbContextShould
+namespace MultiTenantIdentityDbContextShould
 {
-    private DbContextOptions _options;
-    private DbConnection _connection;
-
-    public MultiTenantIdentityDbContextShould()
+    public class TestIdentityDbContext : MultiTenantIdentityDbContext
     {
-        _connection = new SqliteConnection("DataSource=:memory:");
-        _options = new DbContextOptionsBuilder()
-                .UseSqlite(_connection)
-                .Options;
+        public TestIdentityDbContext(TenantInfo tenantInfo)
+            : base(tenantInfo)
+        {
+        }
 
+        public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
+            : base(tenantInfo, options)
+        {
+        }
     }
 
-    [Fact]
-    public void WorkWithSingleParamCtor()
+    public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<IdentityUser>
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
-        var c = new TestIdentityDbContext(tenant1);
+        public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
+            : base(tenantInfo)
+        {
+        }
 
-        Assert.NotNull(c);
+        public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
+            : base(tenantInfo, options)
+        {
+        }
     }
 
-    [Fact]
-    public void AdjustUserIndex()
+    public class TestIdentityDbContext_TUser_TRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string>
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
-        var c = new TestIdentityDbContext(tenant1, _options);
+        public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo)
+            : base(tenantInfo)
+        {
+        }
 
-        var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindProperty("NormalizedUserName"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindProperty("TenantId"));
-
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityUser)).FindIndex(props);
-        Assert.NotNull(index);
-        Assert.True(index.IsUnique);
+        public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo, DbContextOptions options)
+            : base(tenantInfo, options)
+        {
+        }
     }
 
-    [Fact]
-    public void AdjustRoleIndex()
+    public class TestIdentityDbContext_All : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
-        var c = new TestIdentityDbContext(tenant1, _options);
 
-        var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindProperty("NormalizedName"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindProperty("TenantId"));
+        public TestIdentityDbContext_All(TenantInfo tenantInfo)
+            : base(tenantInfo)
+        {
+        }
 
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityRole)).FindIndex(props);
-        Assert.NotNull(index);
-        Assert.True(index.IsUnique);
+        public TestIdentityDbContext_All(TenantInfo tenantInfo, DbContextOptions options)
+            : base(tenantInfo, options)
+        {
+        }
     }
 
-    [Fact]
-    public void AdjustUserLoginKey()
+    public class MultiTenantIdentityDbContextShould
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
-        var c = new TestIdentityDbContext(tenant1, _options);
+        private DbContextOptions _options;
+        private DbConnection _connection;
 
-        Assert.True(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("Id").IsPrimaryKey());
-    }
+        public MultiTenantIdentityDbContextShould()
+        {
+            _connection = new SqliteConnection("DataSource=:memory:");
+            _options = new DbContextOptionsBuilder()
+                    .UseSqlite(_connection)
+                    .Options;
 
-    [Fact]
-    public void AddUserLoginIndex()
-    {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
-        var c = new TestIdentityDbContext(tenant1, _options);
+        }
 
-        var props = new List<IProperty>();
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("LoginProvider"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("ProviderKey"));
-        props.Add(c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindProperty("TenantId"));
+        [Fact]
+        public void WorkWithSingleParamCtor()
+        {
+            var tenant1 = new TenantInfo("abc", "abc", "abc",
+                "DataSource=testdb.db", null);
+            var c = new TestIdentityDbContext(tenant1);
 
-        var index = c.Model.FindEntityType(typeof(MultiTenantIdentityUserLogin<string>)).FindIndex(props);
-        Assert.NotNull(index);
-        Assert.True(index.IsUnique);
+            Assert.NotNull(c);
+        }
+
+        
+
+        [Theory]
+        [InlineData(typeof(IdentityUser), true)]
+        [InlineData(typeof(IdentityRole), true)]
+        [InlineData(typeof(IdentityUserClaim<string>), true)]
+        [InlineData(typeof(IdentityUserRole<string>), true)]
+        [InlineData(typeof(IdentityUserLogin<string>), true)]
+        [InlineData(typeof(IdentityRoleClaim<string>), true)]
+        [InlineData(typeof(IdentityUserToken<string>), true)]
+        public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType, bool isMultiTenant)
+        {
+            var tenant1 = new TenantInfo("abc",
+                                         "abc",
+                                         "abc",
+                                         "DataSource=testdb.db",
+                                         null);
+            var c = new TestIdentityDbContext(tenant1, _options);
+            var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
+
+            Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        }
+
+        [Theory]
+        [InlineData(typeof(IdentityUser), false)]
+        [InlineData(typeof(IdentityRole), true)]
+        [InlineData(typeof(IdentityUserClaim<string>), true)]
+        [InlineData(typeof(IdentityUserRole<string>), true)]
+        [InlineData(typeof(IdentityUserLogin<string>), true)]
+        [InlineData(typeof(IdentityRoleClaim<string>), true)]
+        [InlineData(typeof(IdentityUserToken<string>), true)]
+        public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType, bool isMultiTenant)
+        {
+            var tenant1 = new TenantInfo("abc",
+                                         "abc",
+                                         "abc",
+                                         "DataSource=testdb.db",
+                                         null);
+            var c = new TestIdentityDbContext_TUser(tenant1, _options);
+            var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
+
+            Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        }
+
+        [Theory]
+        [InlineData(typeof(IdentityUser), false)]
+        [InlineData(typeof(IdentityRole), false)]
+        [InlineData(typeof(IdentityUserClaim<string>), true)]
+        [InlineData(typeof(IdentityUserRole<string>), true)]
+        [InlineData(typeof(IdentityUserLogin<string>), true)]
+        [InlineData(typeof(IdentityRoleClaim<string>), true)]
+        [InlineData(typeof(IdentityUserToken<string>), true)]
+        public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType, bool isMultiTenant)
+        {
+            var tenant1 = new TenantInfo("abc",
+                                         "abc",
+                                         "abc",
+                                         "DataSource=testdb.db",
+                                         null);
+            var c = new TestIdentityDbContext_TUser_TRole(tenant1, _options);
+            var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
+
+            Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        }
+
+        [Theory]
+        [InlineData(typeof(IdentityUser), false)]
+        [InlineData(typeof(IdentityRole), false)]
+        [InlineData(typeof(IdentityUserClaim<string>), false)]
+        [InlineData(typeof(IdentityUserRole<string>), false)]
+        [InlineData(typeof(IdentityUserLogin<string>), false)]
+        [InlineData(typeof(IdentityRoleClaim<string>), false)]
+        [InlineData(typeof(IdentityUserToken<string>), false)]
+        public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType, bool isMultiTenant)
+        {
+            var tenant1 = new TenantInfo("abc",
+                                         "abc",
+                                         "abc",
+                                         "DataSource=testdb.db",
+                                         null);
+            var c = new TestIdentityDbContext_All(tenant1, _options);
+            var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
+
+            Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        }
     }
 }

@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2019 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -10,18 +10,18 @@
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
-//    limitations under the License.
+//    limitations under the 
 
-using Finbuckle.MultiTenant;
-
-namespace DataIsolationSample.Models
+namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class ToDoItem
+    /// <summary>
+    /// Contains constant values for Finbuckle.MultiTenant.EntityFrameworkCore.
+    /// </summary>
+    internal static class Constants
     {
-        public int Id { get; set; }
-        
-        public string Title { get; set; }
-
-        public bool Completed { get; set; }
+        /// <summary>
+        /// The annotation name used for configuring MultiTenant entities.
+        /// </summary>
+        public const string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
     }
 }
