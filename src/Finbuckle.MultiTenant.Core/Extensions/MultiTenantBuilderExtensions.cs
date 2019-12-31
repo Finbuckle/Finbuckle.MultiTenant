@@ -50,6 +50,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        [Obsolete("Consider using ConfigurationStore instead.")]
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     IConfigurationSection configurationSection)
             => builder.WithInMemoryStore(o => configurationSection.Bind(o), true);
@@ -60,6 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        [Obsolete("Consider using ConfigurationStore instead.")]
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     IConfigurationSection configurationSection,
                                                                     bool ignoreCase)
@@ -93,9 +95,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.WithStore<InMemoryStore>(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase));
         }
 
-        /// <summary>
-        /// Creates an InMemoryStore from configured InMemoryMultiTenantStoreOptions.
-        /// </summary>
+        // TODO: Clean up any "Configuration" stuff here once it is no longer supported
         private static InMemoryStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase)
         {
             if (config == null)
