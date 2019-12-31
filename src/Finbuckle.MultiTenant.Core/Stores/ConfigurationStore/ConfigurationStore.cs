@@ -13,12 +13,10 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
 namespace Finbuckle.MultiTenant.Stores
@@ -35,7 +33,22 @@ namespace Finbuckle.MultiTenant.Stores
 
         public ConfigurationStore(IConfiguration configuration, string sectionName)
         {
-            section = configuration.GetSection(defaultSectionName);
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            if (string.IsNullOrEmpty(sectionName))
+            {
+                throw new ArgumentException("Section name provided to the Configuration Store is null or empty.", nameof(sectionName));
+            }
+
+            section = configuration.GetSection(sectionName);
+            if(!section.Exists())
+            {
+                throw new MultiTenantException("Section name provided to the Configuration Store is invalid.");
+            }
+
             UpdateTenantMap();
             ChangeToken.OnChange(() => section.GetReloadToken(), UpdateTenantMap);
         }

@@ -30,9 +30,45 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
+        /// Adds a ConfigurationStore to the application. Uses the default IConfiguration and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
+        /// </summary>
+        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder)
+        {
+            builder.Services.TryAddSingleton<IMultiTenantStore>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                return new ConfigurationStore(config);
+            });
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a ConfigurationStore to the application. Uses the default section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
+        /// </summary>
+        /// <param name="configuration">The IConfiguration to load the section from.</param>
+        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder, IConfiguration configuration)
+        {
+            builder.Services.TryAddSingleton<IMultiTenantStore>(new ConfigurationStore(configuration));
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a ConfigurationStore to the application.
+        /// </summary>
+        /// <param name="configuration">The IConfiguration to load the section from.</param>
+        /// <param name="sectionName">The configuration section to load.</param>
+        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder,
+                                                                         IConfiguration configuration,
+                                                                         string sectionName)
+        {
+            builder.Services.TryAddSingleton<IMultiTenantStore>(new ConfigurationStore(configuration, sectionName));
+            return builder;
+        }
+
+        /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.
         /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder)
             => builder.WithInMemoryStore(true);
 
@@ -40,7 +76,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds an empty InMemoryStore to the application.
         /// </summary>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     bool ignoreCase)
             => builder.WithInMemoryStore(_ => { }, ignoreCase);
@@ -49,7 +84,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a case-insensitive InMemoryStore to the application using the provided ConfigurationSeciont.
         /// </summary>
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         [Obsolete("Consider using ConfigurationStore instead.")]
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     IConfigurationSection configurationSection)
@@ -60,7 +94,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         [Obsolete("Consider using ConfigurationStore instead.")]
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     IConfigurationSection configurationSection,
@@ -72,7 +105,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     Action<InMemoryStoreOptions> config)
             => builder.WithInMemoryStore(config, true);
@@ -82,7 +114,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
                                                                     Action<InMemoryStoreOptions> config,
                                                                     bool ignoreCase)
@@ -142,7 +173,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a StaticStrategy to the application.
         /// </summary>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithStaticStrategy(this FinbuckleMultiTenantBuilder builder,
                                                                      string identifier)
         {
@@ -182,7 +212,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             builder.Services.TryAddSingleton<FallbackStrategy>(sp => new FallbackStrategy(identifier));
-        
+
             return builder;
         }
     }

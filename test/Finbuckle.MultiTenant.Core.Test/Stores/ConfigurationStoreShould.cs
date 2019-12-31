@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
@@ -20,8 +21,35 @@ using Xunit;
 
 public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationStore>
 {
+    [Fact]
+    public void ThrowIfNullConfiguration()
+    {
+        Assert.Throws<ArgumentNullException>(() => new ConfigurationStore(null));
+    }
+
+    [Fact]
+    public void ThrowIfEmptyOrNullSection()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        IConfiguration configuration = configBuilder.Build();
+
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore(configuration, ""));
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore(configuration, null));
+    }
+
+    [Fact]
+    public void ThrowIfInvalidSection()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        IConfiguration configuration = configBuilder.Build();
+
+        Assert.Throws<MultiTenantException>(() => new ConfigurationStore(configuration, "invalid"));
+    }
+
     // Basic store functionality tested in MultiTenantStoresShould.cs
-    
+
     protected override IMultiTenantStore CreateTestStore()
     {
         var configBuilder = new ConfigurationBuilder();
