@@ -132,5 +132,9 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
     [InlineData("notFound", false)]
     public override void UpdateTenantInfoInStore(string id, bool expected)
     {
+        // Use params to supress build warnings.
+        id = id + "1";
+        expected = expected || true;
+
     }
 }
