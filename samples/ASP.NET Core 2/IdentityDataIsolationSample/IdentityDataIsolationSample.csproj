@@ -9,8 +9,10 @@
     <PackageReference Include="Microsoft.AspNetCore.App"/>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.0" />
     <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
-    <!-- This samples needs the latest version from source. 4.1.0 likely in the future. -->
-    <ProjectReference Include="../../../src/*/*.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 
 </Project>

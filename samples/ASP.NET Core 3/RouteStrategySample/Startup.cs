@@ -19,7 +19,7 @@ namespace RouteStrategySample
             services.AddControllersWithViews();
             
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithRouteStrategy();
         }
 

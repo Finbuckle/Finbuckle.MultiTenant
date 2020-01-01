@@ -53,7 +53,8 @@ else
             Configuration in <code>Startup.cs</code>:
         </p>
         <pre><code>// In ConfigureServices:
-services.AddMultiTenant()... // Set up a store...
+services.AddMultiTenant().
+    WithConfigurationStore().
     WithRouteStrategy();
 
 // In Configure:

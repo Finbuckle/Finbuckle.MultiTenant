@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" />
+    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 </Project>

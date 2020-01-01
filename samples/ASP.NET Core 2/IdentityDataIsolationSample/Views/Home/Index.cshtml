@@ -57,9 +57,8 @@
             </p>
             <p>
                 The Finbuckle and MegaCorp tenants share a common SQLite database, but Initech has its own separate datasebase.
-                Both of these databases need to be created by applying the latest migration via <em>dotnet ef database update</em> or similar.
-                To apply the migration to each database adjust the connection string used in the <em>Data/DesignTimeFactory.cs</em> file in
-                between migrations.
+                Both of these databases will be created the first time the app runs. If using the dotnet-ef commad line tool
+                modify the Data/DesignTimeFactory.cs file accordingly so that each database gets updated.
             </p>
             <p>
                 The use of per-tenant cookie options in this sample is similar to that of the 

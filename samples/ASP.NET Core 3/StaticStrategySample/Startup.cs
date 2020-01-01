@@ -18,7 +18,7 @@ namespace StaticStrategySample
         {
             services.AddControllersWithViews();
             services.AddMultiTenant()
-                    .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
+                    .WithConfigurationStore()
                     .WithStaticStrategy("finbuckle");
         }
 

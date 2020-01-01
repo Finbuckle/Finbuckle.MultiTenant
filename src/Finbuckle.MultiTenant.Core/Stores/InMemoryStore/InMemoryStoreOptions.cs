@@ -19,6 +19,7 @@ namespace Finbuckle.MultiTenant.Options
     /// <summary>
     /// Holds data for configuring an InMemoryStore.
     /// </summary>
+    // TODO: Reconsider after deprecating configuration loading.
     public class InMemoryStoreOptions
     {
         public string DefaultConnectionString { get; set; }

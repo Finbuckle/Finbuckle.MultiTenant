@@ -18,7 +18,7 @@ namespace BasePathStrategySample
             services.AddControllersWithViews();
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithBasePathStrategy();
         }
 
@@ -35,7 +35,7 @@ namespace BasePathStrategySample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("defaultt",  "{first_segment=}/{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute("defaultt", "{first_segment=}/{controller=Home}/{action=Index}");
             });
         }
     }

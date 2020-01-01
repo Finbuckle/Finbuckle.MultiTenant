@@ -20,21 +20,14 @@ namespace IdentityDataIsolationSample
 
             // Set up the databases for the sample if needed.
             var env = host.Services.GetService<IWebHostEnvironment>();
-
             if (env.EnvironmentName == "Development")
             {
-                var config = host.Services.GetRequiredService<IConfiguration>();
-                var options = new InMemoryStoreOptions();
-                config.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(options);
-                foreach (var tenant in options.TenantConfigurations.Where(tc => tc.ConnectionString != null))
+                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null)))
                 {
-                    using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, tenant.ConnectionString, null)))
-                    {
-                        await db.Database.MigrateAsync();
-                    }
+                    await db.Database.MigrateAsync();
                 }
 
-                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, options.DefaultConnectionString, null)))
+                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/InitechIdentity.db", null)))
                 {
                     await db.Database.MigrateAsync();
                 }

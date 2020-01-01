@@ -27,7 +27,7 @@ namespace SharedLoginSample
             // string since these vary by tenant.
             services.AddDbContext<ApplicationDbContext>();
 
-            services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddDefaultTokenProviders()
                     .AddDefaultUI(UIFramework.Bootstrap4)
                     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -50,7 +50,7 @@ namespace SharedLoginSample
 
             services.AddMultiTenant()
                 .WithRouteStrategy(ConfigRoutes)
-                .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
+                .WithConfigurationStore()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                 {
                    // Since we are using the route strategy configure each tenant

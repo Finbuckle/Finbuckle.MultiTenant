@@ -22,7 +22,7 @@ namespace DelegateStrategySample
             services.AddControllersWithViews();
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithDelegateStrategy(async context =>
                 {
                     ((HttpContext)context).Request.Query.TryGetValue("tenant", out StringValues tenantId);

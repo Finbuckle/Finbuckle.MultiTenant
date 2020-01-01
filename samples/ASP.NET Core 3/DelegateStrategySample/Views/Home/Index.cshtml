@@ -47,7 +47,7 @@ else
         This makes it a good strategy to use for testing purposes. In this sample we configure it to use the request query parameter "tenant"
         as the tenant identifier:
         <pre><code>services.AddMultiTenant().
-    WithInMemoryStore(...).
+    WithConfigurationStore().
     WithDelegateStrategy(async context =&gt; 
     {
         ((HttpContext)context).Request.Query.TryGetValue("tenant", out StringValues tenantId);

@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using DataIsolationSample.Data;
+using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace DataIsolationSample
@@ -7,7 +12,24 @@ namespace DataIsolationSample
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            // Set up the databases for the sample if needed.
+            var env = host.Services.GetService<IWebHostEnvironment>();
+            if (env.EnvironmentName == "Development")
+            {
+                using (var db = new ToDoDbContext(new TenantInfo(null, null, null, "Data Source=Data/ToDoList.db", null)))
+                {
+                    db.Database.MigrateAsync().Wait();
+                }
+
+                using (var db = new ToDoDbContext(new TenantInfo(null, null, null, "Data Source=Data/Initech_ToDoList.db", null)))
+                {
+                    db.Database.MigrateAsync().Wait();
+                }
+            }
+            
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

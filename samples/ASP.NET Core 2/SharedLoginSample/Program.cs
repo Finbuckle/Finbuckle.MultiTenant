@@ -7,6 +7,10 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Finbuckle.MultiTenant;
+using Microsoft.Extensions.DependencyInjection;
+using SharedLoginSample.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SharedLoginSample
 {
@@ -14,7 +18,19 @@ namespace SharedLoginSample
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var host = CreateWebHostBuilder(args).Build();
+
+            // Create and migrate the database if necessary.
+            var env = host.Services.GetService<IHostingEnvironment>();
+            if (env.EnvironmentName == "Development")
+            {
+                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null)))
+                {
+                    db.Database.MigrateAsync().Wait();
+                }
+            }
+
+            host.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
