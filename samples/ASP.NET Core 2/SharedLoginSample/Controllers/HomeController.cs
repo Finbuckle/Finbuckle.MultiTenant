@@ -82,7 +82,7 @@ namespace SharedLoginSample.Controllers
                 // Now sign in and redirect (using Identity in this example). Since TenantInfo is set the options that the signin
                 // uses internally will be for this tenant.
                 var signInManager = HttpContext.RequestServices 
-                                        .GetRequiredService<SignInManager<MultiTenantIdentityUser>>();
+                                        .GetRequiredService<SignInManager<IdentityUser>>();
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
 
                 if (result.Succeeded)

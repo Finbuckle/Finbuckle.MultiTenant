@@ -43,6 +43,69 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
+    public void AddConfigurationStoreWithDefaults()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        var configuration = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        builder.WithConfigurationStore();
+        services.AddSingleton<IConfiguration>(configuration);
+        var sp = services.BuildServiceProvider();
+
+        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
+
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
+        Assert.Equal("initech-id", tc.Id);
+        Assert.Equal("initech", tc.Identifier);
+        Assert.Equal("Initech", tc.Name);
+        Assert.Equal("1234", tc.Items["test_item"]);
+        // Note: connection string below loading from default in json.
+        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
+
+        tc = store.TryGetByIdentifierAsync("lol").Result;
+        Assert.Equal("lol-id", tc.Id);
+        Assert.Equal("lol", tc.Identifier);
+        Assert.Equal("LOL", tc.Name);
+        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
+    }
+
+    [Fact]
+    public void AddConfigurationStoreWithSectionName()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        IConfiguration configuration = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+
+        // Non-default section name.
+        configuration = configuration.GetSection("Finbuckle");
+        builder.WithConfigurationStore(configuration, "MultiTenant:Stores:ConfigurationStore");
+        var sp = services.BuildServiceProvider();
+
+        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
+
+        var tc = store.TryGetByIdentifierAsync("initech").Result;
+        Assert.Equal("initech-id", tc.Id);
+        Assert.Equal("initech", tc.Identifier);
+        Assert.Equal("Initech", tc.Name);
+        Assert.Equal("1234", tc.Items["test_item"]);
+        // Note: connection string below loading from default in json.
+        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
+
+        tc = store.TryGetByIdentifierAsync("lol").Result;
+        Assert.Equal("lol-id", tc.Id);
+        Assert.Equal("lol", tc.Identifier);
+        Assert.Equal("LOL", tc.Name);
+        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
+    }
+
+    [Fact]
+    // TODO: remove and cleanup when this functioanlity is removed
     public void AddInMemoryStoreViaConfigSection()
     {
         var configBuilder = new ConfigurationBuilder();
@@ -51,8 +114,7 @@ public class MultiTenantBuilderExtensionsShould
 
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.
-                WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
+        builder.WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore>(); ;

@@ -40,8 +40,7 @@ namespace SharedLoginSample.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    TenantId = table.Column<string>(maxLength: 64, nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,7 +199,7 @@ namespace SharedLoginSample.Migrations
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
-                columns: new[] { "NormalizedUserName", "TenantId" },
+                column: "NormalizedUserName",
                 unique: true);
         }
 

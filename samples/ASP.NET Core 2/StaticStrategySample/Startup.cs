@@ -20,7 +20,7 @@ namespace StaticStrategySample
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithStaticStrategy("finbuckle");
         }
 

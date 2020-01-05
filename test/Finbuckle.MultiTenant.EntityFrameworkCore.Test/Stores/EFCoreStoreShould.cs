@@ -40,6 +40,21 @@ namespace EFCoreStoreShould
 
     public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
     {
+        private static IProperty GetModelProperty(string propName)
+        {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            var options = new DbContextOptionsBuilder()
+                    .UseSqlite(connection)
+                    .Options;
+            var dbContext = new TestEFCoreStoreDbContext(options);
+
+            var model = dbContext.Model.FindEntityType(typeof(TestTenantInfoEntity));
+            var prop = model.GetProperties().Where(p => p.Name == propName).Single();
+            return prop;
+        }
+
+        // Basic store functionality tested in MultiTenantStoresShould.cs
+
         protected override IMultiTenantStore CreateTestStore()
         {
             var connection = new SqliteConnection("DataSource=:memory:");
@@ -56,26 +71,16 @@ namespace EFCoreStoreShould
             return PopulateTestStore(store);
         }
 
-        // Note, basic store functionality tested in MultiTenantStoresShould.cs
+        protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+        {
+            return base.PopulateTestStore(store);
+        }
 
         [Fact]
         public void AddTenantIdLengthConstraint()
         {
             var prop = GetModelProperty("Id");
             Assert.Equal(Constants.TenantIdMaxLength, prop.GetMaxLength());
-        }
-
-        private static IProperty GetModelProperty(string propName)
-        {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            var options = new DbContextOptionsBuilder()
-                    .UseSqlite(connection)
-                    .Options;
-            var dbContext = new TestEFCoreStoreDbContext(options);
-
-            var model = dbContext.Model.FindEntityType(typeof(TestTenantInfoEntity));
-            var prop = model.GetProperties().Where(p => p.Name == propName).Single();
-            return prop;
         }
 
         [Fact]
@@ -104,6 +109,116 @@ namespace EFCoreStoreShould
         {
             var prop = GetModelProperty("ConnectionString");
             Assert.False(prop.IsNullable);
+        }
+
+        [Fact]
+        public override void GetTenantInfoFromStoreById()
+        {
+            base.GetTenantInfoFromStoreById();
+        }
+
+        [Fact]
+        public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+        {
+            base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+        }
+
+        [Fact]
+        public override void ThrowWhenGettingByIdIfTenantIdIsNull()
+        {
+            base.ThrowWhenGettingByIdIfTenantIdIsNull();
+        }
+
+        [Fact]
+        public override void GetTenantInfoFromStoreByIdentifier()
+        {
+            base.GetTenantInfoFromStoreByIdentifier();
+        }
+
+        [Fact]
+        public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+        {
+            base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+        }
+
+        [Fact]
+        public override void ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull()
+        {
+            base.ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull();
+        }
+
+        [Fact]
+        public override void AddTenantInfoToStore()
+        {
+            base.AddTenantInfoToStore();
+        }
+
+        [Fact]
+        public override void ThrowWhenAddingIfTenantInfoIsNull()
+        {
+            base.ThrowWhenAddingIfTenantInfoIsNull();
+        }
+
+        [Fact]
+        public override void ThrowWhenAddingIfTenantInfoIdIsNull()
+        {
+            base.ThrowWhenAddingIfTenantInfoIdIsNull();
+        }
+
+        [Fact]
+        public override void ReturnFalseWhenAddingIfDuplicateId()
+        {
+            base.ReturnFalseWhenAddingIfDuplicateId();
+        }
+
+        [Fact]
+        public override void ReturnFalseWhenAddingIfDuplicateIdentifier()
+        {
+            base.ReturnFalseWhenAddingIfDuplicateIdentifier();
+        }
+
+        [Fact]
+        public override void ThrowWhenUpdatingIfTenantInfoIsNull()
+        {
+            base.ThrowWhenUpdatingIfTenantInfoIsNull();
+        }
+
+        [Fact]
+        public override void ThrowWhenUpdatingIfTenantInfoIdIsNull()
+        {
+            base.ThrowWhenUpdatingIfTenantInfoIdIsNull();
+        }
+
+        [Fact]
+        public override void ReturnFalseWhenUpdatingIfTenantIdIsNotFound()
+        {
+            base.ReturnFalseWhenUpdatingIfTenantIdIsNotFound();
+        }
+
+        [Fact]
+        public override void RemoveTenantInfoFromStore()
+        {
+            base.RemoveTenantInfoFromStore();
+        }
+
+        [Fact]
+        public override void ThrowWhenRemovingIfTenantIdentifierIsNull()
+        {
+            base.ThrowWhenRemovingIfTenantIdentifierIsNull();
+        }
+
+        [Fact]
+        public override void ReturnFalseWhenRemovingIfTenantInfoNotFound()
+        {
+            base.ReturnFalseWhenRemovingIfTenantInfoNotFound();
+        }
+
+        [Theory]
+        [InlineData("initech-id", true)]
+        [InlineData("notFound", false)]
+        public override void UpdateTenantInfoInStore(string id, bool expected)
+        {
+            base.UpdateTenantInfoInStore(id, expected);
         }
     }
 }

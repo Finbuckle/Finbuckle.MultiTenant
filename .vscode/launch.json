@@ -325,6 +325,26 @@
             }
         },
         {
+            "name": "Shared Login Sample (netcoreapp2.2)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/SharedLoginSample/bin/Debug/netcoreapp2.2/SharedLoginSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/SharedLoginSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Static Strategy Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",

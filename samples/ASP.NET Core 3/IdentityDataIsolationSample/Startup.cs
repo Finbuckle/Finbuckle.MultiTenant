@@ -50,7 +50,7 @@ namespace IdentityDataIsolationSample
 
             services.AddMultiTenant()
                     .WithRouteStrategy()
-                    .WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"))
+                    .WithConfigurationStore()
                     .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                     {
                         // Since we are using the route strategy configure each tenant

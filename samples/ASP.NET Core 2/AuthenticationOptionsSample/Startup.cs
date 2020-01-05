@@ -21,8 +21,7 @@ namespace AuthenticationOptionsSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().
-                AddMvcOptions(options => options.EnableEndpointRouting = false).
-                SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
                 AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -54,7 +53,7 @@ namespace AuthenticationOptionsSample
                 });
 
             services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
