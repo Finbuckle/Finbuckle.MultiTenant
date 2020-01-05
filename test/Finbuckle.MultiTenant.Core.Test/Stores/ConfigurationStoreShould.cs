@@ -48,6 +48,14 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         Assert.Throws<MultiTenantException>(() => new ConfigurationStore(configuration, "invalid"));
     }
 
+    [Fact]
+    public void IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
+    {
+        var store = CreateTestStore();
+
+        Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result.Identifier);
+    }
+
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override IMultiTenantStore CreateTestStore()

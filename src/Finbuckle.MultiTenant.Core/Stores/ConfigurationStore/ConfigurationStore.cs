@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Finbuckle.MultiTenant.Stores
     {
         internal const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
-        private volatile Dictionary<string, TenantInfo> tenantMap;
+        private ConcurrentDictionary<string, TenantInfo> tenantMap;
 
         public ConfigurationStore(IConfiguration configuration) : this(configuration, defaultSectionName)
         {
@@ -55,14 +56,14 @@ namespace Finbuckle.MultiTenant.Stores
 
         private void UpdateTenantMap()
         {
-            var newMap = new Dictionary<string, TenantInfo>();
+            var newMap = new ConcurrentDictionary<string, TenantInfo>(StringComparer.OrdinalIgnoreCase);
             var tenants = section.GetSection("Tenants").GetChildren();
 
             foreach(var tenantSection in tenants)
             {
                 var newTenant = section.GetSection("Defaults").Get<TenantInfo>(options => options.BindNonPublicProperties = true);
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-                newMap.Add(newTenant.Identifier, newTenant);
+                newMap.TryAdd(newTenant.Identifier, newTenant);
             }
 
             var oldMap = tenantMap;

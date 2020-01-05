@@ -19,8 +19,9 @@ public void ConfigureServices(IServiceCollection services)
 Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used. See [MultiTenant Stores](Stores) for more information on each type.
 
 - WithStore&lt;TStore&gt;
-- WithEFCoreStore
 - WithInMemoryStore
+- WithConfigurationStore
+- WithEFCoreStore
 
 ### WithStrategy Variants
 Adds and configures an IMultiTenantStore to the application. Multiple strategies can be registered and each will be used in the order configured, with the exception of the fallback strategy which is always last. See [MultiTenant Strategies](Strategies) for more information on each type.
@@ -76,6 +77,9 @@ if(tenantInfo != null)
 ```
 
 ### TrySetTenantInfo
+
+*Note: For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly overriding the `TenantInfo` set by the middleware.*
+
 Extension method of `HttpContext` that tries to set the current tenant to the provided `TenantInfo`. Returns true if successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the `MultiTenantContext` to null.
 
 ```cs

@@ -44,16 +44,6 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds a ConfigurationStore to the application. Uses the default section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
-        /// </summary>
-        /// <param name="configuration">The IConfiguration to load the section from.</param>
-        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder, IConfiguration configuration)
-        {
-            builder.Services.TryAddSingleton<IMultiTenantStore>(new ConfigurationStore(configuration));
-            return builder;
-        }
-
-        /// <summary>
         /// Adds a ConfigurationStore to the application.
         /// </summary>
         /// <param name="configuration">The IConfiguration to load the section from.</param>
