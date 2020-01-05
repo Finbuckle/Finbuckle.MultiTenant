@@ -73,35 +73,6 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void AddConfigurationStoreWithIConfiguration()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-        var configuration = configBuilder.Build();
-
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithConfigurationStore(configuration);
-        var sp = services.BuildServiceProvider();
-
-        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
-
-        var tc = store.TryGetByIdentifierAsync("initech").Result;
-        Assert.Equal("initech-id", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        Assert.Equal("1234", tc.Items["test_item"]);
-        // Note: connection string below loading from default in json.
-        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
-
-        tc = store.TryGetByIdentifierAsync("lol").Result;
-        Assert.Equal("lol-id", tc.Id);
-        Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
-    }
-
-    [Fact]
     public void AddConfigurationStoreWithSectionName()
     {
         var configBuilder = new ConfigurationBuilder();
