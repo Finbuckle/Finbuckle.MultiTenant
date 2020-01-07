@@ -42,7 +42,7 @@ services.AddMultiTenant().WithInMemoryStore(ignoreCase: false)...
 ```
 
 The contents of the store can be changed at runtime with `TryAdd`, `TryUpdate`, and `TryRemove`:
-```
+```cs
 // Use service provider or dependenct injection to get the InMemoryStore instance.
 var store = serviceProvider.GetService<IMultiTenantStore>();
 
@@ -95,7 +95,7 @@ The configuration section should use this JSON format:
 ```
 
 ## ConfigurationStore
-Uses an app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1) as the underlying store. This store is case insensitive when retrieving tenant information by tenant identifier.
+Uses an app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1) as the underlying store. Most of the sample projects use this store for simplicity. This store is case insensitive when retrieving tenant information by tenant identifier.
 
 This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes, e.g. `appSettings.json` is updated, then the multitenant store will reflect the change.
 
@@ -136,4 +136,63 @@ The configuration section should use this JSON format shown below. Any fields in
 ```
 
 ## EFCore Store
-Documentation in progress. See the EFCoreStoreSample project in the mean time. This store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
+Uses an Entity Framework Core database context as the backing store. This store does not support storing and retrieving the `Items` collection property on `TenantInfo`, although it could be modified to do so. Addtionally, this store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
+
+The database context should derive from `EFCoreStoreDbContext<TTenantInfo>`. `TTenantInfo` must implement `IEFCoreStoreTenantInfo` which is similar in structure to `TenantInfo` but without the `Items` collection property. The examples below are taken from the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample):
+
+```cs
+public class AppTenantInfo : IEFCoreStoreTenantInfo
+{
+    public string Id { get; set; }
+    public string Identifier { get; set; }
+    public string Name { get; set; }
+    public string ConnectionString { get; set; }
+}
+```
+
+The database context can contain any settings or entities, but to be used as a multitenant store it is only necessary to derive from `EFCoreStoreDbContext<TTenantInfo>`:
+
+```cs
+public class AppDbContext : EFCoreStoreDbContext<AppTenantInfo>
+{
+  public AppDbContext(DbContextOptions options) : base(options)
+  {
+  }
+
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+      // Use InMemory, but could be MsSql, Sqlite, MySql, etc...
+      optionsBuilder.UseInMemoryDatabase("StoreConnectionString");
+      base.OnConfiguring(optionsBuilder);
+  }
+
+  // Other stuff if needed...
+}
+```
+
+Note, this database context wil have its own connection string (usually) separate from that of any tenant in the store. Addtionally, this database context can be entirely separate from any others an application might use if comingling the multitenant store and app entity models is not desired.
+
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context and the tenant info generic parameters:
+
+```cs
+// Register to use the database context and TTenantInfo types show above.
+services.AddMultiTenant().WithEFCoreStore<AppDbContext, AppTenantInfo>()...
+```
+
+The contents of the store can be changed at runtime with `TryAdd`, `TryUpdate`, and `TryRemove` which result in updates to the underlying database:
+
+```cs
+// Use service provider or dependenct injection to get the InMemoryStore instance.
+var store = serviceProvider.GetService<IMultiTenantStore>();
+
+// Add a new tenant to the store.
+var newTenant = new TenantInfo(...);
+store.TryAdd(newTenant);
+
+// Update a tenant.
+newTenant.ConnectionString = "UpdatedConnectionString";
+store.TryUpdate(newTenant);
+
+// Remove a tenant.
+store.TryRemove(newTenant.Identifier);
+```
