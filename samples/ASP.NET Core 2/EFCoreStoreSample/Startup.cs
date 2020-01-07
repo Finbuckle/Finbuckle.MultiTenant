@@ -24,7 +24,7 @@ namespace EFCoreStoreSample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddMultiTenant()
-                .WithEFCoreStore<AppDbContext, AppTenantInfo>()
+                .WithEFCoreStore<MultiTenantStoreDbContext>()
                 .WithRouteStrategy(ConfigRoutes);
         }
 

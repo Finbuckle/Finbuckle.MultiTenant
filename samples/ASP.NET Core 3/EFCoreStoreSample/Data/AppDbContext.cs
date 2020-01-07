@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EFCoreStoreSample.Data
 {
 
-    public class AppDbContext : EFCoreStoreDbContext<AppTenantInfo>
+    public class AppDbContext : EFCoreStoreDbContext
     {
         public AppDbContext(DbContextOptions options) : base(options)
         {
@@ -26,7 +26,7 @@ namespace EFCoreStoreSample.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("EFCoreStoreSampleDb");
+            optionsBuilder.UseInMemoryDatabase("EFCoreStoreSampleConnectionString");
             base.OnConfiguring(optionsBuilder);
         }
     }

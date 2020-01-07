@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+﻿//    Copyright 2018 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,14 +12,22 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using Finbuckle.MultiTenant.Stores;
+using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.Stores
+namespace EFCoreStoreSample.Data
 {
-    public interface IEFCoreStoreTenantInfo
+
+    public class MultiTenantStoreDbContext : EFCoreStoreDbContext
     {
-        string Id { get; set; }
-        string Identifier { get; set; }
-        string Name { get; set; }
-        string ConnectionString { get; set; }
+        public MultiTenantStoreDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseInMemoryDatabase("EFCoreStoreSampleConnectionString");
+            base.OnConfiguring(optionsBuilder);
+        }
     }
 }
