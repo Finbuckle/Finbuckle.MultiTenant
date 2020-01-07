@@ -138,31 +138,17 @@ The configuration section should use this JSON format shown below. Any fields in
 ## EFCore Store
 Uses an Entity Framework Core database context as the backing store. This store does not support storing and retrieving the `Items` collection property on `TenantInfo`, although it could be modified to do so. Addtionally, this store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
 
-The database context should derive from `EFCoreStoreDbContext<TTenantInfo>`. `TTenantInfo` must implement `IEFCoreStoreTenantInfo` which is similar in structure to `TenantInfo` but without the `Items` collection property. The examples below are taken from the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample):
+The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample).
+
+The database context can contain any settings or entities, but to be used as a multitenant store it is only necessary to derive from `EFCoreStoreDbContext`:
 
 ```cs
-public class AppTenantInfo : IEFCoreStoreTenantInfo
+public class AppDbContext : EFCoreStoreDbContext
 {
-    public string Id { get; set; }
-    public string Identifier { get; set; }
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
-}
-```
-
-The database context can contain any settings or entities, but to be used as a multitenant store it is only necessary to derive from `EFCoreStoreDbContext<TTenantInfo>`:
-
-```cs
-public class AppDbContext : EFCoreStoreDbContext<AppTenantInfo>
-{
-  public AppDbContext(DbContextOptions options) : base(options)
-  {
-  }
-
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
       // Use InMemory, but could be MsSql, Sqlite, MySql, etc...
-      optionsBuilder.UseInMemoryDatabase("StoreConnectionString");
+      optionsBuilder.UseInMemoryDatabase("EfCoreStoreSampleConnectionString");
       base.OnConfiguring(optionsBuilder);
   }
 
@@ -172,11 +158,11 @@ public class AppDbContext : EFCoreStoreDbContext<AppTenantInfo>
 
 Note, this database context wil have its own connection string (usually) separate from that of any tenant in the store. Addtionally, this database context can be entirely separate from any others an application might use if comingling the multitenant store and app entity models is not desired.
 
-Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context and the tenant info generic parameters:
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext>` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context generic parameter:
 
 ```cs
 // Register to use the database context and TTenantInfo types show above.
-services.AddMultiTenant().WithEFCoreStore<AppDbContext, AppTenantInfo>()...
+services.AddMultiTenant().WithEFCoreStore<AppDbContext>()...
 ```
 
 The contents of the store can be changed at runtime with `TryAdd`, `TryUpdate`, and `TryRemove` which result in updates to the underlying database:

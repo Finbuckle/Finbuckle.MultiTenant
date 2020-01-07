@@ -23,22 +23,14 @@ using Xunit;
 
 namespace EFCoreStoreShould
 {
-    public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TestTenantInfoEntity>
+    public class TestEFCoreStoreDbContext : EFCoreStoreDbContext
     {
         public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
         {
         }
     }
 
-    public class TestTenantInfoEntity : IEFCoreStoreTenantInfo
-    {
-        public string Id { get; set; }
-        public string Identifier { get; set; }
-        public string Name { get; set; }
-        public string ConnectionString { get; set; }
-    }
-
-    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
+    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext>>
     {
         private static IProperty GetModelProperty(string propName)
         {
@@ -48,12 +40,10 @@ namespace EFCoreStoreShould
                     .Options;
             var dbContext = new TestEFCoreStoreDbContext(options);
 
-            var model = dbContext.Model.FindEntityType(typeof(TestTenantInfoEntity));
-            var prop = model.GetProperties().Where(p => p.Name == propName).Single();
+            var model = dbContext.Model.FindEntityType(typeof(TenantInfo));
+            var prop = model.GetProperties().Where(p => p.Name == propName).SingleOrDefault();
             return prop;
         }
-
-        // Basic store functionality tested in MultiTenantStoresShould.cs
 
         protected override IMultiTenantStore CreateTestStore()
         {
@@ -65,8 +55,8 @@ namespace EFCoreStoreShould
             var dbContext = new TestEFCoreStoreDbContext(options);
             dbContext.Database.EnsureCreated();
 
-            var store = new MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>
-                (new EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>(dbContext), null);
+            var store = new MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext >>
+                (new EFCoreStore<TestEFCoreStoreDbContext >(dbContext), null);
 
             return PopulateTestStore(store);
         }
@@ -110,6 +100,22 @@ namespace EFCoreStoreShould
             var prop = GetModelProperty("ConnectionString");
             Assert.False(prop.IsNullable);
         }
+
+        [Fact]
+        public void IgnoreItemsCollectionProperty()
+        {
+            var prop = GetModelProperty("Items");
+            Assert.Null(prop);
+        }
+
+        [Fact]
+        public void IgnoreMultiTenantContextProperty()
+        {
+            var prop = GetModelProperty("MultiTenantContext");
+            Assert.Null(prop);
+        }
+
+        // Basic store functionality tested in MultiTenantStoresShould.cs
 
         [Fact]
         public override void GetTenantInfoFromStoreById()

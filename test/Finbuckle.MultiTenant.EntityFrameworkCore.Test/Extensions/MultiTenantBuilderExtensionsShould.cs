@@ -42,11 +42,11 @@ namespace MultiTenantBuilderExtensionsShould
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder(services);
-            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
             var resolver = sp.GetRequiredService<IMultiTenantStore>();
-            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>>(resolver);
+            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext>>>(resolver);
         }
 
         [Fact]
@@ -55,11 +55,11 @@ namespace MultiTenantBuilderExtensionsShould
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder(services);
             services.AddDbContext<TestEFCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
-            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>();
+            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
             var resolver = sp.GetRequiredService<IMultiTenantStore>();
-            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TestTenantInfoEntity>>>(resolver);
+            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext>>>(resolver);
         }
     }
 }

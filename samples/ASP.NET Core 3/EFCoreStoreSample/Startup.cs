@@ -22,7 +22,7 @@ namespace EFCoreStoreSample
             services.AddControllersWithViews();
 
             services.AddMultiTenant()
-                .WithEFCoreStore<AppDbContext, AppTenantInfo>()
+                .WithEFCoreStore<AppDbContext>()
                 .WithRouteStrategy();
         }
 
