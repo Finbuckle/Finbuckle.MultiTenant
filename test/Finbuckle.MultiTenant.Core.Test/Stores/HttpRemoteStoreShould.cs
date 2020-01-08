@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+﻿//    Copyright 2019 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -13,57 +13,47 @@
 //    limitations under the License.
 
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Xunit;
 
-public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationStore>
+public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore>
 {
-    [Fact]
-    public void ThrowIfNullConfiguration()
+    public class TestHandler : DelegatingHandler
     {
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationStore(null));
-    }
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var result = new HttpResponseMessage();
 
-    [Fact]
-    public void ThrowIfEmptyOrNullSection()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-        IConfiguration configuration = configBuilder.Build();
+            var numSegments = request.RequestUri.Segments.Length;
+            if (string.Equals(request.RequestUri.Segments[numSegments - 1], "initech", StringComparison.OrdinalIgnoreCase))
+            {
 
-        Assert.Throws<ArgumentException>(() => new ConfigurationStore(configuration, ""));
-        Assert.Throws<ArgumentException>(() => new ConfigurationStore(configuration, null));
-    }
+                var tenantInfo = new TenantInfo("initech-id", "initech", "Initech", "connstring", null);
+                var json = JsonConvert.SerializeObject(tenantInfo);
+                result.StatusCode = HttpStatusCode.OK;
+                result.Content = new StringContent(json);
+            }
+            else
+                result.StatusCode = HttpStatusCode.NotFound;
 
-    [Fact]
-    public void ThrowIfInvalidSection()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-        IConfiguration configuration = configBuilder.Build();
-
-        Assert.Throws<MultiTenantException>(() => new ConfigurationStore(configuration, "invalid"));
-    }
-
-    [Fact]
-    public void IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
-    {
-        var store = CreateTestStore();
-
-        Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result.Identifier);
+            return Task.FromResult(result);
+        }
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override IMultiTenantStore CreateTestStore()
     {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-        var configuration = configBuilder.Build();
-
-        return new ConfigurationStore(configuration);
+        var client = new HttpClient(new TestHandler());
+        var typedClient = new HttpRemoteStoreClient(client, "http://example.com");
+        return new HttpRemoteStore(typedClient);
     }
 
     protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
@@ -71,10 +61,9 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         throw new NotImplementedException();
     }
 
-    [Fact]
+    // [Fact(Skip = "Not valid for this store.")]
     public override void GetTenantInfoFromStoreById()
     {
-        base.GetTenantInfoFromStoreById();
     }
 
     [Fact]
@@ -89,7 +78,7 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
     }
 
-    [Fact]
+    // [Fact(Skip = "Not valid for this store.")]
     public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
         base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
