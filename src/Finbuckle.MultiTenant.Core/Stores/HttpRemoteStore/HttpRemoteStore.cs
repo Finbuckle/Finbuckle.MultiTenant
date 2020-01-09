@@ -20,10 +20,27 @@ namespace Finbuckle.MultiTenant.Stores
     public class HttpRemoteStore : IMultiTenantStore
     {
         private readonly HttpRemoteStoreClient client;
+        private readonly string endpointTemplate;
 
-        public HttpRemoteStore(HttpRemoteStoreClient client)
+        public HttpRemoteStore(HttpRemoteStoreClient client, string endpointTemplate)
         {
             this.client = client ?? throw new ArgumentNullException(nameof(client));
+            if (!endpointTemplate.Contains("{tenant}"))
+            {
+                if(endpointTemplate.EndsWith("/"))
+                    endpointTemplate += "{tenant}";
+                else
+                    endpointTemplate += "/{tenant}";
+            }
+
+            if (Uri.IsWellFormedUriString(endpointTemplate, UriKind.Absolute))
+                throw new ArgumentException("Paramter 'endpointTemplate' is not a well formed uri.", nameof(endpointTemplate));
+
+            if (!endpointTemplate.StartsWith("https", StringComparison.OrdinalIgnoreCase)
+                && !endpointTemplate.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Paramter 'endpointTemplate' is not a an http or https uri.", nameof(endpointTemplate));
+
+            this.endpointTemplate = endpointTemplate;
         }
 
         public Task<bool> TryAddAsync(TenantInfo tenantInfo)
@@ -38,7 +55,7 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
         {
-            var result = await client.TryGetByIdentifierAsync(identifier);
+            var result = await client.TryGetByIdentifierAsync(endpointTemplate, identifier);
             return result;
         }
 

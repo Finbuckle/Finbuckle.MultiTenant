@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+ //    Copyright 2018 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 using Finbuckle.MultiTenant;
 using Xunit;
+
+#pragma warning disable xUnit1013 // Public method should be marked as test
 
 public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore
 {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -21,31 +22,18 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class HttpRemoteStoreClient
     {
-        private readonly HttpClient client;
-        private readonly Uri endpoint;
+        private readonly IHttpClientFactory clientFactory;
 
-        public HttpRemoteStoreClient(HttpClient client, string endpoint)
+        public HttpRemoteStoreClient(IHttpClientFactory clientFactory)
         {
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
-
-            if (!Uri.TryCreate(endpoint, UriKind.Absolute, out this.endpoint))
-                throw new ArgumentException("Paramter 'endpoint' is not a well formed uri.", nameof(endpoint));
-
-            if (!(this.endpoint.Scheme == "https" || this.endpoint.Scheme == "http"))
-                throw new ArgumentException("Paramter 'endpoint' is not a an http or https uri.", nameof(endpoint));
+            this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TenantInfo> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
         {
-            if (!endpoint.AbsolutePath.EndsWith("/"))
-            {
-                identifier = "/" + Uri.EscapeDataString(identifier);
-            }
-
-            var builder = new UriBuilder(endpoint);
-            builder.Path += identifier;
-
-            var response = await client.GetAsync(builder.Uri);
+            var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient).FullName);
+            var uri = endpointTemplate.Replace("{tenant}", identifier);
+            var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
                 return null;

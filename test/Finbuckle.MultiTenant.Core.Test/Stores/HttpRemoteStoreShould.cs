@@ -15,11 +15,13 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -47,13 +49,59 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore>
         }
     }
 
+    [Fact]
+    public void ThrowIfTypedClientParamIsNull()
+    {
+        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore(null, "http://example.com"));
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("")]
+    [InlineData("invalidUri")]
+    [InlineData("file://nothttp")]
+    public void ThrowIfEndpointTemplateIsNotWellFormed(string uri)
+    {
+        var clientFactory = new Mock<IHttpClientFactory>();
+        var client = new HttpRemoteStoreClient(clientFactory.Object);
+        Assert.Throws<ArgumentException>(() => new HttpRemoteStore(client, uri));
+    }
+
+    [Fact]
+    public void AppendTenantToTemplateIfMissing()
+    {
+        var clientFactory = new Mock<IHttpClientFactory>();
+        var client = new HttpRemoteStoreClient(clientFactory.Object);
+        var store = new HttpRemoteStore(client, "http://example.com/");
+
+        var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
+        var endpointTemplate = field.GetValue(store);
+
+        Assert.Equal("http://example.com/{tenant}", endpointTemplate);
+    }
+
+    [Fact]
+    public void AppendTenantWithSlashToTemplateIfMissing()
+    {
+        var clientFactory = new Mock<IHttpClientFactory>();
+        var client = new HttpRemoteStoreClient(clientFactory.Object);
+        var store = new HttpRemoteStore(client, "http://example.com");
+
+        var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
+        var endpointTemplate = field.GetValue(store);
+
+        Assert.Equal("http://example.com/{tenant}", endpointTemplate);
+    }
+
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override IMultiTenantStore CreateTestStore()
     {
         var client = new HttpClient(new TestHandler());
-        var typedClient = new HttpRemoteStoreClient(client, "http://example.com");
-        return new HttpRemoteStore(typedClient);
+        var clientFactory = new Mock<IHttpClientFactory>();
+        clientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
+        var typedClient = new HttpRemoteStoreClient(clientFactory.Object);
+        return new HttpRemoteStore(typedClient, "http://example.com");
     }
 
     protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
