@@ -4,7 +4,7 @@ A multitenant store is responsible for retrieving information about a tenant bas
 
 Finbuckle.MultiTenant provides three basic multitenant stores
 - `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
-- `ConfigurationStore` - a read-only store that is back by app configuration (e.g. appSettings.json).
+- `ConfigurationStore` - a read-only store that is back by app configuration (e.g. appsettings.json).
 - `EFCoreStore` - an Entity Framework Core based implementation to query tenant information from a database.
 
 ## IMultiTenantStore and Custom Stores
@@ -22,7 +22,7 @@ services.AddMultiTenant().WithStore( sp => return new MyStore());
 
 ## Accessing the Store at Runtime
 
-The multitenant store can be accessed at runtime to add, remove, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
+The multitenant store can be accessed at runtime to add, remove, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appsettings.json` configuration supported by the In-Memory Store).
 
 There are two ways to access the store. First, via the `Store` property on the `StoreInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()`. This property returns the actual store used to retrieve the tenant information for the current context.
 
@@ -97,7 +97,7 @@ The configuration section should use this JSON format:
 ## ConfigurationStore
 Uses an app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1) as the underlying store. Most of the sample projects use this store for simplicity. This store is case insensitive when retrieving tenant information by tenant identifier.
 
-This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes, e.g. `appSettings.json` is updated, then the multitenant store will reflect the change.
+This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes, e.g. `appsettings.json` is updated, then the multitenant store will reflect the change.
 
 Configure by calling `WithConfigurationStore` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class. By default it will use the root configuration object and search for a section named "Finbuckle:MultiTenant:Stores:ConfigurationStore". An overload of `WithConfigurationStore` allows for a different base configuration object or section name if needed.
 

@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
@@ -77,7 +76,7 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore>
         var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
         var endpointTemplate = field.GetValue(store);
 
-        Assert.Equal("http://example.com/{tenant}", endpointTemplate);
+        Assert.Equal($"http://example.com/{HttpRemoteStore.defaultEndpointTemplateIdentifierToken}", endpointTemplate);
     }
 
     [Fact]
@@ -90,7 +89,7 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore>
         var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
         var endpointTemplate = field.GetValue(store);
 
-        Assert.Equal("http://example.com/{tenant}", endpointTemplate);
+        Assert.Equal($"http://example.com/{HttpRemoteStore.defaultEndpointTemplateIdentifierToken}", endpointTemplate);
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs

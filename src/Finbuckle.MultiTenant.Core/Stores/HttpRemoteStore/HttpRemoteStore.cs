@@ -19,18 +19,19 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class HttpRemoteStore : IMultiTenantStore
     {
+        internal const string defaultEndpointTemplateIdentifierToken = "{__tenant__}";
         private readonly HttpRemoteStoreClient client;
         private readonly string endpointTemplate;
 
         public HttpRemoteStore(HttpRemoteStoreClient client, string endpointTemplate)
         {
             this.client = client ?? throw new ArgumentNullException(nameof(client));
-            if (!endpointTemplate.Contains("{tenant}"))
+            if (!endpointTemplate.Contains(defaultEndpointTemplateIdentifierToken))
             {
                 if(endpointTemplate.EndsWith("/"))
-                    endpointTemplate += "{tenant}";
+                    endpointTemplate += defaultEndpointTemplateIdentifierToken;
                 else
-                    endpointTemplate += "/{tenant}";
+                    endpointTemplate += $"/{defaultEndpointTemplateIdentifierToken}";
             }
 
             if (Uri.IsWellFormedUriString(endpointTemplate, UriKind.Absolute))

@@ -32,7 +32,7 @@ namespace Finbuckle.MultiTenant.Stores
         public async Task<TenantInfo> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
         {
             var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient).FullName);
-            var uri = endpointTemplate.Replace("{tenant}", identifier);
+            var uri = endpointTemplate.Replace(HttpRemoteStore.defaultEndpointTemplateIdentifierToken, identifier);
             var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
