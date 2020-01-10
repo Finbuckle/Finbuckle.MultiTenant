@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;netcoreapp2.2;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -16,16 +16,16 @@
   </ItemGroup>
 
   <Choose>
+    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+      <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.0" />
+      </ItemGroup>
+    </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
       <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.2.0" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">

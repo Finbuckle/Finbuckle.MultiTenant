@@ -29,11 +29,10 @@ namespace IdentityDataIsolationSample
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddDefaultTokenProviders()
-                    .AddDefaultUI(UIFramework.Bootstrap4)
+                    .AddDefaultUI()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddMvcOptions(options => options.EnableEndpointRouting = false)
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddRazorPagesOptions(options =>
                 {
                     // Since we are using the route multitenant strategy we must add the

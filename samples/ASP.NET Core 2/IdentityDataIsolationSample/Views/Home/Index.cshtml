@@ -85,7 +85,7 @@ services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
 // This is needed only because we use the RouteStrategy and
 // aren't using the default MVC routes.
 // This also requires that we disable endpoint routing in ASP.NET Core 2.2.
-services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
     .AddMvcOptions(options => options.EnableEndpointRouting = false)
     .AddRazorPagesOptions(options =>
     {

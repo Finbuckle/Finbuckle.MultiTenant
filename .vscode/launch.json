@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Authentication Options Sample (netcoreapp2.2)",
+            "name": "Authentication Options Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/AuthenticationOptionsSample/bin/Debug/netcoreapp2.2/AuthenticationOptionsSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/AuthenticationOptionsSample/bin/Debug/netcoreapp2.1/AuthenticationOptionsSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/AuthenticationOptionsSample",
             "stopAtEntry": false,
@@ -25,11 +25,11 @@
             }
         },
         {
-            "name": "Authentication Options Sample (netcoreapp3.0)",
+            "name": "Authentication Options Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/AuthenticationOptionsSample/bin/Debug/netcoreapp3.0/AuthenticationOptionsSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/AuthenticationOptionsSample/bin/Debug/netcoreapp3.1/AuthenticationOptionsSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/AuthenticationOptionsSample",
             "stopAtEntry": false,
@@ -45,11 +45,11 @@
             }
         },
         {
-            "name": "BasePath Strategy Sample (netcoreapp2.2)",
+            "name": "BasePath Strategy Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/BasePathStrategySample/bin/Debug/netcoreapp2.2/BasePathStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/BasePathStrategySample/bin/Debug/netcoreapp2.1/BasePathStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/BasePathStrategySample",
             "stopAtEntry": false,
@@ -65,11 +65,11 @@
             }
         },
         {
-            "name": "BasePath Strategy Sample (netcoreapp3.0)",
+            "name": "BasePath Strategy Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/BasePathStrategySample/bin/Debug/netcoreapp3.0/BasePathStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/BasePathStrategySample/bin/Debug/netcoreapp3.1/BasePathStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/BasePathStrategySample",
             "stopAtEntry": false,
@@ -85,11 +85,11 @@
             }
         },
         {
-            "name": "Data Isolation Sample (netcoreapp2.2)",
+            "name": "Data Isolation Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/DataIsolationSample/bin/Debug/netcoreapp2.2/DataIsolationSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/DataIsolationSample/bin/Debug/netcoreapp2.1/DataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/DataIsolationSample",
             "stopAtEntry": false,
@@ -105,11 +105,11 @@
             }
         },
         {
-            "name": "Data Isolation Sample (netcoreapp3.0)",
+            "name": "Data Isolation Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/DataIsolationSample/bin/Debug/netcoreapp3.0/DataIsolationSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/DataIsolationSample/bin/Debug/netcoreapp3.1/DataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/DataIsolationSample",
             "stopAtEntry": false,
@@ -125,11 +125,11 @@
             }
         },
         {
-            "name": "Delegate Strategy Sample (netcoreapp2.2)",
+            "name": "Delegate Strategy Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/DelegateStrategySample/bin/Debug/netcoreapp2.2/DelegateStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/DelegateStrategySample/bin/Debug/netcoreapp2.1/DelegateStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/DelegateStrategySample",
             "stopAtEntry": false,
@@ -145,11 +145,11 @@
             }
         },
         {
-            "name": "Delegate Strategy Sample (netcoreapp3.0)",
+            "name": "Delegate Strategy Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/DelegateStrategySample/bin/Debug/netcoreapp3.0/DelegateStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/DelegateStrategySample/bin/Debug/netcoreapp3.1/DelegateStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/DelegateStrategySample",
             "stopAtEntry": false,
@@ -165,11 +165,11 @@
             }
         },
         {
-            "name": "EFCore Store Sample (netcoreapp2.2)",
+            "name": "EFCore Store Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/EFCoreStoreSample/bin/Debug/netcoreapp2.2/EFCoreStoreSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/EFCoreStoreSample/bin/Debug/netcoreapp2.1/EFCoreStoreSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/EFCoreStoreSample",
             "stopAtEntry": false,
@@ -185,11 +185,11 @@
             }
         },
         {
-            "name": "EFCore Store Sample (netcoreapp3.0)",
+            "name": "EFCore Store Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/EFCoreStoreSample/bin/Debug/netcoreapp3.0/EFCoreStoreSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/EFCoreStoreSample/bin/Debug/netcoreapp3.1/EFCoreStoreSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/EFCoreStoreSample",
             "stopAtEntry": false,
@@ -205,11 +205,11 @@
             }
         },
         {
-            "name": "Host Strategy Sample (netcoreapp2.2)",
+            "name": "Host Strategy Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/HostStrategySample/bin/Debug/netcoreapp2.2/HostStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/HostStrategySample/bin/Debug/netcoreapp2.1/HostStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/HostStrategySample",
             "stopAtEntry": false,
@@ -225,11 +225,11 @@
             }
         },
         {
-            "name": "Host Strategy Sample (netcoreapp3.0)",
+            "name": "Host Strategy Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/HostStrategySample/bin/Debug/netcoreapp3.0/HostStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/HostStrategySample/bin/Debug/netcoreapp3.1/HostStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/HostStrategySample",
             "stopAtEntry": false,
@@ -245,11 +245,11 @@
             }
         },
         {
-            "name": "Http Remote Store Sample (netcoreapp3.0)",
+            "name": "Http Remote Store Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/HttpRemoteStoreSample/HttpRemoteStoreSample/bin/Debug/netcoreapp3.0/HttpRemoteStoreSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/HttpRemoteStoreSample/HttpRemoteStoreSample/bin/Debug/netcoreapp3.1/HttpRemoteStoreSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/HttpRemoteStoreSample/HttpRemoteStoreSample",
             "stopAtEntry": false,
@@ -265,11 +265,11 @@
             }
         },
         {
-            "name": "Identity Data Isolation Sample (netcoreapp2.2)",
+            "name": "Identity Data Isolation Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/IdentityDataIsolationSample/bin/Debug/netcoreapp2.2/IdentityDataIsolationSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/IdentityDataIsolationSample/bin/Debug/netcoreapp2.1/IdentityDataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/IdentityDataIsolationSample",
             "stopAtEntry": false,
@@ -285,11 +285,11 @@
             }
         },
         {
-            "name": "Identity Data Isolation Sample (netcoreapp3.0)",
+            "name": "Identity Data Isolation Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/IdentityDataIsolationSample/bin/Debug/netcoreapp3.0/IdentityDataIsolationSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/IdentityDataIsolationSample/bin/Debug/netcoreapp3.1/IdentityDataIsolationSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/IdentityDataIsolationSample",
             "stopAtEntry": false,
@@ -305,11 +305,11 @@
             }
         },
         {
-            "name": "Route Strategy Sample (netcoreapp2.2)",
+            "name": "Route Strategy Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/RouteStrategySample/bin/Debug/netcoreapp2.2/RouteStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/RouteStrategySample/bin/Debug/netcoreapp2.1/RouteStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/RouteStrategySample",
             "stopAtEntry": false,
@@ -325,11 +325,11 @@
             }
         },
         {
-            "name": "Route Strategy Sample (netcoreapp3.0)",
+            "name": "Route Strategy Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/RouteStrategySample/bin/Debug/netcoreapp3.0/RouteStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/RouteStrategySample/bin/Debug/netcoreapp3.1/RouteStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/RouteStrategySample",
             "stopAtEntry": false,
@@ -345,11 +345,11 @@
             }
         },
         {
-            "name": "Shared Login Sample (netcoreapp2.2)",
+            "name": "Shared Login Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/SharedLoginSample/bin/Debug/netcoreapp2.2/SharedLoginSample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/SharedLoginSample/bin/Debug/netcoreapp2.1/SharedLoginSample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/SharedLoginSample",
             "stopAtEntry": false,
@@ -365,11 +365,11 @@
             }
         },
         {
-            "name": "Static Strategy Sample (netcoreapp2.2)",
+            "name": "Static Strategy Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 2/StaticStrategySample/bin/Debug/netcoreapp2.2/StaticStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 2/StaticStrategySample/bin/Debug/netcoreapp2.1/StaticStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 2/StaticStrategySample",
             "stopAtEntry": false,
@@ -385,11 +385,11 @@
             }
         },
         {
-            "name": "Static Strategy Sample (netcoreapp3.0)",
+            "name": "Static Strategy Sample (netcoreapp3.1)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/samples/ASP.NET Core 3/StaticStrategySample/bin/Debug/netcoreapp3.0/StaticStrategySample.dll",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/StaticStrategySample/bin/Debug/netcoreapp3.1/StaticStrategySample.dll",
             "args": [],
             "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/StaticStrategySample",
             "stopAtEntry": false,

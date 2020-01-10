@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <UserSecretsId>AuthenticationOptionsSample-bc2b0e78-974b-4b3d-abd4-a7dbe3ef828c</UserSecretsId>
   </PropertyGroup>
