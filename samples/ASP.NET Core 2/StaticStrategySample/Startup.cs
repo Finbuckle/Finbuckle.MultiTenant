@@ -18,7 +18,7 @@ namespace StaticStrategySample
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMultiTenant().
                 WithConfigurationStore().
                 WithStaticStrategy("finbuckle");

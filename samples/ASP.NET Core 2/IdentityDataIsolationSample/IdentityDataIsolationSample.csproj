@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <UserSecretsId>IdentityDataIsolationSample-bc2b0e78-974b-4b3d-abd4-aa5cd3ef828c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.14" />
     <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
   </ItemGroup>
 
