@@ -4,8 +4,9 @@ A multitenant store is responsible for retrieving information about a tenant bas
 
 Finbuckle.MultiTenant provides three basic multitenant stores
 - `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
-- `ConfigurationStore` - a read-only store that is back by app configuration (e.g. appSettings.json).
+- `ConfigurationStore` - a read-only store that is back by app configuration (e.g. appsettings.json).
 - `EFCoreStore` - an Entity Framework Core based implementation to query tenant information from a database.
+- `HttpRemoteStore` - a read-only store that sends the tenant identifier to an http(s) endpoint to get the tenant information.
 
 ## IMultiTenantStore and Custom Stores
 If the provided multitenant stores are not suitable then a custom store can easily be created by implementing `IMultiTenantStore`. The implementation must define the`TryAdd`, `TryRemove`, and `GetByIdentifierAsync` methods. `GetByIdentifierAsync` should return null if there is no suitable tenant match.
@@ -22,7 +23,7 @@ services.AddMultiTenant().WithStore( sp => return new MyStore());
 
 ## Accessing the Store at Runtime
 
-The multitenant store can be accessed at runtime to add, remove, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appSettings.json` configuration supported by the In-Memory Store).
+The multitenant store can be accessed at runtime to add, remove, or retrieve a `TenantInfo` in addition to any startup configuration the store implementation may offer (such as the `appsettings.json` configuration supported by the In-Memory Store).
 
 There are two ways to access the store. First, via the `Store` property on the `StoreInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()`. This property returns the actual store used to retrieve the tenant information for the current context.
 
@@ -94,10 +95,10 @@ The configuration section should use this JSON format:
 }
 ```
 
-## ConfigurationStore
+## Configuration Store
 Uses an app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1) as the underlying store. Most of the sample projects use this store for simplicity. This store is case insensitive when retrieving tenant information by tenant identifier.
 
-This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes, e.g. `appSettings.json` is updated, then the multitenant store will reflect the change.
+This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes, e.g. `appsettings.json` is updated, then the multitenant store will reflect the change.
 
 Configure by calling `WithConfigurationStore` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class. By default it will use the root configuration object and search for a section named "Finbuckle:MultiTenant:Stores:ConfigurationStore". An overload of `WithConfigurationStore` allows for a different base configuration object or section name if needed.
 
@@ -181,4 +182,60 @@ store.TryUpdate(newTenant);
 
 // Remove a tenant.
 store.TryRemove(newTenant.Identifier);
+```
+
+## Http Remote Store
+Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object in return. The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HttpRemoteStoreSample) projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
+
+For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`, `Name`, and `ConnectionString` which will be mapped into a `TenantInfo` object.
+
+Any non-200 response code results in a null `TenantInfo`.
+
+This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`.
+
+Configure by calling `WithHttpRemoteStore` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class. A uri template string must be passed to the method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri. If the template provided does not contain `{__tenant__}` it is appended to the template. An overload of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`.
+
+```cs
+// This will append the identifier to the provided url.
+services.AddMultiTenant()
+        .WithHttpRemoteStore("https://remoteserver.com/)...
+```
+
+```cs
+// This will replace {__tenant__} with the identifier.
+services.AddMultiTenant()
+        .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo)...
+```
+
+Use the overload of `WithHttpRemoteStore` to configure the underlying `HttpClient`:
+```cs
+// This will inject MyCustomHeaderHandler, a DelegatingHandler, to the request pipeline.
+services.AddMultiTenant()
+        .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
+        {
+            httpClientBuilder.ConfigureHttpClient( client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+        });
+```
+
+Use the same overload to configure delegating handlers and [customize the http request behavior](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-3.1#outgoing-request-middleware). For example, adding custom headers for authentication:
+```cs
+// This will inject MyCustomHeaderHandler, a DelegatingHandler, to the request pipeline.
+services.AddMultiTenant()
+        .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
+        {
+            httpClientBuilder.AddHttpMessageHander<MyCustomHeaderHandler>();
+        });
+```
+
+Use the same overload to add resilience and transient fault handling with [Polly](https://www.hanselman.com/blog/AddingResilienceAndTransientFaultHandlingToYourNETCoreHttpClientWithPolly.aspx):
+```cs
+// This will retry the request if needed.
+services.AddMultiTenant()
+        .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
+        {
+            httpClientBuilder.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(2));
+        });
 ```

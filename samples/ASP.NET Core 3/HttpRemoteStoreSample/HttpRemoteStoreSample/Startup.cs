@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Net.Http;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace StaticStrategySample
+namespace HttpRemoteStoreSample
 {
     public class Startup
     {
@@ -13,13 +14,13 @@ namespace StaticStrategySample
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
             services.AddMultiTenant()
-                    .WithConfigurationStore()
-                    .WithStaticStrategy("finbuckle");
+                    .WithRouteStrategy()
+                    .WithHttpRemoteStore("http://localhost:5004/tenants/"); // Use https in real apps!
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -32,10 +33,10 @@ namespace StaticStrategySample
             app.UseStaticFiles();
             app.UseRouting();
             app.UseMultiTenant();
-            
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
             });
         }
     }

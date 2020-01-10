@@ -20,7 +20,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
 {
     private IMultiTenantStore CreateCaseSensitiveTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(false), null);
+        var store = new InMemoryStore(false);
         store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Wait();
         store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null)).Wait();
 
@@ -54,7 +54,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
     
     protected override IMultiTenantStore CreateTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(), null);
+        var store = new InMemoryStore();
 
         return PopulateTestStore(store);
     }
@@ -77,12 +77,6 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
     }
 
     [Fact]
-    public override void ThrowWhenGettingByIdIfTenantIdIsNull()
-    {
-        base.ThrowWhenGettingByIdIfTenantIdIsNull();
-    }
-
-    [Fact]
     public override void GetTenantInfoFromStoreByIdentifier()
     {
         base.GetTenantInfoFromStoreByIdentifier();
@@ -95,57 +89,9 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
     }
 
     [Fact]
-    public override void ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull()
-    {
-        base.ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull();
-    }
-
-    [Fact]
     public override void AddTenantInfoToStore()
     {
         base.AddTenantInfoToStore();
-    }
-
-    [Fact]
-    public override void ThrowWhenAddingIfTenantInfoIsNull()
-    {
-        base.ThrowWhenAddingIfTenantInfoIsNull();
-    }
-
-    [Fact]
-    public override void ThrowWhenAddingIfTenantInfoIdIsNull()
-    {
-        base.ThrowWhenAddingIfTenantInfoIdIsNull();
-    }
-
-    [Fact]
-    public override void ReturnFalseWhenAddingIfDuplicateId()
-    {
-        base.ReturnFalseWhenAddingIfDuplicateId();
-    }
-
-    [Fact]
-    public override void ReturnFalseWhenAddingIfDuplicateIdentifier()
-    {
-        base.ReturnFalseWhenAddingIfDuplicateIdentifier();
-    }
-
-    [Fact]
-    public override void ThrowWhenUpdatingIfTenantInfoIsNull()
-    {
-        base.ThrowWhenUpdatingIfTenantInfoIsNull();
-    }
-
-    [Fact]
-    public override void ThrowWhenUpdatingIfTenantInfoIdIsNull()
-    {
-        base.ThrowWhenUpdatingIfTenantInfoIdIsNull();
-    }
-
-    [Fact]
-    public override void ReturnFalseWhenUpdatingIfTenantIdIsNotFound()
-    {
-        base.ReturnFalseWhenUpdatingIfTenantIdIsNotFound();
     }
 
     [Fact]
@@ -153,24 +99,10 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
     {
         base.RemoveTenantInfoFromStore();
     }
-
-    [Fact]
-    public override void ThrowWhenRemovingIfTenantIdentifierIsNull()
-    {
-        base.ThrowWhenRemovingIfTenantIdentifierIsNull();
-    }
-
-    [Fact]
-    public override void ReturnFalseWhenRemovingIfTenantInfoNotFound()
-    {
-        base.ReturnFalseWhenRemovingIfTenantInfoNotFound();
-    }
     
-    [Theory]
-    [InlineData("initech-id", true)]
-    [InlineData("notFound", false)]
-    public override void UpdateTenantInfoInStore(string id, bool expected)
+    [Fact]
+    public override void UpdateTenantInfoInStore()
     {
-        base.UpdateTenantInfoInStore(id, expected);
+        base.UpdateTenantInfoInStore();
     }
 }

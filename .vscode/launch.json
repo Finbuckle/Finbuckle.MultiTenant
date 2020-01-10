@@ -245,6 +245,26 @@
             }
         },
         {
+            "name": "Http Remote Store Sample (netcoreapp3.0)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/HttpRemoteStoreSample/HttpRemoteStoreSample/bin/Debug/netcoreapp3.0/HttpRemoteStoreSample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/HttpRemoteStoreSample/HttpRemoteStoreSample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Identity Data Isolation Sample (netcoreapp2.2)",
             "type": "coreclr",
             "request": "launch",

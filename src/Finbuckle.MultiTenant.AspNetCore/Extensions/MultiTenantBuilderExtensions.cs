@@ -146,7 +146,7 @@ namespace Microsoft.Extensions.DependencyInjection
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
 
         /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "\_\_tenant\_\_" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder)
@@ -169,7 +169,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a HostStrategy with template "\_\_tenant\_\_.*" to the application.
+        /// Adds and configures a HostStrategy with template "__tenant__.*" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder)

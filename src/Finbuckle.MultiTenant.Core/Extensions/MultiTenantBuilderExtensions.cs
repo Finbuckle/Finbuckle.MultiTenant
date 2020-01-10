@@ -27,22 +27,42 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
+
     public static class FinbuckleMultiTenantBuilderExtensions
     {
+        /// <summary>
+        /// Adds a HttpRemoteSTore to the application.
+        /// </summary>
+        /// <param name="endpointTemplate">The endpoint URI template.</param>
+        /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
+        public static FinbuckleMultiTenantBuilder WithHttpRemoteStore(this FinbuckleMultiTenantBuilder builder,
+                                                                      string endpointTemplate)
+        => builder.WithHttpRemoteStore(endpointTemplate, null);
+
+        /// <summary>
+        /// Adds a HttpRemoteSTore to the application.
+        /// </summary>
+        /// <param name="endpointTemplate">The endpoint URI template.</param>
+        /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
+        public static FinbuckleMultiTenantBuilder WithHttpRemoteStore(this FinbuckleMultiTenantBuilder builder,
+                                                                      string endpointTemplate,
+                                                                      Action<IHttpClientBuilder> clientConfig)
+        {
+            var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient).FullName);
+            if(clientConfig != null)
+                clientConfig(httpClientBuilder);
+
+            builder.Services.TryAddSingleton<HttpRemoteStoreClient>();
+
+            return builder.WithStore<HttpRemoteStore>(ServiceLifetime.Singleton, endpointTemplate);
+        }
+
         /// <summary>
         /// Adds a ConfigurationStore to the application. Uses the default IConfiguration and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
         /// </summary>
         public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder)
-        {
-            builder.Services.TryAddSingleton<IMultiTenantStore>(sp =>
-            {
-                var config = sp.GetRequiredService<IConfiguration>();
-                return new ConfigurationStore(config);
-            });
-
-            return builder;
-        }
-
+            => builder.WithStore<ConfigurationStore>(ServiceLifetime.Singleton);
+        
         /// <summary>
         /// Adds a ConfigurationStore to the application.
         /// </summary>
@@ -51,10 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder,
                                                                          IConfiguration configuration,
                                                                          string sectionName)
-        {
-            builder.Services.TryAddSingleton<IMultiTenantStore>(new ConfigurationStore(configuration, sectionName));
-            return builder;
-        }
+            => builder.WithStore<ConfigurationStore>(ServiceLifetime.Singleton, configuration, sectionName);
 
         /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.

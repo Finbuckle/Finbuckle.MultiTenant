@@ -19,27 +19,36 @@ using Finbuckle.MultiTenant.Strategies;
 using System;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Stores;
 
 public class MultiTenantBuilderExtensionsShould
 {
     [Fact]
-    public void AddFallbackTenantIdentifier()
+    public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
     {
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithFallbackStrategy("test");
+        builder.WithHttpRemoteStore("http://example.com");
         var sp = services.BuildServiceProvider();
-
-        var strategy = sp.GetRequiredService<FallbackStrategy>();
-        Assert.Equal("test", strategy.identifier);
+        
+        sp.GetRequiredService<HttpRemoteStoreClient>();
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore>>(store);
     }
 
     [Fact]
-    public void ThrowIfFallbackTenantIdentifierIsNull()
+    public void AddHttpRemoteStoreWithHttpClientBuilders()
     {
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder(services);
-        Assert.Throws<ArgumentNullException>(() => builder.WithFallbackStrategy(null));
+        var flag = false;
+        builder.WithHttpRemoteStore("http://example.com", b => flag = true);
+        var sp = services.BuildServiceProvider();
+        
+        sp.GetRequiredService<HttpRemoteStoreClient>();
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore>>(store);
+        Assert.True(flag);
     }
 
     [Fact]
@@ -55,7 +64,8 @@ public class MultiTenantBuilderExtensionsShould
         services.AddSingleton<IConfiguration>(configuration);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -87,7 +97,8 @@ public class MultiTenantBuilderExtensionsShould
         builder.WithConfigurationStore(configuration, "MultiTenant:Stores:ConfigurationStore");
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -117,7 +128,8 @@ public class MultiTenantBuilderExtensionsShould
         builder.WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>(); ;
+        var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -149,6 +161,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -183,11 +196,11 @@ public class MultiTenantBuilderExtensionsShould
 
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.
-                WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
+        builder.WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
 
         var tc = store.TryGetByIdentifierAsync("lol").Result;
         Assert.Equal("lol", tc.Id);
@@ -198,6 +211,7 @@ public class MultiTenantBuilderExtensionsShould
         // Case sensitive test.
         tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Null(tc);
+
     }
 
     [Fact]
@@ -233,6 +247,26 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore>());
+    }
+
+    [Fact]
+    public void AddFallbackTenantIdentifier()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        builder.WithFallbackStrategy("test");
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<FallbackStrategy>();
+        Assert.Equal("test", strategy.identifier);
+    }
+
+    [Fact]
+    public void ThrowIfFallbackTenantIdentifierIsNull()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder(services);
+        Assert.Throws<ArgumentNullException>(() => builder.WithFallbackStrategy(null));
     }
 
     [Fact]

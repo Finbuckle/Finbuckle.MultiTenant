@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 //    limitations under the License.
 
 using System;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
@@ -96,81 +95,18 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
-    [Fact]
-    public override void ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull()
-    {
-        base.ThrowWhenGettingByIdentifierIfTenantIdentifierIsNull();
-    }
-
-    [Fact]
-    public override void ThrowWhenGettingByIdIfTenantIdIsNull()
-    {
-        base.ThrowWhenGettingByIdIfTenantIdIsNull();
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
+    // [Fact(Skip = "Not valid for this store.")]
     public override void AddTenantInfoToStore()
     {
     }
 
-    [Fact(Skip = "Not valid for this store.")]
+    // [Fact(Skip = "Not valid for this store.")]
     public override void RemoveTenantInfoFromStore()
     {
     }
 
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ReturnFalseWhenAddingIfDuplicateId()
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void UpdateTenantInfoInStore()
     {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ReturnFalseWhenAddingIfDuplicateIdentifier()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ReturnFalseWhenRemovingIfTenantInfoNotFound()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ReturnFalseWhenUpdatingIfTenantIdIsNotFound()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ThrowWhenAddingIfTenantInfoIdIsNull()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ThrowWhenAddingIfTenantInfoIsNull()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ThrowWhenRemovingIfTenantIdentifierIsNull()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ThrowWhenUpdatingIfTenantInfoIdIsNull()
-    {
-    }
-
-    [Fact(Skip = "Not valid for this store.")]
-    public override void ThrowWhenUpdatingIfTenantInfoIsNull()
-    {
-    }
-
-    [Theory(Skip = "Not valid for this store.")]
-    [InlineData("initech-id", true)]
-    [InlineData("notFound", false)]
-    public override void UpdateTenantInfoInStore(string id, bool expected)
-    {
-        // Use params to supress build warnings.
-        id = id + "1";
-        expected = expected || true;
-
     }
 }
