@@ -9,10 +9,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.0" />
-    <!-- <PackageReference Include="Finbuckle.MultiTenant" Version="4.0.0" /> -->
+    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" /> -->
   </ItemGroup>
 </Project>

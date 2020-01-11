@@ -1,4 +1,17 @@
 ## Version
+**5.0.0**
+* Added support for ASP.NET Core 3.1.
+* Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks **@GordonBlahut**!
+* Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
+* Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
+* Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
+* Deprecated `InMemoryStore` functionality that reads from configuration.
+* Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to **@colindekker**!
+* Fixed an exception with OpenIdConnect remote authentication if "state" is not returned from the identity provider. The new behavior will result in no tenant found for the request.
+* Updated samples.
+* Updated documentation.
+* Updated unit tests.
+
 **4.0.0**
 * Added support for ASP.NET Core 3! Valid project targets are `netcoreapp3.0`, `netcoreapp2.0`, and `netcoreapp2.1`.
 * Added a sample app for ASP.NET 3 highlighting the route strategy improvements due to the endpoint routing mechanism.
