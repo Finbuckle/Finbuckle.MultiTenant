@@ -21,12 +21,20 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
     public class RemoteAuthenticationStrategy : IMultiTenantStrategy
     {
+        private readonly ILogger<RemoteAuthenticationStrategy> logger;
+
+        public RemoteAuthenticationStrategy(ILogger<RemoteAuthenticationStrategy> logger)
+        {
+            this.logger = logger;
+        }
+
         public async virtual Task<string> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext))
@@ -82,6 +90,12 @@ namespace Finbuckle.MultiTenant.Strategies
 
                         var properties = oAuthOptions?.StateDataFormat.Unprotect(state) ??
                                          openIdConnectOptions?.StateDataFormat.Unprotect(state);
+
+                        if (properties == null)
+                        {
+                            logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
+                            return null;
+                        }
 
                         if (properties.Items.Keys.Contains("tenantIdentifier"))
                         {
