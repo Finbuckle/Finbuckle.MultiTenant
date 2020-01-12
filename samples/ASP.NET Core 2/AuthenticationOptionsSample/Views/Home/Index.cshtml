@@ -66,7 +66,7 @@ else
         </p>
         <pre><code>services.AddMultiTenant()... // Setup host and strategy...
     WithRemoteAuthentication(). // Important!
-    WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
+    WithPerTenantOptions&lt;AuthenticationOptions&gt;((options, tenantInfo) =>
     {
         // Allow each tenant to have a different default challenge scheme.
         if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
@@ -74,7 +74,7 @@ else
             options.DefaultChallengeScheme = (string)challengeScheme;
         }
     }).
-    WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
+    WithPerTenantOptions&lt;CookieAuthenticationOptions&gt;((options, tenantInfo) =>
     {
         // Set a unique cookie name for this tenant.
         options.Cookie.Name = tenantInfo.Id + "-cookie";
