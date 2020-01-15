@@ -89,7 +89,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 }
 ```
 
-## Deriving from from MultiTenantDbContext
+## Deriving from MultiTenantDbContext
 See the data isolation sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples of this approach.
 
 Start by adding the `Finbuckle.MultiTenant` package to the project:

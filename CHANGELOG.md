@@ -1,4 +1,11 @@
 ## Version
+**5.0.1**
+* Updated for [.NET Core January 2020 Updates](https://devblogs.microsoft.com/dotnet/net-core-january-2020/) adding support for .NET Core 2.1.15, 3.0.2, and 3.1.1.
+* Updated dependencies as recommended in security notices for [.NET Core January 2020 Updates](https://devblogs.microsoft.com/dotnet/net-core-january-2020/).
+* *Finbuckle.MultiTenant.AspNetCore* targets `netcoreapp3.1`, `netcoreapp3.0`, and `netcoreapp2.1`.
+* *Finbuckle.MultiTenant.Core* targets `netstandard2.1` and `netstandard2.0`.
+* *Finbuckle.MultiTenant.EntityFrameworkCore* targets `netstandard2.1` and `netstandard2.0`.
+
 **5.0.0**
 * Added support for ASP.NET Core 3.1.
 * Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks **@GordonBlahut**!

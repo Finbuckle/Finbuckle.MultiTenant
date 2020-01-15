@@ -30,6 +30,10 @@ namespace Finbuckle.MultiTenant.Strategies
     {
         private readonly ILogger<RemoteAuthenticationStrategy> logger;
 
+        public RemoteAuthenticationStrategy()
+        {
+        }
+
         public RemoteAuthenticationStrategy(ILogger<RemoteAuthenticationStrategy> logger)
         {
             this.logger = logger;

@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#if NETCOREAPP2_2 || NETCOREAPP2_1
+#if NETCOREAPP2_1
 
 using System;
 using System.Threading.Tasks;

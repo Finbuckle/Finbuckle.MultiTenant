@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.14" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>

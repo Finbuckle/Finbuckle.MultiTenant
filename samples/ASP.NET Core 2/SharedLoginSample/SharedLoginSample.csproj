@@ -6,9 +6,9 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.14" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" PrivateAssets="All" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
