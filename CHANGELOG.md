@@ -1,4 +1,8 @@
 ## Version
+**5.0.3**
+* Fixed a bug where documented static methods were internal rather than public.
+* Minor documentation fix.
+
 **5.0.1**
 * Updated for [.NET Core January 2020 Updates](https://devblogs.microsoft.com/dotnet/net-core-january-2020/) adding support for .NET Core 2.1.15, 3.0.2, and 3.1.1.
 * Updated dependencies as recommended in security notices for [.NET Core January 2020 Updates](https://devblogs.microsoft.com/dotnet/net-core-january-2020/).

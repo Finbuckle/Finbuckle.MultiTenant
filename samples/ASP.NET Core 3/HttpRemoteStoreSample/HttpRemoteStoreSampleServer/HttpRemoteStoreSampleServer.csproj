@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.1" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.3" />
   </ItemGroup>
 
   <ItemGroup>

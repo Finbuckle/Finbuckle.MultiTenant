@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="3.1.1" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.1" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>5.0.1</Version>
+        <Version>5.0.3</Version>
         <Authors>Andrew White</Authors>
         <Copyright>Copyright ©2020 Andrew White</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/favicon-64x64.png</PackageIconUrl>

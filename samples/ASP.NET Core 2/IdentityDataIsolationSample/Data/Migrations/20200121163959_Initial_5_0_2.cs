@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IdentityDataIsolationSample.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Initial_5_0_2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -96,11 +96,11 @@ namespace IdentityDataIsolationSample.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
                     LoginProvider = table.Column<string>(nullable: false),
                     ProviderKey = table.Column<string>(nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(nullable: false),
                     TenantId = table.Column<string>(maxLength: 64, nullable: false)
                 },
                 constraints: table =>

@@ -76,8 +76,8 @@
                 Some of the highlights are shown below:
             </p>
             <pre><code>// Setup Identity as usual. Note the MultiTenant User and Role type parameters.
-services.AddIdentity<MultiTenantIdentityUser, MultiTenantIdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+services.AddDefaultIdentity<IdentityUser>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Configure MVC:
 // We modify the Identity razor settings to use our tenant route parameter.
