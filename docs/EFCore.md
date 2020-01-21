@@ -19,7 +19,7 @@ There are two ways to designate an entity type as multitenant:
 Entity types not designated via one of these methods are not isolated per-tenant and thus are visible to all tenants.
 
 ### Using the [MultiTenant] attribute
-The `[MultiTenant]` attribute is recognized by `MultiTenantDbContext`-derived db contexts and can be configured to do so for other db contexts by calling the `SetupMultiTenant` extension method on `ModelBuilder` in `OnModelCreating` as described further below.
+The `[MultiTenant]` attribute is recognized by `MultiTenantDbContext`-derived db contexts and can be configured to do so for other db contexts by calling the `ConfigureMultiTenant` extension method on `ModelBuilder` in `OnModelCreating` as described further below.
 
 ```cs
 [MultiTenant]
@@ -39,12 +39,12 @@ public class Post
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // Not needed if db context derives from MultiTenantDbContext
-    builder.SetupMultiTenant();
+    builder.ConfigureMultiTenant();
 }
 ```
 
 ### Using the fluent API
-Alternatively, the fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the same functionality for db contexts that do not derive from `MultiTenantDbContext`. Note that `SetupMultiTenant` is not needed.
+Alternatively, the fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the same functionality for db contexts that do not derive from `MultiTenantDbContext`. Note that `ConfigureMultiTenant` is not needed.
 
 ```cs
 protected override void OnModelCreating(ModelBuilder builder)
@@ -170,17 +170,17 @@ The db context will need to ensure that these properties haves values, e.g. thro
 
 Finally, call the library extension methods as decribed below. This requires overriding the `OnModelCreating`, `SaveChanges`, and `SaveChangesAsync` methods.
 
-In `OnModelCreating` use the `EntityTypeBuilder` fluent API extension method `IsMultiTenant` to designate entity types as multitenant. Call `SetupMultiTenant` on the `ModelBuilder` to configure each entity type marked with the `[MultiTenant]` data attribute. This is only needed if using the attribute and internally uses the `IsMultiTenant` fluent API. Make sure to call the base class `OnModelCreating` method if necessary, such as if inheriting from `IdentityDbContext`.
+In `OnModelCreating` use the `EntityTypeBuilder` fluent API extension method `IsMultiTenant` to designate entity types as multitenant. Call `ConfigureMultiTenant` on the `ModelBuilder` to configure each entity type marked with the `[MultiTenant]` data attribute. This is only needed if using the attribute and internally uses the `IsMultiTenant` fluent API. Make sure to call the base class `OnModelCreating` method if necessary, such as if inheriting from `IdentityDbContext`.
 
 ```cs
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // If necessary call the base class method.
-    // Recommendede to be called first.
+    // Recommended to be called first.
     base.OnModelCreating(builder);
 
-    // Setup all entity types marked with the [MultiTenant] data attribute
-    builder.SetupMultiTenant();
+    // Configure all entity types marked with the [MultiTenant] data attribute
+    builder.ConfigureMultiTenant();
 
     // Configure an entity type to be multitenant.
     builder.Entity<MyEntityType>().IsMultiTenant();

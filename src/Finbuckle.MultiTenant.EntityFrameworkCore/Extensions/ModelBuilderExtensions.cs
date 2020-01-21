@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    static class FinbuckleModelBuilderExtensions
+    public static class FinbuckleModelBuilderExtensions
     {
         /// <summary>
         /// Configures any entity's with the [MultiTenant] attribute.

@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    static class IMultiTenantDbContextExtensions
+    public static class IMultiTenantDbContextExtensions
     {
         /// <summary>
         /// Checks the TenantId on entities taking into account
