@@ -60,6 +60,7 @@ namespace AuthenticationOptionsSample
                     if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
                     {
                         options.DefaultChallengeScheme = (string)challengeScheme;
+                        // options.DefaultSignOutScheme = (string)challengeScheme;
                     }
                 }).
                 WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
