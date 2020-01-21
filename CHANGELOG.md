@@ -1,5 +1,5 @@
 ## Version
-**5.0.2**
+**5.0.3**
 * Fixed a bug where documented static methods were internal rather than public.
 * Minor documentation fix.
 
