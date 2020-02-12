@@ -26,6 +26,6 @@ namespace Finbuckle.MultiTenant
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public MultiTenantContext MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext();
+        public IMultiTenantContext MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext();
     }
 }

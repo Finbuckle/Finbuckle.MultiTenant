@@ -20,6 +20,6 @@ namespace Finbuckle.MultiTenant
     {
         public Type StoreType { get; internal set; }
         public IMultiTenantStore Store { get; internal set; }
-        public MultiTenantContext MultiTenantContext { get; internal set; }
+        public IMultiTenantContext MultiTenantContext { get; internal set; }
     }
 }

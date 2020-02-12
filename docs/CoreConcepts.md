@@ -2,10 +2,12 @@
 
 The library uses standard ASP.Net Core conventions and most of the internal details are abstracted away from app code. However, there are a few important specifics to be aware of.
 
-## MultiTenantContext
-Contains information about a the current multitenant environment. The `MultiTenantContext` for the current request can be obtained by calling the `GetMultiTenantContext()` method on the `HttpContext` object.
+## IMultiTenantContext
+Interface for a type containing information about the current multitenant environment.
 
-* Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was determined, and where its information came from.
+* Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was determined, and from where its information was retrieved.
+* Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext` object. The implementation used with ASP.NET Core middleware has read only properties. The `HttpContext` extension method `TrySetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this. 
+* A custom implementation can be defined for more advanced use cases.
 
 ## TenantInfo
 Contains information about a tenant. Usually an app will get the current `TenantInfo` object from the `MultiTenantContext` instance for that request. Instances of `TenantInfo` can also be passed to multitenant stores for adding, removing, updating the store.

@@ -20,6 +20,6 @@ namespace Finbuckle.MultiTenant
     {
         public Type StrategyType { get; internal set; }
         public IMultiTenantStrategy Strategy { get; internal set; }
-        public MultiTenantContext MultiTenantContext { get; internal set; }
+        public IMultiTenantContext MultiTenantContext { get; internal set; }
     }
 }
