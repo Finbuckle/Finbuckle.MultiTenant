@@ -1,4 +1,8 @@
 ## Version
+**5.0.4**
+* Fixed a conflicting assembly and nuget versions.
+* Minor documentation fix.
+
 **5.0.3**
 * Fixed a bug where documented static methods were internal rather than public.
 * Minor documentation fix.
