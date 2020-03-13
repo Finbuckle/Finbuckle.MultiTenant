@@ -24,14 +24,14 @@ namespace Finbuckle.MultiTenant
     public static class FinbuckleHttpContextExtensions
     {
         /// <summary>
-        /// Returns the current MultiTenantContext or null if there is none.
+        /// Returns the current IMultiTenantContext or null if there is none.
         /// </summary>
-        public static MultiTenantContext GetMultiTenantContext(this HttpContext httpContext)
+        public static IMultiTenantContext GetMultiTenantContext(this HttpContext httpContext)
         {
             object multiTenantContext = null;
             httpContext.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
             
-            return (MultiTenantContext)multiTenantContext;
+            return (IMultiTenantContext)multiTenantContext;
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         public static bool TrySetTenantInfo(this HttpContext httpContext, TenantInfo tenantInfo, bool resetServiceProvider)
         {
-            var multitenantContext = httpContext.GetMultiTenantContext();
+            var multitenantContext = httpContext.GetMultiTenantContext() as MultiTenantContext;
 
             if(multitenantContext == null)
                 return false;

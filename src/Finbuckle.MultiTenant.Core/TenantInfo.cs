@@ -12,7 +12,6 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using Finbuckle.MultiTenant.Core;
 
@@ -61,6 +60,6 @@ namespace Finbuckle.MultiTenant
         public string Name { get; internal set; }
         public string ConnectionString { get; internal set; }
         public IDictionary<string, object> Items { get; internal set; } = new Dictionary<string, object>();
-        public MultiTenantContext MultiTenantContext { get; internal set; }
+        public IMultiTenantContext MultiTenantContext { get; internal set; }
     }
 }
