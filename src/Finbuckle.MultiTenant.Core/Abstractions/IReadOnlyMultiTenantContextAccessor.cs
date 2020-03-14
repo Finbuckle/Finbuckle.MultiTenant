@@ -14,10 +14,8 @@
 
 namespace Finbuckle.MultiTenant
 {
-    public interface IMultiTenantContext
+    public interface IReadOnlyMultiTenantContextAccessor
     {
-        TenantInfo TenantInfo { get; set; }
-        StrategyInfo StrategyInfo { get; set; }
-        StoreInfo StoreInfo { get; set; }
+        IReadOnlyMultiTenantContext MultiTenantContext { get; }
     }
 }

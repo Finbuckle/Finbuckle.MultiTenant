@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,20 +12,22 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Core;
-using Microsoft.AspNetCore.Http;
-
 namespace Finbuckle.MultiTenant
 {
-    public class MultiTenantContextAccessor : IMultiTenantContextAccessor
+    /// <summary>
+    /// Contains information for the multitenant tenant, store, and strategy.
+    /// </summary>
+    public class ReadOnlyMultiTenantContext : IReadOnlyMultiTenantContext
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        public MultiTenantContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public ReadOnlyMultiTenantContext(IMultiTenantContext context)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            TenantInfo = context.TenantInfo;
+            StrategyInfo = context.StrategyInfo;
+            StoreInfo = context.StoreInfo;
         }
 
-        public IMultiTenantContext MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext();
+        public TenantInfo TenantInfo { get; }
+        public StrategyInfo StrategyInfo { get; }
+        public StoreInfo StoreInfo { get; }
     }
 }
