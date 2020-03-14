@@ -25,8 +25,8 @@ namespace Finbuckle.MultiTenant.Options
     /// <typeparam name="TOptions"></typeparam>
     internal class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
     {
-        private readonly IOptionsFactory<TOptions> _factory;
-        private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache
+        private readonly MultiTenantOptionsFactory<TOptions> _factory;
+        private readonly MultiTenantOptionsCache<TOptions> _cache; // This is private, not the global cache used by IOptionsMonitor<TOptions>.
 
         /// <summary>
         /// Initializes a new instance with the specified options configurations.
@@ -34,8 +34,8 @@ namespace Finbuckle.MultiTenant.Options
         /// <param name="factory">The factory to use to create options.</param>
         public MultiTenantOptionsManager(IOptionsFactory<TOptions> factory, IOptionsMonitorCache<TOptions> cache)
         {
-            _factory = factory;
-            _cache = cache;
+            _factory = (MultiTenantOptionsFactory<TOptions>)factory;
+            _cache = (MultiTenantOptionsCache<TOptions>)cache;
         }
 
         public TOptions Value

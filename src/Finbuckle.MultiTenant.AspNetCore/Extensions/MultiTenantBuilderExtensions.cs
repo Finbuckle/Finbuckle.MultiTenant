@@ -12,8 +12,6 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#if NETCOREAPP2_1
-
 using System;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authentication;
@@ -37,7 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
-
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
             builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
@@ -51,8 +48,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder WithBasePathStrategy(this FinbuckleMultiTenantBuilder builder)
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
 
+#if NETCOREAPP2_1
         /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "\_\_tenant\_\_" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
         /// </summary>
         /// <param name="configRoutes">Delegate to configure the routes.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
@@ -72,7 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
-                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
+                throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
             }
 
             if (configRoutes == null)
@@ -82,6 +80,30 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam, configRoutes });
         }
+#else
+        /// <summary>
+        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder)
+            => builder.WithRouteStrategy("__tenant__");
+
+        /// <summary>
+        /// Adds and configures a RouteStrategy to the application.
+        /// </summary>
+        /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder,
+                                                                    string tenantParam)
+        {
+            if (string.IsNullOrWhiteSpace(tenantParam))
+            {
+                throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
+            }
+
+            return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam });
+        }
+#endif
 
         /// <summary>
         /// Adds and configures a HostStrategy with template "\_\_tenant\_\_.*" to the application.
@@ -107,90 +129,3 @@ namespace Microsoft.Extensions.DependencyInjection
         }
     }
 }
-
-#else
-
-using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Authentication;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Strategies;
-
-namespace Microsoft.Extensions.DependencyInjection
-{
-    /// <summary>
-    /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
-    /// </summary>
-    public static class FinbuckleMultiTenantBuilderExtensions
-    {
-        /// <summary>
-        /// Configures support for multitenant OAuth and OpenIdConnect.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRemoteAuthentication(this FinbuckleMultiTenantBuilder builder)
-        {
-            // Replace needed instead of TryAdd...
-            builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
-            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
-            builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds and configures a BasePathStrategy to the application.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.></returns>
-        public static FinbuckleMultiTenantBuilder WithBasePathStrategy(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
-
-        /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithRouteStrategy("__tenant__");
-
-        /// <summary>
-        /// Adds and configures a RouteStrategy to the application.
-        /// </summary>
-        /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder,
-                                                                    string tenantParam)
-        {
-            if (string.IsNullOrWhiteSpace(tenantParam))
-            {
-                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
-            }
-
-            return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam });
-        }
-
-        /// <summary>
-        /// Adds and configures a HostStrategy with template "__tenant__.*" to the application.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithHostStrategy("__tenant__.*");
-
-        /// <summary>
-        /// Adds and configures a HostStrategy to the application.
-        /// </summary>
-        /// <param name="template">The template for determining the tenant identifier in the host.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder,
-                                                                   string template)
-        {
-            if (string.IsNullOrWhiteSpace(template))
-            {
-                throw new ArgumentException("Invalid value for \"template\"", nameof(template));
-            }
-
-            return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, new object[] { template });
-        }
-    }
-}
-
-#endif
