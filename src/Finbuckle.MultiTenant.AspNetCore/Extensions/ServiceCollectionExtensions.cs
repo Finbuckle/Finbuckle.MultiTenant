@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMultiTenantContextAccessor, AspNetCoreMultiTenantContextAccessor>();
             services.AddSingleton<IReadOnlyMultiTenantContextAccessor, ReadOnlyMultiTenantContextAccessor>();
 
-            return AddMultiTenantCore(services);
+            return services.AddMultiTenantCore();
         }
     }
 }
