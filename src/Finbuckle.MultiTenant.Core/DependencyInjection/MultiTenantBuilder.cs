@@ -38,33 +38,31 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds per-tenant configuration for an options class.
         /// </summary>
-        /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
+        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class, new()
+        public FinbuckleMultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantInfo> tenantConfig) where TOptions : class, new()
         {
-            if (tenantInfo == null)
+            if (tenantConfig == null)
             {
-                throw new ArgumentNullException(nameof(tenantInfo));
+                throw new ArgumentNullException(nameof(tenantConfig));
             }
 
             // Handles multiplexing cached options.
-            Services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
-                {
-                    return (MultiTenantOptionsCache<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
-                });
+            // Injected into default IOptionsMonitor<TOption>.
+            // Used in MultiTenantOptionsManager<TOptions>.
+            Services.AddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
 
-            // Necessary to apply tenant options in between configuration and postconfiguration
-            Services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
+            // Necessary to apply tenant options in between configuration and postconfiguration.
+            Services.AddTransient<IOptionsFactory<TOptions>>(sp =>
                 {
                     return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantInfo });
+                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantConfig });
                 });
 
-            Services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
+            Services.AddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
 
-            Services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
-
+            Services.AddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
+            
             return this;
         }
 
