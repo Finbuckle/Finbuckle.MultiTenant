@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -28,10 +29,10 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
         {
             services.AddHttpContextAccessor();
-            services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
-            services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
+            services.AddSingleton<IMultiTenantContextAccessor, AspNetCoreMultiTenantContextAccessor>();
+            services.AddSingleton<IReadOnlyMultiTenantContextAccessor, AspNetCoreReadOnlyMultiTenantContextAccessor>();
 
-            return new FinbuckleMultiTenantBuilder(services);
+            return AddMultiTenantCore(services);
         }
     }
 }
