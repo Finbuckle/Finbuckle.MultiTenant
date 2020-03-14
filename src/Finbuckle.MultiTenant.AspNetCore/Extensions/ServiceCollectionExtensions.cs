@@ -14,8 +14,6 @@
 
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -30,7 +28,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddHttpContextAccessor();
             services.AddSingleton<IMultiTenantContextAccessor, AspNetCoreMultiTenantContextAccessor>();
-            services.AddSingleton<IReadOnlyMultiTenantContextAccessor, AspNetCoreReadOnlyMultiTenantContextAccessor>();
+            services.AddSingleton<IReadOnlyMultiTenantContextAccessor, ReadOnlyMultiTenantContextAccessor>();
 
             return AddMultiTenantCore(services);
         }
