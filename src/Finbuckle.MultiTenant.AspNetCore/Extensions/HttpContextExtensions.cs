@@ -24,15 +24,10 @@ namespace Finbuckle.MultiTenant
     public static class FinbuckleHttpContextExtensions
     {
         /// <summary>
-        /// Returns the current IMultiTenantContext or null if there is none.
+        /// Returns a read-only current MultiTenantContext.
         /// </summary>
-        public static IMultiTenantContext GetMultiTenantContext(this HttpContext httpContext)
-        {
-            object multiTenantContext = null;
-            httpContext.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
-            
-            return (IMultiTenantContext)multiTenantContext;
-        }
+        public static IReadOnlyMultiTenantContext GetMultiTenantContext(this HttpContext httpContext)
+            => httpContext.RequestServices.GetRequiredService<IReadOnlyMultiTenantContext>();
 
         /// <summary>
         /// Sets the provided TenantInfo on the MultiTenantContext.
@@ -41,14 +36,10 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         public static bool TrySetTenantInfo(this HttpContext httpContext, TenantInfo tenantInfo, bool resetServiceProvider)
         {
-            var multitenantContext = httpContext.GetMultiTenantContext() as MultiTenantContext;
-
-            if(multitenantContext == null)
-                return false;
-
             if(resetServiceProvider)
                 httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
 
+            var multitenantContext = httpContext.RequestServices.GetRequiredService<IMultiTenantContext>();
             multitenantContext.TenantInfo = tenantInfo;
             multitenantContext.StrategyInfo = null;
             multitenantContext.StoreInfo = null;

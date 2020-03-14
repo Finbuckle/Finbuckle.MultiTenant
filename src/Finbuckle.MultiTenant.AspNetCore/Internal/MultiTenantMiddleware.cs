@@ -40,8 +40,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             // Set the initial multitenant context into the Items collections.
             if (!context.Items.ContainsKey(Constants.HttpContextMultiTenantContext))
             {
-                var multiTenantContext = new MultiTenantContext();
-                context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
+                var multiTenantContext = context.RequestServices.GetRequiredService<IMultiTenantContext>();
 
                 IMultiTenantStrategy strategy = null;
                 string identifier = null;
@@ -125,7 +124,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
         }
 
-        private static void SetStrategyInfo(MultiTenantContext multiTenantContext, IMultiTenantStrategy strategy)
+        private static void SetStrategyInfo(IMultiTenantContext multiTenantContext, IMultiTenantStrategy strategy)
         {
             var strategyInfo = new StrategyInfo();
             strategyInfo.MultiTenantContext = multiTenantContext;
