@@ -20,7 +20,7 @@ namespace Finbuckle.MultiTenant
 
         public ReadOnlyMultiTenantContextAccessor(IMultiTenantContextAccessor multiTenantContextAccessor)
         {
-            this.multiTenantContextAccessor = multiTenantContextAccessor;
+            this.multiTenantContextAccessor = multiTenantContextAccessor ?? throw new System.ArgumentNullException(nameof(multiTenantContextAccessor));
         }
 
         public IReadOnlyMultiTenantContext MultiTenantContext

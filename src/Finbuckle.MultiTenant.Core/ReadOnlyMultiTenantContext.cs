@@ -21,6 +21,11 @@ namespace Finbuckle.MultiTenant
     {
         public ReadOnlyMultiTenantContext(IMultiTenantContext context)
         {
+            if (context is null)
+            {
+                throw new System.ArgumentNullException(nameof(context));
+            }
+
             TenantInfo = context.TenantInfo;
             StrategyInfo = context.StrategyInfo;
             StoreInfo = context.StoreInfo;

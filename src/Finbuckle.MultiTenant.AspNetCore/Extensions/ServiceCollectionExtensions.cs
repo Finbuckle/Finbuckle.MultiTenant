@@ -28,7 +28,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddHttpContextAccessor();
             services.AddSingleton<IMultiTenantContextAccessor, AspNetCoreMultiTenantContextAccessor>();
-            services.AddSingleton<IReadOnlyMultiTenantContextAccessor, ReadOnlyMultiTenantContextAccessor>();
 
             return services.AddMultiTenantCore();
         }

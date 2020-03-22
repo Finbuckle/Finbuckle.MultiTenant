@@ -13,86 +13,97 @@
 //    limitations under the License.
 
 using System;
+using System.Threading;
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
 public class MultiTenantOptionsManagerShould
 {
+    public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor
+    {
+        private readonly MultiTenantContext _context;
+
+        public TestMultiTenantContextAccessor()
+        {
+            var ti = new TenantInfo("test", null, null, null, null);
+            var stratInfo = new StrategyInfo();
+            var storeInfo = new StoreInfo();
+            _context = new MultiTenantContext();
+            _context.TenantInfo = ti;
+            _context.StrategyInfo = stratInfo;
+            _context.StoreInfo = storeInfo;
+        }
+
+        public IMultiTenantContext MultiTenantContext => _context;
+    }
+
     [Theory]
     [InlineData("OptionName1")]
     [InlineData("OptionName2")]
     public void GetOptionByName(string optionName)
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
+        var services = new ServiceCollection();
+        services.AddTransient<IMultiTenantContextAccessor, TestMultiTenantContextAccessor>();
+        services.AddMultiTenantCore().WithPerTenantOptions<TenantInfo>((o, ti) => o.Id = optionName);
+        var sp = services.BuildServiceProvider();
 
-        var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+        var manager = sp.GetService<IOptionsSnapshot<TenantInfo>>();
+        var result = manager.Get(optionName);
 
-        manager.Get(optionName);
-
-        mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == optionName), It.IsAny<Func<Object>>()), Times.Once);
+        Assert.IsType<MultiTenantOptionsManager<TenantInfo>>(manager);
+        Assert.Equal(optionName, result.Id);
     }
 
     [Fact]
     public void GetOptionByDefaultNameIfNameNull()
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
+        var services = new ServiceCollection();
+        services.AddTransient<IMultiTenantContextAccessor, TestMultiTenantContextAccessor>();
+        services.AddMultiTenantCore().WithPerTenantOptions<TenantInfo>((o, ti) => o.Id = "test");
+        var sp = services.BuildServiceProvider();
 
-        var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+        var manager = sp.GetService<IOptionsSnapshot<TenantInfo>>();
+        var result = manager.Get(null);
 
-        manager.Get(null);
-
-        mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == Options.DefaultName), It.IsAny<Func<Object>>()), Times.Once);
+        Assert.IsType<MultiTenantOptionsManager<TenantInfo>>(manager);
+        Assert.Equal("test", result.Id);
     }
 
     [Fact]
     public void GetOptionByDefaultNameIfGettingValueProp()
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
+        var services = new ServiceCollection();
+        services.AddTransient<IMultiTenantContextAccessor, TestMultiTenantContextAccessor>();
+        services.AddMultiTenantCore().WithPerTenantOptions<TenantInfo>((o, ti) => o.Id = "test");
+        var sp = services.BuildServiceProvider();
 
-        var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+        var manager = sp.GetService<IOptionsSnapshot<TenantInfo>>();
+        var result = manager.Value;
 
-        var dummy = manager.Value;
-
-        mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == Options.DefaultName), It.IsAny<Func<Object>>()), Times.Once);
+        Assert.IsType<MultiTenantOptionsManager<TenantInfo>>(manager);
+        Assert.Equal("test", result.Id);
     }
 
     [Fact]
     public void ClearCacheOnReset()
     {
-        var mock = new Mock<TestOptionsCache<Object>>();
-        mock.Setup(i => i.Clear());
+        var services = new ServiceCollection();
+        services.AddTransient<IMultiTenantContextAccessor, TestMultiTenantContextAccessor>();
+        services.AddMultiTenantCore().WithPerTenantOptions<TenantInfo>((o, ti) => o.Id = DateTime.Now.ToLongTimeString());
+        var sp = services.BuildServiceProvider();
 
-        var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
-        manager.Reset();
+        var manager = sp.GetService<IOptionsSnapshot<TenantInfo>>();
+        var result1 = manager.Value;
 
-        mock.Verify(i => i.Clear(), Times.Once);
-    }
+        (manager as MultiTenantOptionsManager<TenantInfo>).Reset();
+        Thread.Sleep(100);
+        var result2 = manager.Value;
 
-    public class TestOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
-    {
-        public virtual void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual TOptions GetOrAdd(string name, Func<TOptions> createOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool TryAdd(string name, TOptions options)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool TryRemove(string name)
-        {
-            throw new NotImplementedException();
-        }
+        Assert.IsType<MultiTenantOptionsManager<TenantInfo>>(manager);
+        Assert.NotEqual(result1, result2);
     }
 }

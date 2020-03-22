@@ -22,23 +22,6 @@ using Xunit;
 
 public class ServiceCollectionExtensionsShould
 {
-    internal void configTestRoute(Microsoft.AspNetCore.Routing.IRouteBuilder routes)
-    {
-        routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
-    }
-
-    [Fact]
-    public void RegisterTenantInfoInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant();
-        
-        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(TenantInfo)).SingleOrDefault();
-
-        Assert.NotNull(service);
-    }
-
     [Fact]
     public void RegisterIHttpContextAccessorInDI()
     {
@@ -50,7 +33,7 @@ public class ServiceCollectionExtensionsShould
 
         Assert.NotNull(service);
     }
-
+    
     [Fact]
     public void RegisterIMultitenantContextAccessorInDI()
     {

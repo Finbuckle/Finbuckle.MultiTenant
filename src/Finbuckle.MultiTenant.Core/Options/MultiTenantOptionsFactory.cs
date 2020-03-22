@@ -28,8 +28,8 @@ namespace Finbuckle.MultiTenant.Options
     internal class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
     {
         private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
-        private readonly Action<TOptions, TenantInfo> tenantConfig;
-        private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
+        private readonly Action<TOptions, TenantInfo> _tenantConfig;
+        private readonly IMultiTenantContextAccessor _multiTenantContextAccessor;
         private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigures;
 
         /// <summary>
@@ -40,8 +40,8 @@ namespace Finbuckle.MultiTenant.Options
         public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TenantInfo> tenantConfig, IMultiTenantContextAccessor multiTenantContextAccessor)
         {
             _setups = setups;
-            this.tenantConfig = tenantConfig;
-            this.multiTenantContextAccessor = multiTenantContextAccessor;
+            _tenantConfig = tenantConfig;
+            _multiTenantContextAccessor = multiTenantContextAccessor;
             _postConfigures = postConfigures;
         }
 
@@ -61,9 +61,9 @@ namespace Finbuckle.MultiTenant.Options
             }
 
             // Configure tenant options.
-            if(multiTenantContextAccessor.MultiTenantContext?.TenantInfo != null)
+            if(_multiTenantContextAccessor.MultiTenantContext?.TenantInfo != null)
             {
-                tenantConfig(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
+                _tenantConfig(options, _multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }
 
             foreach (var post in _postConfigures)
