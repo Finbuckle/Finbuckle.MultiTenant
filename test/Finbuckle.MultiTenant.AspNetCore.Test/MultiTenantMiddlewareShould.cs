@@ -33,7 +33,6 @@ public class MultiTenantMiddlewareShould
 
         var mock = new Mock<HttpContext>();
         mock.Setup(c => c.RequestServices).Returns(serviceProvider);
-        mock.Setup(c => c.Items).Returns(items);
 
         return mock;
     }
@@ -171,11 +170,11 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolvedTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
-        Assert.NotNull(resolvedTenantContext.TenantInfo);
-        Assert.Equal("initech", resolvedTenantContext.TenantInfo.Id);
-        Assert.Equal("initech", resolvedTenantContext.TenantInfo.Identifier);
-        Assert.NotNull(resolvedTenantContext.TenantInfo.MultiTenantContext);
+        var resolvedContext = context.GetMultiTenantContext();
+        Assert.NotNull(resolvedContext.TenantInfo);
+        Assert.Equal("initech", resolvedContext.TenantInfo.Id);
+        Assert.Equal("initech", resolvedContext.TenantInfo.Identifier);
+        Assert.NotNull(resolvedContext.TenantInfo.MultiTenantContext);
     }
 
     [Fact]
@@ -191,7 +190,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var resolvedContext = context.GetMultiTenantContext();
         
         Assert.NotNull(resolvedContext.StrategyInfo);
         Assert.NotNull(resolvedContext.StrategyInfo.Strategy);
@@ -217,7 +216,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var resolvedContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var resolvedContext = context.GetMultiTenantContext();
         
         Assert.NotNull(resolvedContext.StoreInfo);
         Assert.NotNull(resolvedContext.StoreInfo.Store);
@@ -243,7 +242,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var multiTenantContext = context.GetMultiTenantContext();
         Assert.Null(multiTenantContext.TenantInfo);
         Assert.Null(multiTenantContext.StoreInfo);
         Assert.Null(multiTenantContext.StrategyInfo);
@@ -263,7 +262,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var multiTenantContext = context.GetMultiTenantContext();
         Assert.Null(multiTenantContext.TenantInfo);
         Assert.Null(multiTenantContext.StoreInfo);
         Assert.NotNull(multiTenantContext.StrategyInfo);
@@ -283,7 +282,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var multiTenantContext = context.GetMultiTenantContext();
         Assert.Null(multiTenantContext.TenantInfo);
         Assert.Null(multiTenantContext.StoreInfo);
         Assert.NotNull(multiTenantContext.StrategyInfo);
@@ -306,7 +305,7 @@ public class MultiTenantMiddlewareShould
         var mw = new MultiTenantMiddleware(null);
         mw.Invoke(context).Wait();
 
-        var multiTenantContext = (MultiTenantContext)context.Items[Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext];
+        var multiTenantContext = context.GetMultiTenantContext();
         Assert.Null(multiTenantContext.TenantInfo);
         Assert.Null(multiTenantContext.StoreInfo);
         Assert.NotNull(multiTenantContext.StrategyInfo);

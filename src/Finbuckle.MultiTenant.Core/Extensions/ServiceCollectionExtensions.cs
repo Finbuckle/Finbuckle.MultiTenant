@@ -30,7 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IReadOnlyMultiTenantContext>()?.TenantInfo);
             services.TryAddScoped<IMultiTenantContext, MultiTenantContext>();
-            services.TryAddScoped<IReadOnlyMultiTenantContext>(sp => new ReadOnlyMultiTenantContext(sp.GetRequiredService<IMultiTenantContext>()));
+            services.TryAddTransient<IReadOnlyMultiTenantContext>(sp => new ReadOnlyMultiTenantContext(sp.GetRequiredService<IMultiTenantContext>()));
 
             return new FinbuckleMultiTenantBuilder(services);
         }

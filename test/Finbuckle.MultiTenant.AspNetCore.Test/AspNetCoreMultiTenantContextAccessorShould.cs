@@ -12,30 +12,43 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
 public class AspNetCoreMultiTenantContextAccessorShould
 {
-    [Fact]
-    public void GetMultiTenantContextFromIHttpAccessor()
+    private Mock<HttpContext> CreateHttpContextMock(IServiceProvider serviceProvider)
     {
         var items = new Dictionary<object, object>();
-        var ti = new TenantInfo("test", null, null, null, null);
-        var tc = new MultiTenantContext();
-        tc.TenantInfo = ti;
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
 
-        var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        var mock = new Mock<HttpContext>();
+        mock.Setup(c => c.RequestServices).Returns(serviceProvider);
 
+        return mock;
+    }
+    
+    [Fact]
+    public void GetMultiTenantContextFromIHttpContextAccessor()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant().WithInMemoryStore().WithStaticStrategy("initech");
+        var sp = services.BuildServiceProvider();
+        var ti = new TenantInfo("initech", "initech", null, null, null);
+        sp.GetService<IMultiTenantStore>().TryAddAsync(ti).Wait();
+
+        var context = CreateHttpContextMock(sp).Object;
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-        httpContextAccessorMock.Setup(a => a.HttpContext).Returns(httpContextMock.Object);
+        httpContextAccessorMock.Setup(a => a.HttpContext).Returns(context);
+
+        var mw = new MultiTenantMiddleware(null);
+        mw.Invoke(context).Wait();
 
         var accessor = new AspNetCoreMultiTenantContextAccessor(httpContextAccessorMock.Object);
 
