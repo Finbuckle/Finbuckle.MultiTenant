@@ -29,12 +29,13 @@ namespace DerivedTenantInfoSample
             services.AddMultiTenant().
                 WithStore<ConfigurationStore<DerivedTenantInfo>>(ServiceLifetime.Singleton).
                 WithBasePathStrategy().
-                WithPerTenantOptions<CustomOptions>((options, tenantInfo) =>
-                {
-                    var derivedTenantInfo = (DerivedTenantInfo)tenantInfo;
-                    options.Value1 = derivedTenantInfo.CustomOptions.Value1;
-                    options.Value2 = derivedTenantInfo.CustomOptions.Value2;
-                });
+                //WithPerTenantOptions<CustomOptions>((options, tenantInfo) =>
+                //{
+                //    var derivedTenantInfo = (DerivedTenantInfo)tenantInfo;
+                //    options.Value1 = derivedTenantInfo.CustomOptions.Value1;
+                //    options.Value2 = derivedTenantInfo.CustomOptions.Value2;
+                //})
+                WithPerTenantOptions<CustomOptions, DerivedTenantInfo>(t => t.CustomOptions);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

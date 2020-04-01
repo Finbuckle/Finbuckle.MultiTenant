@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Options;
@@ -21,6 +23,7 @@ using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -222,5 +225,27 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder;
         }
+        public static FinbuckleMultiTenantBuilder WithPerTenantOptions<TOptions, TTenant>(this FinbuckleMultiTenantBuilder builder, Func<TTenant, TOptions> property) where TOptions : class, new() where TTenant : TenantInfo
+        {
+            builder.WithPerTenantOptions<TOptions>((options, tenantInfo) =>
+            {
+                var tenantOptions = property((TTenant)tenantInfo);
+
+                tenantOptions.Copy(options);
+            });
+
+            return builder;
+        }
+
+        public static void Copy<T>(this T source, T target) where T: class
+        {
+            var properties = typeof(T).GetProperties();
+
+            foreach (var property in properties)
+            {
+                property.SetValue(target, property.GetValue(source));
+            }
+        }
     }
+
 }
