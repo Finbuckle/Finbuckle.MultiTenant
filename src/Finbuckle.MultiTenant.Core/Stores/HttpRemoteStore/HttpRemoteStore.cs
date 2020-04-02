@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Finbuckle.MultiTenant.Stores
 {
     public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-        where TTenantInfo : ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         internal const string defaultEndpointTemplateIdentifierToken = "{__tenant__}";
         private readonly HttpRemoteStoreClient<TTenantInfo> client;

@@ -42,14 +42,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithStore<InMemoryStore>(lifetime);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithStore<InMemoryStore<TenantInfo>>(lifetime);
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
 
         switch (lifetime)
         {
@@ -63,7 +63,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
                 Assert.NotSame(store, store2);
                 break;
         }
@@ -76,14 +76,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithStore<InMemoryStore>(lifetime, true);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithStore<InMemoryStore<TenantInfo>>(lifetime, true);
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
 
         switch (lifetime)
         {
@@ -97,7 +97,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
                 Assert.NotSame(store, store2);
                 break;
         }
@@ -110,14 +110,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithStore(lifetime, _sp => new InMemoryStore());
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithStore(lifetime, _sp => new InMemoryStore<TenantInfo>());
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
 
         switch (lifetime)
         {
@@ -131,7 +131,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
                 Assert.NotSame(store, store2);
                 break;
         }
@@ -141,18 +141,18 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStore()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        Assert.Throws<ArgumentNullException>(() => builder.WithStore<InMemoryStore>(ServiceLifetime.Singleton, factory: null));
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        Assert.Throws<ArgumentNullException>(() => builder.WithStore<InMemoryStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null));
     }
 
     [Fact]
     public void AddPerTenantOptions()
     {
         var services = new ServiceCollection();
-        var accessor = new Mock<IMultiTenantContextAccessor>();
-        accessor.Setup(a => a.MultiTenantContext).Returns((MultiTenantContext)null);
-        services.AddSingleton<IMultiTenantContextAccessor>(accessor.Object);
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
+        accessor.Setup(a => a.MultiTenantContext).Returns((MultiTenantContext<TenantInfo>)null);
+        services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(accessor.Object);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         // Note: using MultiTenantBuilderShould as our test options class.
         builder.WithPerTenantOptions<MultiTenantBuilderShould>((o, tc) => o.TestProperty = 1);
         var sp = services.BuildServiceProvider();
@@ -164,7 +164,7 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullParamAddingPerTenantOptions()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>(null));
     }
 
@@ -175,8 +175,8 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
-        builder.WithStrategy<NullStrategy>(lifetime);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithStrategy<StaticStrategy>(lifetime, "initech");
 
         var sp = services.BuildServiceProvider();
 
@@ -209,7 +209,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithStrategy<StaticStrategy>(lifetime, new object[] { "id" });
 
         var sp = services.BuildServiceProvider();
@@ -243,7 +243,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithStrategy(lifetime, _sp => new StaticStrategy("id"));
 
         var sp = services.BuildServiceProvider();
@@ -274,7 +274,7 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentNullException>(() => builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null));
     }
 }

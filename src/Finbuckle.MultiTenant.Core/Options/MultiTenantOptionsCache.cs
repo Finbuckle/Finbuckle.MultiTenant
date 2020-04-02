@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.Options
     /// </summary>
     public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCache<TOptions>
         where TOptions : class
-        where TTenantInfo : ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
 

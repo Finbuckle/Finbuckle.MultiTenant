@@ -17,11 +17,11 @@ using Xunit;
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 
-public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore
+public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<TenantInfo>
 {
-    protected abstract IMultiTenantStore CreateTestStore();
+    protected abstract IMultiTenantStore<TenantInfo> CreateTestStore();
 
-    protected virtual IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+    protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         store.TryAddAsync(new TenantInfo("initech-id", "initech", "Initech", "connstring", null)).Wait();
         store.TryAddAsync(new TenantInfo("lol-id", "lol", "Lol, Inc.", "connstring2", null)).Wait();

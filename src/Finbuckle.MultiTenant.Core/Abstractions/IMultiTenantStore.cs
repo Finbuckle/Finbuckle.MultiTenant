@@ -19,7 +19,7 @@ namespace Finbuckle.MultiTenant
     /// <summary>
     /// Interface definition for tenant stores.
     /// </summary>
-    public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo, new()
+    public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         /// <summary>
         /// Try to add the TTenantInfo to the store.

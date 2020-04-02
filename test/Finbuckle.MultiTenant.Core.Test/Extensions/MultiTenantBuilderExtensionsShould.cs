@@ -27,27 +27,27 @@ public class MultiTenantBuilderExtensionsShould
     public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithHttpRemoteStore("http://example.com");
         var sp = services.BuildServiceProvider();
         
-        sp.GetRequiredService<HttpRemoteStoreClient>();
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore>>(store);
+        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore<TenantInfo>, TenantInfo>>(store);
     }
 
     [Fact]
     public void AddHttpRemoteStoreWithHttpClientBuilders()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         var flag = false;
         builder.WithHttpRemoteStore("http://example.com", b => flag = true);
         var sp = services.BuildServiceProvider();
         
-        sp.GetRequiredService<HttpRemoteStoreClient>();
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore>>(store);
+        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore<TenantInfo>, TenantInfo>>(store);
         Assert.True(flag);
     }
 
@@ -59,13 +59,13 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithConfigurationStore();
         services.AddSingleton<IConfiguration>(configuration);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore<TenantInfo>, TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -90,15 +90,15 @@ public class MultiTenantBuilderExtensionsShould
         IConfiguration configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
 
         // Non-default section name.
         configuration = configuration.GetSection("Finbuckle");
         builder.WithConfigurationStore(configuration, "MultiTenant:Stores:ConfigurationStore");
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore<TenantInfo>, TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -124,18 +124,18 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
-        Assert.Equal("1234", tc.Items["test_item"]);
+        //Assert.Equal("1234", tc.Items["test_item"]); "Items" not loaded for TenantInfo
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
@@ -155,13 +155,13 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -182,9 +182,9 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfNullParamAddingInMemoryStore()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentNullException>(()
-            => builder.WithInMemoryStore(config: null));
+            => builder.WithInMemoryStore<TenantInfo>(config: null));
     }
 
     [Fact]
@@ -195,12 +195,12 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("lol").Result;
         Assert.Equal("lol", tc.Id);
@@ -222,12 +222,12 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.
                 WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore>());
+        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore<TenantInfo>>());
     }
 
     [Theory]
@@ -242,18 +242,18 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore>());
+        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore<TenantInfo>>());
     }
 
     [Fact]
     public void AddFallbackTenantIdentifier()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithFallbackStrategy("test");
         var sp = services.BuildServiceProvider();
 
@@ -265,7 +265,7 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfFallbackTenantIdentifierIsNull()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentNullException>(() => builder.WithFallbackStrategy(null));
     }
 
@@ -273,7 +273,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddDelegateStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithDelegateStrategy(c => Task.FromResult("Hi"));
         var sp = services.BuildServiceProvider();
 
@@ -285,7 +285,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddStaticStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         builder.WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
 
@@ -297,7 +297,7 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfNullParamAddingStaticStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder(services);
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentException>(()
             => builder.WithStaticStrategy(null));
     }

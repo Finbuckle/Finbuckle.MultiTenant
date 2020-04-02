@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.Options
     /// <typeparam name="TOptions">The type of options being requested.</typeparam>
     internal class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<TOptions>
         where TOptions : class, new()
-        where TTenantInfo : ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
         private readonly Action<TOptions, TTenantInfo> tenantConfig;
@@ -63,7 +63,7 @@ namespace Finbuckle.MultiTenant.Options
             }
 
             // Configure tenant options.
-            if(multiTenantContextAccessor.MultiTenantContext.TenantInfo != null)
+            if(multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
             {
                 tenantConfig(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }

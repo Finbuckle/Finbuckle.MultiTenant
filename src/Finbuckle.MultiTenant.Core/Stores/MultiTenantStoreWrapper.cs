@@ -24,7 +24,7 @@ namespace Finbuckle.MultiTenant.Stores
     /// </summary>
     public class MultiTenantStoreWrapper<TStore, TTenantInfo> : IMultiTenantStore<TTenantInfo>
         where TStore : IMultiTenantStore<TTenantInfo>
-        where TTenantInfo : ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         public TStore Store { get; }
         private readonly ILogger logger;
@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.Stores
                 throw new ArgumentNullException(nameof(id));
             }
 
-            TTenantInfo result = default(TTenantInfo);
+            TTenantInfo result = null;
 
             try
             {
@@ -73,7 +73,7 @@ namespace Finbuckle.MultiTenant.Stores
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            TTenantInfo result = default(TTenantInfo);
+            TTenantInfo result = null;
 
             try
             {

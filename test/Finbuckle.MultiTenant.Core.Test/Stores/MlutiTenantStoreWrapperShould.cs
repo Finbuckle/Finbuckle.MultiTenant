@@ -17,18 +17,18 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemoryStore>
+public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemoryStore<TenantInfo>>
 {
     // Basic store functionality tested in MultiTenantStoresShould.cs
     
-    protected override IMultiTenantStore CreateTestStore()
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(), null);
+        var store = new MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>(new InMemoryStore<TenantInfo>(), null);
 
         return PopulateTestStore(store);
     }
 
-    protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         return base.PopulateTestStore(store);
     }

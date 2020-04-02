@@ -13,15 +13,8 @@
 //    limitations under the License.
 
 using System;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
-using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 public class HttpRemoteStoreClientShould
@@ -29,6 +22,6 @@ public class HttpRemoteStoreClientShould
     [Fact]
     public void ThrowIfHttpClientFactoryIsNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient(null));
+        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo>(null));
     }   
 }

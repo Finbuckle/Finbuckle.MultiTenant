@@ -29,10 +29,10 @@ public class MultiTenantOptionsCacheShould
     public void AddNamedOptionsForCurrentTenantOnlyOnAdd(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -54,7 +54,7 @@ public class MultiTenantOptionsCacheShould
     public void HandleNullMultiTenantContextOnAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -67,7 +67,7 @@ public class MultiTenantOptionsCacheShould
     public void HandleNullMultiTenantContextOnGetOrAdd()
     {
         var tca = new TestMultiTenantContextAccessor(null);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -83,10 +83,10 @@ public class MultiTenantOptionsCacheShould
     public void GetOrAddNamedOptionForCurrentTenantOnly(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
         var options2 = new InMemoryStoreOptions();
@@ -108,9 +108,9 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowsIfGetOrAddFactoryIsNull()
     {
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null));
     }
@@ -118,10 +118,10 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowIfContructorParamIsNull()
     {
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         var tca = new TestMultiTenantContextAccessor(tc);
 
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<InMemoryStoreOptions>(null));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(null));
     }
 
     [Theory]
@@ -131,10 +131,10 @@ public class MultiTenantOptionsCacheShould
     public void RemoveNamedOptionsForCurrentTenantOnly(string name)
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -174,10 +174,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearOptionsForCurrentTenantOnly()
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -214,10 +214,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearOptionsForTenantIdOnly()
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 
@@ -252,10 +252,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearAllOptionsForClearAll()
     {
         var ti = new TenantInfo("test-id-123", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);
-        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions>(tca);
+        var cache = new MultiTenantOptionsCache<InMemoryStoreOptions, TenantInfo>(tca);
 
         var options = new InMemoryStoreOptions();
 

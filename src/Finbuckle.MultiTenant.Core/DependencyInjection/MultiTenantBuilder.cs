@@ -23,7 +23,7 @@ using Finbuckle.MultiTenant.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : ITenantInfo, new()
+    public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         public IServiceCollection Services { get; set; }
 
@@ -107,8 +107,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<T>(ServiceLifetime lifetime, params object[] parameters) where T : IMultiTenantStrategy
-            => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime, params object[] parameters) where TStrategy : IMultiTenantStrategy
+            => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<TStrategy>(sp, parameters));
 
         /// <summary>
         /// Adds and configures a IMultiTenantStrategy to the application using a factory method.

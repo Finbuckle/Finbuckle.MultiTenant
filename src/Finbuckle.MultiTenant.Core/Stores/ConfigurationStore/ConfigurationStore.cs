@@ -22,7 +22,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo, new()
+    public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         internal const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
@@ -92,7 +92,7 @@ namespace Finbuckle.MultiTenant.Stores
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : default(TTenantInfo));
+            return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
         }
 
         public Task<bool> TryRemoveAsync(string id)

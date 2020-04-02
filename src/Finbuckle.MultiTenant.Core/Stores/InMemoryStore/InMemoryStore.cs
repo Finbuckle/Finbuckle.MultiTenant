@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 namespace Finbuckle.MultiTenant.Stores
 {
     public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-        where TTenantInfo : ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly ConcurrentDictionary<string, TTenantInfo> tenantMap;
 

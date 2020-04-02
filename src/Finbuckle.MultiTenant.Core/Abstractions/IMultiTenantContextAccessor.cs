@@ -14,7 +14,7 @@
 
 namespace Finbuckle.MultiTenant
 {
-    public interface IMultiTenantContextAccessor<TTenantInfo> where TTenantInfo : ITenantInfo, new()
+    public interface IMultiTenantContextAccessor<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         MultiTenantContext<TTenantInfo> MultiTenantContext { get; }
     }

@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo, new()
+    public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IHttpClientFactory clientFactory;
 
@@ -36,7 +36,7 @@ namespace Finbuckle.MultiTenant.Stores
             var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
-                return default(TTenantInfo);
+                return null;
 
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<TTenantInfo>(json);
