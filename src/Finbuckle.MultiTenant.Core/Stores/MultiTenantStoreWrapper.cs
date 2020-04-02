@@ -22,8 +22,9 @@ namespace Finbuckle.MultiTenant.Stores
     /// <summary>
     /// A multitenant store decorator that handles exception handling and logging.
     /// </summary>
-    public class MultiTenantStoreWrapper<TStore> : IMultiTenantStore
-        where TStore : IMultiTenantStore
+    public class MultiTenantStoreWrapper<TStore, TTenantInfo> : IMultiTenantStore<TTenantInfo>
+        where TStore : IMultiTenantStore<TTenantInfo>
+        where TTenantInfo : ITenantInfo, new()
     {
         public TStore Store { get; }
         private readonly ILogger logger;
@@ -34,14 +35,14 @@ namespace Finbuckle.MultiTenant.Stores
             this.logger = logger;
         }
 
-        public async Task<TenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo> TryGetAsync(string id)
         {
             if (id == null)
             {
                 throw new ArgumentNullException(nameof(id));
             }
 
-            TenantInfo result = null;
+            TTenantInfo result = default(TTenantInfo);
 
             try
             {
@@ -65,14 +66,14 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            TenantInfo result = null;
+            TTenantInfo result = default(TTenantInfo);
 
             try
             {
@@ -96,7 +97,7 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             if (tenantInfo == null)
             {
@@ -184,7 +185,7 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
             if (tenantInfo == null)
             {

@@ -25,11 +25,13 @@ namespace Finbuckle.MultiTenant.Options
     /// Implementation of IOptionsFactory.
     /// </summary>
     /// <typeparam name="TOptions">The type of options being requested.</typeparam>
-    internal class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions> where TOptions : class, new()
+    internal class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<TOptions>
+        where TOptions : class, new()
+        where TTenantInfo : ITenantInfo, new()
     {
         private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
-        private readonly Action<TOptions, TenantInfo> tenantConfig;
-        private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
+        private readonly Action<TOptions, TTenantInfo> tenantConfig;
+        private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
         private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigures;
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace Finbuckle.MultiTenant.Options
         /// </summary>
         /// <param name="setups">The configuration actions to run.</param>
         /// <param name="postConfigures">The initialization actions to run.</param>
-        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TenantInfo> tenantConfig, IMultiTenantContextAccessor multiTenantContextAccessor)
+        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TTenantInfo> tenantConfig, IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
         {
             _setups = setups;
             this.tenantConfig = tenantConfig;
@@ -61,7 +63,7 @@ namespace Finbuckle.MultiTenant.Options
             }
 
             // Configure tenant options.
-            if(multiTenantContextAccessor.MultiTenantContext?.TenantInfo != null)
+            if(multiTenantContextAccessor.MultiTenantContext.TenantInfo != null)
             {
                 tenantConfig(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }

@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class HttpRemoteStoreClient
+    public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo, new()
     {
         private readonly IHttpClientFactory clientFactory;
 
@@ -29,25 +29,19 @@ namespace Finbuckle.MultiTenant.Stores
             this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
+        public async Task<TTenantInfo> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
         {
-            var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient).FullName);
-            var uri = endpointTemplate.Replace(HttpRemoteStore.defaultEndpointTemplateIdentifierToken, identifier);
+            var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName);
+            var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.defaultEndpointTemplateIdentifierToken, identifier);
             var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode)
-                return null;
+                return default(TTenantInfo);
 
             var json = await response.Content.ReadAsStringAsync();
-            var anon = new { Id = "", Identifier = "", Name = "", ConnectionString = "" };
-            var settings = new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            };
+            var result = JsonConvert.DeserializeObject<TTenantInfo>(json);
 
-            var result = JsonConvert.DeserializeAnonymousType(json, anon);
-
-            return new TenantInfo(result.Id, result.Identifier, result.Name, result.ConnectionString, null);
+            return result;
         }
     }
 }

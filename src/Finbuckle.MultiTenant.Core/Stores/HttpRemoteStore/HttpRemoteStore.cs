@@ -17,13 +17,14 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class HttpRemoteStore : IMultiTenantStore
+    public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
+        where TTenantInfo : ITenantInfo, new()
     {
         internal const string defaultEndpointTemplateIdentifierToken = "{__tenant__}";
-        private readonly HttpRemoteStoreClient client;
+        private readonly HttpRemoteStoreClient<TTenantInfo> client;
         private readonly string endpointTemplate;
 
-        public HttpRemoteStore(HttpRemoteStoreClient client, string endpointTemplate)
+        public HttpRemoteStore(HttpRemoteStoreClient<TTenantInfo> client, string endpointTemplate)
         {
             this.client = client ?? throw new ArgumentNullException(nameof(client));
             if (!endpointTemplate.Contains(defaultEndpointTemplateIdentifierToken))
@@ -44,17 +45,17 @@ namespace Finbuckle.MultiTenant.Stores
             this.endpointTemplate = endpointTemplate;
         }
 
-        public Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public Task<bool> TryAddAsync(TTenantInfo TtenantInfo)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<TenantInfo> TryGetAsync(string id)
+        public Task<TTenantInfo> TryGetAsync(string id)
         {
             throw new System.NotImplementedException();
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             var result = await client.TryGetByIdentifierAsync(endpointTemplate, identifier);
             return result;
@@ -65,7 +66,7 @@ namespace Finbuckle.MultiTenant.Stores
             throw new System.NotImplementedException();
         }
 
-        public Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
             throw new System.NotImplementedException();
         }

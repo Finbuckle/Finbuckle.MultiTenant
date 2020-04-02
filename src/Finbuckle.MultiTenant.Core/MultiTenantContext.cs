@@ -14,14 +14,13 @@
 
 namespace Finbuckle.MultiTenant
 {
-
     /// <summary>
     /// Contains information for the multitenant tenant, store, and strategy.
     /// </summary>
-    public class MultiTenantContext : IMultiTenantContext
+    public class MultiTenantContext<TTenantInfo> where TTenantInfo : ITenantInfo, new()
     {
-        public TenantInfo TenantInfo { get; internal set; }
-        public StrategyInfo StrategyInfo { get; internal set; }
-        public StoreInfo StoreInfo { get; internal set; }
+        public TTenantInfo TenantInfo { get; set; }
+        public StrategyInfo StrategyInfo { get; set; }
+        public StoreInfo<TTenantInfo> StoreInfo { get; set; }
     }
 }

@@ -22,11 +22,11 @@ using Microsoft.Extensions.Primitives;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class ConfigurationStore : IMultiTenantStore
+    public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo, new()
     {
         internal const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
-        private ConcurrentDictionary<string, TenantInfo> tenantMap;
+        private ConcurrentDictionary<string, TTenantInfo> tenantMap;
 
         public ConfigurationStore(IConfiguration configuration) : this(configuration, defaultSectionName)
         {
@@ -56,12 +56,12 @@ namespace Finbuckle.MultiTenant.Stores
 
         private void UpdateTenantMap()
         {
-            var newMap = new ConcurrentDictionary<string, TenantInfo>(StringComparer.OrdinalIgnoreCase);
+            var newMap = new ConcurrentDictionary<string, TTenantInfo>(StringComparer.OrdinalIgnoreCase);
             var tenants = section.GetSection("Tenants").GetChildren();
 
             foreach(var tenantSection in tenants)
             {
-                var newTenant = section.GetSection("Defaults").Get<TenantInfo>(options => options.BindNonPublicProperties = true);
+                var newTenant = section.GetSection("Defaults").Get<TTenantInfo>((options => options.BindNonPublicProperties = true));
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
                 newMap.TryAdd(newTenant.Identifier, newTenant);
             }
@@ -70,12 +70,12 @@ namespace Finbuckle.MultiTenant.Stores
             tenantMap = newMap;
         }
 
-        public Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<TenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo> TryGetAsync(string id)
         {
             if (id is null)
             {
@@ -85,14 +85,14 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(tenantMap.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier is null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
+            return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : default(TTenantInfo));
         }
 
         public Task<bool> TryRemoveAsync(string id)
@@ -100,15 +100,9 @@ namespace Finbuckle.MultiTenant.Stores
             throw new NotImplementedException();
         }
 
-        public Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
             throw new NotImplementedException();
-        }
-
-        public class ConfigurationStoreOptions
-        {
-            TenantInfo Defaults { get; set; }
-            public List<TenantInfo> Tenants { get; set; }
         }
     }
 }

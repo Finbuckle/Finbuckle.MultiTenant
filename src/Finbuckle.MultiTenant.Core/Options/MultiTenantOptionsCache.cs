@@ -21,9 +21,11 @@ namespace Finbuckle.MultiTenant.Options
     /// <summary>
     /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
     /// </summary>
-    public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCache<TOptions>
+        where TOptions : class
+        where TTenantInfo : ITenantInfo, new()
     {
-        private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
+        private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
 
         // The object is just a dummy because there is no ConcurrentSet<T> class.
         //private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
@@ -31,7 +33,7 @@ namespace Finbuckle.MultiTenant.Options
 
         private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>>();
 
-        public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
+        public MultiTenantOptionsCache(IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
         {
             this.multiTenantContextAccessor = multiTenantContextAccessor ?? throw new ArgumentNullException(nameof(multiTenantContextAccessor));
         }

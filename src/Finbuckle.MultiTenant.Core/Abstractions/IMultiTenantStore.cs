@@ -19,41 +19,41 @@ namespace Finbuckle.MultiTenant
     /// <summary>
     /// Interface definition for tenant stores.
     /// </summary>
-    public interface IMultiTenantStore
+    public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo, new()
     {
         /// <summary>
-        /// Try to add the TenantInfo to the store.
+        /// Try to add the TTenantInfo to the store.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<bool> TryAddAsync(TenantInfo tenantInfo);
+        Task<bool> TryAddAsync(TTenantInfo tenantInfo);
 
         /// <summary>
-        /// Try to update the TenantInfo in the store.
+        /// Try to update the TTenantInfo in the store.
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<bool> TryUpdateAsync(TenantInfo tenantInfo);
+        Task<bool> TryUpdateAsync(TTenantInfo tenantInfo);
 
         /// <summary>
-        /// Try to remove the TenantInfo from the store.
+        /// Try to remove the TTenantInfo from the store.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<bool> TryRemoveAsync(string id);
 
         /// <summary>
-        /// Retrieve the TenantInfo for a given identifier.
+        /// Retrieve the TTenantInfo for a given identifier.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        Task<TenantInfo> TryGetByIdentifierAsync(string identifier);
+        Task<TTenantInfo> TryGetByIdentifierAsync(string identifier);
 
         /// <summary>
-        /// Retrieve the TenantInfo for a given tenant Id.
+        /// Retrieve the TTenantInfo for a given tenant Id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TenantInfo> TryGetAsync(string id);
+        Task<TTenantInfo> TryGetAsync(string id);
     }
 }
