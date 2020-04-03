@@ -23,8 +23,8 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
 
     protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-        store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech", ConnectionString = "connstring" }).Wait();
-        store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc.", ConnectionString = "connstring2" }).Wait();
+        var r1 = store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech", ConnectionString = "connstring" }).Result;
+        r1 = store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc.", ConnectionString = "connstring2" }).Result;
 
         return store;
     }
@@ -83,7 +83,7 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
     public virtual void RemoveTenantInfoFromStore()
     {
         var store = CreateTestStore();
-
+        // TODO: Change to use Id instead of identifier
         Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
         Assert.True(store.TryRemoveAsync("initech").Result);
         Assert.Null(store.TryGetByIdentifierAsync("initech").Result);

@@ -41,25 +41,25 @@ namespace MultiTenantBuilderExtensionsShould
         public void AddEFCoreStore()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder(services);
-            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext>();
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
-            var resolver = sp.GetRequiredService<IMultiTenantStore>();
-            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext>>>(resolver);
+            var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>, TenantInfo>>(resolver);
         }
 
         [Fact]
         public void AddEFCoreStoreWithExistingDbContext()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder(services);
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
             services.AddDbContext<TestEFCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
-            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext>();
+            builder.WithStaticStrategy("initech").WithEFCoreStore<TestEFCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
-            var resolver = sp.GetRequiredService<IMultiTenantStore>();
-            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext>>>(resolver);
+            var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+            Assert.IsType<MultiTenantStoreWrapper<EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>, TenantInfo>>(resolver);
         }
     }
 }
