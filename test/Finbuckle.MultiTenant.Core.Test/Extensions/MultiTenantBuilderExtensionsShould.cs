@@ -71,7 +71,6 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("initech-id", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
-        Assert.Equal("1234", tc.Items["test_item"]);
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
@@ -104,7 +103,6 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("initech-id", tc.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
-        Assert.Equal("1234", tc.Items["test_item"]);
         // Note: connection string below loading from default in json.
         Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 

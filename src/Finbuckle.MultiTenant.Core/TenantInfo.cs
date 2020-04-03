@@ -25,18 +25,6 @@ namespace Finbuckle.MultiTenant
         {
         }
 
-        public TenantInfo(string id, string identifier, string name, string connectionString, IDictionary<string, object> items)
-        {
-            Id = id;
-            Identifier = identifier;
-            Name = name;
-            ConnectionString = connectionString;
-            if (items != null)
-            {
-                Items = items;
-            }
-        }
-
         public string Id
         {
             get
@@ -59,6 +47,5 @@ namespace Finbuckle.MultiTenant
         public string Identifier { get; set; }
         public string Name { get; set; }
         public string ConnectionString { get; set; }
-        public IDictionary<string, object> Items { get; set; } = new Dictionary<string, object>();
     }
 }

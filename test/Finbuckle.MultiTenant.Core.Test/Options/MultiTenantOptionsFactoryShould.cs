@@ -26,7 +26,7 @@ public class MultiTenantOptionsFactoryShould
     [InlineData("name")]
     public void CreateOptionsWithTenantAction(string name)
     {
-        var ti = new TenantInfo("test-id-123", null, null, null, null);
+        var ti = new TenantInfo{ Id = "test-id-123" };
         var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         var tca = new TestMultiTenantContextAccessor(tc);

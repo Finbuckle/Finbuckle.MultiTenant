@@ -14,18 +14,22 @@
 
 using System.Collections.Concurrent;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Core;
 using Xunit;
 
 public class TenantInfoShould
 {
     [Fact]
-    public void CtorShouldSetItems()
+    public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
     {
+        // OK
+        new TenantInfo { Id = "".PadRight(1, 'a') };
 
-        var items = new ConcurrentDictionary<string, object>();
-        items.TryAdd("test-entry", "test-value");
-        var ti = new TenantInfo("".PadRight(1, 'a'), null, null, null, items);
+        // OK
+        new TenantInfo { Id = "".PadRight(Constants.TenantIdMaxLength, 'a') };
         
-        Assert.Same(items, ti.Items);
+        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength + 1, 'a') });
+        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength
+            + 999, 'a') });
     }
 }

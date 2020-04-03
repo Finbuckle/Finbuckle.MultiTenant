@@ -23,8 +23,8 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
 
     protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-        store.TryAddAsync(new TenantInfo("initech-id", "initech", "Initech", "connstring", null)).Wait();
-        store.TryAddAsync(new TenantInfo("lol-id", "lol", "Lol, Inc.", "connstring2", null)).Wait();
+        store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech", ConnectionString = "connstring" }).Wait();
+        store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc.", ConnectionString = "connstring2" }).Wait();
 
         return store;
     }
@@ -65,9 +65,9 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
     {
         var store = CreateTestStore();
 
-        Assert.Null(store.TryGetByIdentifierAsync("test-identifier").Result);
-        Assert.True(store.TryAddAsync(new TenantInfo("test-id", "test-identifier", "test", "connstring", null)).Result);
-        Assert.NotNull(store.TryGetByIdentifierAsync("test-identifier").Result);
+        Assert.Null(store.TryGetByIdentifierAsync("identifier").Result);
+        Assert.True(store.TryAddAsync(new TenantInfo { Id = "id", Identifier = "identifier", Name = "name", ConnectionString = "cs" }).Result);
+        Assert.NotNull(store.TryGetByIdentifierAsync("identifier").Result);
     }
 
     //[Fact]
@@ -75,8 +75,8 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
     {
         var store = CreateTestStore();
 
-        var result = store.TryUpdateAsync(new TenantInfo("initech-id", "test123", "name", "connstring", null)).Result;
-        Assert.Equal(true, result);
+        var result = store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2", Name = "Initech2", ConnectionString = "connstring2" }).Result;
+        Assert.True(result);
     }
 
     //[Fact]

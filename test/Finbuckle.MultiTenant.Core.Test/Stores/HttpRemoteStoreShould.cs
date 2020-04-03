@@ -36,7 +36,7 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore<T
             if (string.Equals(request.RequestUri.Segments[numSegments - 1], "initech", StringComparison.OrdinalIgnoreCase))
             {
 
-                var tenantInfo = new TenantInfo("initech-id", "initech", "Initech", "connstring", null);
+                var tenantInfo = new TenantInfo { Id = "initech-id", Identifier = "initech" };
                 var json = JsonConvert.SerializeObject(tenantInfo);
                 result.StatusCode = HttpStatusCode.OK;
                 result.Content = new StringContent(json);
