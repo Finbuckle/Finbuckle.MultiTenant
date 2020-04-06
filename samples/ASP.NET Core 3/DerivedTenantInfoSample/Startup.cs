@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DerivedTenantInfoSample.Services;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Stores;
@@ -26,15 +27,11 @@ namespace DerivedTenantInfoSample
         {
             services.AddControllersWithViews();
 
+            services.AddSingleton<CustomService>();
+
             services.AddMultiTenant().
                 WithStore<ConfigurationStore<DerivedTenantInfo>>(ServiceLifetime.Singleton).
                 WithBasePathStrategy().
-                //WithPerTenantOptions<CustomOptions>((options, tenantInfo) =>
-                //{
-                //    var derivedTenantInfo = (DerivedTenantInfo)tenantInfo;
-                //    options.Value1 = derivedTenantInfo.CustomOptions.Value1;
-                //    options.Value2 = derivedTenantInfo.CustomOptions.Value2;
-                //})
                 WithPerTenantOptions<CustomOptions, DerivedTenantInfo>(t => t.CustomOptions);
         }
 

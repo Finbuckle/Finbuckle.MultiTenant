@@ -1,0 +1,61 @@
+﻿@page "/counter"
+@using Services
+@using Finbuckle.MultiTenant
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@inject CustomService customService
+<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+<p>Option: @customOptions</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="GetOptions">Options</button>
+
+@{
+    //Try get TenantInfo from HttpConext.
+    GetTenantInfo();
+
+    @if (tenantInfo != null)
+    {
+        <h2>Tenant Info</h2>
+        <ul>
+            <li>Identifier: @tenantInfo.Identifier</li>
+            <li>Id: @tenantInfo.Id</li>
+            <li>Name: @tenantInfo.Name</li>
+        </ul>
+    }
+}
+@code {
+    private int currentCount = 0;
+
+    private CustomOptions customOptions;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private async void GetOptions()
+    {
+        var options = await this.customService.GetOptionsAsync();
+
+        this.customOptions = options;
+    }
+
+    TenantInfo tenantInfo;
+
+    bool GetTenantInfo()
+    {
+        //if (httpContextAccessor.HttpContext.GetMultiTenantContext().TenantInfo != null)
+        //{
+        //    tenantInfo = httpContextAccessor.HttpContext.GetMultiTenantContext().TenantInfo;
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //}
+        return false;
+    }
+}

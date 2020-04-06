@@ -15,19 +15,25 @@
 using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataIsolationSample.Data
 {
-    public class ToDoDbContext : MultiTenantDbContext
+    public class ToDoDbContext : IdentityDbContext<IdentityUser>, IMultiTenantDbContext
     {
-        public ToDoDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        public ToDoDbContext(TenantInfo tenantInfo)
         {
+            this.TenantInfo = tenantInfo;
         }
 
-        public ToDoDbContext(TenantInfo tenantInfo, DbContextOptions<ToDoDbContext> options) : base(tenantInfo, options)
+        public ToDoDbContext(TenantInfo tenantInfo, DbContextOptions<ToDoDbContext> options) : base(options)
         {
+            this.TenantInfo = tenantInfo;
         }
+
+        protected string ConnectionString => TenantInfo.ConnectionString;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -42,6 +48,10 @@ namespace DataIsolationSample.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<ToDoItem> ToDoItems { get; set; }
+        public TenantInfo TenantInfo { get; }
+
+        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
     }
 }
