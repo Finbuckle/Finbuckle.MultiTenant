@@ -12,6 +12,10 @@ using Microsoft.Extensions.Hosting;
 using BlazorSample.Data;
 using BlazorSample.Services;
 using Finbuckle.MultiTenant.Stores;
+using Microsoft.AspNetCore.ProtectedBrowserStorage;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Finbuckle.MultiTenant.AspNetCore;
+using Microsoft.AspNetCore.Http;
 
 namespace BlazorSample
 {
@@ -32,25 +36,24 @@ namespace BlazorSample
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
 
-            services.AddScoped<CustomService>();
+            services.AddSingleton<CustomService>();
 
-            services.AddMultiTenant().
+            services.AddBlazorMultiTenant().
                 WithStore<ConfigurationStore<DerivedTenantInfo>>(ServiceLifetime.Singleton).
-                WithDelegateStrategy(obj =>
+                WithDelegateStrategy(async context =>
                 {
-                    return Task.FromResult("finbuckle");
+                    HttpContext httpContext = (HttpContext)context;
+                    PathString pathString = httpContext.Request.PathBase;
+                    var tenantId = await Task.FromResult(pathString.Value.Trim('/')).ConfigureAwait(false);
+                    return tenantId;
                 }).
-                //WithBasePathStrategy().
                 WithPerTenantOptions<CustomOptions, DerivedTenantInfo>(t => t.CustomOptions);
-
-            //Allows accessing HttpContext in Blazor
-            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMultiTenant();
+            app.UseBlazorMultiTenant();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

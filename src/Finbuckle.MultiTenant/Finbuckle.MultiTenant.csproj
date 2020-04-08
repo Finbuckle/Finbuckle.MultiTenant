@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0</TargetFrameworks>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Description>Metapackage for Finbuckle.MultiTenant.</Description>
     <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>
@@ -10,6 +10,7 @@
   <ItemGroup>
       <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
       <ProjectReference Include="../Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
+      <ProjectReference Include="../Finbuckle.MultiTenant.Blazor/Finbuckle.MultiTenant.Blazor.csproj" />
       <ProjectReference Include="../Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
   </ItemGroup>
 </Project>

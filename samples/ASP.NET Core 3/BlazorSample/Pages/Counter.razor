@@ -2,12 +2,14 @@
 @using Services
 @using Finbuckle.MultiTenant
 @using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
 @inject IHttpContextAccessor httpContextAccessor
 @inject CustomService customService
+@inject IOptions<CustomOptions> optionsAccessor
+
 <h1>Counter</h1>
 
 <p>Current count: @currentCount</p>
-<p>Option: @customOptions</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <button class="btn btn-primary" @onclick="GetOptions">Options</button>
@@ -25,11 +27,30 @@
             <li>Name: @tenantInfo.Name</li>
         </ul>
     }
+
+    @if (this.serviceCustomOptions != null)
+    {
+        <h2>Custom Options from service</h2>
+        <ul>
+            <li>Value 1: @this.serviceCustomOptions.Value1</li>
+            <li>Value 2: @this.serviceCustomOptions.Value2</li>
+        </ul>
+    }
+
+    @if (this.componentCustomOptions != null)
+    {
+        <h2>Custom Options from component</h2>
+        <ul>
+            <li>Value 1: @this.componentCustomOptions.Value1</li>
+            <li>Value 2: @this.componentCustomOptions.Value2</li>
+        </ul>
+    }
 }
 @code {
     private int currentCount = 0;
 
-    private CustomOptions customOptions;
+    private CustomOptions serviceCustomOptions;
+    private CustomOptions componentCustomOptions;
 
     private void IncrementCount()
     {
@@ -38,9 +59,9 @@
 
     private async void GetOptions()
     {
-        var options = await this.customService.GetOptionsAsync();
+        this.componentCustomOptions = this.optionsAccessor.Value;
 
-        this.customOptions = options;
+        this.serviceCustomOptions = await this.customService.GetOptionsAsync();
     }
 
     TenantInfo tenantInfo;

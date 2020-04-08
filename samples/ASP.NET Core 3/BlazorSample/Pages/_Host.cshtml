@@ -14,10 +14,11 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <script src="_content/Microsoft.AspNetCore.ProtectedBrowserStorage/protectedBrowserStorage.js"></script>
 </head>
 <body>
     <app>
-        <component type="typeof(App)" render-mode="ServerPrerendered" />
+        <component type="typeof(App)" render-mode="Server" />
     </app>
 
     <div id="blazor-error-ui">

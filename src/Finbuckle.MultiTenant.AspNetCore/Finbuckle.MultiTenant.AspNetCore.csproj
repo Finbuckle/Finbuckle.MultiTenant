@@ -1,10 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0</TargetFrameworks>
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.ProtectedBrowserStorage" Version="0.1.0-alpha.19521.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
@@ -23,7 +26,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.0.2" />
       </ItemGroup>
     </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' " >
+    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
       <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.11" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.2" />

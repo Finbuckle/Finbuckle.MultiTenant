@@ -75,7 +75,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpRemoteStoreSample", "sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DerivedTenantInfoSample", "samples\ASP.NET Core 3\DerivedTenantInfoSample\DerivedTenantInfoSample.csproj", "{3A2FFF22-AECC-460E-B825-C2F9717F20E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorSample", "samples\ASP.NET Core 3\BlazorSample\BlazorSample.csproj", "{171D4323-CE7C-4947-8384-4A5EFCAC47C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorSample", "samples\ASP.NET Core 3\BlazorSample\BlazorSample.csproj", "{171D4323-CE7C-4947-8384-4A5EFCAC47C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Finbuckle.MultiTenant.Blazor", "src\Finbuckle.MultiTenant.Blazor\Finbuckle.MultiTenant.Blazor.csproj", "{672676C9-DF15-474A-BD07-DF07062FF14C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -459,6 +461,18 @@ Global
 		{171D4323-CE7C-4947-8384-4A5EFCAC47C8}.Release|x64.Build.0 = Release|Any CPU
 		{171D4323-CE7C-4947-8384-4A5EFCAC47C8}.Release|x86.ActiveCfg = Release|Any CPU
 		{171D4323-CE7C-4947-8384-4A5EFCAC47C8}.Release|x86.Build.0 = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|x64.Build.0 = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Debug|x86.Build.0 = Debug|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|x64.ActiveCfg = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|x64.Build.0 = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|x86.ActiveCfg = Release|Any CPU
+		{672676C9-DF15-474A-BD07-DF07062FF14C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -498,6 +512,7 @@ Global
 		{DB269588-B1EE-424F-B2E5-B0FD001864B9} = {0BE3A847-10BC-4078-839E-D62A5C097231}
 		{3A2FFF22-AECC-460E-B825-C2F9717F20E8} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
 		{171D4323-CE7C-4947-8384-4A5EFCAC47C8} = {BD5BD485-39EB-4174-84CC-0BC0E7366462}
+		{672676C9-DF15-474A-BD07-DF07062FF14C} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B36550DF-2A87-48E7-942A-E223DC25C282}
