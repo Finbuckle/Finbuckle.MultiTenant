@@ -1,4 +1,4 @@
-﻿@model TenantInfo
+﻿@model AuthenticationOptionsSampleTenantInfo
 
 @if(Model != null)
 {
@@ -40,6 +40,10 @@
                 <td>@nameof(Model.ConnectionString)</td>
                 <td>@Model.ConnectionString</td>
             </tr>
+            <tr>
+                <td>@nameof(Model.ChallengeScheme)</td>
+                <td>@Model.ChallengeScheme</td>
+            </tr>
         </tbody>
     
     </table>
@@ -64,7 +68,7 @@ else
         <p>
             Configuration in <code>Startup.cs</code>:
         </p>
-        <pre><code>services.AddMultiTenant&lt;TenantInfo&gt;()... // Setup host and strategy...
+        <pre><code>services.AddMultiTenant&lt;AuthenticationOptionsSampleTenantInfo&gt;()... // Setup host and strategy...
     WithRemoteAuthentication(). // Important!
     WithPerTenantOptions&lt;AuthenticationOptions&gt;((options, tenantInfo) =>
     {

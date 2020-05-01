@@ -21,7 +21,7 @@ namespace FallbackStrategySample
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMultiTenant<TenantInfo>().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+                WithConfigurationStore().
                 WithRouteStrategy(ConfigRoutes).
                 WithFallbackStrategy("finbuckle");
         }
