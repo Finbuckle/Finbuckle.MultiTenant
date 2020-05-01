@@ -20,7 +20,7 @@ namespace HostStrategySample
         {
             services.AddControllersWithViews();
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithHostStrategy();
         }
@@ -34,7 +34,7 @@ namespace HostStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseEndpoints(endpoints => {
                 endpoints.MapDefaultControllerRoute();
             });

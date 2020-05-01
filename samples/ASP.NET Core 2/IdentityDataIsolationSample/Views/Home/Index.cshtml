@@ -99,7 +99,7 @@ services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         });
     });
 
-services.AddMultiTenant()... // Similar to setup in the AuthenticationOptionsSample.
+services.AddMultiTenant<TenantInfo>()... // Similar to setup in the AuthenticationOptionsSample.
 
 // Required due to a bug in ASP.NET Core Identity.
 // (https://github.com/aspnet/Identity/issues/2019)

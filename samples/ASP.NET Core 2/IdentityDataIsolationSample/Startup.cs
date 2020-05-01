@@ -47,7 +47,7 @@ namespace IdentityDataIsolationSample
                     });
                 });
 
-            services.AddMultiTenant()
+            services.AddMultiTenant<TenantInfo>()
                 .WithRouteStrategy(ConfigRoutes)
                 .WithConfigurationStore()
                 .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
@@ -78,7 +78,7 @@ namespace IdentityDataIsolationSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

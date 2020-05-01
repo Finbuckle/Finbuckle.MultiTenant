@@ -13,9 +13,9 @@ namespace SharedLoginSample.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IMultiTenantStore store;
+        private readonly IMultiTenantStore<TenantInfo> store;
 
-        public HomeController(IMultiTenantStore store)
+        public HomeController(IMultiTenantStore<TenantInfo> store)
         {
             this.store = store;
         }
@@ -73,7 +73,7 @@ namespace SharedLoginSample.Controllers
                 }
 
                 // Save the original TenantInfo and service provider.
-                var originalTenantInfo = HttpContext.GetMultiTenantContext()?.TenantInfo;
+                var originalTenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
                 var orignalServiceProvider = HttpContext.RequestServices;
 
                 // Set the new TenantInfo and reset the service provider.

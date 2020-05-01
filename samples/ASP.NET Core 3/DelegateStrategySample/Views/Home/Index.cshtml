@@ -46,7 +46,7 @@ else
         <p>The delegate strategy accepts a <code>Func&lt;object, Task&lt;string&gt;&gt;</code> to define its functionality.
         This makes it a good strategy to use for testing purposes. In this sample we configure it to use the request query parameter "tenant"
         as the tenant identifier:
-        <pre><code>services.AddMultiTenant().
+        <pre><code>services.AddMultiTenant&lt;TenantInfo&gt;().
     WithConfigurationStore().
     WithDelegateStrategy(async context =&gt; 
     {

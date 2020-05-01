@@ -64,7 +64,7 @@ else
         <p>
             Configuration in <code>Startup.cs</code>:
         </p>
-        <pre><code>services.AddMultiTenant()... // Setup host and strategy...
+        <pre><code>services.AddMultiTenant&lt;TenantInfo&gt;()... // Setup host and strategy...
     WithRemoteAuthentication(). // Important!
     WithPerTenantOptions&lt;AuthenticationOptions&gt;((options, tenantInfo) =>
     {

@@ -12,13 +12,14 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreStoreSample.Data
 {
 
-    public class MultiTenantStoreDbContext : EFCoreStoreDbContext
+    public class MultiTenantStoreDbContext : EFCoreStoreDbContext<TenantInfo>
     {
         public MultiTenantStoreDbContext(DbContextOptions options) : base(options)
         {

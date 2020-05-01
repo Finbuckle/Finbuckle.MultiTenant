@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthenticationOptionsSample
 {
@@ -50,18 +49,13 @@ namespace AuthenticationOptionsSample
                     options.Authority = Configuration.GetValue<string>("OpenIdConnectAuthority");
                 });
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy().
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
-                    // Allow each tenant to have a different default challenge scheme.
-                    if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
-                    {
-                        options.DefaultChallengeScheme = (string)challengeScheme;
-                        // options.DefaultSignOutScheme = (string)challengeScheme;
-                    }
+                    options.DefaultChallengeScheme = tenantInfo.ChallengeScheme ?? options.DefaultChallengeScheme;
                 }).
                 WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                 {
@@ -83,7 +77,7 @@ namespace AuthenticationOptionsSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
             app.UseAuthentication();
             app.UseAuthorization();
 

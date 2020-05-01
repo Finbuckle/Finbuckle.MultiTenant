@@ -52,17 +52,13 @@ namespace AuthenticationOptionsSample
                     options.Authority = Configuration.GetValue<string>("OpenIdConnectAuthority");
                 });
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy(ConfigRoutes).
                 WithRemoteAuthentication(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
-                    // Allow each tenant to have a different default challenge scheme.
-                    if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
-                    {
-                        options.DefaultChallengeScheme = (string)challengeScheme;
-                    }
+                    options.DefaultChallengeScheme = tenantInfo.ChallengeScheme ?? options.DefaultChallengeScheme;
                 }).
                 WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
                 {
@@ -84,7 +80,7 @@ namespace AuthenticationOptionsSample
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

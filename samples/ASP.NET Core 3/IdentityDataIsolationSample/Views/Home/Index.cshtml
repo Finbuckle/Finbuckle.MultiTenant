@@ -103,7 +103,7 @@ services.AddControllersWithViews()
 // Wrap the default link generator with one that will preserve the tenant route parameter for links.
 services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
 
-services.AddMultiTenant()... // Similar to setup in the AuthenticationOptionsSample.
+services.AddMultiTenant&lt;TenantInfo&gt;()... // Similar to setup in the AuthenticationOptionsSample.
 </code></pre>
             <p>Click the links on the navbar to it in action!</p>
             </div>
