@@ -55,7 +55,7 @@ else
             Configuration in <code>Startup.cs</code>:
         </p>
         <pre><code>// In ConfigureServices:
-services.AddMultiTenant().
+services.AddMultiTenant<TenantInfo>().
     WithConfigurationStore().
     WithRouteStrategy(ConfigRoutes);
 

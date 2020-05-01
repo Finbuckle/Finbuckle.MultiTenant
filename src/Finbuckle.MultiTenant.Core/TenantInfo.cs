@@ -17,24 +17,12 @@ using Finbuckle.MultiTenant.Core;
 
 namespace Finbuckle.MultiTenant
 {
-    public class TenantInfo
+    public class TenantInfo : ITenantInfo
     {
         private string id;
 
         public TenantInfo()
         {
-        }
-
-        public TenantInfo(string id, string identifier, string name, string connectionString, IDictionary<string, object> items)
-        {
-            Id = id;
-            Identifier = identifier;
-            Name = name;
-            ConnectionString = connectionString;
-            if (items != null)
-            {
-                Items = items;
-            }
         }
 
         public string Id
@@ -43,7 +31,7 @@ namespace Finbuckle.MultiTenant
             {
                 return id;
             }
-            internal set
+            set
             {
                 if (value != null)
                 {
@@ -56,10 +44,8 @@ namespace Finbuckle.MultiTenant
             }
         }
 
-        public string Identifier { get; internal set; }
-        public string Name { get; internal set; }
-        public string ConnectionString { get; internal set; }
-        public IDictionary<string, object> Items { get; internal set; } = new Dictionary<string, object>();
-        public IMultiTenantContext MultiTenantContext { get; internal set; }
+        public string Identifier { get; set; }
+        public string Name { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

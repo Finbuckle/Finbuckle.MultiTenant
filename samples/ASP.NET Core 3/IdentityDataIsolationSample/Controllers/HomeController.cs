@@ -7,7 +7,7 @@ namespace IdentityDataIsolationSample.Controllers
     {
         public IActionResult Index()
         {
-            return View(HttpContext.GetMultiTenantContext()?.TenantInfo);
+            return View(HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo);
         }
     }
 }

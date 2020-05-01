@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
@@ -127,7 +126,7 @@ namespace Finbuckle.MultiTenant
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        public TenantInfo TenantInfo { get; }
+        public ITenantInfo TenantInfo { get; }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 

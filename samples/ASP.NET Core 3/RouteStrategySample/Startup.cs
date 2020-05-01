@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,7 @@ namespace RouteStrategySample
         {
             services.AddControllersWithViews();
             
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy();
         }
@@ -32,7 +33,7 @@ namespace RouteStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
 
             app.UseEndpoints(endpoints =>
             {

@@ -19,7 +19,7 @@ namespace HostStrategySample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithHostStrategy();
         }
@@ -32,7 +32,7 @@ namespace HostStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseMvc(routes => routes.MapRoute("Defaut", "{controller=Home}/{action=Index}"));
         }
     }

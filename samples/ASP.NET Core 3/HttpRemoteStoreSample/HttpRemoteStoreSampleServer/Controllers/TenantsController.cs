@@ -13,9 +13,9 @@ namespace HttpRemoteStoreSampleServer.Controllers
     public class TenantsController : ControllerBase
     {
         private readonly ILogger<TenantsController> _logger;
-        private readonly IMultiTenantStore store;
+        private readonly IMultiTenantStore<TenantInfo> store;
 
-        public TenantsController(ILogger<TenantsController> logger, IMultiTenantStore store)
+        public TenantsController(ILogger<TenantsController> logger, IMultiTenantStore<TenantInfo> store)
         {
             _logger = logger;
             this.store = store;

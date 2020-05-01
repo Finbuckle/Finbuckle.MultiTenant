@@ -48,7 +48,7 @@ else
         <p>
             Configuration in <code>Startup.cs</code>:
         </p>
-        <pre><code>services.AddMultiTenant()... // Set up a strategy.
+        <pre><code>services.AddMultiTenant<TenantInfo>()... // Set up a strategy.
     WithEFCoreStore<AppDbContext, AppTenantInfo>()</code></pre>
         <p>Click the links on the navbar to see it in action!</p>
     </div> 

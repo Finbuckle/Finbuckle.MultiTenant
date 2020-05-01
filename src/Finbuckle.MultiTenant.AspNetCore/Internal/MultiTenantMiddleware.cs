@@ -1,4 +1,4 @@
-﻿//    Copyright 2018 Andrew White
+﻿//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,21 +12,20 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
     /// Middleware for resolving the TenantContext and storing it in HttpContext.
     /// </summary>
-    internal class MultiTenantMiddleware
+    internal class MultiTenantMiddleware<TTenantInfo>
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly RequestDelegate next;
 
@@ -40,7 +39,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             // Set the initial multitenant context into the Items collections.
             if (!context.Items.ContainsKey(Constants.HttpContextMultiTenantContext))
             {
-                var multiTenantContext = new MultiTenantContext();
+                var multiTenantContext = new MultiTenantContext<TTenantInfo>();
                 context.Items.Add(Constants.HttpContextMultiTenantContext, multiTenantContext);
 
                 IMultiTenantStrategy strategy = null;
@@ -58,8 +57,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
                         }
                 }
                
-                var store = context.RequestServices.GetRequiredService<IMultiTenantStore>();
-                TenantInfo tenantInfo = null;
+                var store = context.RequestServices.GetRequiredService<IMultiTenantStore<TTenantInfo>>();
+                TTenantInfo tenantInfo = null;
                 if (identifier != null)
                 {
                     SetStrategyInfo(multiTenantContext, strategy);
@@ -98,16 +97,14 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 {
                     // Set the tenant info.
                     multiTenantContext.TenantInfo = tenantInfo;
-                    tenantInfo.MultiTenantContext = multiTenantContext;
 
                     // Set the store info.
-                    var storeInfo = new StoreInfo();
-                    storeInfo.MultiTenantContext = multiTenantContext;
+                    var storeInfo = new StoreInfo<TTenantInfo>();
                     storeInfo.Store = store;
                     if (store.GetType().IsGenericType &&
-                        store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<>))
+                        store.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStoreWrapper<,>))
                     {
-                        storeInfo.Store = (IMultiTenantStore)store.GetType().GetProperty("Store").GetValue(store);
+                        storeInfo.Store = (IMultiTenantStore<TTenantInfo>)store.GetType().GetProperty("Store").GetValue(store);
                         storeInfo.StoreType = store.GetType().GetGenericArguments().First();
                     }
                     else
@@ -125,10 +122,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
             }
         }
 
-        private static void SetStrategyInfo(MultiTenantContext multiTenantContext, IMultiTenantStrategy strategy)
+        private static void SetStrategyInfo(MultiTenantContext<TTenantInfo> multiTenantContext, IMultiTenantStrategy strategy)
         {
             var strategyInfo = new StrategyInfo();
-            strategyInfo.MultiTenantContext = multiTenantContext;
             strategyInfo.Strategy = strategy;
             if (strategy.GetType().IsGenericType &&
                 strategy.GetType().GetGenericTypeDefinition() == typeof(MultiTenantStrategyWrapper<>))

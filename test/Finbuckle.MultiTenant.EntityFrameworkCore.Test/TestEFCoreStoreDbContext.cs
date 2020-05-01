@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,12 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-namespace Finbuckle.MultiTenant
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Stores;
+using Microsoft.EntityFrameworkCore;
+
+public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
 {
-    public interface IMultiTenantContext
+    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-        TenantInfo TenantInfo { get; }
-        StrategyInfo StrategyInfo { get; }
-        StoreInfo StoreInfo { get; }
     }
 }

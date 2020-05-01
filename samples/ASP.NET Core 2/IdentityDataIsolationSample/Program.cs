@@ -24,12 +24,12 @@ namespace IdentityDataIsolationSample
             var env = host.Services.GetService<IHostingEnvironment>();
             if (env.EnvironmentName == "Development")
             {
-                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null)))
+                using (var db = new ApplicationDbContext(new TenantInfo { ConnectionString = "Data Source=Data/SharedIdentity.db" }))
                 {
                     db.Database.MigrateAsync().Wait();
                 }
 
-                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/InitechIdentity.db", null)))
+                using (var db = new ApplicationDbContext(new TenantInfo { ConnectionString = "Data Source=Data/InitechIdentity.db" }))
                 {
                     db.Database.MigrateAsync().Wait();
                 }

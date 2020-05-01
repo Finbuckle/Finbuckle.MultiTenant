@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class ServiceCollectionExtensionsShould
     public void RegisterTenantInfoInDI()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant();
+        services.AddMultiTenant<TenantInfo>();
         
         var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
                                             s.ServiceType == typeof(TenantInfo)).SingleOrDefault();
@@ -43,7 +43,7 @@ public class ServiceCollectionExtensionsShould
     public void RegisterIHttpContextAccessorInDI()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant();
+        services.AddMultiTenant<TenantInfo>();
         
         var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Singleton &&
                                             s.ServiceType == typeof(IHttpContextAccessor)).SingleOrDefault();
@@ -55,10 +55,10 @@ public class ServiceCollectionExtensionsShould
     public void RegisterIMultitenantContextAccessorInDI()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant();
+        services.AddMultiTenant<TenantInfo>();
         
         var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Singleton &&
-                                            s.ServiceType == typeof(IMultiTenantContextAccessor)).SingleOrDefault();
+                                            s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>)).SingleOrDefault();
 
         Assert.NotNull(service);
     }

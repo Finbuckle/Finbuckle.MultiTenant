@@ -17,22 +17,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class EFCoreStoreDbContext : DbContext
+    public class EFCoreStoreDbContext<TTenantInfo> : DbContext
+        where TTenantInfo : class, ITenantInfo, new()
     {
         public EFCoreStoreDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        public DbSet<TenantInfo> TenantInfo { get; set; }
+        public DbSet<TTenantInfo> TenantInfo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TenantInfo>().HasKey(ti => ti.Id);
-            modelBuilder.Entity<TenantInfo>().Property(ti => ti.Id).HasMaxLength(Constants.TenantIdMaxLength);
-            modelBuilder.Entity<TenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
-            modelBuilder.Entity<TenantInfo>().Property(ti => ti.Name).IsRequired();
-            modelBuilder.Entity<TenantInfo>().Property(ti => ti.ConnectionString).IsRequired();
-            modelBuilder.Entity<TenantInfo>().Ignore(p => p.Items).Ignore(p => p.MultiTenantContext);
+            modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
+            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id).HasMaxLength(Constants.TenantIdMaxLength);
+            modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
         }
     }
 }

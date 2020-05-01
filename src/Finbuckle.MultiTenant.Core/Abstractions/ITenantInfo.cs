@@ -1,4 +1,4 @@
-﻿//    Copyright 2019 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,16 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Stores;
-using Xunit;
-
-public class HttpRemoteStoreClientShould
+namespace Finbuckle.MultiTenant
 {
-    [Fact]
-    public void ThrowIfHttpClientFactoryIsNull()
+    public interface ITenantInfo
     {
-        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo>(null));
-    }   
+        string Id { get; set; }
+        string Identifier { get; set;  }
+        string Name { get; set; }
+        string ConnectionString { get; set; }
+    }
 }

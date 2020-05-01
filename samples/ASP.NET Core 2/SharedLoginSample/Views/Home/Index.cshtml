@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    var tenantInfo = Context.GetMultiTenantContext()?.TenantInfo;
+    var tenantInfo = Context.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
 }
 
 @using Finbuckle.MultiTenant.AspNetCore

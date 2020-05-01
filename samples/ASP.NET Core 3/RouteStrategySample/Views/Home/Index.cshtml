@@ -53,14 +53,14 @@ else
             Configuration in <code>Startup.cs</code>:
         </p>
         <pre><code>// In ConfigureServices:
-services.AddMultiTenant().
+services.AddMultiTenant&lt;TenantInfo&gt;().
     WithConfigurationStore().
     WithRouteStrategy();
 
 // In Configure:
 // Make sure to call UseRouting before UseMultiTenant
 app.UseRouting();
-app.UseMultiTenant();
+app.UseMultiTenant&lt;TenantInfo&gt;();
 app.UseEndpoints(endpoints => 
 {
     endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");

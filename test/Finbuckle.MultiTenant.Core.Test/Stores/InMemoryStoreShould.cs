@@ -16,13 +16,25 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
+public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<TenantInfo>>
 {
-    private IMultiTenantStore CreateCaseSensitiveTestStore()
+    private IMultiTenantStore<TenantInfo> CreateCaseSensitiveTestStore()
     {
-        var store = new InMemoryStore(false);
-        store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Wait();
-        store.TryAddAsync(new TenantInfo("lol", "lol", "Lol, Inc.", null, null)).Wait();
+        var store = new InMemoryStore<TenantInfo>(false);
+        var ti1 = new TenantInfo
+        {
+            Id = "initech",
+            Identifier = "initech",
+            Name = "initech"
+        };
+        var ti2 = new TenantInfo
+        {
+            Id = "lol",
+            Identifier = "lol",
+            Name = "lol"
+        };
+        store.TryAddAsync(ti1).Wait();
+        store.TryAddAsync(ti2).Wait();
 
         return store;
     }
@@ -46,20 +58,32 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore>
     public void FailIfAddingDuplicateCaseSensitive()
     {
         var store = CreateCaseSensitiveTestStore();
-        Assert.False(store.TryAddAsync(new TenantInfo("initech", "initech", "Initech", null, null)).Result);
-        Assert.True(store.TryAddAsync(new TenantInfo("iNiTEch", "iNiTEch", "Initech", null, null)).Result);
+        var ti1 = new TenantInfo
+        {
+            Id = "initech",
+            Identifier = "initech",
+            Name = "initech"
+        };
+        var ti2 = new TenantInfo
+        {
+            Id = "iNiTEch",
+            Identifier = "iNiTEch",
+            Name = "Initech"
+        };
+        Assert.False(store.TryAddAsync(ti1).Result);
+        Assert.True(store.TryAddAsync(ti2).Result);
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
     
-    protected override IMultiTenantStore CreateTestStore()
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new InMemoryStore();
+        var store = new InMemoryStore<TenantInfo>();
 
         return PopulateTestStore(store);
     }
 
-    protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         return base.PopulateTestStore(store);
     }

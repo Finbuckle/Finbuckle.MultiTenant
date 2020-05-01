@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -25,13 +25,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static FinbuckleMultiTenantBuilder AddMultiTenant(this IServiceCollection services)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             services.AddHttpContextAccessor();
-            services.TryAddScoped<TenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext()?.TenantInfo);
-            services.TryAddSingleton<IMultiTenantContextAccessor, MultiTenantContextAccessor>();
+            services.TryAddScoped<TTenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext<TTenantInfo>()?.TenantInfo);
+            services.TryAddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
 
-            return new FinbuckleMultiTenantBuilder(services);
+            return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
         }
     }
 }

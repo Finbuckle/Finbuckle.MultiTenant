@@ -19,9 +19,10 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class InMemoryStore : IMultiTenantStore
+    public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly ConcurrentDictionary<string, TenantInfo> tenantMap;
+        private readonly ConcurrentDictionary<string, TTenantInfo> tenantMap;
 
         public InMemoryStore() : this (true)
         {
@@ -33,24 +34,24 @@ namespace Finbuckle.MultiTenant.Stores
             if(!ignoreCase)
                 stringComparerer = StringComparer.Ordinal;
                 
-            tenantMap = new ConcurrentDictionary<string, TenantInfo>(stringComparerer);
+            tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparerer);
         }
 
-        public virtual async Task<TenantInfo> TryGetAsync(string id)
+        public virtual async Task<TTenantInfo> TryGetAsync(string id)
         {
             var result = tenantMap.Values.Where(ti => ti.Id == id).SingleOrDefault();
             
             return await Task.FromResult(result);
         }
 
-        public virtual async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public virtual async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             tenantMap.TryGetValue(identifier, out var result);
             
             return await Task.FromResult(result);
         }
 
-        public async Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
@@ -64,7 +65,7 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(result);
         }
 
-        public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
             var existingTenantInfo = await TryGetAsync(tenantInfo.Id);
 

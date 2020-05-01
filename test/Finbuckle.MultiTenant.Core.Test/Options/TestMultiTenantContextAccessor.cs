@@ -14,14 +14,14 @@
 
 using Finbuckle.MultiTenant;
 
-public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor
+public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor<TenantInfo>
 {
-    private readonly MultiTenantContext multiTenantContext;
+    private readonly MultiTenantContext<TenantInfo> multiTenantContext;
 
-    public TestMultiTenantContextAccessor(MultiTenantContext multiTenantContext)
+    public TestMultiTenantContextAccessor(MultiTenantContext<TenantInfo> multiTenantContext)
     {
         this.multiTenantContext = multiTenantContext;
     }
 
-    public IMultiTenantContext MultiTenantContext => multiTenantContext;
+    public MultiTenantContext<TenantInfo> MultiTenantContext => multiTenantContext;
 }

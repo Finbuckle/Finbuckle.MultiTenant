@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
@@ -29,7 +28,7 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     {
-        public TenantInfo TenantInfo { get; }
+        public ITenantInfo TenantInfo { get; }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
@@ -46,12 +45,12 @@ namespace Finbuckle.MultiTenant
 
         protected string ConnectionString => TenantInfo.ConnectionString;
 
-        protected MultiTenantDbContext(TenantInfo tenantInfo)
+        protected MultiTenantDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
         }
 
-        protected MultiTenantDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
+        protected MultiTenantDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
             this.TenantInfo = tenantInfo;
         }

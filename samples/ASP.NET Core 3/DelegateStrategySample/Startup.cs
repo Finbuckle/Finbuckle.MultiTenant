@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,7 +22,7 @@ namespace DelegateStrategySample
         {
             services.AddControllersWithViews();
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithDelegateStrategy(async context =>
                 {
@@ -39,7 +40,7 @@ namespace DelegateStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
 
             app.UseEndpoints(endpoints =>
             {

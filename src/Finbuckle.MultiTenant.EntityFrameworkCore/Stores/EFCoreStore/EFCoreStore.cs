@@ -19,61 +19,56 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.Stores
 {
-    public class EFCoreStore<TEFCoreStoreDbContext> : IMultiTenantStore
-        where TEFCoreStoreDbContext : EFCoreStoreDbContext
+    public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
+        where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+        where TTenantInfo :class, ITenantInfo, new()
     {
-        private readonly TEFCoreStoreDbContext dbContext;
+        internal readonly TEFCoreStoreDbContext dbContext;
 
         public EFCoreStore(TEFCoreStoreDbContext dbContext)
         {
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<TenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo> TryGetAsync(string id)
         {
-            return await dbContext.Set<TenantInfo>()
+            return await dbContext.TenantInfo
                             .Where(ti => ti.Id == id)
-                            .Select(ti => new TenantInfo(ti.Id, ti.Identifier, ti.Name, ti.ConnectionString, null))
                             .SingleOrDefaultAsync();
         }
 
-        public async Task<TenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
-            return await dbContext.Set<TenantInfo>()
+            return await dbContext.TenantInfo
                             .Where(ti => ti.Identifier == identifier)
-                            .Select(ti => new TenantInfo(ti.Id, ti.Identifier, ti.Name, ti.ConnectionString, null))
                             .SingleOrDefaultAsync();
         }
 
-        public async Task<bool> TryAddAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
-            var newEntity = new TenantInfo
-            {
-                Id = tenantInfo.Id,
-                Identifier = tenantInfo.Identifier,
-                Name = tenantInfo.Name,
-                ConnectionString = tenantInfo.ConnectionString
-            };
-
-            await dbContext.Set<TenantInfo>().AddAsync(newEntity);
+            await dbContext.TenantInfo.AddAsync(tenantInfo);
 
             return await dbContext.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> TryRemoveAsync(string identifier)
         {
-            var existing = await dbContext.Set<TenantInfo>().Where(ti => ti.Identifier == identifier).FirstOrDefaultAsync();
-            dbContext.Set<TenantInfo>().Remove(existing);
+            var existing = await dbContext.TenantInfo
+                .Where(ti => ti.Identifier == identifier)
+                .SingleOrDefaultAsync();
+            dbContext.TenantInfo.Remove(existing);
             return await dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> TryUpdateAsync(TenantInfo tenantInfo)
+        public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
-            var existing = await dbContext.Set<TenantInfo>().FindAsync(tenantInfo.Id);
-            existing.Identifier = tenantInfo.Identifier;
-            existing.Name = tenantInfo.Name;
-            existing.ConnectionString = tenantInfo.ConnectionString;
+            var existingLocal = dbContext.TenantInfo.Local.Where(ti => ti.Id == tenantInfo.Id).SingleOrDefault();
+            if(existingLocal != null)
+            {
+                dbContext.Entry(existingLocal).State = EntityState.Detached;
+            }
 
+            dbContext.TenantInfo.Update(tenantInfo);
             return await dbContext.SaveChangesAsync() > 0;
         }
     }

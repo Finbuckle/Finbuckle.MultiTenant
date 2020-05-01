@@ -23,10 +23,7 @@ using Finbuckle.MultiTenant.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    /// <summary>
-    /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
-    /// </summary>
-    public class FinbuckleMultiTenantBuilder
+    public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         public IServiceCollection Services { get; set; }
 
@@ -40,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithPerTenantOptions<TOptions>(Action<TOptions, TenantInfo> tenantInfo) where TOptions : class, new()
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(Action<TOptions, TTenantInfo> tenantInfo) where TOptions : class, new()
         {
             if (tenantInfo == null)
             {
@@ -50,15 +47,15 @@ namespace Microsoft.Extensions.DependencyInjection
             // Handles multiplexing cached options.
             Services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
                 {
-                    return (MultiTenantOptionsCache<TOptions>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
+                    return (MultiTenantOptionsCache<TOptions, TTenantInfo>)
+                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions, TTenantInfo>));
                 });
 
             // Necessary to apply tenant options in between configuration and postconfiguration
             Services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
                 {
                     return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions>), new[] { tenantInfo });
+                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions, TTenantInfo>), new[] { tenantInfo });
                 });
 
             Services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
@@ -70,7 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp) where TOptions : class, new()
         {
-            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions>));
+            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions, TTenantInfo>));
             return (MultiTenantOptionsManager<TOptions>)
                 ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { cache });
         }
@@ -81,8 +78,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithStore<TStore>(ServiceLifetime lifetime, params object[] parameters)
-            where TStore : IMultiTenantStore
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime, params object[] parameters)
+            where TStore : IMultiTenantStore<TTenantInfo>
             => WithStore<TStore>(lifetime, sp => ActivatorUtilities.CreateInstance<TStore>(sp, parameters));
 
         /// <summary>
@@ -91,15 +88,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithStore<TStore>(ServiceLifetime lifetime, Func<IServiceProvider, TStore> factory)
-            where TStore : IMultiTenantStore
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime, Func<IServiceProvider, TStore> factory)
+            where TStore : IMultiTenantStore<TTenantInfo>
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStore), sp => new MultiTenantStoreWrapper<TStore>(factory(sp), sp.GetService<ILogger<TStore>>()), lifetime));
+            Services.TryAdd(ServiceDescriptor.Describe(typeof(IMultiTenantStore<TTenantInfo>), sp => new MultiTenantStoreWrapper<TStore, TTenantInfo>(factory(sp), sp.GetService<ILogger<TStore>>()), lifetime));
 
             return this;
         }
@@ -110,8 +107,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithStrategy<T>(ServiceLifetime lifetime, params object[] parameters) where T : IMultiTenantStrategy
-            => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<T>(sp, parameters));
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime, params object[] parameters) where TStrategy : IMultiTenantStrategy
+            => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<TStrategy>(sp, parameters));
 
         /// <summary>
         /// Adds and configures a IMultiTenantStrategy to the application using a factory method.
@@ -119,7 +116,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="lifetime">The service lifetime.</param>
         /// <param name="factory">A delegate that will create and configure the strategy.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder WithStrategy<TStrategy>(ServiceLifetime lifetime, Func<IServiceProvider, TStrategy> factory)
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime, Func<IServiceProvider, TStrategy> factory)
             where TStrategy : IMultiTenantStrategy
         {
             if (factory == null)

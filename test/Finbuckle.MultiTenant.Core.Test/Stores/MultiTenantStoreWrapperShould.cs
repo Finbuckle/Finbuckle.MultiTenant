@@ -17,18 +17,18 @@ using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
-public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemoryStore>
+public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemoryStore<TenantInfo>>
 {
     // Basic store functionality tested in MultiTenantStoresShould.cs
-    
-    protected override IMultiTenantStore CreateTestStore()
+
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore>(new InMemoryStore(), null);
+        var store = new MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>(new InMemoryStore<TenantInfo>(), null);
 
         return PopulateTestStore(store);
     }
 
-    protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         return base.PopulateTestStore(store);
     }
@@ -93,7 +93,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
     public void ThrowWhenAddingIfTenantInfoIdIsNull()
     {
         var store = CreateTestStore();
-        var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo(null, null, null, null, null)).Result);
+        var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo()).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -102,7 +102,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
     {
         var store = CreateTestStore();
         // Try to add with duplicate identifier.
-        Assert.False(store.TryAddAsync(new TenantInfo("initech-id", "initech123", "Initech", "connstring", null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" }).Result);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
     {
         var store = CreateTestStore();
         // Try to add with duplicate identifier.
-        Assert.False(store.TryAddAsync(new TenantInfo("initech-id123", "initech", "Initech", "connstring", null)).Result);
+        Assert.False(store.TryAddAsync(new TenantInfo { Id = "initech-id2", Identifier = "initech" }).Result);
     }
 
     [Fact]
@@ -126,8 +126,8 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
     public virtual void ThrowWhenUpdatingIfTenantInfoIdIsNull()
     {
         var store = CreateTestStore();
-        
-        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(new TenantInfo(null, null, null, null, null)).Result);
+
+        var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(new TenantInfo()).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -135,8 +135,8 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
     public void ReturnFalseWhenUpdatingIfTenantIdIsNotFound()
     {
         var store = CreateTestStore();
-        
-        var result = store.TryUpdateAsync(new TenantInfo("not-found", null, null, null, null)).Result;
+
+        var result = store.TryUpdateAsync(new TenantInfo{Id = "not-found"}).Result;
         Assert.False(result);
     }
 
@@ -160,7 +160,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
         var store = CreateTestStore();
         Assert.False(store.TryRemoveAsync("not-there-identifier").Result);
     }
-    
+
     [Fact]
     public override void UpdateTenantInfoInStore()
     {

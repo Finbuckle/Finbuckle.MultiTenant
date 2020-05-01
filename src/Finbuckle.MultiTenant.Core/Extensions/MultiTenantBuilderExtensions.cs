@@ -35,8 +35,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="endpointTemplate">The endpoint URI template.</param>
         /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
-        public static FinbuckleMultiTenantBuilder WithHttpRemoteStore(this FinbuckleMultiTenantBuilder builder,
-                                                                      string endpointTemplate)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+                                                                      string endpointTemplate) where TTenantInfo : class, ITenantInfo, new()
         => builder.WithHttpRemoteStore(endpointTemplate, null);
 
         /// <summary>
@@ -44,57 +44,62 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="endpointTemplate">The endpoint URI template.</param>
         /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
-        public static FinbuckleMultiTenantBuilder WithHttpRemoteStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                       string endpointTemplate,
-                                                                      Action<IHttpClientBuilder> clientConfig)
+                                                                      Action<IHttpClientBuilder> clientConfig) where TTenantInfo : class, ITenantInfo, new()
         {
-            var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient).FullName);
-            if(clientConfig != null)
+            var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName);
+            if (clientConfig != null)
                 clientConfig(httpClientBuilder);
 
-            builder.Services.TryAddSingleton<HttpRemoteStoreClient>();
+            builder.Services.TryAddSingleton<HttpRemoteStoreClient<TTenantInfo>>();
 
-            return builder.WithStore<HttpRemoteStore>(ServiceLifetime.Singleton, endpointTemplate);
+            return builder.WithStore<HttpRemoteStore<TTenantInfo>>(ServiceLifetime.Singleton, endpointTemplate);
         }
 
         /// <summary>
         /// Adds a ConfigurationStore to the application. Uses the default IConfiguration and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
         /// </summary>
-        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithStore<ConfigurationStore>(ServiceLifetime.Singleton);
-        
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton);
+
         /// <summary>
         /// Adds a ConfigurationStore to the application.
         /// </summary>
         /// <param name="configuration">The IConfiguration to load the section from.</param>
         /// <param name="sectionName">The configuration section to load.</param>
-        public static FinbuckleMultiTenantBuilder WithConfigurationStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                          IConfiguration configuration,
                                                                          string sectionName)
-            => builder.WithStore<ConfigurationStore>(ServiceLifetime.Singleton, configuration, sectionName);
+                where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton, configuration, sectionName);
 
         /// <summary>
         /// Adds an empty, case-insensitive InMemoryStore to the application.
         /// </summary>
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithInMemoryStore(true);
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithInMemoryStore<TTenantInfo>(true);
 
         /// <summary>
         /// Adds an empty InMemoryStore to the application.
         /// </summary>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     bool ignoreCase)
-            => builder.WithInMemoryStore(_ => { }, ignoreCase);
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithInMemoryStore<TTenantInfo>(_ => { }, ignoreCase);
 
         /// <summary>
         /// Adds and configures a case-insensitive InMemoryStore to the application using the provided ConfigurationSeciont.
         /// </summary>
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         [Obsolete("Consider using ConfigurationStore instead.")]
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     IConfigurationSection configurationSection)
-            => builder.WithInMemoryStore(o => configurationSection.Bind(o), true);
+                where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithInMemoryStore<TTenantInfo>(o => configurationSection.Bind(o), true);
 
         /// <summary>
         /// Adds and configures InMemoryStore to the application using the provided ConfigurationSeciont.
@@ -102,39 +107,43 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="config">The ConfigurationSection which contains the InMemoryStore configuartion settings.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
         [Obsolete("Consider using ConfigurationStore instead.")]
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     IConfigurationSection configurationSection,
                                                                     bool ignoreCase)
-            => builder.WithInMemoryStore(o => configurationSection.Bind(o), ignoreCase);
+                where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithInMemoryStore<TTenantInfo>(o => configurationSection.Bind(o), ignoreCase);
 
         /// <summary>
         /// Adds and configures a case-insensitive InMemoryStore to the application using the provided action.
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
-                                                                    Action<InMemoryStoreOptions> config)
-            => builder.WithInMemoryStore(config, true);
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+                                                                               Action<InMemoryStoreOptions> config)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithInMemoryStore<TTenantInfo>(config, true);
 
         /// <summary>
         /// Adds and configures InMemoryStore to the application using the provided action.
         /// </summary>
         /// <param name="config">A delegate or lambda for configuring the tenant.</param>
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
-        public static FinbuckleMultiTenantBuilder WithInMemoryStore(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     Action<InMemoryStoreOptions> config,
                                                                     bool ignoreCase)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (config == null)
             {
                 throw new ArgumentNullException(nameof(config));
             }
 
-            return builder.WithStore<InMemoryStore>(ServiceLifetime.Singleton, sp => InMemoryStoreFactory(config, ignoreCase));
+            return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton, sp => InMemoryStoreFactory<TTenantInfo>(config, ignoreCase));
         }
 
-        // TODO: Clean up any "Configuration" stuff here once it is no longer supported
-        private static InMemoryStore InMemoryStoreFactory(Action<InMemoryStoreOptions> config, bool ignoreCase)
+        //TODO: Clean up any "Configuration" stuff here once it is no longer supported
+        private static InMemoryStore<TTenantInfo> InMemoryStoreFactory<TTenantInfo>(Action<InMemoryStoreOptions> config, bool ignoreCase)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (config == null)
             {
@@ -143,7 +152,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var options = new InMemoryStoreOptions();
             config(options);
-            var store = new InMemoryStore(ignoreCase);
+            var store = new InMemoryStore<TTenantInfo>(ignoreCase);
 
             try
             {
@@ -153,16 +162,18 @@ namespace Microsoft.Extensions.DependencyInjection
                         string.IsNullOrWhiteSpace(tenantConfig.Identifier))
                         throw new MultiTenantException("Tenant Id and Identifer cannot be null or whitespace.");
 
-                    var tenantInfo = new TenantInfo(tenantConfig.Id,
-                                               tenantConfig.Identifier,
-                                               tenantConfig.Name,
-                                               tenantConfig.ConnectionString ?? options.DefaultConnectionString,
-                                               null);
-
-                    foreach (var item in tenantConfig.Items ?? new Dictionary<string, string>())
+                    var tenantInfo = new TTenantInfo
                     {
-                        tenantInfo.Items.Add(item.Key, item.Value);
-                    }
+                        Id = tenantConfig.Id,
+                        Identifier = tenantConfig.Identifier,
+                        Name = tenantConfig.Name,
+                        ConnectionString = tenantConfig.ConnectionString ?? options.DefaultConnectionString
+                    };
+
+                    // foreach (var item in tenantConfig.Items ?? new Dictionary<string, string>())
+                    // {
+                    //     tenantInfo.Items.Add(item.Key, item.Value);
+                    // }
 
                     if (!store.TryAddAsync(tenantInfo).Result)
                         throw new MultiTenantException($"Unable to add {tenantInfo.Identifier} because it is already present.");
@@ -180,8 +191,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a StaticStrategy to the application.
         /// </summary>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
-        public static FinbuckleMultiTenantBuilder WithStaticStrategy(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                      string identifier)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
@@ -195,8 +207,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a DelegateStrategy to the application.
         /// </summary>
         /// <param name="doStrategy">The delegate implementing the strategy.</returns>
-        public static FinbuckleMultiTenantBuilder WithDelegateStrategy(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                        Func<object, Task<string>> doStrategy)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (doStrategy == null)
             {
@@ -210,8 +223,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a fallback strategy for if the main strategy or remote authentication
         /// fail to resolve a tenant.
         /// </summary>
-        public static FinbuckleMultiTenantBuilder WithFallbackStrategy(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithFallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                        string identifier)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (identifier == null)
             {

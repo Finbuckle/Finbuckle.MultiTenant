@@ -7,7 +7,7 @@ namespace HttpRemoteStoreSample.Controllers
     {
         public IActionResult Index()
         {
-            var ti = HttpContext.GetMultiTenantContext()?.TenantInfo;
+            var ti = HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
             return View(ti);
         }
     }

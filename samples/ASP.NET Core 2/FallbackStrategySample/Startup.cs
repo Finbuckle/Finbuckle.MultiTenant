@@ -20,8 +20,8 @@ namespace FallbackStrategySample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddMultiTenant().
-                WithInMemoryStore(Configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore")).
+            services.AddMultiTenant<TenantInfo>().
+                WithConfigurationStore().
                 WithRouteStrategy(ConfigRoutes).
                 WithFallbackStrategy("finbuckle");
         }
@@ -34,7 +34,7 @@ namespace FallbackStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
 
             // Note this is the same route delegate used in WithFallbackStrategy()
             app.UseMvc(ConfigRoutes);

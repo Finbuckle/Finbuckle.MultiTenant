@@ -19,7 +19,7 @@ namespace StaticStrategySample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithStaticStrategy("finbuckle");
         }
@@ -32,7 +32,7 @@ namespace StaticStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseMvcWithDefaultRoute();
         }
     }

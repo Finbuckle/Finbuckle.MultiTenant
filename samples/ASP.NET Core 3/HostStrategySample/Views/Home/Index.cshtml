@@ -54,7 +54,7 @@ else
         <p>
             Configuration in <code>Startup.cs</code>:
         </p>
-        <pre><code>services.AddMultiTenant().
+        <pre><code>services.AddMultiTenant&lt;TenantInfo&gt;().
     WithConfigurationStore().
     WithHostStrategy();</code></pre>
         <p>Click the links on the navbar to see it in action!</p>

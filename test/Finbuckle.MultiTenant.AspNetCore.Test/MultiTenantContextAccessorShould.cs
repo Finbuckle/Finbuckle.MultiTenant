@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 using System.Collections.Generic;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -26,8 +24,8 @@ public class MultiTenantContextAccessorShould
     public void GetMultiTenantContextFromIHttpAccessor()
     {
         var items = new Dictionary<object, object>();
-        var ti = new TenantInfo("test", null, null, null, null);
-        var tc = new MultiTenantContext();
+        var ti = new TenantInfo{Id = "test" };
+        var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
         items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
 
@@ -37,7 +35,7 @@ public class MultiTenantContextAccessorShould
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(a => a.HttpContext).Returns(httpContextMock.Object);
 
-        var accessor = new MultiTenantContextAccessor(httpContextAccessorMock.Object);
+        var accessor = new MultiTenantContextAccessor<TenantInfo>(httpContextAccessorMock.Object);
 
         Assert.Equal(ti.Id, accessor.MultiTenantContext.TenantInfo.Id);
     }
@@ -48,7 +46,7 @@ public class MultiTenantContextAccessorShould
         var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
         httpContextAccessorMock.Setup(a => a.HttpContext).Returns((HttpContext)null);
 
-        var accessor = new MultiTenantContextAccessor(httpContextAccessorMock.Object);
+        var accessor = new MultiTenantContextAccessor<TenantInfo>(httpContextAccessorMock.Object);
 
         Assert.Null(accessor.MultiTenantContext);
     }

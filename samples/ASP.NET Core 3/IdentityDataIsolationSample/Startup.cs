@@ -48,7 +48,7 @@ namespace IdentityDataIsolationSample
             
             services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
 
-            services.AddMultiTenant()
+            services.AddMultiTenant<TenantInfo>()
                     .WithRouteStrategy()
                     .WithConfigurationStore()
                     .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
@@ -73,7 +73,7 @@ namespace IdentityDataIsolationSample
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace StaticStrategySample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMultiTenant()
+            services.AddMultiTenant<TenantInfo>()
                     .WithConfigurationStore()
                     .WithStaticStrategy("finbuckle");
         }
@@ -31,7 +32,7 @@ namespace StaticStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             
             app.UseEndpoints(endpoints =>
             {
