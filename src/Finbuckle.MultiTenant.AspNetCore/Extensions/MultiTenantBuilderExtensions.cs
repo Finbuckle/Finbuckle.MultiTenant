@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,13 +12,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#if NETCOREAPP2_1
-
 using System;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Routing;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -32,13 +31,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configures support for multitenant OAuth and OpenIdConnect.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRemoteAuthentication(this FinbuckleMultiTenantBuilder builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
-
-            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
+            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
             builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
 
             return builder;
@@ -48,16 +47,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a BasePathStrategy to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.></returns>
-        public static FinbuckleMultiTenantBuilder WithBasePathStrategy(this FinbuckleMultiTenantBuilder builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
 
+#if NETCOREAPP2_1
         /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "\_\_tenant\_\_" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
         /// </summary>
         /// <param name="configRoutes">Delegate to configure the routes.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     Action<IRouteBuilder> configRoutes)
+                where TTenantInfo : class, ITenantInfo, new()
             => builder.WithRouteStrategy("__tenant__", configRoutes);
 
         /// <summary>
@@ -66,9 +68,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
         /// <param name="configRoutes">Delegate to configure the routes.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     string tenantParam,
                                                                     Action<IRouteBuilder> configRoutes)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
@@ -82,74 +85,13 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam, configRoutes });
         }
-
-        /// <summary>
-        /// Adds and configures a HostStrategy with template "\_\_tenant\_\_.*" to the application.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithHostStrategy("__tenant__.*");
-
-        /// <summary>
-        /// Adds and configures a HostStrategy to the application.
-        /// </summary>
-        /// <param name="template">The template for determining the tenant identifier in the host.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder,
-                                                                   string template)
-        {
-            if (string.IsNullOrWhiteSpace(template))
-            {
-                throw new ArgumentException("Invalid value for \"template\"", nameof(template));
-            }
-
-            return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, new object[] { template });
-        }
-    }
-}
-
 #else
-
-using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Authentication;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Strategies;
-
-namespace Microsoft.Extensions.DependencyInjection
-{
-    /// <summary>
-    /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
-    /// </summary>
-    public static class FinbuckleMultiTenantBuilderExtensions
-    {
-        /// <summary>
-        /// Configures support for multitenant OAuth and OpenIdConnect.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRemoteAuthentication(this FinbuckleMultiTenantBuilder builder)
-        {
-            // Replace needed instead of TryAdd...
-            builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
-            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService>();
-            builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds and configures a BasePathStrategy to the application.
-        /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.></returns>
-        public static FinbuckleMultiTenantBuilder WithBasePathStrategy(this FinbuckleMultiTenantBuilder builder)
-            => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
-
         /// <summary>
         /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
             => builder.WithRouteStrategy("__tenant__");
 
         /// <summary>
@@ -157,8 +99,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithRouteStrategy(this FinbuckleMultiTenantBuilder builder,
-                                                                    string tenantParam)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantParam)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
@@ -167,12 +109,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam });
         }
+#endif
 
         /// <summary>
         /// Adds and configures a HostStrategy with template "__tenant__.*" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
             => builder.WithHostStrategy("__tenant__.*");
 
         /// <summary>
@@ -180,8 +124,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="template">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder WithHostStrategy(this FinbuckleMultiTenantBuilder builder,
-                                                                   string template)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string template)
+            where TTenantInfo : class, ITenantInfo, new()
         {
             if (string.IsNullOrWhiteSpace(template))
             {
@@ -192,5 +136,3 @@ namespace Microsoft.Extensions.DependencyInjection
         }
     }
 }
-
-#endif

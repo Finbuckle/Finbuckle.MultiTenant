@@ -1,4 +1,4 @@
-﻿//    Copyright 2018 Andrew White
+﻿//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
-    internal class MultiTenantAuthenticationService : IAuthenticationService
+    internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IAuthenticationService inner;
 
@@ -34,7 +35,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
-            var multiTenantContext = context.GetMultiTenantContext();
+            var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
             if (multiTenantContext.TenantInfo != null)
             {
                 properties = properties ?? new AuthenticationProperties();
