@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.14" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="6.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="6.0.0-preview1" />
   </ItemGroup>
 
   <ItemGroup>
