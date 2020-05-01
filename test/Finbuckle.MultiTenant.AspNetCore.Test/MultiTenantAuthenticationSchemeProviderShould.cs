@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
         return new WebHostBuilder()
                     .ConfigureServices(services =>
                     {
-                        services.AddMultiTenant()
+                        services.AddMultiTenant<TenantInfo>()
                             .WithBasePathStrategy()
                             .WithInMemoryStore()
                             .WithRemoteAuthentication()
@@ -47,19 +47,19 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant();
+                        app.UseMultiTenant<TenantInfo>();
                         app.Run(async context =>
                         {
-                            if (context.GetMultiTenantContext().TenantInfo != null)
+                            if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
                             {
                                 var schemeProvider = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
                                 await context.Response.WriteAsync((await schemeProvider.GetDefaultChallengeSchemeAsync()).Name);
                             }
                         });
 
-                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAddAsync(new TenantInfo("tenant1", "tenant1", null, null, null)).Wait();
-                        store.TryAddAsync(new TenantInfo("tenant2", "tenant2", null, null, null)).Wait();
+                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                        store.TryAddAsync(new TenantInfo { Id = "tenant1", Identifier = "tenant1" }).Wait();
+                        store.TryAddAsync(new TenantInfo { Id = "tenant2", Identifier = "tenant2" }).Wait();
                     });
     }
 
