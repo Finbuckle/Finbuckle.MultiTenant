@@ -40,6 +40,18 @@ public class ServiceCollectionExtensionsShould
     }
 
     [Fact]
+    public void RegisterTenantInfoInterfaceInDI()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        
+        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
+                                            s.ServiceType == typeof(ITenantInfo)).SingleOrDefault();
+
+        Assert.NotNull(service);
+    }
+
+    [Fact]
     public void RegisterIHttpContextAccessorInDI()
     {
         var services = new ServiceCollection();

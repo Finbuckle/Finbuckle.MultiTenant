@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ namespace DataIsolationSample.Data
 {
     public class ToDoDbContext : MultiTenantDbContext
     {
-        public ToDoDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        public ToDoDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        public ToDoDbContext(TenantInfo tenantInfo, DbContextOptions<ToDoDbContext> options) : base(tenantInfo, options)
+        public ToDoDbContext(ITenantInfo tenantInfo, DbContextOptions<ToDoDbContext> options) : base(tenantInfo, options)
         {
         }
 
