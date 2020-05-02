@@ -29,6 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where TTenantInfo : class, ITenantInfo, new()
         {
             services.AddHttpContextAccessor();
+            services.TryAddScoped<ITenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext<TTenantInfo>()?.TenantInfo);
             services.TryAddScoped<TTenantInfo>(sp => sp.GetRequiredService<IHttpContextAccessor>().HttpContext?.GetMultiTenantContext<TTenantInfo>()?.TenantInfo);
             services.TryAddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
 
