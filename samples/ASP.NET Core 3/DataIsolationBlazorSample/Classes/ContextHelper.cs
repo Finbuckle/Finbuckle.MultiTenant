@@ -86,12 +86,4 @@ namespace DataIsolationBlazorSample.Classes
         string DefaultRoute { get; set; }
         string HostTemplate { get; set; }
     }
-    public static class RouteStrategy
-    {
-#if routestrategy
-        public const bool IsUsed = true;
-#else
-        public const bool IsUsed = false;
-#endif
-    }
 }

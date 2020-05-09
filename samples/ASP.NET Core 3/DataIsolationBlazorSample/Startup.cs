@@ -144,7 +144,7 @@ namespace DataIsolationBlazorSample
         private void ConfigRoutes(IRouteBuilder routes)
         {
 #if routestrategy
-            routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
+           routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
 #endif
         }
     }
