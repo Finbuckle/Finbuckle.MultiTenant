@@ -1,0 +1,73 @@
+﻿@using Classes
+@inject ContextHelper _ctxHelper
+@inject IConfigHelper _cfgHelper
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">DataIsolationBlazorSample</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        @if (IsRouteStrategyUsed())
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="finbuckle">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Finbuckle Tenant
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="megaCorp">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> MegaCorp Tenant
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="initech">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Initech Tenant
+                </NavLink>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="tenant">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Current Tenant
+                </NavLink>
+            </li>
+        }
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Weather
+            </NavLink>
+        </li>
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private bool IsRouteStrategyUsed()
+    {
+        if (_cfgHelper == null) return false;
+        return _cfgHelper.IsRouteStrategyUsed();
+    }
+}

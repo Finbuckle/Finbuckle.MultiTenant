@@ -1,0 +1,97 @@
+﻿@page "/megaCorp"
+@using DataIsolationBlazorSample.Data
+@using DataIsolationBlazorSample.Models
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@inject Classes.ContextHelper _ctxHelper
+
+<h1>Tenant @(_ctxHelper.GetTenantName())</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (tenantInfo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    @if (tenantInfo != null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="text-muted">Id</th>
+                    <th></th>
+                    <th>Title</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (todolist != null)
+                {
+                    @foreach (var item in todolist)
+                    {
+                        <tr>
+                            <td style="width: 4rem" class="text-muted">@item.Id</td>
+                            <td style="width: 2rem"><input type="checkbox" checked="@item.Completed" /> </td>
+                            <td>@item.Title</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="jumbotron">
+            <h1 class="display-4">Hello, world!</h1>
+            <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/EFCore">per-tenant data with EFCore</a>.</p>
+            <hr class="my-4">
+            <p>
+                The <code>MultiTenantDbContext</code> constructor takes a <code>TenantInfo</code> parameter which ASP.NET Core
+                provides via dependency injection depending on the current tenant.
+            </p>
+            <p>
+                Two of the tenants share a single database with a connection string of <em>Data Source=Data/ToDoList.db</em>.
+                The database context only returns results for the current tenant (without the need for the app use <em>where</em>).
+            </p>
+            <p>
+                The third tenant uses a completely different database per its connection string of "Data Source=Data/Initech_ToDoList.db".
+                Either way tenant data is isolated when reading/inserting/updating/deleting.
+            </p>
+            <p>Click the links on the navbar to see it in action!</p>
+        </div>
+    }
+}
+
+
+@code
+{
+    private List<ToDoItem> todolist = new List<ToDoItem>();
+    private object tenantInfo = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetTenantInfo();
+        GetToDoList();
+    }
+
+    bool GetTenantInfo()
+    {
+        if (tenantInfo == null)
+        {
+            tenantInfo = _ctxHelper.GetCurrentTenant();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private bool GetToDoList()
+    {
+        todolist = _ctxHelper.GetToDoItems();
+        return true;
+    }
+}
