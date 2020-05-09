@@ -1,4 +1,4 @@
-﻿The example usew multitenant strategies: host and route.
+﻿The example uses multitenant strategies: host and route.
 
 It can be set in the appsettings.json
 "TenantStrategy": {
