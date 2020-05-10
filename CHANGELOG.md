@@ -1,4 +1,7 @@
 ## Version
+**6.0.0**
+* TBD
+
 **5.0.4**
 * Fixed a conflicting assembly and nuget versions.
 * Minor documentation fix.
