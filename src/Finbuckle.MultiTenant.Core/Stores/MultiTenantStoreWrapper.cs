@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@ namespace Finbuckle.MultiTenant.Stores
     /// <summary>
     /// A multitenant store decorator that handles exception handling and logging.
     /// </summary>
-    public class MultiTenantStoreWrapper<TStore, TTenantInfo> : IMultiTenantStore<TTenantInfo>
-        where TStore : IMultiTenantStore<TTenantInfo>
+    public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
-        public TStore Store { get; }
+        public IMultiTenantStore<TTenantInfo> Store { get; }
         private readonly ILogger logger;
 
-        public MultiTenantStoreWrapper(TStore store, ILogger<TStore> logger)
+        public MultiTenantStoreWrapper(IMultiTenantStore<TTenantInfo> store, ILogger logger)
         {
             this.Store = store;
             this.logger = logger;
@@ -50,17 +49,17 @@ namespace Finbuckle.MultiTenant.Stores
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStore)}.TryGetAsync.";
+                var errorMessage = $"Exception in {Store.GetType()}.TryGetAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
             }
 
             if (result != null)
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryGetAsync: Tenant Id \"{id}\" found.");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryGetAsync: Tenant Id \"{id}\" found.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryGetAsync: Unable to find Tenant Id \"{id}\".");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryGetAsync: Unable to find Tenant Id \"{id}\".");
             }
 
             return result;
@@ -81,17 +80,17 @@ namespace Finbuckle.MultiTenant.Stores
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStore)}.TryGetByIdentifierAsync.";
+                var errorMessage = $"Exception in {Store.GetType()}.TryGetByIdentifierAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
             }
 
             if (result != null)
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryGetByIdentifierAsync: Tenant found with identifier \"{identifier}\".");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryGetByIdentifierAsync: Tenant found with identifier \"{identifier}\".");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryGetByIdentifierAsync: Unable to find Tenant with identifier \"{identifier}\".");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryGetByIdentifierAsync: Unable to find Tenant with identifier \"{identifier}\".");
             }
 
             return result;
@@ -121,14 +120,14 @@ namespace Finbuckle.MultiTenant.Stores
                 var existing = await TryGetAsync(tenantInfo.Id);
                 if (existing != null)
                 {
-                    Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryAddAsync: Tenant already exists. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
+                    Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryAddAsync: Tenant already exists. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
                     goto end;
                 }
 
                 existing = await TryGetByIdentifierAsync(tenantInfo.Identifier);
                 if (existing != null)
                 {
-                    Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryAddAsync: Tenant already exists. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
+                    Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryAddAsync: Tenant already exists. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
                     goto end;
                 }
 
@@ -137,18 +136,18 @@ namespace Finbuckle.MultiTenant.Stores
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStore)}.TryAddAsync.";
+                var errorMessage = $"Exception in {Store.GetType()}.TryAddAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
             }
 
         end:
             if (result)
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryAddAsync: Tenant added. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryAddAsync: Tenant added. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryAddAsync: Unable to add Tenant. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryAddAsync: Unable to add Tenant. Id: \"{tenantInfo.Id}\", Identifier: \"{tenantInfo.Identifier}\"");
             }
 
             return result;
@@ -169,17 +168,17 @@ namespace Finbuckle.MultiTenant.Stores
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStore)}.TryRemoveAsync.";
+                var errorMessage = $"Exception in {Store.GetType()}.TryRemoveAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
             }
 
             if (result)
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryRemoveAsync: Tenant Id: \"{id}\" removed.");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryRemoveAsync: Tenant Id: \"{id}\" removed.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryRemoveAsync: Unable to remove Tenant Id: \"{id}\".");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryRemoveAsync: Unable to remove Tenant Id: \"{id}\".");
             }
 
             return result;
@@ -204,7 +203,7 @@ namespace Finbuckle.MultiTenant.Stores
                 var existing = await TryGetAsync(tenantInfo.Id);
                 if (existing == null)
                 {
-                    Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryUpdateAsync: Tenant Id: \"{tenantInfo.Id}\" not found.");
+                    Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryUpdateAsync: Tenant Id: \"{tenantInfo.Id}\" not found.");
                     goto end;
                 }
 
@@ -213,18 +212,18 @@ namespace Finbuckle.MultiTenant.Stores
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStore)}.TryUpdateAsync.";
+                var errorMessage = $"Exception in {Store.GetType()}.TryUpdateAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
             }
 
         end:
             if (result)
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryUpdateAsync: Tenant Id: \"{tenantInfo.Id}\" updated.");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryUpdateAsync: Tenant Id: \"{tenantInfo.Id}\" updated.");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStore)}.TryUpdateAsync: Unable to update Tenant Id: \"{tenantInfo.Id}\".");
+                Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryUpdateAsync: Unable to update Tenant Id: \"{tenantInfo.Id}\".");
             }
 
             return result;

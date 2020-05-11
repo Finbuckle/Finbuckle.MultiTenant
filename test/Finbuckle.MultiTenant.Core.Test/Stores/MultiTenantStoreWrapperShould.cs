@@ -23,7 +23,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
 
     protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>(new InMemoryStore<TenantInfo>(), null);
+        var store = new MultiTenantStoreWrapper<TenantInfo>(new InMemoryStore<TenantInfo>(), null);
 
         return PopulateTestStore(store);
     }

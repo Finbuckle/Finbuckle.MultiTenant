@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -19,14 +19,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class MultiTenantStrategyWrapper<TStrategy> : IMultiTenantStrategy
-        where TStrategy : IMultiTenantStrategy
+    public class MultiTenantStrategyWrapper : IMultiTenantStrategy
     {
-        public TStrategy Strategy { get; }
+        public IMultiTenantStrategy Strategy { get; }
 
         private readonly ILogger logger;
 
-        public MultiTenantStrategyWrapper(TStrategy strategy, ILogger<TStrategy> logger)
+        public MultiTenantStrategyWrapper(IMultiTenantStrategy strategy, ILogger logger)
         {
             this.Strategy = strategy;
             this.logger = logger;
@@ -47,18 +46,18 @@ namespace Finbuckle.MultiTenant.Strategies
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {typeof(TStrategy)}.GetIdentifierAsync.";
+                var errorMessage = $"Exception in {Strategy.GetType()}.GetIdentifierAsync.";
                 Utilities.TryLogError(logger, errorMessage, e);
                 throw new MultiTenantException(errorMessage, e);
             }
 
             if(identifier != null)
             {                
-                Utilities.TryLogInfo(logger, $"{typeof(TStrategy)}.GetIdentifierAsync: Found identifier: \"{identifier}\".");
+                Utilities.TryLogDebug(logger, $"{Strategy.GetType()}.GetIdentifierAsync: Found identifier: \"{identifier}\".");
             }
             else
             {
-                Utilities.TryLogInfo(logger, $"{typeof(TStrategy)}.GetIdentifierAsync: No identifier found.");
+                Utilities.TryLogDebug(logger, $"{Strategy.GetType()}.GetIdentifierAsync: No identifier found.");
             }
 
             return identifier;

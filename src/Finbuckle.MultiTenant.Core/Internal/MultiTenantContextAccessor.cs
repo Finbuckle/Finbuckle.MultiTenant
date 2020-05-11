@@ -12,20 +12,15 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Microsoft.AspNetCore.Http;
+using System.Threading;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant.Core
 {
     public class MultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        internal static AsyncLocal<MultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<MultiTenantContext<TTenantInfo>>();
 
-        public MultiTenantContextAccessor(IHttpContextAccessor httpContextAccessor)
-        {
-            this.httpContextAccessor = httpContextAccessor;
-        }
-
-        public MultiTenantContext<TTenantInfo> MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext<TTenantInfo>();
+        public MultiTenantContext<TTenantInfo> MultiTenantContext => _asyncLocalContext.Value;
     }
 }

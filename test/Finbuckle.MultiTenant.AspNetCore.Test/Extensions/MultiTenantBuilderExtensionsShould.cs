@@ -46,7 +46,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<BasePathStrategy>>(strategy);
+        Assert.IsType<BasePathStrategy>(strategy);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<HostStrategy>>(strategy);
+        Assert.IsType<HostStrategy>(strategy);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
+        Assert.IsType<RouteStrategy>>(strategy);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
+        Assert.IsType<RouteStrategy>(strategy);
     }
 
     [Fact]

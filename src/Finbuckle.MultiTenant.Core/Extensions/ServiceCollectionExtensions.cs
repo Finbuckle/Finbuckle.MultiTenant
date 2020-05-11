@@ -1,4 +1,4 @@
-// Copyright 2019 Andrew White
+// Copyright 2020 Andrew White
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,11 +14,30 @@
 
 using System;
 using System.Linq;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Core;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class FinbuckleServiceCollectionExtensions
     {
+        /// <summary>
+        /// Configure Finbuckle.MultiTenant services for the application.
+        /// </summary>
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            services.TryAddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo);
+            services.TryAddScoped<TTenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo);
+            services.TryAddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
+            services.TryAddSingleton<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
+            
+            return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
+        }
+
         public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
         {
             var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
