@@ -33,11 +33,14 @@ namespace Finbuckle.MultiTenant
         }
 
         public IEnumerable<IMultiTenantStrategy> Strategies { get; }
-
         public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; }
+        public MultiTenantContext<TTenantInfo> MultiTenantContext { get; set; }
 
-        public async Task<MultiTenantContext<TTenantInfo>> ResolveAsync(object context)
+        public async Task ResolveAsync(object context)
         {
+            if(MultiTenantContext != null)
+                return;
+
             MultiTenantContext<TTenantInfo> result = null;
 
             foreach (var strategy in Strategies)
@@ -62,12 +65,12 @@ namespace Finbuckle.MultiTenant
                         }
                     }
 
-                    if(result != null)
+                    if (result != null)
                         break;
                 }
             }
 
-            return result;
+            MultiTenantContext = result;
         }
     }
 }
