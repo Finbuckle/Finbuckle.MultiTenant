@@ -1,4 +1,4 @@
-﻿//    Copyright 2020 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
 
 namespace Microsoft.AspNetCore.Builder
@@ -27,9 +26,8 @@ namespace Microsoft.AspNetCore.Builder
         /// </summary>
         /// <param name="builder">The IApplicationBuilder<c/> instance the extension method applies to.</param>
         /// <returns>The same IApplicationBuilder passed into the method.</returns>
-        public static IApplicationBuilder UseMultiTenant<TTenantInfo>(this IApplicationBuilder builder)
-            where TTenantInfo : class, ITenantInfo, new()
-            => builder.UseMiddleware<MultiTenantMiddleware<TTenantInfo>>();
+        public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder)
+            => builder.UseMiddleware<MultiTenantMiddleware>();
         
     }
 }

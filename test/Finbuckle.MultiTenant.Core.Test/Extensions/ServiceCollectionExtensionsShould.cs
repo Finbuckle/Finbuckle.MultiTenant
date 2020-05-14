@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,33 +14,52 @@
 
 using System.Linq;
 using Finbuckle.MultiTenant;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 public class ServiceCollectionExtensionsShould
 {
-    internal void configTestRoute(Microsoft.AspNetCore.Routing.IRouteBuilder routes)
-    {
-        routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
-    }
-
     [Fact]
-    public void RegisterTenantInfoInDI()
+    public void RegisterITenantResolverGenericInDI()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
         
         var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(TenantInfo)).SingleOrDefault();
+                                            s.ServiceType == typeof(ITenantResolver<TenantInfo>)).SingleOrDefault();
 
         Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
     }
 
     [Fact]
-    public void RegisterTenantInfoInterfaceInDI()
+    public void RegisterITenantResolverInDI()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        
+        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
+                                            s.ServiceType == typeof(ITenantResolver)).SingleOrDefault();
+
+        Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+    }
+
+    [Fact]
+    public void RegisterIMultiTenantContextInDI()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        
+        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
+                                            s.ServiceType == typeof(IMultiTenantContext<TenantInfo>)).SingleOrDefault();
+
+        Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+    }
+
+    [Fact]
+    public void RegisterITenantInfoInDI()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
@@ -49,18 +68,7 @@ public class ServiceCollectionExtensionsShould
                                             s.ServiceType == typeof(ITenantInfo)).SingleOrDefault();
 
         Assert.NotNull(service);
-    }
-
-    [Fact]
-    public void RegisterIHttpContextAccessorInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        
-        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Singleton &&
-                                            s.ServiceType == typeof(IHttpContextAccessor)).SingleOrDefault();
-
-        Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
     }
 
     [Fact]
@@ -73,5 +81,6 @@ public class ServiceCollectionExtensionsShould
                                             s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>)).SingleOrDefault();
 
         Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
     }
 }

@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     {
                         services.AddMultiTenant<TenantInfo>()
                             .WithBasePathStrategy()
+                            .WithRemoteAuthenticationStrategy()
                             .WithInMemoryStore()
-                            .WithRemoteAuthentication()
                             .WithPerTenantOptions<AuthenticationOptions>((ao, ti) =>
                             {
                                 ao.DefaultChallengeScheme = ti.Identifier + "Scheme";
@@ -47,7 +47,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant<TenantInfo>();
+                        app.UseMultiTenant();
                         app.Run(async context =>
                         {
                             if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)

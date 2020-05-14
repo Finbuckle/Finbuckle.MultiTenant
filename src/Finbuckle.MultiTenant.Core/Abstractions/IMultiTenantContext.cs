@@ -1,4 +1,4 @@
-﻿//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,14 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-namespace Finbuckle.MultiTenant.AspNetCore
+namespace Finbuckle.MultiTenant
 {
-    /// <summary>
-    /// Constant values for use with Finbuckle.MultiTenant.AspNetCore.
-    /// </summary>
-    internal static class Constants
+    public interface IMultiTenantContext<TTenantInfo>
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        public const string HttpContextMultiTenantContext =
-            "Finbuckle.MultiTenant.AspNetCore.MultiTenantContext";
+        TTenantInfo TenantInfo { get; set; }
+        StrategyInfo StrategyInfo { get; set; }
+        StoreInfo<TTenantInfo> StoreInfo { get; set; }
     }
 }

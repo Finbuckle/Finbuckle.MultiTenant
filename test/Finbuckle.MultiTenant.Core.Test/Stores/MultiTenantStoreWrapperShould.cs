@@ -1,4 +1,4 @@
-﻿//    Copyright 2020 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ public class MultiTenantStoreWrappperShould : IMultiTenantStoreTestBase<InMemory
 
     protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>(new InMemoryStore<TenantInfo>(), null);
+        var store = new MultiTenantStoreWrapper<TenantInfo>(new InMemoryStore<TenantInfo>(), null);
 
         return PopulateTestStore(store);
     }

@@ -1,4 +1,4 @@
-﻿//    Copyright 2020 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -26,13 +26,10 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Returns the current MultiTenantContext or null if there is none.
         /// </summary>
-        public static MultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
+        public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : class, ITenantInfo, new()
         {
-            object multiTenantContext = null;
-            httpContext.Items.TryGetValue(Constants.HttpContextMultiTenantContext, out multiTenantContext);
-
-            return (MultiTenantContext<TTenantInfo>)multiTenantContext;
+            return httpContext.RequestServices.GetRequiredService<ITenantResolver<TTenantInfo>>().MultiTenantContext;
         }
 
         /// <summary>
@@ -40,20 +37,21 @@ namespace Finbuckle.MultiTenant
         /// Sets StrategyInfo and StoreInfo on the MultiTenant Context to null.
         /// Optionally resets the current dependency injection service provider.
         /// </summary>
-        public static bool TrySetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo, bool resetServiceProvider)
+        public static bool TrySetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo, bool resetServiceProviderScope)
             where TTenantInfo : class, ITenantInfo, new()
         {
-            var multitenantContext = httpContext.GetMultiTenantContext<TTenantInfo>() as MultiTenantContext<TTenantInfo>;
+            var resolver = httpContext.RequestServices.GetRequiredService<ITenantResolver<TTenantInfo>>();
+            var multitenantContext = resolver.MultiTenantContext ?? new MultiTenantContext<TTenantInfo>();
 
-            if (multitenantContext == null)
-                return false;
-
-            if (resetServiceProvider)
+            if (resetServiceProviderScope)
                 httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
 
             multitenantContext.TenantInfo = tenantInfo;
             multitenantContext.StrategyInfo = null;
             multitenantContext.StoreInfo = null;
+
+            resolver.MultiTenantContext = multitenantContext;
+            resolver.SyncMultiTenantContextAccessor();
 
             return true;
         }

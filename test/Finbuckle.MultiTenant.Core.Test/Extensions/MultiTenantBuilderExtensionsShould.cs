@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class MultiTenantBuilderExtensionsShould
         
         sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<HttpRemoteStore<TenantInfo>>(store);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class MultiTenantBuilderExtensionsShould
         
         sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<HttpRemoteStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<HttpRemoteStore<TenantInfo>>(store);
         Assert.True(flag);
     }
 
@@ -65,7 +65,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -97,7 +97,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<ConfigurationStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech-id", tc.Id);
@@ -127,7 +127,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<InMemoryStore<TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -159,7 +159,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<InMemoryStore<TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("initech").Result;
         Assert.Equal("initech", tc.Id);
@@ -198,7 +198,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<MultiTenantStoreWrapper<InMemoryStore<TenantInfo>, TenantInfo>>(store);
+        Assert.IsType<InMemoryStore<TenantInfo>>(store);
 
         var tc = store.TryGetByIdentifierAsync("lol").Result;
         Assert.Equal("lol", tc.Id);
@@ -276,7 +276,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<DelegateStrategy>>(strategy);
+        Assert.IsType<DelegateStrategy>(strategy);
     }
 
     [Fact]
@@ -288,7 +288,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<StaticStrategy>>(strategy);
+        Assert.IsType<StaticStrategy>(strategy);
     }
 
     [Fact]

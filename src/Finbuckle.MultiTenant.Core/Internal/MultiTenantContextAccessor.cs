@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,20 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Microsoft.AspNetCore.Http;
+using System.Threading;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant.Core
 {
     public class MultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        internal static AsyncLocal<IMultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<TTenantInfo>>();
 
-        public MultiTenantContextAccessor(IHttpContextAccessor httpContextAccessor)
+        public IMultiTenantContext<TTenantInfo> MultiTenantContext
         {
-            this.httpContextAccessor = httpContextAccessor;
-        }
+            get
+            {
+                return _asyncLocalContext.Value;
+            }
 
-        public MultiTenantContext<TTenantInfo> MultiTenantContext => httpContextAccessor.HttpContext?.GetMultiTenantContext<TTenantInfo>();
+            set
+            {
+                _asyncLocalContext.Value = value;
+            }
+        }
     }
 }

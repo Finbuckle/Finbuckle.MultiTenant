@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ namespace Finbuckle.MultiTenant
     /// <summary>
     /// Contains information for the multitenant tenant, store, and strategy.
     /// </summary>
-    public class MultiTenantContext<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+    public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
+        where TTenantInfo : class, ITenantInfo, new()
     {
         public TTenantInfo TenantInfo { get; set; }
         public StrategyInfo StrategyInfo { get; set; }

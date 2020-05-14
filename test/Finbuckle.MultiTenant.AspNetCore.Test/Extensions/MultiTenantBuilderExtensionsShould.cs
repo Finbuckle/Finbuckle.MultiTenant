@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         services.AddAuthentication();
-        builder.WithRemoteAuthentication();
+        builder.WithRemoteAuthenticationStrategy();
         var sp = services.BuildServiceProvider();
 
         var authService = sp.GetRequiredService<IAuthenticationService>(); // Throw fails
@@ -46,7 +46,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<BasePathStrategy>>(strategy);
+        Assert.IsType<BasePathStrategy>(strategy);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<HostStrategy>>(strategy);
+        Assert.IsType<HostStrategy>(strategy);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
+        Assert.IsType<RouteStrategy>(strategy);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<MultiTenantStrategyWrapper<RouteStrategy>>(strategy);
+        Assert.IsType<RouteStrategy>(strategy);
     }
 
     [Fact]

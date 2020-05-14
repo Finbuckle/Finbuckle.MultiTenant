@@ -1,4 +1,4 @@
-//    Copyright 2020 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -95,12 +95,12 @@ public class RouteStrategyShould
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant<TenantInfo>();
+                        app.UseMultiTenant();
                         app.Run(async context =>
                         {
-                            if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
+                            if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                             {
-                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>().TenantInfo.Id);
+                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()?.TenantInfo.Id);
                             }
                         });
 
@@ -182,12 +182,12 @@ public class RouteStrategyShould
                     .Configure(app =>
                     {
                         app.UseRouting();
-                        app.UseMultiTenant<TenantInfo>();
+                        app.UseMultiTenant();
                         app.UseEndpoints(endpoints =>
                         {
                             endpoints.Map(routePattern, async context =>
                             {
-                                if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
+                                if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                                 {
                                     await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>().TenantInfo.Id);
                                 }

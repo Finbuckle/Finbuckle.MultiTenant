@@ -34,7 +34,7 @@ namespace FallbackStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
 
             // Note this is the same route delegate used in WithFallbackStrategy()
             app.UseMvc(ConfigRoutes);

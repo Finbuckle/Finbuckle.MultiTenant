@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Finbuckle.MultiTenant;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace AuthenticationOptionsSample
+namespace Finbuckle.MultiTenant
 {
-    public class AuthenticationOptionsSampleTenantInfo : ITenantInfo
+    public interface ITenantResolver
     {
-        public string Id { get; set; }
-        public string Identifier { get; set; }
-        public string Name { get; set; }
-        public string ConnectionString { get; set; }
-        public string ChallengeScheme { get; set; }
+        Task<object> ResolveAsync(object context);
+        void SyncMultiTenantContextAccessor();
+    }
+    
+    public interface ITenantResolver<TTenantInfo> : ITenantResolver
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        IEnumerable<IMultiTenantStrategy> Strategies { get; }
+        IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; }
+        IMultiTenantContext<TTenantInfo> MultiTenantContext { get; set; }
     }
 }
