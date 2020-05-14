@@ -80,7 +80,7 @@ namespace AuthenticationOptionsSample
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

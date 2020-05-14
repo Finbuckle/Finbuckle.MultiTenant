@@ -77,7 +77,7 @@ namespace AuthenticationOptionsSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseAuthorization();
 
