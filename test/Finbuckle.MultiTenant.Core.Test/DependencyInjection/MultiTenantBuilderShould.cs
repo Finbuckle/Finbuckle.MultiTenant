@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ public class MultiTenantBuilderShould
     {
         var services = new ServiceCollection();
         var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
-        accessor.Setup(a => a.MultiTenantContext).Returns((MultiTenantContext<TenantInfo>)null);
+        accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>)null);
         services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(accessor.Object);
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         // Note: using MultiTenantBuilderShould as our test options class.

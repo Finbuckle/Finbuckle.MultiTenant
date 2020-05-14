@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@ using Finbuckle.MultiTenant;
 
 public class TestMultiTenantContextAccessor : IMultiTenantContextAccessor<TenantInfo>
 {
-    private readonly MultiTenantContext<TenantInfo> multiTenantContext;
+    private readonly IMultiTenantContext<TenantInfo> multiTenantContext;
 
-    public TestMultiTenantContextAccessor(MultiTenantContext<TenantInfo> multiTenantContext)
+    public TestMultiTenantContextAccessor(IMultiTenantContext<TenantInfo> multiTenantContext)
     {
         this.multiTenantContext = multiTenantContext;
     }
 
-    public MultiTenantContext<TenantInfo> MultiTenantContext => multiTenantContext;
+    public IMultiTenantContext<TenantInfo> MultiTenantContext => multiTenantContext;
 }

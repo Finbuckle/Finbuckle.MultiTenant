@@ -19,8 +19,8 @@ namespace Finbuckle.MultiTenant.Core
     public class MultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
-        internal static AsyncLocal<MultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<MultiTenantContext<TTenantInfo>>();
+        internal static AsyncLocal<IMultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<TTenantInfo>>();
 
-        public MultiTenantContext<TTenantInfo> MultiTenantContext => _asyncLocalContext.Value;
+        public IMultiTenantContext<TTenantInfo> MultiTenantContext => _asyncLocalContext.Value;
     }
 }
