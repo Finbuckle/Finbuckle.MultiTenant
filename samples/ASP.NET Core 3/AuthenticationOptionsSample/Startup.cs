@@ -52,7 +52,7 @@ namespace AuthenticationOptionsSample
             services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy().
-                WithRemoteAuthentication(). // Important!
+                WithRemoteAuthenticationStrategy(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
                     options.DefaultChallengeScheme = tenantInfo.ChallengeScheme ?? options.DefaultChallengeScheme;
