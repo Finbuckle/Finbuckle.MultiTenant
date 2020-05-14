@@ -27,7 +27,7 @@ public class TenantResolverShould
     void InitializeStrategiesFromDI()
     {
         var services = new ServiceCollection();
-        services.AddLogging().
+        services.
             AddMultiTenant<TenantInfo>().
             WithDelegateStrategy(c => Task.FromResult("strat1")).
             WithStaticStrategy("strat2").
@@ -54,7 +54,7 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
 
-        services.AddLogging().
+        services.
             AddMultiTenant<TenantInfo>().
             WithStaticStrategy("strat").
             WithInMemoryStore().
@@ -79,7 +79,7 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
 
-        services.AddLogging().
+        services.
             AddMultiTenant<TenantInfo>().
             WithDelegateStrategy(c => Task.FromResult("not-found")).
             WithStaticStrategy("initech").
@@ -92,8 +92,9 @@ public class TenantResolverShould
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
 
-        var result = resolver.ResolveAsync(new object()).Result;
-
+        resolver.ResolveAsync(new object()).Wait();
+        var result = resolver.MultiTenantContext;
+        
         Assert.Equal("initech", result.TenantInfo.Identifier);
         Assert.IsType<StaticStrategy>(result.StrategyInfo.Strategy);
         Assert.IsType<ConfigurationStore<TenantInfo>>(result.StoreInfo.Store);
@@ -109,7 +110,8 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
 
-        services.AddMultiTenant<TenantInfo>().
+        services.
+            AddMultiTenant<TenantInfo>().
             WithDelegateStrategy(c => Task.FromResult<string>(null)).
             WithInMemoryStore().
             WithConfigurationStore();
@@ -120,7 +122,8 @@ public class TenantResolverShould
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
 
-        var result = resolver.ResolveAsync(null).Result;
+        resolver.ResolveAsync(new object()).Wait();
+        var result = resolver.MultiTenantContext;
 
         Assert.Null(result);
     }
@@ -135,7 +138,8 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
 
-        services.AddMultiTenant<TenantInfo>().
+        services.AddLogging().
+            AddMultiTenant<TenantInfo>().
             WithDelegateStrategy(c => Task.FromResult("not-found")).
             WithStaticStrategy("also-not-found").
             WithInMemoryStore().
@@ -147,7 +151,8 @@ public class TenantResolverShould
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
 
-        var result = resolver.ResolveAsync(null).Result;
+        resolver.ResolveAsync(new object()).Wait();
+        var result = resolver.MultiTenantContext;
 
         Assert.Null(result);
     }

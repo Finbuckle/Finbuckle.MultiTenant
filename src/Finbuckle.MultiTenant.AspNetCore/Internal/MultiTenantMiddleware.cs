@@ -34,8 +34,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
             
-            await resolver.ResolveAsync(context);
-
+            var multiTenantContext = await resolver.ResolveAsync(context);
+            resolver.SyncMultiTenantContextAccessor();
+            
             if (next != null)
             {
                 await next(context);

@@ -98,9 +98,9 @@ public class RouteStrategyShould
                         app.UseMultiTenant();
                         app.Run(async context =>
                         {
-                            if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
+                            if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                             {
-                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>().TenantInfo.Id);
+                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()?.TenantInfo.Id);
                             }
                         });
 
@@ -187,7 +187,7 @@ public class RouteStrategyShould
                         {
                             endpoints.Map(routePattern, async context =>
                             {
-                                if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
+                                if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                                 {
                                     await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>().TenantInfo.Id);
                                 }

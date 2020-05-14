@@ -13,7 +13,6 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,14 +24,16 @@ public class HttpContextExtensionShould
     [Fact]
     public void GetTenantContextIfExists()
     {
-        var items = new Dictionary<object, object>();
         var ti = new TenantInfo { Id = "test" };
         var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
+
+        var services = new ServiceCollection();
+        services.AddScoped<ITenantResolver<TenantInfo>>(_ => new TenantResolver<TenantInfo>(null, null, null){ MultiTenantContext = tc });
+        var sp = services.BuildServiceProvider();
 
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
 
         var mtc = httpContextMock.Object.GetMultiTenantContext<TenantInfo>();
 
@@ -42,9 +43,12 @@ public class HttpContextExtensionShould
     [Fact]
     public void ReturnNullIfNoMultiTenantContext()
     {
-        var items = new Dictionary<object, object>();
+        var services = new ServiceCollection();
+        services.AddScoped<ITenantResolver<TenantInfo>>(_ => new TenantResolver<TenantInfo>(null, null, null));
+        var sp = services.BuildServiceProvider();
+
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
 
         var mtc = httpContextMock.Object.GetMultiTenantContext<TenantInfo>();
 
@@ -54,74 +58,70 @@ public class HttpContextExtensionShould
     [Fact]
     public void SetTenantInfo()
     {
-        var items = new Dictionary<object, object>();
-        var ti = new TenantInfo { Id = "test" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        var context = httpContextMock.Object;
 
         var ti2 = new TenantInfo { Id = "tenant2" };
-
-        var res = httpContextMock.Object.TrySetTenantInfo(ti2, false);
-
+        var res = context.TrySetTenantInfo(ti2, false);
+        var mtc = context.GetMultiTenantContext<TenantInfo>();
         Assert.True(res);
-        Assert.Same(ti2, httpContextMock.Object.GetMultiTenantContext<TenantInfo>().TenantInfo);
+        Assert.Same(ti2, mtc.TenantInfo);
     }
 
     [Fact]
-    public void NotSetTenantInfoIfNoMultiTenantContext()
+    public void SyncMultiTenantContextAcccessor()
     {
-        var items = new Dictionary<object, object>();
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        var context = httpContextMock.Object;
 
         var ti2 = new TenantInfo { Id = "tenant2" };
-
-        var res = httpContextMock.Object.TrySetTenantInfo(ti2, false);
-
-        Assert.False(res);
-        Assert.Null(httpContextMock.Object.GetMultiTenantContext<TenantInfo>());
+        var res = context.TrySetTenantInfo(ti2, false);
+        var mtc = context.GetMultiTenantContext<TenantInfo>();
+        var accessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
+        Assert.True(res);
+        Assert.Same(mtc, accessor.MultiTenantContext);
     }
 
     [Fact]
     public void SetStoreInfoAndStrategyInfoNull()
     {
-        var items = new Dictionary<object, object>();
-        var ti = new TenantInfo { Id = "test" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
-        tc.StrategyInfo = new StrategyInfo();
-        tc.StoreInfo = new StoreInfo<TenantInfo>();
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        var context = httpContextMock.Object;
 
         var ti2 = new TenantInfo { Id = "tenant2" };
+        var res = context.TrySetTenantInfo(ti2, false);
+        var mtc = context.GetMultiTenantContext<TenantInfo>();
 
-        var res = httpContextMock.Object.TrySetTenantInfo(ti2, false);
-
-        Assert.Null(httpContextMock.Object.GetMultiTenantContext<TenantInfo>().StoreInfo);
-        Assert.Null(httpContextMock.Object.GetMultiTenantContext<TenantInfo>().StrategyInfo);
+        Assert.Null(mtc.StoreInfo);
+        Assert.Null(mtc.StrategyInfo);
     }
 
     [Fact]
     public void ResetScopeIfApplicable()
     {
-        var items = new Dictionary<object, object>();
-        var ti = new TenantInfo { Id = "test" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
 
         httpContextMock.SetupProperty(c => c.RequestServices);
 
-        var sc = new ServiceCollection();
-        sc.AddScoped<object>(_sp => DateTime.Now);
-        var sp = sc.BuildServiceProvider();
+        var services = new ServiceCollection();
+        services.AddScoped<object>(_sp => DateTime.Now);
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
         httpContextMock.Object.RequestServices = sp;
 
         var ti2 = new TenantInfo { Id = "tenant2" };
@@ -135,19 +135,14 @@ public class HttpContextExtensionShould
     [Fact]
     public void NotResetScopeIfNotApplicable()
     {
-        var items = new Dictionary<object, object>();
-        var ti = new TenantInfo { Id = "test" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
-        items.Add(Finbuckle.MultiTenant.AspNetCore.Constants.HttpContextMultiTenantContext, tc);
         var httpContextMock = new Mock<HttpContext>();
-        httpContextMock.Setup(c => c.Items).Returns(items);
 
         httpContextMock.SetupProperty(c => c.RequestServices);
 
-        var sc = new ServiceCollection();
-        sc.AddScoped<object>(_sp => DateTime.Now);
-        var sp = sc.BuildServiceProvider();
+        var services = new ServiceCollection();
+        services.AddScoped<object>(_sp => DateTime.Now);
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
         httpContextMock.Object.RequestServices = sp;
 
         var ti2 = new TenantInfo { Id = "tenant2" };

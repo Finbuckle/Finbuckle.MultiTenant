@@ -33,8 +33,8 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     {
                         services.AddMultiTenant<TenantInfo>()
                             .WithBasePathStrategy()
+                            .WithRemoteAuthenticationStrategy()
                             .WithInMemoryStore()
-                            .WithRemoteAuthentication()
                             .WithPerTenantOptions<AuthenticationOptions>((ao, ti) =>
                             {
                                 ao.DefaultChallengeScheme = ti.Identifier + "Scheme";

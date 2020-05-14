@@ -14,6 +14,7 @@
 
 using System;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -29,7 +30,8 @@ public class MultiTenantOptionsFactoryShould
         var ti = new TenantInfo{ Id = "test-id-123" };
         var tc = new MultiTenantContext<TenantInfo>();
         tc.TenantInfo = ti;
-        var tca = new TestMultiTenantContextAccessor(tc);
+        var tca = new MultiTenantContextAccessor<TenantInfo>();
+        tca.MultiTenantContext = tc;
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);
@@ -49,7 +51,8 @@ public class MultiTenantOptionsFactoryShould
     [Fact]
     public void IgnoreNullTenantInfo()
     {
-        var tca = new TestMultiTenantContextAccessor(new MultiTenantContext<TenantInfo>());
+        var tca = new MultiTenantContextAccessor<TenantInfo>();
+        tca.MultiTenantContext = new MultiTenantContext<TenantInfo>();
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);
@@ -69,7 +72,7 @@ public class MultiTenantOptionsFactoryShould
     [Fact]
     public void IgnoreNullMultiTenantContext()
     {
-        var tca = new TestMultiTenantContextAccessor(null);
+        var tca = new MultiTenantContextAccessor<TenantInfo>();
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);

@@ -30,7 +30,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         services.AddAuthentication();
-        builder.WithRemoteAuthentication();
+        builder.WithRemoteAuthenticationStrategy();
         var sp = services.BuildServiceProvider();
 
         var authService = sp.GetRequiredService<IAuthenticationService>(); // Throw fails
@@ -82,7 +82,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<RouteStrategy>>(strategy);
+        Assert.IsType<RouteStrategy>(strategy);
     }
 
     [Fact]

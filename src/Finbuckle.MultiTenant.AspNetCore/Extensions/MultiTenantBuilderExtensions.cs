@@ -31,16 +31,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configures support for multitenant OAuth and OpenIdConnect.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
             // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
-            builder.Services.TryAddSingleton<RemoteAuthenticationStrategy>();
-
-            return builder;
+            return builder.WithStrategy<RemoteAuthenticationStrategy>(ServiceLifetime.Singleton);
         }
 
         /// <summary>

@@ -51,6 +51,7 @@ namespace Finbuckle.MultiTenant
             multitenantContext.StoreInfo = null;
 
             resolver.MultiTenantContext = multitenantContext;
+            resolver.SyncMultiTenantContextAccessor();
 
             return true;
         }
