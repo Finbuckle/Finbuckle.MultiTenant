@@ -2,9 +2,9 @@
 
 A multitenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier string which is used to create a `TenantInfo` object with information from the [MultiTenant store](Stores).
 
-Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`. Internally strategies are registered as singleton services.
+Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 
-Multiple strategies can be registered after `AddMultiTenant` as described invidually below. Each strategy will be tried in the order configured until a non-null identifier is returned. The remaining strategies are skipped. Due to limitations the ASP.NET Core dependency injection containers only a single instance of each strategy type can be registered, i.e. `WithDelegateStrategy(...).WithDelegateStrategy(...)` will throw an exception on startup. A decent workaround is to define various types from `DelegateStrategy` or similar and register the derived types in the desired order.
+Multiple strategies can be registered after `AddMultiTenant` and each strategy will be tried in the order configured until a non-null identifier is returned. The remaining strategies are skipped for that request. Note that some strategies are registered as singleton service so registering them multiple times after `AddMultiTenant` is not recommended. The main use for registering multiple strategies of the same type is using several instances of the `DelegateStrategy` utilizing distinct logic.
 
 The `Strategy` property on the `StrategyInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()` returns the actual strategy used to resolve the tenant information for the current context.
 
@@ -13,7 +13,7 @@ All multitenant strategies derive from `IMultiTenantStrategy` and must implement
 
 If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a null `TenantInfo`.
 
-Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. The first override uses dependency injection along with any passed parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic logging and exception handling.
+Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. There are several available overrides for configurign the strategy. The first override uses dependency injection along with any passed parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic logging and exception handling.
 
 ```cs
 // Register a custom strategy with the templated method.
@@ -26,7 +26,7 @@ services.AddMultiTenant().WithStrategy( sp => return new MyStrat())...
 ```
 
 ## Static Strategy
-Always uses the same identifier to resolve the tenant.
+Always uses the same identifier to resolve the tenant. This strategy is configured as a singleton.
 
 Configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution:
 
@@ -35,8 +35,10 @@ Configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `Configu
 services.AddMultiTenant().WithStaticStrategy("MyTenant")...
 ```
 
+This strategy is configured as a singleton.
+
 ## Base Path Strategy 
-Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when resolving the tenant.
+Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when resolving the tenant. This strategy is configured as a singleton.
 
 Configure by calling `WithBasePathStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class:
 
@@ -46,9 +48,9 @@ services.AddMultiTenant().WithBasePathStrategy()...
 ```
 
 ## Route Strategy
-Note: the route strategy has improved for ASP.NET Core 3!
+Note: the configuration and use of this strategy differs in ASP.NET Core 2.1 and ASP.NET Core 3.1+.
 
-Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/contoso/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "contoso" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration.
+Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/contoso/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "contoso" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration. This strategy is configured as a singleton.
 
 **ASP.NET Core 3 or higher**
  The route strategy is made improved in ASP.NET Core 3 due to the new endpoint routing mechanism. Configure by calling `WithRouteStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. A different route parameter name can be specified with the overloaded version. Then in the app pipeline make sure to call `UseRouting` before `UseMultiTenant`:
@@ -94,8 +96,7 @@ public class Startup
 }
 ```
 
-
-**ASP.NET Core 2.1 or 2.2**
+**ASP.NET Core 2.1**
 Configure by calling `WithRouteStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. An `Action<IRouteBuilder>` parameter which configures the routing is passed in which should always match the routes configured with MVC.  A different route parameter name can be specified with the overloaded version:
 
 ```cs
@@ -138,7 +139,7 @@ public class Startup
 ```
 
 ## Host Strategy
-Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`.
+Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`. This strategy is configured as a singleton.
 
 The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifier using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
   - `__tenant__.*` is the default if no pattern is provided and selects the first domain segment for the tenant identifier.
@@ -161,7 +162,7 @@ services.AddMultiTenant().WithHostStrategy("*.__tenant__.?")...
 
 ## Delegate Strategy
 
-Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda function `context => Task.FromResult("contoso")` would use "contoso" as the identifier when resolving the tenant for every request. This strategy is good to use for testing or simple logic.
+Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda function `context => Task.FromResult("contoso")` would use "contoso" as the identifier when resolving the tenant for every request. This strategy is good to use for testing or simple logic. This strategy is configured as transient and multiple instances can be registered.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. A `Func<object, Task<string>>`is passed in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter:
 
@@ -178,7 +179,7 @@ services.AddMultiTenant().
 
 ## Fallback Strategy
 
-Returns a static tenant identifier string if the main strategy (and the remove authentication strategy, if applicable) fails to resolve a tenant with the tenant store. If the store does not have an entry for the fallback tenant identifier then this strategy has no effect.
+Returns a static tenant identifier string if the main strategy (and the remove authentication strategy, if applicable) fails to resolve a tenant with the tenant store. If the store does not have an entry for the fallback tenant identifier then this strategy has no effect. This strategy is configured as a singleton.
 
 This strategy is intended be used in conjunction with other strategies and is always called last.
 
@@ -191,9 +192,15 @@ Configure by calling `WithFallbackStrategy` after `AddMultiTenant` in the `Confi
 services.AddMultiTenant().WithHostStrategy().WithFallbackStrategy("defaultTenant");
 ```
 
-## Remote Authentication Strategy
+## Remote Authentication Callback Strategy
 
 This is a special strategy used for per-tenant authentication when remote authentication such as Open
-ID Connect or OAuth (e.g. Log in via Facebook) are used.
+ID Connect or OAuth (e.g. Log in via Facebook) are used. This strategy is configured as a singleton.
 
-This strategy is intended be used in conjunction with other strategies. It is configured when `WithRemoteAuthentication` is called after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. See [Per-Tenant Authentication](Authentication) for more details.
+Ideally remote authentication callback paths can be configured per-tenant using `WithPerTenantOptions`
+so that the callback paths work in conjunction with another strategy such as the host or route strategies.
+
+However, in scenarios where this is not possible and multiple tenants must use the same callback url this strategy
+will append the tenant identifier to state parameter which the remote authentication passes back to the app after
+performing authentication. The strategy will parse the tenant identifier out of the callback resonse state paramater
+and use it to set the current tenant for the request.
