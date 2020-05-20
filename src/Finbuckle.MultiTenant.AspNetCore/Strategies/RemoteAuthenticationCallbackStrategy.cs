@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -23,18 +23,20 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Finbuckle.MultiTenant;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
-    public class RemoteAuthenticationStrategy : IMultiTenantStrategy
+    public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
     {
-        private readonly ILogger<RemoteAuthenticationStrategy> logger;
+        internal const string TenantKey = "__tenant__";
+        private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
 
-        public RemoteAuthenticationStrategy()
+        public RemoteAuthenticationCallbackStrategy()
         {
         }
 
-        public RemoteAuthenticationStrategy(ILogger<RemoteAuthenticationStrategy> logger)
+        public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
         {
             this.logger = logger;
         }
@@ -48,29 +50,20 @@ namespace Finbuckle.MultiTenant.Strategies
             var httpContext = context as HttpContext;
 
             var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-            var handlers = httpContext.RequestServices.GetRequiredService<IAuthenticationHandlerProvider>();
 
-            foreach (var scheme in await schemes.GetRequestHandlerSchemesAsync())
+            foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync()).
+                Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
             {
-                var optionType = scheme.HandlerType.GetProperty("Options").PropertyType;
-                
-                // Skip if this is not a compatible type of authentication.
-                if (!typeof(OAuthOptions).IsAssignableFrom(optionType) &&
-                    !typeof(OpenIdConnectOptions).IsAssignableFrom(optionType))
-                {
-                    continue;
-                }
-
-                // RequestHandlers have a method, ShouldHandleRequestAsync, which would be nice here,
-                // but instantiating the handler internally caches an Options instance... which is bad because
-                // we don't know the tenant yet. Thus we will get the Options ourselves with reflection,
-                // and replicate the ShouldHandleRequestAsync logic.
-
-                var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionType);
+                var optionsType = scheme.HandlerType.GetProperty("Options").PropertyType;
+                var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionsType);
                 var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
                 var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
                 
-                if (options.CallbackPath == httpContext.Request.Path)
+                var callbackPath = (PathString)optionsType.GetProperty("CallbackPath")?.GetValue(options);
+                var signedOutCallbackPath = (PathString)optionsType.GetProperty("SignedOututCallbackPath")?.GetValue(options);
+
+                if (callbackPath != PathString.Empty && callbackPath == httpContext.Request.Path ||
+                    signedOutCallbackPath != PathString.Empty && signedOutCallbackPath == httpContext.Request.Path)
                 {
                     try
                     {
@@ -80,11 +73,13 @@ namespace Finbuckle.MultiTenant.Strategies
                         {
                             state = httpContext.Request.Query["state"];
                         }
+                        // Assumption: it is safe to read the form, limit to 1MB form size.
                         else if (string.Equals(httpContext.Request.Method, "POST", StringComparison.OrdinalIgnoreCase)
                             && httpContext.Request.HasFormContentType
                             && httpContext.Request.Body.CanRead)
                         {
-                            var formOptions = new FormOptions { BufferBody = true };
+                            var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
+                            
                             var form = await httpContext.Request.ReadFormAsync(formOptions);
                             state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
                         }
@@ -101,9 +96,9 @@ namespace Finbuckle.MultiTenant.Strategies
                             return null;
                         }
 
-                        if (properties.Items.Keys.Contains("tenantIdentifier"))
+                        if (properties.Items.Keys.Contains(TenantKey))
                         {
-                            return properties.Items["tenantIdentifier"] as string;
+                            return properties.Items[TenantKey] as string;
                         }
                     }
                     catch (Exception e)
