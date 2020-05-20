@@ -30,11 +30,20 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         services.AddAuthentication();
-        builder.WithRemoteAuthenticationStrategy();
+        builder.WithRemoteAuthenticationCallbackStrategy();
         var sp = services.BuildServiceProvider();
 
-        var authService = sp.GetRequiredService<IAuthenticationService>(); // Throw fails
-        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throw fails
+        var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
+        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throws if fails
+    }
+
+    [Fact]
+    public void ThrowIfCantDecorateIAuthenticationService()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+
+        Assert.Throws<MultiTenantException>(() => builder.WithRemoteAuthenticationCallbackStrategy());
     }
 
     [Fact]

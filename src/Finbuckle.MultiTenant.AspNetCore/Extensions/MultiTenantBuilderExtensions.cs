@@ -19,6 +19,7 @@ using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.Strategies;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Routing;
+using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -31,14 +32,18 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configures support for multitenant OAuth and OpenIdConnect.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            // builder.Services.Replace(ServiceDescriptor.Scoped<IAuthenticationService, MultiTenantAuthenticationService>());
+            
+            // We need to "decorate" IAuthenticationService
+            if(!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
+                throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAutheorization() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
-            return builder.WithStrategy<RemoteAuthenticationStrategy>(ServiceLifetime.Singleton);
+            
+            return builder.WithStrategy<RemoteAuthenticationCallbackStrategy>(ServiceLifetime.Singleton);
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ using System.Reflection;
 
 namespace Finbuckle.MultiTenant
 {
-    internal static class TypeExtensions
+    public static class TypeExtensions
     {
         public static bool ImplementsOrInheritsUnboundGeneric(this Type source, Type unboundGeneric)
         {

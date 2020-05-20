@@ -14,6 +14,7 @@
 
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
@@ -29,29 +30,42 @@ namespace Finbuckle.MultiTenant.AspNetCore
             this.inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
         }
 
-        public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string scheme)
-            => inner.AuthenticateAsync(context, scheme);
-
-        public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        private static void AddTenantIdentiferToProperties(HttpContext context, AuthenticationProperties properties)
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
             if (multiTenantContext.TenantInfo != null)
             {
                 properties = properties ?? new AuthenticationProperties();
-                properties.Items.Add("tenantIdentifier", multiTenantContext.TenantInfo.Identifier);
+                properties.Items.Add(RemoteAuthenticationCallbackStrategy.TenantKey, multiTenantContext.TenantInfo.Identifier);
             }
+        }
 
+        public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string scheme)
+            => inner.AuthenticateAsync(context, scheme);
+
+        public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        {
+            AddTenantIdentiferToProperties(context, properties);
             return inner.ChallengeAsync(context, scheme, properties);
         }
 
         public Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
-            => inner.ForbidAsync(context, scheme, properties);
+        {
+            AddTenantIdentiferToProperties(context, properties);
+            return inner.ForbidAsync(context, scheme, properties);
+        }
 
         public Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
-            => inner.SignInAsync(context, scheme, principal, properties);
+        {
+            AddTenantIdentiferToProperties(context, properties);
+            return inner.SignInAsync(context, scheme, principal, properties);
+        }
 
         public Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
-            => inner.SignOutAsync(context, scheme, properties);
+        {
+            AddTenantIdentiferToProperties(context, properties);
+            return inner.SignOutAsync(context, scheme, properties);
+        }
     }
 }
