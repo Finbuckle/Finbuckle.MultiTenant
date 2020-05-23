@@ -41,14 +41,16 @@ public class MultiTenantMiddlewareShould
         var context = new Mock<HttpContext>();
         context.Setup(c => c.RequestServices).Returns(sp);
 
-        var mw = new MultiTenantMiddleware(null);
-        await mw.Invoke(context.Object);
+        var mw = new MultiTenantMiddleware<TenantInfo>(c => {
+            Assert.Equal("initech", context.Object.RequestServices.GetService<ITenantInfo>().Id);
+            return Task.CompletedTask;
+        });
 
-        Assert.Equal("initech", context.Object.RequestServices.GetService<ITenantInfo>().Id);
+        await mw.Invoke(context.Object);
     }
 
     [Fact]
-    async void SyncMultiTenantContextAccessor()
+    async void SetMultiTenantContextAccessor()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>().
@@ -61,10 +63,10 @@ public class MultiTenantMiddlewareShould
         var context = new Mock<HttpContext>();
         context.Setup(c => c.RequestServices).Returns(sp);
 
-        var mw = new MultiTenantMiddleware(c => {
+        var mw = new MultiTenantMiddleware<TenantInfo>(c => {
             var accessor = c.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
             var resolver = c.RequestServices.GetRequiredService<ITenantResolver<TenantInfo>>();
-            Assert.Same(accessor.MultiTenantContext, resolver.MultiTenantContext);
+            Assert.NotNull(accessor.MultiTenantContext);
             return Task.CompletedTask;
         });
 

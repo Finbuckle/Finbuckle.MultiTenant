@@ -31,6 +31,10 @@ public class MultiTenantAuthenticationSchemeProviderShould
         return new WebHostBuilder()
                     .ConfigureServices(services =>
                     {
+                        services.AddAuthentication()
+                            .AddCookie("tenant1Scheme")
+                            .AddCookie("tenant2Scheme");
+                            
                         services.AddMultiTenant<TenantInfo>()
                             .WithBasePathStrategy()
                             .WithRemoteAuthenticationCallbackStrategy()
@@ -39,15 +43,12 @@ public class MultiTenantAuthenticationSchemeProviderShould
                             {
                                 ao.DefaultChallengeScheme = ti.Identifier + "Scheme";
                             });
-                        services.AddAuthentication()
-                            .AddCookie("tenant1Scheme")
-                            .AddCookie("tenant2Scheme");
 
                         services.AddMvc();
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant();
+                        app.UseMultiTenant<TenantInfo>();
                         app.Run(async context =>
                         {
                             if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)

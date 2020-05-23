@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System;
 using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +30,7 @@ namespace Finbuckle.MultiTenant
         public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : class, ITenantInfo, new()
         {
-            return httpContext.RequestServices.GetRequiredService<ITenantResolver<TTenantInfo>>().MultiTenantContext;
+            return httpContext.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext;
         }
 
         /// <summary>
@@ -40,18 +41,19 @@ namespace Finbuckle.MultiTenant
         public static bool TrySetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo, bool resetServiceProviderScope)
             where TTenantInfo : class, ITenantInfo, new()
         {
-            var resolver = httpContext.RequestServices.GetRequiredService<ITenantResolver<TTenantInfo>>();
-            var multitenantContext = resolver.MultiTenantContext ?? new MultiTenantContext<TTenantInfo>();
-
             if (resetServiceProviderScope)
                 httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
 
-            multitenantContext.TenantInfo = tenantInfo;
-            multitenantContext.StrategyInfo = null;
-            multitenantContext.StoreInfo = null;
+            var multitenantContext = new MultiTenantContext<TTenantInfo>
+            {
+                TenantInfo = tenantInfo,
+                StrategyInfo = null,
+                StoreInfo = null
+            };
 
-            resolver.MultiTenantContext = multitenantContext;
-            resolver.SyncMultiTenantContextAccessor();
+
+            var accessor = httpContext.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>();
+            accessor.MultiTenantContext = multitenantContext;
 
             return true;
         }
