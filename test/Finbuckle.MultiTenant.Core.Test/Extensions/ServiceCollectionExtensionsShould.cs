@@ -33,19 +33,6 @@ public class ServiceCollectionExtensionsShould
     }
 
     [Fact]
-    public void RegisterITenantResolverInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        
-        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(ITenantResolver)).SingleOrDefault();
-
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
-
-    [Fact]
     public void RegisterIMultiTenantContextInDI()
     {
         var services = new ServiceCollection();

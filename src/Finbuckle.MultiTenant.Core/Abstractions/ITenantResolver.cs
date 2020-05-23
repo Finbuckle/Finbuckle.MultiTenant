@@ -17,17 +17,12 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant
 {
-    public interface ITenantResolver
-    {
-        Task<object> ResolveAsync(object context);
-        void SyncMultiTenantContextAccessor();
-    }
-    
-    public interface ITenantResolver<TTenantInfo> : ITenantResolver
+    public interface ITenantResolver<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
         IEnumerable<IMultiTenantStrategy> Strategies { get; }
         IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; }
-        IMultiTenantContext<TTenantInfo> MultiTenantContext { get; set; }
+        
+        Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context);
     }
 }

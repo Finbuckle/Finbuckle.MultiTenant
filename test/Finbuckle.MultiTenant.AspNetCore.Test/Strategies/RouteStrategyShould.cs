@@ -95,7 +95,7 @@ public class RouteStrategyShould
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant();
+                        app.UseMultiTenant<TenantInfo>();
                         app.Run(async context =>
                         {
                             if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
@@ -182,7 +182,7 @@ public class RouteStrategyShould
                     .Configure(app =>
                     {
                         app.UseRouting();
-                        app.UseMultiTenant();
+                        app.UseMultiTenant<TenantInfo>();
                         app.UseEndpoints(endpoints =>
                         {
                             endpoints.Map(routePattern, async context =>

@@ -70,7 +70,7 @@ public class TenantResolverShould
     }
 
     [Fact]
-    void ReturnStrategyAndStoreHit()
+    void ReturnMultiTenantContext()
     {
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -91,9 +91,7 @@ public class TenantResolverShould
             Single().TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
-
-        resolver.ResolveAsync(new object()).Wait();
-        var result = resolver.MultiTenantContext;
+        var result = resolver.ResolveAsync(new object()).Result;
         
         Assert.Equal("initech", result.TenantInfo.Identifier);
         Assert.IsType<StaticStrategy>(result.StrategyInfo.Strategy);
@@ -121,9 +119,7 @@ public class TenantResolverShould
             Single().TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
-
-        resolver.ResolveAsync(new object()).Wait();
-        var result = resolver.MultiTenantContext;
+        var result = resolver.ResolveAsync(new object()).Result;
 
         Assert.Null(result);
     }
@@ -150,9 +146,7 @@ public class TenantResolverShould
             Single().TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
 
         var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
-
-        resolver.ResolveAsync(new object()).Wait();
-        var result = resolver.MultiTenantContext;
+        var result = resolver.ResolveAsync(new object()).Result;
 
         Assert.Null(result);
     }

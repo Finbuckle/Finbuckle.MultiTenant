@@ -32,7 +32,7 @@ namespace HostStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseMvc(routes => routes.MapRoute("Defaut", "{controller=Home}/{action=Index}"));
         }
     }

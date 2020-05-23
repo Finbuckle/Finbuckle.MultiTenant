@@ -24,35 +24,24 @@ namespace Finbuckle.MultiTenant
         where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly ILoggerFactory loggerFactory;
-        private readonly IMultiTenantContextAccessor<TTenantInfo> accessor;
 
         public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores) :
-            this(strategies, stores, null, null)
+            this(strategies, stores, null)
         {
         }
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IMultiTenantContextAccessor<TTenantInfo> accessor) :
-            this(strategies, stores, accessor, null)
-        {
-        }
-
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IMultiTenantContextAccessor<TTenantInfo> accessor, ILoggerFactory loggerFactory)
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, ILoggerFactory loggerFactory)
         {
             Strategies = strategies;
             Stores = stores;
-            this.accessor = accessor;
             this.loggerFactory = loggerFactory;
         }
 
         public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
         public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
-        public IMultiTenantContext<TTenantInfo> MultiTenantContext { get; set; }
 
-        public async Task<object> ResolveAsync(object context)
+        public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
         {
-            if(MultiTenantContext != null)
-                return MultiTenantContext;
-
             IMultiTenantContext<TTenantInfo> result = null;
 
             foreach (var strategy in Strategies)
@@ -82,14 +71,7 @@ namespace Finbuckle.MultiTenant
                 }
             }
 
-            MultiTenantContext = result;
             return result;
-        }
-
-        public void SyncMultiTenantContextAccessor()
-        {
-            if(accessor != null)
-                accessor.MultiTenantContext = MultiTenantContext;
         }
     }
 }

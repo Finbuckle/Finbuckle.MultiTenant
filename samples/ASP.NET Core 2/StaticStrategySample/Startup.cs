@@ -32,7 +32,7 @@ namespace StaticStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseMvcWithDefaultRoute();
         }
     }

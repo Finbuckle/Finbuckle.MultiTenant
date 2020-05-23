@@ -36,7 +36,7 @@ namespace EFCoreStoreSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseMvc(ConfigRoutes);
 
             // Seed the database the multitenant store will need.

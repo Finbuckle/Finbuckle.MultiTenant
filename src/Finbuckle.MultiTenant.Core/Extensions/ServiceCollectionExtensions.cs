@@ -31,9 +31,8 @@ namespace Microsoft.Extensions.DependencyInjection
             where TTenantInfo : class, ITenantInfo, new()
         {
             services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
-            services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
-            services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>().MultiTenantContext);
-            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>().MultiTenantContext?.TenantInfo);
+            services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext);
+            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo);
             services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
             
             return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);

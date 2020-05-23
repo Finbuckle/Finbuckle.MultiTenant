@@ -14,6 +14,7 @@
 
 using System;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -29,7 +30,7 @@ public class HttpContextExtensionShould
         tc.TenantInfo = ti;
 
         var services = new ServiceCollection();
-        services.AddScoped<ITenantResolver<TenantInfo>>(_ => new TenantResolver<TenantInfo>(null, null, null){ MultiTenantContext = tc });
+        services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new MultiTenantContextAccessor<TenantInfo>{ MultiTenantContext = tc });
         var sp = services.BuildServiceProvider();
 
         var httpContextMock = new Mock<HttpContext>();
@@ -44,7 +45,7 @@ public class HttpContextExtensionShould
     public void ReturnNullIfNoMultiTenantContext()
     {
         var services = new ServiceCollection();
-        services.AddScoped<ITenantResolver<TenantInfo>>(_ => new TenantResolver<TenantInfo>(null, null, null));
+        services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new MultiTenantContextAccessor<TenantInfo>());
         var sp = services.BuildServiceProvider();
 
         var httpContextMock = new Mock<HttpContext>();
@@ -74,7 +75,7 @@ public class HttpContextExtensionShould
     }
 
     [Fact]
-    public void SyncMultiTenantContextAcccessor()
+    public void SetMultiTenantContextAcccessor()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
