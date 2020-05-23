@@ -59,8 +59,8 @@ namespace Finbuckle.MultiTenant.Strategies
                 var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
                 var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
                 
-                var callbackPath = (PathString)optionsType.GetProperty("CallbackPath")?.GetValue(options);
-                var signedOutCallbackPath = (PathString)optionsType.GetProperty("SignedOututCallbackPath")?.GetValue(options);
+                var callbackPath = (PathString)(optionsType.GetProperty("CallbackPath")?.GetValue(options) ?? PathString.Empty);
+                var signedOutCallbackPath = (PathString)(optionsType.GetProperty("SignedOutCallbackPath")?.GetValue(options) ?? PathString.Empty);
 
                 if (callbackPath != PathString.Empty && callbackPath == httpContext.Request.Path ||
                     signedOutCallbackPath != PathString.Empty && signedOutCallbackPath == httpContext.Request.Path)

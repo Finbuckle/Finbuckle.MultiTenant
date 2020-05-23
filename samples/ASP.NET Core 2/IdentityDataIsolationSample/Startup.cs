@@ -78,7 +78,7 @@ namespace IdentityDataIsolationSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant();
+            app.UseMultiTenant<TenantInfo>();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }

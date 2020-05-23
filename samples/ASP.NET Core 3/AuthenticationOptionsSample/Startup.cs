@@ -52,7 +52,7 @@ namespace AuthenticationOptionsSample
             services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy().
-                WithRemoteAuthenticationStrategy(). // Important!
+                WithRemoteAuthenticationCallbackStrategy(). // Important!
                 WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
                 {
                     options.DefaultChallengeScheme = tenantInfo.ChallengeScheme ?? options.DefaultChallengeScheme;
@@ -77,7 +77,7 @@ namespace AuthenticationOptionsSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant();
+            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
             app.UseAuthentication();
             app.UseAuthorization();
 
