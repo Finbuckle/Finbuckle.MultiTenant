@@ -30,10 +30,10 @@ namespace DataIsolationSample.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(ConnectionString);
+            optionsBuilder.UseSqlite(TenantInfo.ConnectionString);
             base.OnConfiguring(optionsBuilder);
         }
 
         public DbSet<ToDoItem> ToDoItems { get; set; }
     }
-}
+} 
