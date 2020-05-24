@@ -32,13 +32,14 @@ Adds and configures an IMultiTenantStore to the application. Multiple strategies
 - WithFallbackStrategy
 - WithHostStrategy
 - WithRouteStrategy
+- WithSessionStrategy
 - WithStaticStrategy
 
 ### WithPerTenantOptions<TOptions>
 Adds per-tenant configuration for an options class. See [Per-Tenant Options](Options) for more details.
 
-### WithRemoteAuthentication
-Configures support for multitenant OAuth and OpenIdConnect. See the relevant sections in [Per-Tenant Authentication](Authentication) for more details.
+### WithRemoteAuthenticationCallbackStrategy
+Configures support for multitenant OAuth and OpenIdConnect in certain scenarios. See the relevant sections in [Per-Tenant Authentication](Authentication) for more details.
 
 ## Usage
 Most of the capability enabled by Finbuckle.MultiTenant is utilized through its middleware and use the [Options pattern with per-tenant options](Options). The middleware will resolve the app's current tenant on each request using the configured strategies and stores, and the per-tenant options will alter the app's behavior as dependency injection passes the options to app components.

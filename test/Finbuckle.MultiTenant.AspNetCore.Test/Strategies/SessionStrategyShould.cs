@@ -87,20 +87,8 @@ public class SessionStrategyShould
         }
     }
 
-    [Fact]
-    public async Task ReturnIdentifierIfSessionValue()
-    {
-        Action<IRouteBuilder> configRoutes = (IRouteBuilder rb) => rb.MapRoute("testRoute", "{controller}");
-        IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
-
-        using (var server = new TestServer(hostBuilder))
-        {
-            var client = server.CreateClient();
-            var response = await client.GetStringAsync("/test_tenant");
-            Assert.Equal("", response);
-
-            response = await client.GetStringAsync("/test_tenant");
-            Assert.Equal("test_tenant", response);
-        }
-    }
+    // TO DO: Figure out how to test this
+    // public async Task ReturnIdentifierIfSessionValue()
+    // {
+    // }
 }
