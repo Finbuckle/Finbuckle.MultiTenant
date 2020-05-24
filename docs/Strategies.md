@@ -35,8 +35,6 @@ Configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `Configu
 services.AddMultiTenant().WithStaticStrategy("MyTenant")...
 ```
 
-This strategy is configured as a singleton.
-
 ## Base Path Strategy 
 Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when resolving the tenant. This strategy is configured as a singleton.
 
@@ -46,6 +44,21 @@ Configure by calling `WithBasePathStrategy` after `AddMultiTenant` in the `Confi
 // Make sure to include a multitenant store!
 services.AddMultiTenant().WithBasePathStrategy()...
 ```
+
+## Session Strategy
+Uses the ASP.NET Core session to retrieve the tenant identifier. This strategy is configured as a singleton.
+
+Configure by calling `WithSessionStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class. This will use a default session key named `__tenant__`. An overload of `WithSessionStrategy can be used to specify a different key name:
+
+```cs
+// Configure to use "__tenant__" as the session key,
+services.AddMultiTenant<TenantInfo>().WithSessionStrategy()...
+
+// Or configure to use "my-tenant-session-key" as the session key,
+services.AddMultiTenant().WithSessionStrategy("my-tenant-session-key")...
+```
+
+Note that an app will have to [configure session state](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-3.1#session-state) accordingly and then actually set the session variable. A typical use case is to register the session strategy before a more expensive strategy. The expensive strategy can set the session value so that for subsequent requests resolve the tenant without invoking the expensive strategy.
 
 ## Route Strategy
 Note: the configuration and use of this strategy differs in ASP.NET Core 2.1 and ASP.NET Core 3.1+.

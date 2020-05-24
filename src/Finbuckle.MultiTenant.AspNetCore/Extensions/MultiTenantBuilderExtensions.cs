@@ -29,7 +29,24 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
-        /// Configures support for multitenant OAuth and OpenIdConnect.
+        /// Adds and configures a SessionStrategy to the application.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, "__tenant__");
+
+        /// <summary>
+        /// Adds and configures a SessionStrategy to the application.
+        /// </summary>
+        /// <param name="tenantLey">The session key to use.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);
+
+        /// <summary>
+        /// Adds and configures a RemoteAuthenticationCallbackStrategy to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)

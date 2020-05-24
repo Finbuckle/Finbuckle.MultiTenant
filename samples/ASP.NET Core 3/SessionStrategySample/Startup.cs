@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BasePathStrategySample
+namespace SessionStrategySample
 {
     public class Startup
     {
@@ -14,13 +14,20 @@ namespace BasePathStrategySample
         }
 
         public IConfiguration Configuration { get; }
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
-                WithBasePathStrategy();
+                WithSessionStrategy();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -32,11 +39,13 @@ namespace BasePathStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
+            
+            app.UseSession();
             app.UseMultiTenant<TenantInfo>();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("default", "{first_segment=}/{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}");
             });
         }
     }
