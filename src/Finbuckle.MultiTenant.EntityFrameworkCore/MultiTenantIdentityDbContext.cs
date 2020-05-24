@@ -33,11 +33,11 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -60,11 +60,11 @@ namespace Finbuckle.MultiTenant
     public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
         where TUser : IdentityUser
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -89,11 +89,11 @@ namespace Finbuckle.MultiTenant
         where TRole : IdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -141,14 +141,12 @@ namespace Finbuckle.MultiTenant
             }
         }
 
-        protected string ConnectionString => TenantInfo.ConnectionString;
-
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
             this.TenantInfo = tenantInfo;
         }

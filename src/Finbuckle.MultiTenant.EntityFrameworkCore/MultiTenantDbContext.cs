@@ -43,9 +43,6 @@ namespace Finbuckle.MultiTenant
             }
         }
 
-        [Obsolete]
-        protected string ConnectionString => TenantInfo.ConnectionString;
-
         protected MultiTenantDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
