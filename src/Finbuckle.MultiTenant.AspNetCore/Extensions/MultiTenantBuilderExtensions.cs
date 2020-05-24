@@ -32,6 +32,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a SessionStrategy to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, "__tenant__");
+
+        /// <summary>
+        /// Adds and configures a SessionStrategy to the application.
+        /// </summary>
+        /// <param name="tenantLey">The session key to use.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);

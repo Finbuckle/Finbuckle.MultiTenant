@@ -14,6 +14,7 @@ namespace SessionStrategySample
         }
 
         public IConfiguration Configuration { get; }
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
@@ -26,7 +27,7 @@ namespace SessionStrategySample
 
             services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
-                WithSessionStrategy("__tenant__");
+                WithSessionStrategy();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
