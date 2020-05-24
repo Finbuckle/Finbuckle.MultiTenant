@@ -345,6 +345,26 @@
             }
         },
         {
+            "name": "Session Strategy Sample (netcoreapp3.1)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/samples/ASP.NET Core 3/SessionStrategySample/bin/Debug/netcoreapp3.1/SessionStrategySample.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/samples/ASP.NET Core 3/SessionStrategySample",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
             "name": "Shared Login Sample (netcoreapp2.1)",
             "type": "coreclr",
             "request": "launch",
