@@ -48,8 +48,6 @@ In addition to this documentation a variety of sample projects are available. Be
 
 [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/EFCoreStoreSample)
 
-[Fallback Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/FallbackStrategySample)
-
 [Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/HostStrategySample)
 
 [Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/IdentityDataIsolationSample)

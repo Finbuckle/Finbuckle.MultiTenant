@@ -153,26 +153,6 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void AddFallbackTenantIdentifier()
-    {
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.WithFallbackStrategy("test");
-        var sp = services.BuildServiceProvider();
-
-        var strategy = sp.GetRequiredService<FallbackStrategy>();
-        Assert.Equal("test", strategy.identifier);
-    }
-
-    [Fact]
-    public void ThrowIfFallbackTenantIdentifierIsNull()
-    {
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        Assert.Throws<ArgumentNullException>(() => builder.WithFallbackStrategy(null));
-    }
-
-    [Fact]
     public void AddDelegateStrategy()
     {
         var services = new ServiceCollection();
