@@ -24,12 +24,11 @@ Adds and configures an IMultiTenantStore to the application. Only the last store
 - WithEFCoreStore
 
 ### WithStrategy Variants
-Adds and configures an IMultiTenantStore to the application. Multiple strategies can be registered and each will be used in the order configured, with the exception of the fallback strategy which is always last. See [MultiTenant Strategies](Strategies) for more information on each type.
+Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - WithStrategy&lt;TStrategy&gt;
 - WithBasePathStrategy
 - WithDelegateStrategy
-- WithFallbackStrategy
 - WithHostStrategy
 - WithRouteStrategy
 - WithSessionStrategy

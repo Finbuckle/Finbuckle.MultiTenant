@@ -133,23 +133,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<DelegateStrategy>(ServiceLifetime.Singleton, new object[] { doStrategy });
         }
-
-        /// <summary>
-        /// Adds and configures a fallback strategy for if the main strategy or remote authentication
-        /// fail to resolve a tenant.
-        /// </summary>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithFallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                       string identifier)
-            where TTenantInfo : class, ITenantInfo, new()
-        {
-            if (identifier == null)
-            {
-                throw new ArgumentNullException(nameof(identifier));
-            }
-
-            builder.Services.TryAddSingleton<FallbackStrategy>(sp => new FallbackStrategy(identifier));
-
-            return builder;
-        }
     }
 }

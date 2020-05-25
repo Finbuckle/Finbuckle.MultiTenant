@@ -26,7 +26,7 @@ services.AddMultiTenant().WithStrategy( sp => return new MyStrat())...
 ```
 
 ## Static Strategy
-Always uses the same identifier to resolve the tenant. This strategy is configured as a singleton.
+Always uses the same identifier to resolve the tenant. Often useful in testing or to resolve to a fallback or default tenant by registering the strategy last. This strategy is configured as a singleton.
 
 Configure by calling `WithStaticStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution:
 
@@ -190,25 +190,9 @@ services.AddMultiTenant().
     })...
 ```
 
-## Fallback Strategy
-
-Returns a static tenant identifier string if the main strategy (and the remove authentication strategy, if applicable) fails to resolve a tenant with the tenant store. If the store does not have an entry for the fallback tenant identifier then this strategy has no effect. This strategy is configured as a singleton.
-
-This strategy is intended be used in conjunction with other strategies and is always called last.
-
-Configure by calling `WithFallbackStrategy` after `AddMultiTenant` in the `ConfigureServices` method of the `Startup` class and passing in the identifier to use for tenant resolution.
-
-```cs
-// If the called with e.g. "not_a_tenant.mysite.com" and the identifer "not_a_tenant"
-// is not in the store, then the identifier "defaultTenant" will be used as a fallback.
-// Make sure to include a multitenant store!
-services.AddMultiTenant().WithHostStrategy().WithFallbackStrategy("defaultTenant");
-```
-
 ## Remote Authentication Callback Strategy
 
-This is a special strategy used for per-tenant authentication when remote authentication such as Open
-ID Connect or OAuth (e.g. Log in via Facebook) are used. This strategy is configured as a singleton.
+This is a special strategy used for per-tenant authentication when remote authentication such as OpenID Connect or OAuth (e.g. Log in via Facebook) are used. This strategy is configured as a singleton.
 
 Ideally remote authentication callback paths can be configured per-tenant using `WithPerTenantOptions`
 so that the callback paths work in conjunction with another strategy such as the host or route strategies.
