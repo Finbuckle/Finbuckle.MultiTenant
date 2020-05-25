@@ -114,87 +114,28 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    // TODO: remove and cleanup when this functioanlity is removed
-    public void AddInMemoryStoreViaConfigSection()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("testsettings.json");
-        var configuration = configBuilder.Build();
-
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.WithInMemoryStore(configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore"));
-        var sp = services.BuildServiceProvider();
-
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<InMemoryStore<TenantInfo>>(store);
-
-        var tc = store.TryGetByIdentifierAsync("initech").Result;
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        //Assert.Equal("1234", tc.Items["test_item"]); "Items" not loaded for TenantInfo
-        // Note: connection string below loading from default in json.
-        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
-
-        // Case insensitive test.
-        tc = store.TryGetByIdentifierAsync("LOL").Result;
-        Assert.Equal("lol", tc.Id);
-        Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
-    }
-
-    [Fact]
-    public void AddInMemoryStoreViaConfigAction()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("testsettings.json");
-        var configuration = configBuilder.Build();
-
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.
-                WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
-        var sp = services.BuildServiceProvider();
-
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<InMemoryStore<TenantInfo>>(store);
-
-        var tc = store.TryGetByIdentifierAsync("initech").Result;
-        Assert.Equal("initech", tc.Id);
-        Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
-        // Note: connection string below loading from default in json.
-        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
-
-        // Case insensitive test.
-        tc = store.TryGetByIdentifierAsync("LOL").Result;
-        Assert.Equal("lol", tc.Id);
-        Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
-    }
-
-    [Fact]
     public void ThrowIfNullParamAddingInMemoryStore()
     {
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentNullException>(()
-            => builder.WithInMemoryStore<TenantInfo>(config: null));
+            => builder.WithInMemoryStore<TenantInfo>(null));
     }
 
     [Fact]
     public void AddInMemoryStoreWithCaseSentivity()
     {
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("testsettings.json");
+        //configBuilder.AddJsonFile("testsettings.json");
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o), false);
+        builder.WithInMemoryStore(options =>
+        {
+            options.IsCaseSensitive = true;
+            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db"});
+        });
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
@@ -209,42 +150,6 @@ public class MultiTenantBuilderExtensionsShould
         // Case sensitive test.
         tc = store.TryGetByIdentifierAsync("LOL").Result;
         Assert.Null(tc);
-
-    }
-
-    [Fact]
-    public void ThrowIfDuplicateIdentifierInTenantConfig()
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile("testsettings_duplicates.json");
-        var configuration = configBuilder.Build();
-
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.
-                WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
-        var sp = services.BuildServiceProvider();
-
-        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore<TenantInfo>>());
-    }
-
-    [Theory]
-    [InlineData("testsettings_missing_id.json")]
-    [InlineData("testsettings_missing_identifier.json")]
-    [InlineData("testsettings_empty_id.json")]
-    [InlineData("testsettings_empty_identifier.json")]
-    public void ThrowIfMissingIdOrIdentifierInTenantConfig(string jsonFile)
-    {
-        var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddJsonFile(jsonFile);
-        var configuration = configBuilder.Build();
-
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.WithInMemoryStore(o => configuration.GetSection("Finbuckle:MultiTenant:InMemoryStore").Bind(o));
-        var sp = services.BuildServiceProvider();
-
-        Assert.Throws<MultiTenantException>(() => sp.GetRequiredService<IMultiTenantStore<TenantInfo>>());
     }
 
     [Fact]

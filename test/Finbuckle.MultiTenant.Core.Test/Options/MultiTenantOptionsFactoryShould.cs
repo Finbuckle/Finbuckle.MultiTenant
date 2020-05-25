@@ -35,14 +35,14 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);
-        services.Configure<InMemoryStoreOptions>(name, o => o.DefaultConnectionString = $"{name}_begin");
-        services.PostConfigure<InMemoryStoreOptions>(name, o => o.DefaultConnectionString += "end");
+        services.Configure<TestOptions>(name, o => o.DefaultConnectionString = $"{name}_begin");
+        services.PostConfigure<TestOptions>(name, o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
+        Action<TestOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions, TenantInfo>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<TestOptions, TenantInfo>>(sp, new [] { tenantConfig });
 
         var options = factory.Create(name);
         Assert.Equal($"{name}_begin_{ti.Id}_end", options.DefaultConnectionString);
@@ -56,14 +56,14 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);
-        services.Configure<InMemoryStoreOptions>(o => o.DefaultConnectionString = "begin");
-        services.PostConfigure<InMemoryStoreOptions>(o => o.DefaultConnectionString += "end");
+        services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
+        services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
+        Action<TestOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions, TenantInfo>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<TestOptions, TenantInfo>>(sp, new [] { tenantConfig });
 
         var options = factory.Create("");
         Assert.Equal($"beginend", options.DefaultConnectionString);
@@ -76,14 +76,14 @@ public class MultiTenantOptionsFactoryShould
 
         var services = new ServiceCollection();
         services.AddTransient<IMultiTenantContextAccessor<TenantInfo>>(_sp => tca);
-        services.Configure<InMemoryStoreOptions>(o => o.DefaultConnectionString = "begin");
-        services.PostConfigure<InMemoryStoreOptions>(o => o.DefaultConnectionString += "end");
+        services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
+        services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "end");
         var sp = services.BuildServiceProvider();
 
-        Action<InMemoryStoreOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
+        Action<TestOptions, TenantInfo> tenantConfig = (o, _ti) => o.DefaultConnectionString += $"_{_ti.Id}_";
         
         var factory = ActivatorUtilities.
-            CreateInstance<MultiTenantOptionsFactory<InMemoryStoreOptions, TenantInfo>>(sp, new [] { tenantConfig });
+            CreateInstance<MultiTenantOptionsFactory<TestOptions, TenantInfo>>(sp, new [] { tenantConfig });
 
         var options = factory.Create("");
         Assert.Equal($"beginend", options.DefaultConnectionString);

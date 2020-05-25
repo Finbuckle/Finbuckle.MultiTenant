@@ -14,8 +14,10 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Stores
 {
@@ -23,18 +25,28 @@ namespace Finbuckle.MultiTenant.Stores
         where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly ConcurrentDictionary<string, TTenantInfo> tenantMap;
+        private readonly InMemoryStoreOptions<TTenantInfo> options;
 
-        public InMemoryStore() : this (true)
+        public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
         {
-        }
+            this.options = options?.Value ?? new InMemoryStoreOptions<TTenantInfo>();
 
-        public InMemoryStore(bool ignoreCase)
-        {
-            var stringComparerer = StringComparer.OrdinalIgnoreCase;
-            if(!ignoreCase)
-                stringComparerer = StringComparer.Ordinal;
-                
-            tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparerer);
+            var stringComparer = StringComparer.OrdinalIgnoreCase;
+            if(this.options.IsCaseSensitive)
+                stringComparer = StringComparer.Ordinal;
+            
+            tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
+            foreach(var tenant in this.options.Tenants)
+            {
+                if(String.IsNullOrWhiteSpace(tenant.Id))
+                    throw new MultiTenantException("Missing tenant id in options.");
+                if(String.IsNullOrWhiteSpace(tenant.Identifier))
+                    throw new MultiTenantException("Missing tenant identifier in options.");
+                if(tenantMap.ContainsKey(tenant.Identifier))
+                    throw new MultiTenantException("Duplicate tenant identifier in options.");
+
+                tenantMap.TryAdd(tenant.Identifier, tenant);
+            }
         }
 
         public virtual async Task<TTenantInfo> TryGetAsync(string id)

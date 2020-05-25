@@ -12,14 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Collections.Generic;
-
-namespace Finbuckle.MultiTenant.Stores
+internal class TestOptions
 {
-    public class InMemoryStoreOptions<TTenantInfo>
-        where TTenantInfo : class, ITenantInfo, new()
-    {
-        public bool IsCaseSensitive { get; set; } = false;
-        public IList<TTenantInfo> Tenants { get; set; } = new List<TTenantInfo>();
-    }
+    public string DefaultConnectionString { get; set; }
 }

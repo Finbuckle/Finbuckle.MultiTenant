@@ -16,7 +16,7 @@ namespace IdentityDataIsolationSample.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(ConnectionString);
+            optionsBuilder.UseSqlite(TenantInfo.ConnectionString);
             base.OnConfiguring(optionsBuilder);
         }
     }
