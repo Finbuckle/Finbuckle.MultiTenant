@@ -34,15 +34,6 @@ namespace Finbuckle.MultiTenant
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
-        [Obsolete]
-        internal IImmutableList<IEntityType> MultiTenantEntityTypes
-        {
-            get
-            {
-                return Model.GetMultiTenantEntityTypes().ToImmutableList();
-            }
-        }
-
         protected MultiTenantDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;

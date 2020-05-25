@@ -25,7 +25,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 public class MultiTenantBuilderExtensionsShould
 {
     [Fact]
-    public void AddRemoteAuthenticationServices()
+    public void AddRemoteAuthenticationCallbackServices()
     {
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
