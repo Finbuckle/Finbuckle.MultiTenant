@@ -9,11 +9,11 @@ namespace IdentityDataIsolationSample.Data
 {
     public class ApplicationDbContext : MultiTenantIdentityDbContext
     {
-        public ApplicationDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        public ApplicationDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        public ApplicationDbContext(TenantInfo tenantInfo, DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(ITenantInfo tenantInfo, DbContextOptions<ApplicationDbContext> options)
             : base(tenantInfo, options)
         {
         }
