@@ -15,11 +15,11 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant
 {
-    public class Utilities
+    internal class Utilities
     {
-        public static void TryLoginfo(ILogger logger, string message)
+        internal static void TryLoginfo(ILogger logger, string message)
         {
             if (logger != null)
             {
@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.Core
             }
         }
 
-        public static void TryLogDebug(ILogger logger, string message)
+        internal static void TryLogDebug(ILogger logger, string message)
         {
             if (logger != null)
             {
@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.Core
             }
         }
 
-        public static void TryLogError(ILogger logger, string message, Exception e)
+        internal static void TryLogError(ILogger logger, string message, Exception e)
         {
             if (logger != null)
             {

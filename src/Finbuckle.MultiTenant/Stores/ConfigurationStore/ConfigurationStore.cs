@@ -24,7 +24,7 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
-        internal const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
+        internal static readonly string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
         private ConcurrentDictionary<string, TTenantInfo> tenantMap;
 

@@ -14,7 +14,7 @@
 
 using System.Linq;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

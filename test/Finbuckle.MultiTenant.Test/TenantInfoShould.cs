@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Xunit;
 
 public class TenantInfoShould

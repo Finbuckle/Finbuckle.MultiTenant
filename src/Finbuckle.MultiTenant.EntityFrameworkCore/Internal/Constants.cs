@@ -17,11 +17,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     /// <summary>
     /// Contains constant values for Finbuckle.MultiTenant.EntityFrameworkCore.
     /// </summary>
-    internal static class Constants
+    internal class Constants
     {
-        /// <summary>
-        /// The annotation name used for configuring MultiTenant entities.
-        /// </summary>
-        public const string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
+        public static readonly string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
     }
 }

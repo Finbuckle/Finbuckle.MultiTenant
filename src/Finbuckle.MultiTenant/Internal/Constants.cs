@@ -12,19 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant.Internal
 {
-    /// <summary>
-    /// Contains constant values for Finbuckle.MultiTenant.Core.
-    /// </summary>
-    public static class Constants
+    internal static class Constants
     {
-        /// <summary>
-        /// The maximum character length for Id property on a TenantContet.
-        /// The property setter will throw a MultiTenantException if the assigned value exceeds this limit.
-        /// </summary>
-        public const int TenantIdMaxLength = 64;
+        public static int TenantIdMaxLength = 64;
     }
 }

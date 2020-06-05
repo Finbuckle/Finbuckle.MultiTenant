@@ -12,8 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Collections.Generic;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 
 namespace Finbuckle.MultiTenant
 {
@@ -37,7 +36,7 @@ namespace Finbuckle.MultiTenant
                 {
                     if (value.Length > Constants.TenantIdMaxLength)
                     {
-                        throw new MultiTenantException($"The tenant id cannot be null or exceed {Constants.TenantIdMaxLength} characters.");
+                        throw new MultiTenantException($"The tenant id cannot exceed {Constants.TenantIdMaxLength} characters.");
                     }
                     id = value;
                 }
