@@ -16,11 +16,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.1" />
       </ItemGroup>
     </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.2" />
-      </ItemGroup>
-    </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
       <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.14" />
@@ -29,7 +24,7 @@
   </Choose>
 
   <ItemGroup>
-    <ProjectReference Include="../Finbuckle.MultiTenant.Core.Test/Finbuckle.Multitenant.Core.Test.csproj" />
+    <ProjectReference Include="../Finbuckle.MultiTenant.Test/Finbuckle.Multitenant.Test.csproj" />
     <ProjectReference Include="../../src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+    <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 
   <Choose>

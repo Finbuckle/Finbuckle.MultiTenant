@@ -19,6 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+    <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 </Project>

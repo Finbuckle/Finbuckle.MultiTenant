@@ -13,7 +13,7 @@
 //    limitations under the License.
 
 using System.Runtime.CompilerServices;
-[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Core.Test")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Test")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore.Test")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore")]
