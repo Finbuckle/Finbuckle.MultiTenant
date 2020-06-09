@@ -26,8 +26,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// 
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services, Action<MultiTenantOptions> config)
             where TTenantInfo : class, ITenantInfo, new()
         {
             services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
@@ -35,7 +36,20 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo);
             services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
             
+            services.Configure<MultiTenantOptions>(config);
+            
             return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
+        }
+
+        /// <summary>
+        /// Configure Finbuckle.MultiTenant services for the application.
+        /// </summary>
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            return services.AddMultiTenant<TTenantInfo>(_ => { });
         }
 
         public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)

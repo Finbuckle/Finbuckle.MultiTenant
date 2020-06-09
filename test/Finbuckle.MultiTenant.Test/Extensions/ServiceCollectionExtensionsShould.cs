@@ -15,6 +15,7 @@
 using System.Linq;
 using Finbuckle.MultiTenant;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 public class ServiceCollectionExtensionsShould
@@ -66,6 +67,19 @@ public class ServiceCollectionExtensionsShould
         
         var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Singleton &&
                                             s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>)).SingleOrDefault();
+
+        Assert.NotNull(service);
+        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+    }
+
+    [Fact]
+    public void RegisterMultiTenantOptionsInDI()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        
+        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Singleton &&
+                                            s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>)).SingleOrDefault();
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);

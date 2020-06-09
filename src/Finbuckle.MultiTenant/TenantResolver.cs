@@ -17,23 +17,26 @@ using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant
 {
     public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
+        private readonly IOptionsMonitor<MultiTenantOptions> options;
         private readonly ILoggerFactory loggerFactory;
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores) :
-            this(strategies, stores, null)
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options) :
+            this(strategies, stores, options, null)
         {
         }
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, ILoggerFactory loggerFactory)
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory loggerFactory)
         {
             Strategies = strategies;
             Stores = stores;
+            this.options = options;
             this.loggerFactory = loggerFactory;
         }
 
@@ -48,6 +51,12 @@ namespace Finbuckle.MultiTenant
             {
                 var _strategy = new MultiTenantStrategyWrapper(strategy, loggerFactory?.CreateLogger(strategy.GetType()));
                 var identifier = await _strategy.GetIdentifierAsync(context);
+
+                if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier))
+                {
+                    Utilities.TryLoginfo(loggerFactory?.CreateLogger(GetType()), $"Ignored identifier: {identifier}");
+                    identifier = null;
+                }
 
                 if (identifier != null)
                 {

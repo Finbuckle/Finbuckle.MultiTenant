@@ -99,6 +99,35 @@ public class TenantResolverShould
     }
 
     [Fact]
+    void IgnoreSomeIdentifiersFromOptions()
+    {
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        var configuration = configBuilder.Build();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+
+        services.
+            AddMultiTenant<TenantInfo>(options => options.IgnoredIdentifiers.Add("lol")).
+            WithDelegateStrategy(c => Task.FromResult("lol")). // should be ignored
+            WithStaticStrategy("initech").
+            WithInMemoryStore().
+            WithConfigurationStore();
+        var sp = services.BuildServiceProvider();
+        sp.GetServices<IMultiTenantStore<TenantInfo>>().
+            Where(i => i.GetType() == typeof(InMemoryStore<TenantInfo>)).
+            Single().TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
+
+        var resolver = sp.GetService<ITenantResolver<TenantInfo>>();
+        var result = resolver.ResolveAsync(new object()).Result;
+        
+        Assert.Equal("initech", result.TenantInfo.Identifier);
+        Assert.IsType<StaticStrategy>(result.StrategyInfo.Strategy);
+        Assert.IsType<ConfigurationStore<TenantInfo>>(result.StoreInfo.Store);
+    }
+
+    [Fact]
     void ReturnNullIfNoStrategySuccess()
     {
         var configBuilder = new ConfigurationBuilder();
