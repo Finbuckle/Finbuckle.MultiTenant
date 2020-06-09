@@ -158,7 +158,7 @@ namespace EntityTypeBuilderExtensionsShould
             {
                 var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing)).FindProperty("TenantId");
 
-                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, prop.GetMaxLength());
+                Assert.Equal(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
             }
         }
 

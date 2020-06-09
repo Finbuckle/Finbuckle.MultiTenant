@@ -29,7 +29,7 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
     {
-        internal const string TenantKey = "__tenant__";
+        internal static readonly string TenantKey = "__tenant__";
         private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
 
         public RemoteAuthenticationCallbackStrategy()

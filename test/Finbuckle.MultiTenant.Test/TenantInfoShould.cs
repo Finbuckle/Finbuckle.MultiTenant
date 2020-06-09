@@ -12,26 +12,23 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Threading;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Internal;
+using Xunit;
 
-namespace Finbuckle.MultiTenant.Core
+public class TenantInfoShould
 {
-    public class MultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor<TTenantInfo>
-        where TTenantInfo : class, ITenantInfo, new()
+    [Fact]
+    public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
     {
-        internal static AsyncLocal<IMultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<TTenantInfo>>();
+        // OK
+        new TenantInfo { Id = "".PadRight(1, 'a') };
 
-        public IMultiTenantContext<TTenantInfo> MultiTenantContext
-        {
-            get
-            {
-                return _asyncLocalContext.Value;
-            }
-
-            set
-            {
-                _asyncLocalContext.Value = value;
-            }
-        }
+        // OK
+        new TenantInfo { Id = "".PadRight(Constants.TenantIdMaxLength, 'a') };
+        
+        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength + 1, 'a') });
+        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength
+            + 999, 'a') });
     }
 }

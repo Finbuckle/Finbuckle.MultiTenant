@@ -12,23 +12,10 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
-using Xunit;
-
-public class TenantInfoShould
+namespace Finbuckle.MultiTenant.Internal
 {
-    [Fact]
-    public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
+    internal static class Constants
     {
-        // OK
-        new TenantInfo { Id = "".PadRight(1, 'a') };
-
-        // OK
-        new TenantInfo { Id = "".PadRight(Constants.TenantIdMaxLength, 'a') };
-        
-        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength + 1, 'a') });
-        Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength
-            + 999, 'a') });
+        public static int TenantIdMaxLength = 64;
     }
 }

@@ -12,35 +12,39 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
-using Microsoft.Extensions.Logging;
+using Finbuckle.MultiTenant.Internal;
 
-namespace Finbuckle.MultiTenant.Core
+namespace Finbuckle.MultiTenant
 {
-    public class Utilities
+    public class TenantInfo : ITenantInfo
     {
-        public static void TryLoginfo(ILogger logger, string message)
+        private string id;
+
+        public TenantInfo()
         {
-            if (logger != null)
+        }
+
+        public string Id
+        {
+            get
             {
-                logger.LogInformation(message);
+                return id;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    if (value.Length > Constants.TenantIdMaxLength)
+                    {
+                        throw new MultiTenantException($"The tenant id cannot exceed {Constants.TenantIdMaxLength} characters.");
+                    }
+                    id = value;
+                }
             }
         }
 
-        public static void TryLogDebug(ILogger logger, string message)
-        {
-            if (logger != null)
-            {
-                logger.LogDebug(message);
-            }
-        }
-
-        public static void TryLogError(ILogger logger, string message, Exception e)
-        {
-            if (logger != null)
-            {
-                logger.LogError(e, message);
-            }
-        }
+        public string Identifier { get; set; }
+        public string Name { get; set; }
+        public string ConnectionString { get; set; }
     }
 }

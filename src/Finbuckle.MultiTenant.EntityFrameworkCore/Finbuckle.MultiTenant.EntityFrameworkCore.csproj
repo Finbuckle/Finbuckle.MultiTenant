@@ -9,7 +9,7 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -20,7 +20,7 @@
   </Choose>
 
   <ItemGroup>
-      <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+      <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 
 </Project>

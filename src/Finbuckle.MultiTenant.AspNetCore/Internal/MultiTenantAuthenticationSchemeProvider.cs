@@ -45,7 +45,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
         /// <param name="schemes">The dictionary used to store authentication schemes.</param>
-        protected MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
+        public MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
         {
             _optionsProvider = options;
 

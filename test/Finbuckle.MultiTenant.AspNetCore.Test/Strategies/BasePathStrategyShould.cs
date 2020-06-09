@@ -13,10 +13,6 @@
 //    limitations under the License.
 
 using System;
-using System.Threading.Tasks;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;

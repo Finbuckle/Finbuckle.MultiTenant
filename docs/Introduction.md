@@ -1,5 +1,5 @@
 # Finbuckle.MultiTenant Docs
-Current version: 6.0.0-preview3
+Current version: 6.0.0-preview4
 [Version History](https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/master/CHANGELOG.md)
 
 Finbuckle.MultiTenant is a multitenancy library for ASP.NET Core. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.

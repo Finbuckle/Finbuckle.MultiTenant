@@ -20,7 +20,7 @@ namespace Finbuckle.MultiTenant.Stores
     public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
-        internal const string defaultEndpointTemplateIdentifierToken = "{__tenant__}";
+        internal static readonly string defaultEndpointTemplateIdentifierToken = "{__tenant__}";
         private readonly HttpRemoteStoreClient<TTenantInfo> client;
         private readonly string endpointTemplate;
 

@@ -12,19 +12,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System;
+using System.Threading;
 
 namespace Finbuckle.MultiTenant.Core
 {
-    /// <summary>
-    /// Contains constant values for Finbuckle.MultiTenant.Core.
-    /// </summary>
-    public static class Constants
+    internal class MultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor<TTenantInfo>
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        /// <summary>
-        /// The maximum character length for Id property on a TenantContet.
-        /// The property setter will throw a MultiTenantException if the assigned value exceeds this limit.
-        /// </summary>
-        public const int TenantIdMaxLength = 64;
+        internal static AsyncLocal<IMultiTenantContext<TTenantInfo>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<TTenantInfo>>();
+
+        public IMultiTenantContext<TTenantInfo> MultiTenantContext
+        {
+            get
+            {
+                return _asyncLocalContext.Value;
+            }
+
+            set
+            {
+                _asyncLocalContext.Value = value;
+            }
+        }
     }
 }

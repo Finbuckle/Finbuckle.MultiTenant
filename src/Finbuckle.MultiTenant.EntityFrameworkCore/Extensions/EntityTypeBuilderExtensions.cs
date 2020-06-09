@@ -57,7 +57,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             try
             {
-                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Core.Constants.TenantIdMaxLength);
+                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
             }
             catch (Exception ex)
             {

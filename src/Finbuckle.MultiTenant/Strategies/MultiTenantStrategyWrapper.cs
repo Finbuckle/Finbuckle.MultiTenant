@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies

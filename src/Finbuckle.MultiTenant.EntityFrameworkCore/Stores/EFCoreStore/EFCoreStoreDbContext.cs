@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.Stores
