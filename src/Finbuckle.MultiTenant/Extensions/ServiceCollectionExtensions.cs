@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
-        /// 
+        /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services, Action<MultiTenantOptions> config)
             where TTenantInfo : class, ITenantInfo, new()
