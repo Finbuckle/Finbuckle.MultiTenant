@@ -15,9 +15,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Finbuckle.MultiTenant.Strategies;
-using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Options;
 
@@ -35,13 +32,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds per-tenant configuration for an options class.
         /// </summary>
-        /// <param name="tenantInfo">The configuration action to be run for each tenant.</param>
+        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(Action<TOptions, TTenantInfo> tenantInfo) where TOptions : class, new()
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(Action<TOptions, TTenantInfo> tenantConfig) where TOptions : class, new()
         {
-            if (tenantInfo == null)
+            if (tenantConfig == null)
             {
-                throw new ArgumentNullException(nameof(tenantInfo));
+                throw new ArgumentNullException(nameof(tenantConfig));
             }
 
             // Handles multiplexing cached options.
@@ -55,7 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
                 {
                     return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions, TTenantInfo>), new[] { tenantInfo });
+                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions, TTenantInfo>), new[] { tenantConfig });
                 });
 
             Services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
