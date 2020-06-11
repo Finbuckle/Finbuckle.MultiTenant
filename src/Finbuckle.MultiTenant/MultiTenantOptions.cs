@@ -18,6 +18,6 @@ namespace Finbuckle.MultiTenant
 {
     public class MultiTenantOptions
     {
-        public List<string> IgnoredIdentifiers = new List<string>();
+        public IList<string> IgnoredIdentifiers = new List<string>();
     }
 }
