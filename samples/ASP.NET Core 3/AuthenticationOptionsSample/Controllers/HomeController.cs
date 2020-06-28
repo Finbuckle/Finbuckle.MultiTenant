@@ -47,7 +47,6 @@ namespace AuthenticationOptionsSample.Controllers
         [Authorize]
         public IActionResult Authenticate()
         {
-
             return RedirectToAction("Index");
         }
 

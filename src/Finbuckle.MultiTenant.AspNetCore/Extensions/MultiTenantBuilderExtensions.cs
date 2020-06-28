@@ -20,14 +20,66 @@ using Finbuckle.MultiTenant.Strategies;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
+    /// Provides builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
     public static class FinbuckleMultiTenantBuilderExtensions
     {
+        /// <summary>
+        /// Configures authentication options to enable per-tenant behavior.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc)
+               => options.Cookie.Name = $"{options.Cookie.Name}__{tc.Id}");
+
+            builder.WithRemoteAuthenticationCallbackStrategy();
+
+            var prop = typeof(TTenantInfo).GetProperty("ChallengeScheme");
+            if (prop != null && prop.PropertyType == typeof(string))
+            {
+                builder.WithPerTenantOptions<AuthenticationOptions>((options, tc)
+                    => options.DefaultChallengeScheme = (string)prop.GetValue(tc) ?? options.DefaultChallengeScheme);
+            }
+
+            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectAuthority");
+            if (prop != null && prop.PropertyType == typeof(string))
+            {
+                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
+                    => options.Authority = (string)prop.GetValue(tc) ?? options.Authority);
+            }
+
+            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientId");
+            if (prop != null && prop.PropertyType == typeof(string))
+            {
+                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
+                    => options.ClientId = (string)prop.GetValue(tc) ?? options.ClientId);
+            }
+
+            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientSecret");
+            if (prop != null && prop.PropertyType == typeof(string))
+            {
+                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
+                    => options.ClientSecret = (string)prop.GetValue(tc) ?? options.ClientSecret);
+            }
+
+            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientSecret");
+            if (prop != null && prop.PropertyType == typeof(string))
+            {
+                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
+                    => options.ClientSecret = (string)prop.GetValue(tc) ?? options.ClientSecret);
+            }
+
+            return builder;
+        }
+
         /// <summary>
         /// Adds and configures a SessionStrategy to the application.
         /// </summary>
@@ -54,12 +106,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             // Replace needed instead of TryAdd...
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-            
+
             // We need to "decorate" IAuthenticationService
-            if(!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
+            if (!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
                 throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAutheorization() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
-            
+
             return builder.WithStrategy<RemoteAuthenticationCallbackStrategy>(ServiceLifetime.Singleton);
         }
 

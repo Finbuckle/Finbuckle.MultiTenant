@@ -20,52 +20,27 @@ namespace AuthenticationOptionsSample
         {
             services.AddControllersWithViews();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
-                AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                {
-                    // Required for Safari 12 issue and OpenID Connect.
-                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-                }).
-                AddFacebook("Facebook", options =>
-                {
-                    // These configuration settings should be set via user-secrets or environment variables!
-                    options.AppId = Configuration.GetValue<string>("FacebookAppId");
-                    options.AppSecret = Configuration.GetValue<string>("FacebookAppSecret");
-                    options.Scope.Add("email");
-                    options.Fields.Add("name");
-                    options.Fields.Add("email");
-                }).
-                AddGoogle("Google", options =>
-                {
-                    // These configuration settings should be set via user-secrets or environment variables!
-                    options.ClientId = Configuration.GetValue<string>("GoogleClientId");
-                    options.ClientSecret = Configuration.GetValue<string>("GoogleClientSecret");
-                    options.AuthorizationEndpoint = string.Concat(options.AuthorizationEndpoint, "?prompt=consent");
-                }).
-                AddOpenIdConnect("OpenIdConnect", options =>
-                {
-                    // These configuration settings should be set via user-secrets or environment variables!
-                    options.ClientId = Configuration.GetValue<string>("OpenIdConnectClientId");
-                    options.Authority = Configuration.GetValue<string>("OpenIdConnectAuthority");
-                });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                    {
+                        // Required for Safari 12 issue and OpenID Connect.
+                        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                    })
+                    .AddOpenIdConnect(options =>
+                    {
+                        options.ClientId = "clientId"; // Will be set per-tenant.
+                        options.Authority = "https://authorityUrl"; // Will be set per-tenant.
+                    });
 
-            services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>().
-                WithConfigurationStore().
-                WithRouteStrategy().
-                WithRemoteAuthenticationCallbackStrategy(). // Important!
-                WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
-                {
-                    options.DefaultChallengeScheme = tenantInfo.ChallengeScheme ?? options.DefaultChallengeScheme;
-                }).
-                WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-                {
-                    // Set a unique cookie name for this tenant.
-                    options.Cookie.Name = tenantInfo.Id + "-cookie";
-
-                    // Note the paths set take our routing strategy into account.
-                    options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
-                    options.Cookie.Path = "/" + tenantInfo.Identifier;
-                });
+            services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>()
+                    .WithConfigurationStore()
+                    .WithRouteStrategy()
+                    .WithPerTenantAuthentication()
+                    .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
+                    {
+                        // Note the paths set take our routing strategy into account.
+                        options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
+                    });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

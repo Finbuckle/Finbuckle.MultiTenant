@@ -20,8 +20,8 @@
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
       <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.16" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.16" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.1.2" />
       </ItemGroup>
     </When>
   </Choose>
