@@ -24,7 +24,7 @@ namespace AuthenticationOptionsSample
         public string ConnectionString { get; set; }
         public string ChallengeScheme { get; set; }
         public string OpenIdConnectAuthority { get; set; }
-        public string OpenIdConnectCliendId { get; set; }
+        public string OpenIdConnectClientId { get; set; }
         public string OpenIdConnectClientSecret { get; set; }
     }
 }

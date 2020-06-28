@@ -30,7 +30,7 @@ namespace AuthenticationOptionsSample
                     {
                         options.ClientId = "clientId"; // Will be set per-tenant.
                         options.Authority = "https://authorityUrl"; // Will be set per-tenant.
-                        options.Prompt = "login consent"; // Force login and consent for sample purposes.
+                        options.Prompt = "login"; // Force login for sample purposes.
                     });
 
             services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>()
