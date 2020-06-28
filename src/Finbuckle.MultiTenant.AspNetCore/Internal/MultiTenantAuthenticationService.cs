@@ -30,7 +30,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             this.inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
         }
 
-        private static void AddTenantIdentiferToProperties(HttpContext context, AuthenticationProperties properties)
+        private static void AddTenantIdentiferToProperties(HttpContext context, ref AuthenticationProperties properties)
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
@@ -46,25 +46,25 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, properties);
+            AddTenantIdentiferToProperties(context, ref properties);
             return inner.ChallengeAsync(context, scheme, properties);
         }
 
         public Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, properties);
+            AddTenantIdentiferToProperties(context, ref properties);
             return inner.ForbidAsync(context, scheme, properties);
         }
 
         public Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, properties);
+            AddTenantIdentiferToProperties(context, ref properties);
             return inner.SignInAsync(context, scheme, principal, properties);
         }
 
         public Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, properties);
+            AddTenantIdentiferToProperties(context, ref properties);
             return inner.SignOutAsync(context, scheme, properties);
         }
     }

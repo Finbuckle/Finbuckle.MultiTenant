@@ -25,12 +25,15 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 public class MultiTenantBuilderExtensionsShould
 {
     [Fact]
-    public void AddRemoteAuthenticationCallbackServices()
+    public void ConfigurePerTenantAuthentication()
     {
+        // TODO: Expand to cover WithPerTenantOptions
+        throw new NotImplementedException();
+
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
         services.AddAuthentication();
-        builder.WithRemoteAuthenticationCallbackStrategy();
+        //builder.WithRemoteAuthenticationCallbackStrategy();
         var sp = services.BuildServiceProvider();
 
         var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
@@ -43,7 +46,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
 
-        Assert.Throws<MultiTenantException>(() => builder.WithRemoteAuthenticationCallbackStrategy());
+        Assert.Throws<MultiTenantException>(() => builder.WithPerTenantAuthentication());
     }
 
     [Fact]

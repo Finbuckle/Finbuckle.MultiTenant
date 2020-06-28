@@ -37,45 +37,32 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
-            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc)
-               => options.Cookie.Name = $"{options.Cookie.Name}__{tc.Id}");
+
+            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
+            {
+                var d = (dynamic)tc;
+                options.Cookie.Name = $"{options.Cookie.Name}__{tc.Id}";
+                try { options.LoginPath = ((string)d.CookieLoginPath).Replace("__tenant__", tc.Identifier); } finally { }
+                try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace("__tenant__", tc.Identifier); } finally { }
+                try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace("__tenant__", tc.Identifier); } finally { }
+                try { options.Cookie.Path = ((string)d.CookiePath).Replace("__tenant__", tc.Identifier); } finally { }
+            });
 
             builder.WithRemoteAuthenticationCallbackStrategy();
-
-            var prop = typeof(TTenantInfo).GetProperty("ChallengeScheme");
-            if (prop != null && prop.PropertyType == typeof(string))
+            var challengeSchemeProp = typeof(TTenantInfo).GetProperty("ChallengeScheme");
+            if (challengeSchemeProp != null && challengeSchemeProp.PropertyType == typeof(string))
             {
                 builder.WithPerTenantOptions<AuthenticationOptions>((options, tc)
-                    => options.DefaultChallengeScheme = (string)prop.GetValue(tc) ?? options.DefaultChallengeScheme);
+                    => options.DefaultChallengeScheme = (string)challengeSchemeProp.GetValue(tc) ?? options.DefaultChallengeScheme);
             }
 
-            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectAuthority");
-            if (prop != null && prop.PropertyType == typeof(string))
+            builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
-                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
-                    => options.Authority = (string)prop.GetValue(tc) ?? options.Authority);
-            }
-
-            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientId");
-            if (prop != null && prop.PropertyType == typeof(string))
-            {
-                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
-                    => options.ClientId = (string)prop.GetValue(tc) ?? options.ClientId);
-            }
-
-            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientSecret");
-            if (prop != null && prop.PropertyType == typeof(string))
-            {
-                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
-                    => options.ClientSecret = (string)prop.GetValue(tc) ?? options.ClientSecret);
-            }
-
-            prop = typeof(TTenantInfo).GetProperty("OpenIdConnectClientSecret");
-            if (prop != null && prop.PropertyType == typeof(string))
-            {
-                builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc)
-                    => options.ClientSecret = (string)prop.GetValue(tc) ?? options.ClientSecret);
-            }
+                var d = (dynamic)tc;
+                try { options.Authority = d.OpenIdConnectAuthority; } finally { }
+                try { options.ClientId = d.OpenIdConnectClientId; } finally { }
+                try { options.ClientSecret = d.OpenIdConnectClientSecret; } finally { }
+            });
 
             return builder;
         }
@@ -101,7 +88,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a RemoteAuthenticationCallbackStrategy to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        private static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
             // Replace needed instead of TryAdd...

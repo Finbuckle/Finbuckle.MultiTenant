@@ -28,9 +28,12 @@ namespace Finbuckle.MultiTenant
         /// <returns></returns>
         Task<string> GetIdentifierAsync(object context);
 
+        
+        #if NETSTANDARD2_1
         /// <summary>
-        ///  Method for implemenations to control how the identifier is determined.
+        ///  Determines strategy execution order. Normally handled in the order registered.
         /// </summary>
         int Priority { get => 1; }
+        #endif
     }
 }

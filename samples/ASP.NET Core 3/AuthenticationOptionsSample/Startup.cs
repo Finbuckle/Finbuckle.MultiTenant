@@ -30,17 +30,13 @@ namespace AuthenticationOptionsSample
                     {
                         options.ClientId = "clientId"; // Will be set per-tenant.
                         options.Authority = "https://authorityUrl"; // Will be set per-tenant.
+                        options.Prompt = "login consent"; // Force login and consent for sample purposes.
                     });
 
             services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>()
                     .WithConfigurationStore()
                     .WithRouteStrategy()
-                    .WithPerTenantAuthentication()
-                    .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-                    {
-                        // Note the paths set take our routing strategy into account.
-                        options.LoginPath = "/" + tenantInfo.Identifier + "/Home/Login";
-                    });
+                    .WithPerTenantAuthentication();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
