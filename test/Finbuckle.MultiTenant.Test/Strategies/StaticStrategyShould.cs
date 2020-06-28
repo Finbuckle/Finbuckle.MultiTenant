@@ -32,4 +32,11 @@ public class StaticStrategyShould
 
         Assert.Equal(staticIdentifier, identifier);
     }
+
+    [Fact]
+    public void HavePriorityNeg1000()
+    {
+        var strategy = new StaticStrategy("");
+        Assert.Equal(-1000, strategy.Priority);
+    }
 }

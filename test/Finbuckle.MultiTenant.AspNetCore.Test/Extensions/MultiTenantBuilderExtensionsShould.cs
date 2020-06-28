@@ -30,14 +30,14 @@ public class MultiTenantBuilderExtensionsShould
         // TODO: Expand to cover WithPerTenantOptions
         throw new NotImplementedException();
 
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        services.AddAuthentication();
-        //builder.WithRemoteAuthenticationCallbackStrategy();
-        var sp = services.BuildServiceProvider();
+        // var services = new ServiceCollection();
+        // var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        // services.AddAuthentication();
+        // builder.WithRemoteAuthenticationCallbackStrategy();
+        // var sp = services.BuildServiceProvider();
 
-        var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
-        var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throws if fails
+        // var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
+        // var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throws if fails
     }
 
     [Fact]

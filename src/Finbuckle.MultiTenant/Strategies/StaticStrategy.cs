@@ -20,7 +20,7 @@ namespace Finbuckle.MultiTenant.Strategies
     {
         internal readonly string identifier;
 
-        int Priority { get => 1000; }
+        public int Priority { get => -1000; }
         
         public StaticStrategy(string identifier)
         {

@@ -29,11 +29,11 @@ namespace Finbuckle.MultiTenant
         Task<string> GetIdentifierAsync(object context);
 
         
-        #if NETSTANDARD2_1
+        #if !NETSTANDARD2_0
         /// <summary>
         ///  Determines strategy execution order. Normally handled in the order registered.
         /// </summary>
-        int Priority { get => 1; }
+        int Priority { get => 0; }
         #endif
     }
 }

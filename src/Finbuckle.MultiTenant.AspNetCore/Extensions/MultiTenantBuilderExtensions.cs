@@ -41,7 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
-                options.Cookie.Name = $"{options.Cookie.Name}__{tc.Id}";
+                options.Cookie.Name = $"{options.Cookie.Name}__{tc.Identifier}";
                 try { options.LoginPath = ((string)d.CookieLoginPath).Replace("__tenant__", tc.Identifier); } finally { }
                 try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace("__tenant__", tc.Identifier); } finally { }
                 try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace("__tenant__", tc.Identifier); } finally { }
