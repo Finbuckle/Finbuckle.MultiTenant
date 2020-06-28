@@ -24,7 +24,7 @@ using Xunit;
 public class TenantResolverShould
 {
     [Fact]
-    void InitializeStrategiesFromDI()
+    void InitializeSortedStrategiesFromDI()
     {
         var services = new ServiceCollection();
         services.
@@ -40,8 +40,8 @@ public class TenantResolverShould
 
         Assert.Equal(3, strategies.Length);
         Assert.IsType<DelegateStrategy>(strategies[0]);
-        Assert.IsType<StaticStrategy>(strategies[1]);
-        Assert.IsType<DelegateStrategy>(strategies[2]);
+        Assert.IsType<DelegateStrategy>(strategies[1]);
+        Assert.IsType<StaticStrategy>(strategies[2]); // Note the Static stragy should be last due its priority.
     }
 
     [Fact]

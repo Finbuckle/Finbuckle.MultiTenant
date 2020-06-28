@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
@@ -34,7 +35,7 @@ namespace Finbuckle.MultiTenant
 
         public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory loggerFactory)
         {
-            Strategies = strategies;
+            Strategies = strategies.OrderBy(s => s.Priority);
             Stores = stores;
             this.options = options;
             this.loggerFactory = loggerFactory;
