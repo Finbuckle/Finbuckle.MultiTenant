@@ -27,5 +27,10 @@ namespace Finbuckle.MultiTenant
         /// <param name="context"></param>
         /// <returns></returns>
         Task<string> GetIdentifierAsync(object context);
+
+        /// <summary>
+        ///  Method for implemenations to control how the identifier is determined.
+        /// </summary>
+        int Priority { get => 1; }
     }
 }

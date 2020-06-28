@@ -19,6 +19,8 @@ namespace Finbuckle.MultiTenant.Strategies
     public class StaticStrategy : IMultiTenantStrategy
     {
         internal readonly string identifier;
+
+        int Priority { get => 1000; }
         
         public StaticStrategy(string identifier)
         {
