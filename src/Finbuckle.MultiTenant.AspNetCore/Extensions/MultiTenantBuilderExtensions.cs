@@ -41,11 +41,11 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
-                options.Cookie.Name = $"{options.Cookie.Name}__{tc.Identifier}";
-                try { options.LoginPath = ((string)d.CookieLoginPath).Replace("__tenant__", tc.Identifier); } finally { }
-                try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace("__tenant__", tc.Identifier); } finally { }
-                try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace("__tenant__", tc.Identifier); } finally { }
-                try { options.Cookie.Path = ((string)d.CookiePath).Replace("__tenant__", tc.Identifier); } finally { }
+                options.Cookie.Name = $"{options.Cookie.Name ?? CookieAuthenticationDefaults.CookiePrefix}__{tc.Identifier}";
+                try { options.LoginPath = ((string)d.CookieLoginPath).Replace("__tenant__", tc.Identifier); } catch { }
+                try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace("__tenant__", tc.Identifier); } catch { }
+                try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace("__tenant__", tc.Identifier); } catch { }
+                try { options.Cookie.Path = ((string)d.CookiePath).Replace("__tenant__", tc.Identifier); } catch { }
             });
 
             builder.WithRemoteAuthenticationCallbackStrategy();
@@ -59,9 +59,9 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
-                try { options.Authority = d.OpenIdConnectAuthority; } finally { }
-                try { options.ClientId = d.OpenIdConnectClientId; } finally { }
-                try { options.ClientSecret = d.OpenIdConnectClientSecret; } finally { }
+                try { options.Authority = d.OpenIdConnectAuthority; } catch { }
+                try { options.ClientId = d.OpenIdConnectClientId; } catch { }
+                try { options.ClientSecret = d.OpenIdConnectClientSecret; } catch { }
             });
 
             return builder;
