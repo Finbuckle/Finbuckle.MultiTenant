@@ -1,4 +1,4 @@
-// Copyright 2018-2020 Andrew White
+﻿// Copyright 2018-2020 Andrew White
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ using Finbuckle.MultiTenant;
 
 namespace AuthenticationOptionsSample
 {
-    public class AuthenticationOptionsSampleTenantInfo : ITenantInfo
+    public class SampleTenantInfo : ITenantInfo
     {
         public string Id { get; set; }
         public string Identifier { get; set; }

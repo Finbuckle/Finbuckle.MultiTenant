@@ -33,7 +33,7 @@ namespace AuthenticationOptionsSample
                         options.Prompt = "login"; // Force login for sample purposes.
                     });
 
-            services.AddMultiTenant<AuthenticationOptionsSampleTenantInfo>()
+            services.AddMultiTenant<SampleTenantInfo>()
                     .WithConfigurationStore()
                     .WithRouteStrategy()
                     .WithPerTenantAuthentication();
@@ -48,7 +48,7 @@ namespace AuthenticationOptionsSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<AuthenticationOptionsSampleTenantInfo>();
+            app.UseMultiTenant<SampleTenantInfo>();
             app.UseAuthentication();
             app.UseAuthorization();
 
