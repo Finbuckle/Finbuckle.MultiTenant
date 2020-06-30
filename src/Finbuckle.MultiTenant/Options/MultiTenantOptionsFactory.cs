@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options
@@ -29,28 +30,28 @@ namespace Finbuckle.MultiTenant.Options
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly IEnumerable<IConfigureOptions<TOptions>> _setups;
-        private readonly Action<TOptions, TTenantInfo> tenantConfig;
+        private readonly IEnumerable<IConfigureOptions<TOptions>> configureOptions;
+        private readonly IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions;
         private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
-        private readonly IEnumerable<IPostConfigureOptions<TOptions>> _postConfigures;
+        private readonly IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions;
 
         /// <summary>
         /// Initializes a new instance with the specified options configurations.
         /// </summary>
-        /// <param name="setups">The configuration actions to run.</param>
+        /// <param name="configureOptions">The configuration actions to run.</param>
         /// <param name="postConfigures">The initialization actions to run.</param>
-        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> setups, IEnumerable<IPostConfigureOptions<TOptions>> postConfigures, Action<TOptions, TTenantInfo> tenantConfig, IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
+        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions, IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions, IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions, IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
         {
-            _setups = setups;
-            this.tenantConfig = tenantConfig;
+            this.configureOptions = configureOptions;
+            this.tenantConfigureOptions = tenantConfigureOptions;
             this.multiTenantContextAccessor = multiTenantContextAccessor;
-            _postConfigures = postConfigures;
+            this.postConfigureOptions = postConfigureOptions;
         }
 
         public TOptions Create(string name)
         {
             var options = new TOptions();
-            foreach (var setup in _setups)
+            foreach (var setup in configureOptions)
             {
                 if (setup is IConfigureNamedOptions<TOptions> namedSetup)
                 {
@@ -65,10 +66,11 @@ namespace Finbuckle.MultiTenant.Options
             // Configure tenant options.
             if(multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
             {
-                tenantConfig(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
+                foreach(var tenantConfigureOption in tenantConfigureOptions)
+                    tenantConfigureOption.Configure(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }
 
-            foreach (var post in _postConfigures)
+            foreach (var post in postConfigureOptions)
             {
                 post.PostConfigure(name, options);
             }

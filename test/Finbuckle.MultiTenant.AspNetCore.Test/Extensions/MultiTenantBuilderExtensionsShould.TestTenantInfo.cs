@@ -31,5 +31,4 @@ public partial class MultiTenantBuilderExtensionsShould
         public string OpenIdConnectClientId { get; set; }
         public string OpenIdConnectClientSecret { get; set; }
     }
-#endif
 }
