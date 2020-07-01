@@ -32,9 +32,15 @@ namespace Microsoft.Extensions.DependencyInjection
             where T : class, ITenantInfo, new()
         {
             services.AddSingleton<ITenantResolver<T>, TenantResolver<T>>();
+            services.AddSingleton<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
+
             services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext);
-            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo);
+            
+            services.AddScoped<T>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo);
+            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<T>());
+            
             services.AddSingleton<IMultiTenantContextAccessor<T>, MultiTenantContextAccessor<T>>();
+            services.AddSingleton<IMultiTenantContextAccessor>(sp => (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<T>>());
             
             services.Configure<MultiTenantOptions>(config);
             

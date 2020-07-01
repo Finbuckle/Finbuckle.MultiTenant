@@ -47,7 +47,7 @@ public class SessionStrategyShould
                     .Configure(app =>
                     {
                         app.UseSession();
-                        app.UseMultiTenant<TenantInfo>();
+                        app.UseMultiTenant();
                         app.Run(async context =>
                         {
                             context.Session.SetString(sessionKey, identifier);

@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant
 {
     public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
-        where TTenantInfo : class, ITenantInfo, new()
+        where T : class, ITenantInfo, new()
     {
         private readonly IOptionsMonitor<MultiTenantOptions> options;
         private readonly ILoggerFactory loggerFactory;

@@ -34,7 +34,7 @@ namespace HostStrategySample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
             app.UseEndpoints(endpoints => {
                 endpoints.MapDefaultControllerRoute();
             });

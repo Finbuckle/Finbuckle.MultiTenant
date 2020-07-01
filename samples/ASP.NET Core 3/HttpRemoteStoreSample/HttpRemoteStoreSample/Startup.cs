@@ -32,7 +32,7 @@ namespace HttpRemoteStoreSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
 
             app.UseEndpoints(endpoints =>
             {

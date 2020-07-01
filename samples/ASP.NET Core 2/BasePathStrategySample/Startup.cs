@@ -31,7 +31,7 @@ namespace BasePathStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
             app.UseMvc(routes => routes.MapRoute("Default", "{first_segment=}/{controller=Home}/{action=Index}"));
         }
     }
