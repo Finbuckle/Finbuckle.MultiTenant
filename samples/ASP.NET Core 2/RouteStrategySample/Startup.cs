@@ -34,7 +34,7 @@ namespace RouteStrategySample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
 
             // Note this is the same route delegate used in WithRouteStrategy()
             app.UseMvc(ConfigRoutes);

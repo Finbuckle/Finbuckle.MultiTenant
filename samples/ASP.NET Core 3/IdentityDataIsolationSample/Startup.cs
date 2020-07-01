@@ -65,7 +65,7 @@ namespace IdentityDataIsolationSample
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<SampleTenantInfo>();
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

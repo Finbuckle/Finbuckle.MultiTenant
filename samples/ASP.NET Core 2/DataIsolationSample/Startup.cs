@@ -41,7 +41,7 @@ namespace DataIsolationSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
             app.UseMvc(ConfigRoutes);
 
             SetupDb();

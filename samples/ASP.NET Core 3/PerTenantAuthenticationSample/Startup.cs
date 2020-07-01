@@ -42,7 +42,7 @@ namespace PerTenantAuthenticationSample
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseMultiTenant<SampleTenantInfo>();
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -48,7 +48,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
                     })
                     .Configure(app =>
                     {
-                        app.UseMultiTenant<TenantInfo>();
+                        app.UseMultiTenant();
                         app.Run(async context =>
                         {
                             if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)

@@ -41,7 +41,7 @@ public class MultiTenantMiddlewareShould
         var context = new Mock<HttpContext>();
         context.Setup(c => c.RequestServices).Returns(sp);
 
-        var mw = new MultiTenantMiddleware<TenantInfo>(c => {
+        var mw = new MultiTenantMiddleware(c => {
             Assert.Equal("initech", context.Object.RequestServices.GetService<ITenantInfo>().Id);
             return Task.CompletedTask;
         });
@@ -63,7 +63,7 @@ public class MultiTenantMiddlewareShould
         var context = new Mock<HttpContext>();
         context.Setup(c => c.RequestServices).Returns(sp);
 
-        var mw = new MultiTenantMiddleware<TenantInfo>(c => {
+        var mw = new MultiTenantMiddleware(c => {
             var accessor = c.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
             var resolver = c.RequestServices.GetRequiredService<ITenantResolver<TenantInfo>>();
             Assert.NotNull(accessor.MultiTenantContext);

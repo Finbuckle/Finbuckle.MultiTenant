@@ -41,7 +41,7 @@ namespace SessionStrategySample
             app.UseRouting();
             
             app.UseSession();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
 
             app.UseEndpoints(endpoints =>
             {

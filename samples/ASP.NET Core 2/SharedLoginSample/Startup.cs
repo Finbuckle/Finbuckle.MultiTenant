@@ -69,7 +69,7 @@ namespace SharedLoginSample
             }
 
             app.UseStaticFiles();
-            app.UseMultiTenant<TenantInfo>();
+            app.UseMultiTenant();
             app.UseAuthentication();
             app.UseMvc(ConfigRoutes);
         }
