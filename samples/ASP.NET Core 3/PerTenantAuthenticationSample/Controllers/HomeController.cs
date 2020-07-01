@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace AuthenticationOptionsSample.Controllers
+namespace PerTenantAuthenticationSample.Controllers
 {
     public class HomeController : Controller
     {
@@ -54,12 +54,14 @@ namespace AuthenticationOptionsSample.Controllers
         {
             await HttpContext.SignOutAsync();
             await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, "Username") }, "Cookies")));
+  
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
+
             return RedirectToAction("Index");
         }
     }

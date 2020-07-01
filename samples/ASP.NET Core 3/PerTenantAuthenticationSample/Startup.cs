@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AuthenticationOptionsSample
+namespace PerTenantAuthenticationSample
 {
     public class Startup
     {
@@ -19,18 +19,12 @@ namespace AuthenticationOptionsSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
+            
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                    {
-                        // Required for Safari 12 issue and OpenID Connect.
-                        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-                    })
+                    .AddCookie()
                     .AddOpenIdConnect(options =>
                     {
-                        options.ClientId = "clientId"; // Will be set per-tenant.
-                        options.Authority = "https://authorityUrl"; // Will be set per-tenant.
-                        options.Prompt = "login"; // Force login for sample purposes.
+                        options.Prompt = "login consent"; // For sample purposes.
                     });
 
             services.AddMultiTenant<SampleTenantInfo>()

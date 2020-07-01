@@ -14,7 +14,7 @@
 
 using Finbuckle.MultiTenant;
 
-namespace AuthenticationOptionsSample
+namespace PerTenantAuthenticationSample
 {
     public class SampleTenantInfo : ITenantInfo
     {
@@ -22,7 +22,13 @@ namespace AuthenticationOptionsSample
         public string Identifier { get; set; }
         public string Name { get; set; }
         public string ConnectionString { get; set; }
+        
         public string ChallengeScheme { get; set; }
+
+        public string CookiePath { get; set; }
+        public string CookieLoginPath { get; set; }
+        public string CookieLogoutPath { get; set; }
+
         public string OpenIdConnectAuthority { get; set; }
         public string OpenIdConnectClientId { get; set; }
         public string OpenIdConnectClientSecret { get; set; }

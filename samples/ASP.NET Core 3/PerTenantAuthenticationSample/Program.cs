@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace AuthenticationOptionsSample
+namespace PerTenantAuthenticationSample
 {
     public class Program
     {
