@@ -20,7 +20,7 @@ using Finbuckle.MultiTenant.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+    public partial class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
         public IServiceCollection Services { get; set; }
 
@@ -32,35 +32,27 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds per-tenant configuration for an options class.
         /// </summary>
-        /// <param name="tenantConfig">The configuration action to be run for each tenant.</param>
+        /// <param name="tenantConfigureOptions">The configuration action to be run for each tenant.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(Action<TOptions, TTenantInfo> tenantConfig) where TOptions : class, new()
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(Action<TOptions, TTenantInfo> tenantConfigureOptions) where TOptions : class, new()
         {
-            if (tenantConfig == null)
+            if (tenantConfigureOptions == null)
             {
-                throw new ArgumentNullException(nameof(tenantConfig));
+                throw new ArgumentNullException(nameof(tenantConfigureOptions));
             }
 
             // Handles multiplexing cached options.
-            Services.TryAddSingleton<IOptionsMonitorCache<TOptions>>(sp =>
-                {
-                    return (MultiTenantOptionsCache<TOptions, TTenantInfo>)
-                        ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions, TTenantInfo>));
-                });
+            Services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions, TTenantInfo>>();
 
             // Necessary to apply tenant options in between configuration and postconfiguration
-            Services.TryAddTransient<IOptionsFactory<TOptions>>(sp =>
-                {
-                    return (IOptionsFactory<TOptions>)ActivatorUtilities.
-                        CreateInstance(sp, typeof(MultiTenantOptionsFactory<TOptions, TTenantInfo>), new[] { tenantConfig });
-                });
-
+            Services.AddSingleton<ITenantConfigureOptions<TOptions, TTenantInfo>, TenantConfigureOptions<TOptions, TTenantInfo>>(sp => new TenantConfigureOptions<TOptions, TTenantInfo>(tenantConfigureOptions));
+            Services.TryAddTransient<IOptionsFactory<TOptions>, MultiTenantOptionsFactory<TOptions, TTenantInfo>>();
             Services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
-
             Services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
 
             return this;
         }
+
 
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp) where TOptions : class, new()
         {
@@ -122,7 +114,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            // Note: can't use TryAddEnumerable here because ServiceDescriptor.Describe with a factory can't set implementation type.
+            // Potential for multiple entries per service is intended.
             Services.Add(ServiceDescriptor.Describe(typeof(IMultiTenantStrategy), sp => factory(sp), lifetime));
 
             return this;

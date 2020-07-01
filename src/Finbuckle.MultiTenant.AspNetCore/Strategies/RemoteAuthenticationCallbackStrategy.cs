@@ -23,7 +23,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Finbuckle.MultiTenant;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
@@ -32,7 +31,7 @@ namespace Finbuckle.MultiTenant.Strategies
         internal static readonly string TenantKey = "__tenant__";
         private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
         
-        int Priority { get => 999; }
+        public int Priority { get => -900; }
 
         public RemoteAuthenticationCallbackStrategy()
         {

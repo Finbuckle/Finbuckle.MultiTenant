@@ -28,17 +28,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
         /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services, Action<MultiTenantOptions> config)
-            where TTenantInfo : class, ITenantInfo, new()
+        public static FinbuckleMultiTenantBuilder<T> AddMultiTenant<T>(this IServiceCollection services, Action<MultiTenantOptions> config)
+            where T : class, ITenantInfo, new()
         {
-            services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
-            services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext);
-            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo);
-            services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>, MultiTenantContextAccessor<TTenantInfo>>();
+            services.AddSingleton<ITenantResolver<T>, TenantResolver<T>>();
+            services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext);
+            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo);
+            services.AddSingleton<IMultiTenantContextAccessor<T>, MultiTenantContextAccessor<T>>();
             
             services.Configure<MultiTenantOptions>(config);
             
-            return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
+            return new FinbuckleMultiTenantBuilder<T>(services);
         }
 
         /// <summary>
@@ -46,10 +46,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
         /// <returns>An new instance of MultiTenantBuilder.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
-            where TTenantInfo : class, ITenantInfo, new()
+        public static FinbuckleMultiTenantBuilder<T> AddMultiTenant<T>(this IServiceCollection services)
+            where T : class, ITenantInfo, new()
         {
-            return services.AddMultiTenant<TTenantInfo>(_ => { });
+            return services.AddMultiTenant<T>(_ => { });
         }
 
         public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)

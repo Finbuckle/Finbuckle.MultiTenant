@@ -19,9 +19,9 @@ namespace RouteStrategySample
         {
             services.AddControllersWithViews();
             
-            services.AddMultiTenant<TenantInfo>().
-                WithConfigurationStore().
-                WithRouteStrategy();
+            services.AddMultiTenant<TenantInfo>()
+                    .WithConfigurationStore()
+                    .WithRouteStrategy();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

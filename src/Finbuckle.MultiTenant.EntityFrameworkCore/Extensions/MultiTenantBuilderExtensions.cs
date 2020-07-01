@@ -18,7 +18,7 @@ using Finbuckle.MultiTenant.Stores;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Provices builder methods for Finbuckle.MultiTenant services and configuration.
+    /// Provides builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
     public static class FinbuckleMultiTenantBuilderExtensions
     {

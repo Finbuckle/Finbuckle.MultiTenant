@@ -12,4 +12,17 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// TODO: Implement tests.
+// TODO: Implement more tests.
+
+using Finbuckle.MultiTenant.Strategies;
+using Xunit;
+
+public class RemoteAuthenticationCallbackStrategyShould
+{
+    [Fact]
+    public void HavePriorityNeg900()
+    {
+        var strategy = new RemoteAuthenticationCallbackStrategy();
+        Assert.Equal(-900, strategy.Priority);
+    }
+}

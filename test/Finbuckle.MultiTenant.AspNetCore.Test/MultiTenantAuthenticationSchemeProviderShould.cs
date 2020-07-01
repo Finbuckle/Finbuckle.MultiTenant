@@ -37,7 +37,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
                             
                         services.AddMultiTenant<TenantInfo>()
                             .WithBasePathStrategy()
-                            .WithRemoteAuthenticationCallbackStrategy()
+                            .WithPerTenantAuthentication()
                             .WithInMemoryStore()
                             .WithPerTenantOptions<AuthenticationOptions>((ao, ti) =>
                             {

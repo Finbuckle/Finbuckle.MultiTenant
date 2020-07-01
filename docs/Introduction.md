@@ -1,5 +1,5 @@
 # Finbuckle.MultiTenant Docs
-Current version: 6.0.0-preview4
+Current version: 6.0.0-preview5
 [Version History](https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/master/CHANGELOG.md)
 
 Finbuckle.MultiTenant is a multitenancy library for ASP.NET Core. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.
@@ -14,7 +14,7 @@ In addition to this documentation a variety of sample projects are available. Be
 
 **ASP.NET Core 3.1 Samples**
 
-[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/AuthenticationOptionsSample)
+[Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
 
 [Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/RouteStrategySample)
 
@@ -38,8 +38,6 @@ In addition to this documentation a variety of sample projects are available. Be
 
 **ASP.NET Core 2.1 Samples**
 
-[Authentication Options Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/AuthenticationOptionsSample)
-
 [Base Path Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/BasePathStrategySample)
 
 [Data Isolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DataIsolationSample) 
@@ -49,8 +47,6 @@ In addition to this documentation a variety of sample projects are available. Be
 [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/EFCoreStoreSample)
 
 [Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/HostStrategySample)
-
-[Identity DataIsolation Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/IdentityDataIsolationSample)
 
 [Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/RouteStrategySample)  
 

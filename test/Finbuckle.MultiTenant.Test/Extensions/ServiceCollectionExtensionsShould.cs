@@ -26,11 +26,10 @@ public class ServiceCollectionExtensionsShould
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
         
-        var service = services.Where(s =>   s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(ITenantResolver<TenantInfo>)).SingleOrDefault();
+        var service = services.Where(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>)).SingleOrDefault();
 
         Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
     }
 
     [Fact]
