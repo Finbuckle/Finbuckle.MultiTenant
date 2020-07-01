@@ -22,18 +22,18 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant
 {
-    public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
+    public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
         where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IOptionsMonitor<MultiTenantOptions> options;
         private readonly ILoggerFactory loggerFactory;
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options) :
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options) :
             this(strategies, stores, options, null)
         {
         }
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory loggerFactory)
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory loggerFactory)
         {
             Stores = stores;
             this.options = options;
@@ -53,11 +53,11 @@ namespace Finbuckle.MultiTenant
         }
 
         public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
-        public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
+        public IEnumerable<IMultiTenantStore<T>> Stores { get; set; }
 
-        public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
+        public async Task<IMultiTenantContext<T>> ResolveAsync(object context)
         {
-            IMultiTenantContext<TTenantInfo> result = null;
+            IMultiTenantContext<T> result = null;
 
             foreach (var strategy in Strategies)
             {
@@ -74,12 +74,12 @@ namespace Finbuckle.MultiTenant
                 {
                     foreach (var store in Stores)
                     {
-                        var _store = new MultiTenantStoreWrapper<TTenantInfo>(store, loggerFactory?.CreateLogger(store.GetType()));
+                        var _store = new MultiTenantStoreWrapper<T>(store, loggerFactory?.CreateLogger(store.GetType()));
                         var tenantInfo = await _store.TryGetByIdentifierAsync(identifier);
                         if (tenantInfo != null)
                         {
-                            result = new MultiTenantContext<TTenantInfo>();
-                            result.StoreInfo = new StoreInfo<TTenantInfo> { Store = store, StoreType = store.GetType() };
+                            result = new MultiTenantContext<T>();
+                            result.StoreInfo = new StoreInfo<T> { Store = store, StoreType = store.GetType() };
                             result.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
                             result.TenantInfo = tenantInfo;
 
@@ -93,6 +93,12 @@ namespace Finbuckle.MultiTenant
             }
 
             return result;
+        }
+
+        async Task<object> ITenantResolver.ResolveAsync(object context)
+        {
+            var multiTenantContext = await ResolveAsync(context);
+            return multiTenantContext;
         }
     }
 }
