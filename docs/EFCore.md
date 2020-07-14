@@ -1,93 +1,36 @@
 # Data Isolation with Entity Framework Core
 
 ## Introduction
-Data isolation is one of the most important considerations in a multitenant app. Whether each tenant has its own database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant supports each of these models by associating a connection string with each tenant. Tenants using the same connection string will share a database and accordingly those with a unique connection string will have separate databases.
+Data isolation is one of the most important considerations in a multitenant app. Whether each tenant has its own database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant supports each of these models by associating a connection string with each tenant.
 
-In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data belonging to other tenants. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where" clauses all over an app. Designating an entity type as multitenant tells Finbuckle.MultiTenant to ensure isolation of both queries and create/update/delete commands.
+## Separate Databases
+If each tenant uses a separate database then the `ConnectionString` tenant info 
+property can be used directly in the `OnConfiguring` method of the database
+context class to configure the connection. The `TenantInfo` instance can be
+injected into the database context using either an `ITenantInfo` or custom
+`ITenantInfo` implementation (as configured with `AddMultiTenant<T>`) parameter
+on the database context constructor.
 
-The easiest way to configure a shared database is to derive a db context from `MultiTenantDbContext` which contains the added functionality needed to accomplish tenant data isolation. In some situations it is desirable to add multitenant functionality to an existing db context in which case deriving from `MultiTenantDbContext` is not possible. See further below for how to accomplish the same functionality in these cases.
+## Shared Database
+In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data belonging to other tenants. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where" clauses all over an app. Internally a "shadow" tenant ID property is added (or used if already present) to multitenant entity types and managed as the database context is used. It also performs validation and related options for handling null or mismatched tenants.
+
+Finbuckle.MultiTenant provides two different ways to utilize this behavior:
+1. Derive a database context class from `MultiTenantDbContext`
+2. Implement `IMultiTenantDbContext` and used the heper methods as [described below](#deriving-from-multitenantdbcontext)
+
+The first option is easier, but provides less flexibility. The second option is more complex, but provides enhanced flexibility and allows existing database context classes (which may derive from a base class) to utilize per-tenant data isolation.
+
+With a multitenant database contextDesignating an entity type as multitenant tells Finbuckle.MultiTenant to ensure isolation of both queries and create/update/delete commands.
 
 ## MultiTenant Entity Types
-
-Regardless of how the db context is configured, the library will need to know which entity types should be treated as multitenant. When the db context is initialized, a shadow property named `TenantId` is added to the data model for designated entity types. This property is used internally to filter all requests and commands. If there already is a defined string property named "TenantId" then Finbuckle.Multitenant will use the existing property.
+Regardless of how the db context is configured, the context will need to know which entity types should be treated as multitenant. When the db context is initialized, a shadow property named `TenantId` is added to the data model for designated entity types. This property is used internally to filter all requests and commands. If there already is a defined string property named "TenantId" then Finbuckle.Multitenant will use the existing property.
 
 There are two ways to designate an entity type as multitenant: 
 
-1. the `[MultiTenant]` data attribute; and
+1. the `[MultiTenant]` data attribute
 2. the fluent API entity type builder extension method `IsMultiTenant`. 
 
 Entity types not designated via one of these methods are not isolated per-tenant and thus are visible to all tenants.
-
-### Using the [MultiTenant] attribute
-The `[MultiTenant]` attribute is recognized by `MultiTenantDbContext`-derived db contexts and can be configured to do so for other db contexts by calling the `ConfigureMultiTenant` extension method on `ModelBuilder` in `OnModelCreating` as described further below.
-
-```cs
-[MultiTenant]
-public class Blog
-{
-    ...
-}
-
-[MultiTenant]
-public class Post
-{
-    ...
-}
-```
-
-```cs
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    // Not needed if db context derives from MultiTenantDbContext
-    builder.ConfigureMultiTenant();
-}
-```
-
-### Using the fluent API
-Alternatively, the fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the same functionality for db contexts that do not derive from `MultiTenantDbContext`. Note that `ConfigureMultiTenant` is not needed.
-
-```cs
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    // Configure an entity type to be multitenant.
-    builder.Entity<MyEntityType>().IsMultiTenant();
-}
-```
-
-`IsMultiTenant` uses a query filter for data isolation and will automatically merge its query filter with an existing query filter is one is present. For that reason, if the type to be multitenant has a global query filter, `IsMultiTenant` should be called *after* `HasQueryFilter`. 
-
-```cs
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    // set a global query filter, e.g. to support soft delete
-    builder.Entity<MyEntityType>().HasQueryFilter(p => !p.IsDeleted);
-
-    // Configure an entity type to be multitenant (will merge with existing call to HasQueryFilter)
-    builder.Entity<MyEntityType>().IsMultiTenant();
-}
-
-```
-
-The fluent API can also be used from within `IEntityTypeConfiguration<TEntity>` classes.
-
-```cs
-public class BlogEntityTypeConfiguration : IEntityTypeConfiguration<Blog>
-{
-    public void Configure(EntityTypeBuilder<Blog> builder)
-    {
-        builder.IsMultiTenant();
-    }
-}
-```
-```cs
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    builder.ApplyConfiguration(new BlogEntityTypeConfiguration());
-    // or builder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
-
-    base.OnModelCreating(builder);
-}
-```
 
 ## Deriving from MultiTenantDbContext
 See the data isolation sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples of this approach.
@@ -204,6 +147,79 @@ public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
     return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 }
 ```
+
+### Using the [MultiTenant] attribute
+The `[MultiTenant]` attribute is recognized by `MultiTenantDbContext`-derived db contexts and can be configured to do so for other db contexts by calling the `ConfigureMultiTenant` extension method on `ModelBuilder` in `OnModelCreating` as described further below.
+
+```cs
+[MultiTenant]
+public class Blog
+{
+    ...
+}
+
+[MultiTenant]
+public class Post
+{
+    ...
+}
+```
+
+```cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // Not needed if db context derives from MultiTenantDbContext
+    builder.ConfigureMultiTenant();
+}
+```
+
+### Using the fluent API
+Alternatively, the fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the same functionality for db contexts that do not derive from `MultiTenantDbContext`. Note that `ConfigureMultiTenant` is not needed.
+
+```cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // Configure an entity type to be multitenant.
+    builder.Entity<MyEntityType>().IsMultiTenant();
+}
+```
+
+`IsMultiTenant` uses a query filter for data isolation and will automatically merge its query filter with an existing query filter is one is present. For that reason, if the type to be multitenant has a global query filter, `IsMultiTenant` should be called *after* `HasQueryFilter`. 
+
+```cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // set a global query filter, e.g. to support soft delete
+    builder.Entity<MyEntityType>().HasQueryFilter(p => !p.IsDeleted);
+
+    // Configure an entity type to be multitenant (will merge with existing call to HasQueryFilter)
+    builder.Entity<MyEntityType>().IsMultiTenant();
+}
+
+```
+
+The fluent API can also be used from within `IEntityTypeConfiguration<TEntity>` classes.
+
+```cs
+public class BlogEntityTypeConfiguration : IEntityTypeConfiguration<Blog>
+{
+    public void Configure(EntityTypeBuilder<Blog> builder)
+    {
+        builder.IsMultiTenant();
+    }
+}
+```
+```cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    builder.ApplyConfiguration(new BlogEntityTypeConfiguration());
+    // or builder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
+
+    base.OnModelCreating(builder);
+}
+```
+
+
 
 ## Design Time Instantiation
 Given that a multitenant db context usually requires a tenant to function, design time instanciation can be challenging. For db contexts deriving from `MultiTenantDbContext` it is recommended to use a [design time factory](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation#from-a-design-time-factory) wherein a dummy `TenantInfo` is constructed  with the desired connection string and passed to the db context constructor.

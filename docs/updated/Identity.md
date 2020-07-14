@@ -28,9 +28,9 @@ Identity options can be configured for the `IdentityOptions` class as described 
 The Identity option to require a unique email address per user will require email addresses be unique only within the current tenant, i.e. per-tenant options are not required for this.
 
 ## Authentication
-Internally, ASP.NET Core Identity uses regular ASP.NET Core authentication. It uses a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration), but under the hood the end result is the same in that `CookieAuthenticationOptions` are being configured and consumed.
+ASP.NET Core Identity cookies for authentication. It uses a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration), but under the hood standard ASP.NET Core authentication is used.
 
-Finbuckle.Multitenant can customize these options per tenant so that user sessions are unique per tenant. See [per-tenant cookie authentication options](Authentication#cookie-authentication-options) for information on how to customize authentication options per tenant.
+Finbuckle.Multitenant can isolate Identity authentication per tenant so that user sessions are unique per tenant. See [per-tenant authentication](Authentication) for information on how to customize authentication options per tenant.
 
 ## Identity Model Customization with MultiTenantIdenitityDbContext
 The [ASP.NET Core Identity data model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-2.2#the-identity-model) relies on several types which are passed to the database context as generic parameters: 
