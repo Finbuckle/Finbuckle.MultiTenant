@@ -4,7 +4,7 @@ A multitenant store is responsible for retrieving information about a tenant bas
 
 Finbuckle.MultiTenant provides three basic multitenant stores
 - `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
-- `ConfigurationStore` - a read-only store that is back by app configuration (e.g. appsettings.json).
+- `ConfigurationStore` - a read-only store that is backed by app configuration (e.g. appsettings.json).
 - `EFCoreStore` - an Entity Framework Core based implementation to query tenant information from a database.
 - `HttpRemoteStore` - a read-only store that sends the tenant identifier to an http(s) endpoint to get the tenant information.
 
