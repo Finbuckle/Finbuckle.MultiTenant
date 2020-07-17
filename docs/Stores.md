@@ -1,12 +1,20 @@
 # MultiTenant Stores
 A multitenant store is responsible for retrieving information about a tenant based on an identifier string determined by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which provides the current tenant information to an app.
 
+
 Finbuckle.MultiTenant provides three basic multitenant stores
 - `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
 - `ConfigurationStore` - a read-only store that is backed by app configuration (e.g. appsettings.json).
 - `EFCoreStore` - an Entity Framework Core based implementation to query tenant information from a database.
 - `HttpRemoteStore` - a read-only store that sends the tenant identifier to an http(s) endpoint to get the tenant information.
 
+## Custom ITenantInfo Support
+MultiTenant stores support custom `ITenantInfo` implementations. but complex
+implementations may require special handling. For best results ensure the class
+works well with the underlying store approach--e.g. that it can be serialized
+from JSON for the configuration store if using json file configuration sources.
+
+The examples in this documentation use the `TenantInfo` basic implementation.
 
 ## IMultiTenantStore and Custom Stores
 If the provided multitenant stores are not suitable then a custom store can be created by implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type parameter passed to `AddMultiTenant<T>` at compile time. The implementation must defines `TryAddAsync`, `TryUpdateAsync`, `TryRemoveAsyc`, `TryGetByIdentifierAsync`, and `TryGetAsync` methods. `TryGetByIdentifierAsync` and `TryGetAsync` should return null if there is no suitable tenant match.
