@@ -14,11 +14,11 @@
 
 namespace Finbuckle.MultiTenant
 {
-    public interface IMultiTenantContext<TTenantInfo>
-        where TTenantInfo : class, ITenantInfo, new()
+    public interface IMultiTenantContext<T>
+        where T : class, ITenantInfo, new()
     {
-        TTenantInfo TenantInfo { get; set; }
+        T TenantInfo { get; set; }
         StrategyInfo StrategyInfo { get; set; }
-        StoreInfo<TTenantInfo> StoreInfo { get; set; }
+        StoreInfo<T> StoreInfo { get; set; }
     }
 }
