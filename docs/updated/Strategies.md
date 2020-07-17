@@ -4,7 +4,6 @@ A multitenant strategy is responsible for defining how the tenant is determined.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 
-Multiple strategies can be registered after `AddMultiTenant<T>` and each strategy will be tried in the order configured until a non-null identifier is returned. The remaining strategies are skipped for that request. Note that some strategies are registered as singleton service so registering them multiple times after `AddMultiTenant<T>` is not recommended. The main use for registering multiple strategies of the same type is using several instances of the `DelegateStrategy` utilizing distinct logic.
 
 The `Strategy` property on the `StrategyInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()` returns the actual strategy used to resolve the tenant information for the current context.
 
@@ -21,9 +20,31 @@ services.AddMultiTenant<TenantInfo>()
         .WithStrategy<MyStrat>(myParam1, myParam2)...
 
 // Or register a custom strategy with the overload method accepting a factory method.
+// Note that the type parameter for WithStrategy is inferred by the compiler.
 services.AddMultiTenant<TenantInfo>()
-        .WithStrategy<MyStrat>( sp => return new MyStrat())...
+        .WithStrategy(sp => new MyStrat())...
 ```
+
+## Accessing the Strategies at Runtime
+MultiTenant strategies are registered in the dependency injection system under the
+`IMultiTenantStrategy` service type.
+
+If multiple strategies are registered a specific one can be retrieving an
+`IEnumerable<IMultiTenantStrategy>` and filtering to the specific implementation
+type:
+
+```cs
+// Assume we have a service provider. The IEnumerable could be injected via
+// other DI means as well.
+var strat = serviceProvider.GetService<IEnumerable<IMultiTenantStrategy>>
+                           .Where(s => s.ImplementationType == typeof(StaticStrategy))
+                           .SingleOrDefault();
+```
+
+## Using Multiple Strategies
+Multiple strategies can be registered after `AddMultiTenant<T>` and each strategy will be tried in the order configured until a non-null identifier is returned. The remaining strategies are skipped for that request.
+
+Note that some strategies are registered as singleton service so registering them multiple times after `AddMultiTenant<T>` is not recommended. The main use for registering multiple strategies of the same type is using several instances of the `DelegateStrategy` utilizing distinct logic.
 
 ## Static Strategy
 > NuGet package: Finbuckle.MultiTenant

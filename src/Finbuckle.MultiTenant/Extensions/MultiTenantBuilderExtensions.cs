@@ -81,7 +81,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="ignoreCase">Whether the store should ignore case.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithInMemoryStore<TTenantInfo>(_ => { });
+            => builder.WithInMemoryStore<TTenantInfo>(_ => {});
 
         /// <summary>
         /// Adds and configures InMemoryStore to the application using the provided action.
