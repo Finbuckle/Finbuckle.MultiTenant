@@ -29,7 +29,7 @@ public class ServiceCollectionExtensionsShould
         var service = services.Where(s => s.ServiceType == typeof(ITenantResolver)).SingleOrDefault();
 
         Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ServiceCollectionExtensionsShould
         var service = services.Where(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>)).SingleOrDefault();
 
         Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
     }
 
     [Fact]
