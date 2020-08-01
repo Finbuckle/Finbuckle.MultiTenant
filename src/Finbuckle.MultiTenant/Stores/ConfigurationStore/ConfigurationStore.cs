@@ -85,6 +85,11 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(tenantMap.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
         }
 
+        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        {
+            return await Task.FromResult(tenantMap.Select(x => x.Value).ToList());
+        }
+
         public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier is null)

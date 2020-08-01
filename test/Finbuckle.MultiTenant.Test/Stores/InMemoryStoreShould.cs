@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,15 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
         var store = CreateCaseSensitiveTestStore();
         Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
         Assert.Null(store.TryGetByIdentifierAsync("iNitEch").Result);
+    }
+
+    [Fact]
+    public void GetAllTenantsFromStoreAsync()
+    {
+        var store = CreateTestStore();
+        Assert.Equal(2, store.GetAllAsync().Result.Count());
+        store.TryAddAsync(new TenantInfo() {Identifier = "test"});
+        Assert.Equal(3, store.GetAllAsync().Result.Count());
     }
 
     [Fact]

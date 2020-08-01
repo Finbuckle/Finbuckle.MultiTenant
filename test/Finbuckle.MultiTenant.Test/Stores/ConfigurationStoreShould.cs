@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
@@ -93,6 +94,13 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
     public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
         base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+    }
+
+    [Fact]
+    public void GetAllTenantsFromStoreAsync()
+    {
+        var store = CreateTestStore();
+        Assert.Equal(2, store.GetAllAsync().Result.Count());
     }
 
     // [Fact(Skip = "Not valid for this store.")]

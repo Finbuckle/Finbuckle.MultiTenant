@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.Extensions.Logging;
@@ -60,6 +61,23 @@ namespace Finbuckle.MultiTenant.Stores
             else
             {
                 Utilities.TryLogDebug(logger, $"{Store.GetType()}.TryGetAsync: Unable to find Tenant Id \"{id}\".");
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        {
+            IEnumerable<TTenantInfo> result = null;
+
+            try
+            {
+                result = await Store.GetAllAsync();
+            }
+            catch (Exception e)
+            {
+                var errorMessage = $"Exception in {Store.GetType()}.GetAllAsync.";
+                Utilities.TryLogError(logger, errorMessage, e);
             }
 
             return result;
