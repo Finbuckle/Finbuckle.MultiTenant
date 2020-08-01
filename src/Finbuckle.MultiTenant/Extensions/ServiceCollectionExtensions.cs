@@ -31,8 +31,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<T> AddMultiTenant<T>(this IServiceCollection services, Action<MultiTenantOptions> config)
             where T : class, ITenantInfo, new()
         {
-            services.AddSingleton<ITenantResolver<T>, TenantResolver<T>>();
-            services.AddSingleton<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
+            services.AddScoped<ITenantResolver<T>, TenantResolver<T>>();
+            services.AddScoped<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
 
             services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext);
             
