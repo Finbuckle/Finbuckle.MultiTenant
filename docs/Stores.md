@@ -99,7 +99,7 @@ await store.TryUpdateAsync(newTenant);
 await store.TryRemoveAsync(newTenant.Identifier);
 ```
 
-It is not recommended to use a case-sensitive in-memory store.
+When possible prefer a case-insensitive in-memory store.
 
 ## Configuration Store
 > NuGet package: Finbuckle.MultiTenant
@@ -145,14 +145,14 @@ The configuration section should use this JSON format shown below. Any fields in
 ## EFCore Store
 > NuGet package: Finbuckle.MultiTenant.EntityFrameworkCore
 
-Uses an Entity Framework Core database context as the backing store. This store does not support storing and retrieving the `Items` collection property on `TenantInfo`, although it could be modified to do so. Addtionally, this store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
+Uses an Entity Framework Core database context as the backing store. This store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
 
 The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample).
 
-The database context can contain any settings or entities, but to be used as a multitenant store it is only necessary to derive from `EFCoreStoreDbContext`:
+The database context used with the EFCore store must derive from `EFCoreStoreDbContext`, but other entities can be added:
 
 ```cs
-public class AppDbContext : EFCoreStoreDbContext
+public class MultiTenantStoreDbContext : EFCoreStoreDbContext
 {
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
@@ -165,19 +165,22 @@ public class AppDbContext : EFCoreStoreDbContext
 }
 ```
 
-Note, this database context wil have its own connection string (usually) separate from that of any tenant in the store. Addtionally, this database context can be entirely separate from any others an application might use if comingling the multitenant store and app entity models is not desired.
+This database context will have its own connection string (usually) separate from that of any tenant in the store. Addtionally, this database context can be entirely separate from any others an application might use if comingling the multitenant store and app entity models is not desired.
 
 Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext>` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context generic parameter:
 
 ```cs
 // Register to use the database context and TTenantInfo types show above.
-services.AddMultiTenant().WithEFCoreStore<AppDbContext>()...
+services.AddMultiTenant<TenantInfo>()
+        .WithEFCoreStore<MultiTenantStoreDbContext>()...
 ```
 
-The contents of the store can be changed at runtime with `TryAdd`, `TryUpdate`, and `TryRemove` which result in updates to the underlying database:
+The contents of the store can be changed at runtime with the `TryAddAsync`,
+`TryUpdateAsync`, and `TryRemoveAsync` methods of `IMultiTenantStore`:
 
 ```cs
-// Use service provider or dependenct injection to get the InMemoryStore instance.
+// Use service provider or dependenct injection to get the store instance.
+// Here assuming only one store is registered in DI.
 var store = serviceProvider.GetService<IMultiTenantStore>();
 
 // Add a new tenant to the store.
@@ -191,6 +194,9 @@ store.TryUpdate(newTenant);
 // Remove a tenant.
 store.TryRemove(newTenant.Identifier);
 ```
+
+In addition the underlying dbcontext can be used to modify data in the same way
+Entity Framework Core works with any dbcontext.
 
 ## Http Remote Store
 Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object in return. The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HttpRemoteStoreSample) projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.

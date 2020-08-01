@@ -44,12 +44,12 @@ else
         <p class="lead">This sample highlights the <a href="https://www.finbuckle.com/MultiTenant/Docs/Stores#efcore-store">EFCore multitenant store</a>.</p>
         <hr class="my-4">
         <p>The TenantInfo is pulled from AN EFCore database.</p>
-        <p>See the AppDbContext and AppTenantInfo classes for implementation details.</p>
+        <p>See the MultiTenantStoreDbContext and AppTenantInfo classes for implementation details.</p>
         <p>
             Configuration in <code>Startup.cs</code>:
         </p>
         <pre><code>services.AddMultiTenant&lt;TenantInfo&gt;()... // Set up a strategy.
-    WithEFCoreStore<AppDbContext, AppTenantInfo>()</code></pre>
+    WithEFCoreStore<MultiTenantStoreDbContext, AppTenantInfo>()</code></pre>
         <p>Click the links on the navbar to see it in action!</p>
     </div> 
 }
