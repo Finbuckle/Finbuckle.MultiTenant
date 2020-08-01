@@ -44,8 +44,6 @@ In addition to this documentation a variety of sample projects are available. Be
 
 [Delegate Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/DelegateStrategySample)
 
-[EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/EFCoreStoreSample)
-
 [Host Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/HostStrategySample)
 
 [Route Strategy Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%202/RouteStrategySample)  

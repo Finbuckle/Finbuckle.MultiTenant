@@ -167,7 +167,7 @@ public class MultiTenantStoreDbContext : EFCoreStoreDbContext
 
 This database context will have its own connection string (usually) separate from that of any tenant in the store. Addtionally, this database context can be entirely separate from any others an application might use if comingling the multitenant store and app entity models is not desired.
 
-Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext>` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context generic parameter:
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext>` after `AddMultiTenant<T>` in the `ConfigureServices` method of the app's `Startup` class and provide types for the store's database context generic parameter:
 
 ```cs
 // Register to use the database context and TTenantInfo types show above.
@@ -185,7 +185,7 @@ var store = serviceProvider.GetService<IMultiTenantStore>();
 
 // Add a new tenant to the store.
 var newTenant = new TenantInfo(...);
-store.TryAdd(newTenant);
+store.TryAddAsync(newTenant);
 
 // Update a tenant.
 newTenant.ConnectionString = "UpdatedConnectionString";
@@ -199,32 +199,34 @@ In addition the underlying dbcontext can be used to modify data in the same way
 Entity Framework Core works with any dbcontext.
 
 ## Http Remote Store
+> NuGet package: Finbuckle.MultiTenant
+
 Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object in return. The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HttpRemoteStoreSample) projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
 
-For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`, `Name`, and `ConnectionString` which will be mapped into a `TenantInfo` object.
+For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`, `Name`, and `ConnectionString` and other properties which will be mapped into a `TenantInfo` object with the type passed to `AddMultiTenant<T>`.
 
 Any non-200 response code results in a null `TenantInfo`.
 
-This store is read-only and calls to `TryAdd`, `TryUpdate`, and `TryRemove` will throw a `NotImplementedException`.
+This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw a `NotImplementedException`.
 
-Configure by calling `WithHttpRemoteStore` after `AddMultiTenant` in the `ConfigureServices` method of the app's `Startup` class. A uri template string must be passed to the method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri. If the template provided does not contain `{__tenant__}` it is appended to the template. An overload of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`.
+Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<T>` in the `ConfigureServices` method of the app's `Startup` class. A uri template string must be passed to the method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri template. If the template provided does not contain `{__tenant__}`, the identifier is appended to the template. An overload of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`.
 
 ```cs
 // This will append the identifier to the provided url.
-services.AddMultiTenant()
+services.AddMultiTenant<TenantInfo>()
         .WithHttpRemoteStore("https://remoteserver.com/)...
 ```
 
 ```cs
 // This will replace {__tenant__} with the identifier.
-services.AddMultiTenant()
+services.AddMultiTenant<TenantInfo>()
         .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo)...
 ```
 
 Use the overload of `WithHttpRemoteStore` to configure the underlying `HttpClient`:
 ```cs
 // This will inject MyCustomHeaderHandler, a DelegatingHandler, to the request pipeline.
-services.AddMultiTenant()
+services.AddMultiTenant<TenantInfo>()
         .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
         {
             httpClientBuilder.ConfigureHttpClient( client =>
@@ -237,7 +239,7 @@ services.AddMultiTenant()
 Use the same overload to configure delegating handlers and [customize the http request behavior](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-3.1#outgoing-request-middleware). For example, adding custom headers for authentication:
 ```cs
 // This will inject MyCustomHeaderHandler, a DelegatingHandler, to the request pipeline.
-services.AddMultiTenant()
+services.AddMultiTenant<TenantInfo>()
         .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
         {
             httpClientBuilder.AddHttpMessageHander<MyCustomHeaderHandler>();
@@ -247,7 +249,7 @@ services.AddMultiTenant()
 Use the same overload to add resilience and transient fault handling with [Polly](https://www.hanselman.com/blog/AddingResilienceAndTransientFaultHandlingToYourNETCoreHttpClientWithPolly.aspx):
 ```cs
 // This will retry the request if needed.
-services.AddMultiTenant()
+services.AddMultiTenant<TenantInfo>()
         .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
         {
             httpClientBuilder.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(2));
