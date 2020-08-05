@@ -53,18 +53,21 @@ namespace Finbuckle.MultiTenant.Strategies
             var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
             foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync()).
-                Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
+                Where(s => typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
+                // Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
             {
+                // Unfortnately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
+                // Instead we'll get the paths to check from the options.
                 var optionsType = scheme.HandlerType.GetProperty("Options").PropertyType;
                 var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionsType);
                 var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
                 var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
-                
+
                 var callbackPath = (PathString)(optionsType.GetProperty("CallbackPath")?.GetValue(options) ?? PathString.Empty);
                 var signedOutCallbackPath = (PathString)(optionsType.GetProperty("SignedOutCallbackPath")?.GetValue(options) ?? PathString.Empty);
 
-                if (callbackPath != PathString.Empty && callbackPath == httpContext.Request.Path ||
-                    signedOutCallbackPath != PathString.Empty && signedOutCallbackPath == httpContext.Request.Path)
+                if (callbackPath.HasValue && callbackPath == httpContext.Request.Path ||
+                    signedOutCallbackPath.HasValue && signedOutCallbackPath == httpContext.Request.Path)
                 {
                     try
                     {
@@ -85,11 +88,7 @@ namespace Finbuckle.MultiTenant.Strategies
                             state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
                         }
 
-                        var oAuthOptions = options as OAuthOptions;
-                        var openIdConnectOptions = options as OpenIdConnectOptions;
-
-                        var properties = oAuthOptions?.StateDataFormat.Unprotect(state) ??
-                                         openIdConnectOptions?.StateDataFormat.Unprotect(state);
+                        var properties = ((dynamic)options).StateDataFormat.Unprotect(state) as AuthenticationProperties;
 
                         if (properties == null)
                         {
@@ -97,10 +96,9 @@ namespace Finbuckle.MultiTenant.Strategies
                             return null;
                         }
 
-                        if (properties.Items.Keys.Contains(TenantKey))
-                        {
-                            return properties.Items[TenantKey] as string;
-                        }
+                        properties.Items.TryGetValue(TenantKey, out var identifier);
+
+                        return identifier;
                     }
                     catch (Exception e)
                     {
