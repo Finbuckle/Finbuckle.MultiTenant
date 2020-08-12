@@ -193,5 +193,24 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, new object[] { template });
         }
+        
+        /// <summary>
+        /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
+        {
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, "__tenant__");
+        }
+
+        /// <summary>
+        /// Adds and configures a HostStrategy to the application.
+        /// </summary>
+        /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        {
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
+        }
     }
 }
