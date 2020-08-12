@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Microsoft.Extensions.Options;
@@ -291,6 +292,11 @@ public class MultiTenantBuilderShould
         public Task<TTenant> TryGetAsync(string id)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<TTenant>> GetAllAsync()
+        {
+	        throw new NotImplementedException();
         }
 
         public Task<TTenant> TryGetByIdentifierAsync(string identifier)

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Stores
@@ -53,6 +54,11 @@ namespace Finbuckle.MultiTenant.Stores
         public Task<TTenantInfo> TryGetAsync(string id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        {
+	        throw new NotImplementedException();
         }
 
         public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)

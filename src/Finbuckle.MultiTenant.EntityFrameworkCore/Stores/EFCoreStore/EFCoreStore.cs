@@ -13,6 +13,7 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,11 @@ namespace Finbuckle.MultiTenant.Stores
             return await dbContext.TenantInfo
                             .Where(ti => ti.Id == id)
                             .SingleOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        {
+            return await dbContext.TenantInfo.ToListAsync();
         }
 
         public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)

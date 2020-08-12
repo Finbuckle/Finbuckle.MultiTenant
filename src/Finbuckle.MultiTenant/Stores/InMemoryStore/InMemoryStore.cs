@@ -63,6 +63,11 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(result);
         }
 
+        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        {
+            return await Task.FromResult(tenantMap.Select(x => x.Value).ToList());
+        }
+
         public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);

@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant
@@ -55,5 +56,12 @@ namespace Finbuckle.MultiTenant
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TTenantInfo> TryGetAsync(string id);
+
+
+        /// <summary>
+        /// Retrieve all the TTenantInfo's from the store.
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<TTenantInfo>> GetAllAsync();
     }
 }
