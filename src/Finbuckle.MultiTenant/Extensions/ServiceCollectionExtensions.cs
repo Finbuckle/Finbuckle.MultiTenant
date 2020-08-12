@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext);
             
             services.AddScoped<T>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo);
-            services.AddScoped<ITenantInfo>(sp => sp.GetRequiredService<T>());
+            services.AddScoped<ITenantInfo>(sp => sp.GetService<T>());
             
             services.AddSingleton<IMultiTenantContextAccessor<T>, MultiTenantContextAccessor<T>>();
             services.AddSingleton<IMultiTenantContextAccessor>(sp => (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<T>>());
