@@ -34,6 +34,7 @@ public partial class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
+        services.AddLogging();
         services.AddMultiTenant<TestTenantInfo>()
                 .WithPerTenantAuthentication();
 

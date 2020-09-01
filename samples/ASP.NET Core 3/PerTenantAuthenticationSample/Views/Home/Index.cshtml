@@ -4,7 +4,8 @@
 {
     @if(!User.Identity.IsAuthenticated)
     {
-        <a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a>
+        <p><a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a></p>
+        <p>For external login:<br/>Username: <i>alice</i> or <i>bob</i><br />Password: <i>Pass123$</i></p>
     } else
     {
         <a asp-action="Logout" class="btn btn-secondary">Logout</a>
@@ -71,7 +72,7 @@ else
                 options.Prompt = "login consent"; // For sample purposes.
             });
 
-    services.AddMultiTenant<SampleTenantInfo>()
+    services.AddMultiTenant&lt;SampleTenantInfo&gt;()
             .WithConfigurationStore()
             .WithRouteStrategy()
             .WithPerTenantAuthentication();
