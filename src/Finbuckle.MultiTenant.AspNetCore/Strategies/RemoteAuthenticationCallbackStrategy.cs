@@ -33,10 +33,6 @@ namespace Finbuckle.MultiTenant.Strategies
         
         public int Priority { get => -900; }
 
-        public RemoteAuthenticationCallbackStrategy()
-        {
-        }
-
         public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
         {
             this.logger = logger;
@@ -92,7 +88,8 @@ namespace Finbuckle.MultiTenant.Strategies
 
                         if (properties == null)
                         {
-                            logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
+                            if(logger != null)
+                                logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
                             return null;
                         }
 
