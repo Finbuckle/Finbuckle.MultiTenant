@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
-            if (multiTenantContext.TenantInfo != null)
+            if (multiTenantContext?.TenantInfo != null)
             {
                 properties = properties ?? new AuthenticationProperties();
                 if(!properties.Items.Keys.Contains(Constants.TenantToken))
