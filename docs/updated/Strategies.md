@@ -91,6 +91,35 @@ services.AddMultiTenant<TenantInfo>()
         .WithBasePathStrategy()...
 ```
 
+## Claim Strategy
+> NuGet package: Finbuckle.MultiTenant.AspNetCore
+
+Uses a claim to determine the tenant identifier. By default the first claim
+value with type `__tenant__` is used, but a custom type name can also be used.
+This strategy uses the default authentication scheme, which is usually cookie
+based, but does not go so far as to set `HttpContext.User`. Thus the ASP.NET
+Core authentication middleware should still be used as normal, and in most use
+cases should come after `UseMultiTenant` when using `ClaimsStrategy`. Due to how
+the authentication middleware is implemented there is practically no perfomance
+penalty when used in conjunction with the `ClaimStrategy`.
+
+Note that this strategy is does not work well with per-tenant cookie names since
+it must know the cookie name before the tenant is resolved.
+
+Configure by calling `WithClaimStrategy` after `AddMultiTenant<T>` in the
+`ConfigureServices` method of the `Startup` class. An overload to accept a
+custom claim type is also available:
+
+```cs
+// This will check for a claim type __tenant__
+services.AddMultiTenant<TenantInfo>()
+        .WithClaimStrategy()...
+
+// This will check for a custom claim type
+services.AddMultiTenant<TenantInfo>()
+        .WithClaimStrategy("MyClaimType")...
+```
+
 ## Session Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 

@@ -238,7 +238,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         
         /// <summary>
-        /// Adds and configures a ClaimStrategy with tenantKey Constants.TenantToken to the application.
+        /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
