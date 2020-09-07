@@ -34,6 +34,7 @@ public partial class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         services.AddAuthentication();
+        services.AddLogging();
         services.AddMultiTenant<TestTenantInfo>()
                 .WithPerTenantAuthentication();
 
@@ -118,8 +119,7 @@ public partial class MultiTenantBuilderExtensionsShould
             Identifier = "identifier1",
             CookieLoginPath = "/path1",
             CookieLogoutPath = "/path2",
-            CookieAccessDeniedPath = "/path3",
-            CookiePath = "/path4"
+            CookieAccessDeniedPath = "/path3"
         };
 
         var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
@@ -127,67 +127,9 @@ public partial class MultiTenantBuilderExtensionsShould
 
         var options = sp.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        Assert.Equal(CookieAuthenticationDefaults.CookiePrefix + "__" + ti1.Identifier, options.Cookie.Name);
         Assert.Equal(ti1.CookieLoginPath, options.LoginPath);
         Assert.Equal(ti1.CookieLogoutPath, options.LogoutPath);
         Assert.Equal(ti1.CookieAccessDeniedPath, options.AccessDeniedPath);
-        Assert.Equal(ti1.CookiePath, options.Cookie.Path);
-    }
-
-    [Fact]
-    public void ConfigurePerTenantAuthentication_PrependExistingCookieName()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions();
-        services.AddAuthentication().AddCookie(o => o.Cookie.Name = "name");
-        services.AddMultiTenant<TestTenantInfo>()
-                .WithPerTenantAuthentication();
-        var sp = services.BuildServiceProvider();
-
-        var ti1 = new TestTenantInfo
-        {
-            Id = "id1",
-            Identifier = "identifier1"
-        };
-
-        var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-        accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
-
-        var options = sp.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
-
-        Assert.Equal("name" + "__" + ti1.Identifier, options.Cookie.Name);
-    }
-
-    [Fact]
-    public void ConfigurePerTenantAuthentication_UseCookieOptionsPathReplacement()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions();
-        services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TestTenantInfo>()
-                .WithPerTenantAuthentication();
-        var sp = services.BuildServiceProvider();
-
-        var ti1 = new TestTenantInfo
-        {
-            Id = "id1",
-            Identifier = "identifier1",
-            CookieLoginPath = "/__tenant__",
-            CookieLogoutPath = "/__tenant__",
-            CookieAccessDeniedPath = "/__tenant__",
-            CookiePath = "/__tenant__"
-        };
-
-        var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-        accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
-
-        var options = sp.GetRequiredService<IOptions<CookieAuthenticationOptions>>();
-
-        // The string __tenant__ should be replaced with the identifier.
-        Assert.Equal(ti1.CookieLoginPath.Replace("__tenant__", ti1.Identifier), options.Value.LoginPath);
-        Assert.Equal(ti1.CookieLogoutPath.Replace("__tenant__", ti1.Identifier), options.Value.LogoutPath);
-        Assert.Equal(ti1.CookieAccessDeniedPath.Replace("__tenant__", ti1.Identifier), options.Value.AccessDeniedPath);
-        Assert.Equal(ti1.CookiePath.Replace("__tenant__", ti1.Identifier), options.Value.Cookie.Path);
     }
 
     [Fact]

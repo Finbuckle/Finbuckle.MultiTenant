@@ -14,6 +14,7 @@
 
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -34,11 +35,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
-            if (multiTenantContext.TenantInfo != null)
+            if (multiTenantContext?.TenantInfo != null)
             {
                 properties = properties ?? new AuthenticationProperties();
-                if(!properties.Items.Keys.Contains(RemoteAuthenticationCallbackStrategy.TenantKey))
-                    properties.Items.Add(RemoteAuthenticationCallbackStrategy.TenantKey, multiTenantContext.TenantInfo.Identifier);
+                if(!properties.Items.Keys.Contains(Constants.TenantToken))
+                    properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
             }
         }
 

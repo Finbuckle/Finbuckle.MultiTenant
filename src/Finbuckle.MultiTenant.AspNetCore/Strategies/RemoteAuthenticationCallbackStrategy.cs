@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -28,14 +29,9 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
     {
-        internal static readonly string TenantKey = "__tenant__";
         private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
         
         public int Priority { get => -900; }
-
-        public RemoteAuthenticationCallbackStrategy()
-        {
-        }
 
         public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
         {
@@ -92,11 +88,12 @@ namespace Finbuckle.MultiTenant.Strategies
 
                         if (properties == null)
                         {
-                            logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
+                            if(logger != null)
+                                logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
                             return null;
                         }
 
-                        properties.Items.TryGetValue(TenantKey, out var identifier);
+                        properties.Items.TryGetValue(Constants.TenantToken, out var identifier);
 
                         return identifier;
                     }

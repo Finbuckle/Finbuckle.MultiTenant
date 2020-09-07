@@ -23,6 +23,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Security.Claims;
+using Finbuckle.MultiTenant.Internal;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -38,15 +39,29 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
-            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
+            builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
             {
-                var d = (dynamic)tc;
-                //options.Cookie.Name = $"{options.Cookie.Name ?? CookieAuthenticationDefaults.CookiePrefix}__{tc.Identifier}";
-                try { options.LoginPath = ((string)d.CookieLoginPath).Replace("__tenant__", tc.Identifier); } catch { }
-                try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace("__tenant__", tc.Identifier); } catch { }
-                try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace("__tenant__", tc.Identifier); } catch { }
-                //try { options.Cookie.Path = ((string)d.CookiePath).Replace("__tenant__", tc.Identifier); } catch { }
+                // Validate that claimed tenant matches current tenant.
+                var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
+                options.Events.OnValidatePrincipal = async context =>
+                {
+                    await origOnValidatePrincipal(context);
 
+                    if(context.Principal == null)
+                        return;
+                    
+                    var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
+                    
+                    // If no current tenant and no tenant claim then OK
+                    if(currentTenant == null && !context.Principal.Claims.Any(c => c.Type == Constants.TenantToken))
+                        return;
+
+                    // Does a tenant claim for the principle match the current tenant?
+                    if(!context.Principal.Claims.Where(c => c.Type == Constants.TenantToken && String.Equals(c.Value, currentTenant, StringComparison.OrdinalIgnoreCase)).Any())
+                        context.RejectPrincipal();
+                };
+
+                // Set the tenant claim when signing in.
                 var origOnSigningIn = options.Events.OnSigningIn;
                 options.Events.OnSigningIn = async context =>
                 {
@@ -56,32 +71,32 @@ namespace Microsoft.Extensions.DependencyInjection
                         return;
 
                     var identity = (ClaimsIdentity)context.Principal.Identity;
-                    identity.AddClaim(new Claim("__tenant__", context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo.Identifier));
-                };
+                    var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
 
-                var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
-                options.Events.OnValidatePrincipal = async context =>
-                {
-                    await origOnValidatePrincipal(context);
-
-                    if(context.Principal == null)
-                        return;
-                    
-                    var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo.Identifier;
-                    // Does a tenant claim for the principle match the current tenant?
-                    if(!context.Principal.Claims.Where(c => c.Type == "__tenant__" && String.Equals(c.Value, currentTenant, StringComparison.OrdinalIgnoreCase)).Any())
-                        context.RejectPrincipal();
+                    if(currentTenant != null)
+                        identity.AddClaim(new Claim(Constants.TenantToken, currentTenant));
                 };
+            });
+
+            // Set per-tenant cookie options by convention.
+            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
+            {
+                var d = (dynamic)tc;
+                try { options.LoginPath = ((string)d.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.LogoutPath = ((string)d.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier); } catch { }
             });
 
             builder.WithRemoteAuthenticationCallbackStrategy();
             
-            // We need to "decorate" IAuthenticationService so callbacks for
+            // We need to "decorate" IAuthenticationService so callbacks so that
             // remote authentication can get the tenant from the authentication
             // properties in the state parameter.
             if (!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
                 throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAutheorization() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
+            
+            // Set per-tenant OpenIdConnect options by convention.
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
@@ -90,10 +105,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 try { options.ClientSecret = d.OpenIdConnectClientSecret; } catch { }
             });
 
-            // Replace so that the options aren't cached and can be used per-
-            // tenant.
+            // Replace IAuthenticationSchemeProvider so that the options aren't
+            // cached and can be used per-tenant.
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
-
             var challengeSchemeProp = typeof(TTenantInfo).GetProperty("ChallengeScheme");
             if (challengeSchemeProp != null && challengeSchemeProp.PropertyType == typeof(string))
             {
@@ -110,7 +124,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, "__tenant__");
+            => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
 
         /// <summary>
         /// Adds and configures a SessionStrategy to the application.
@@ -141,14 +155,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
 #if NETCOREAPP2_1
         /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
         /// </summary>
         /// <param name="configRoutes">Delegate to configure the routes.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                     Action<IRouteBuilder> configRoutes)
                 where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithRouteStrategy("__tenant__", configRoutes);
+            => builder.WithRouteStrategy(Constants.TenantToken, configRoutes);
 
         /// <summary>
         /// Adds and configures a RouteStrategy to the application.
@@ -175,12 +189,12 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 #else
         /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter "__tenant__" to the application.
+        /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithRouteStrategy("__tenant__");
+            => builder.WithRouteStrategy(Constants.TenantToken);
 
         /// <summary>
         /// Adds and configures a RouteStrategy to the application.
@@ -205,7 +219,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithHostStrategy("__tenant__.*");
+            => builder.WithHostStrategy($"{Constants.TenantToken}.*");
 
         /// <summary>
         /// Adds and configures a HostStrategy to the application.
@@ -224,12 +238,12 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         
         /// <summary>
-        /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
+        /// Adds and configures a ClaimStrategy with tenantKey Constants.TenantToken to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, "__tenant__");
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
         }
 
         /// <summary>
