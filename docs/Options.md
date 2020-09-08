@@ -3,7 +3,7 @@ Finbuckle.MultiTenant integrates with the standard ASP.NET Core [Options pattern
 
  A specialized variation of this is [per-tenant authentication](Authentication).
 
-Per-tenant options will work with *any* options class when using `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes an app's own code *and* code internal to ASP.NET Core or other libraries that use the Options pattern. Use with caution: ASP.NET Core and other libraries may internally cache options or exhibit other unexpected behavior resulting in the wrong option values!
+Per-tenant options will work with *any* options class when using `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes an app's own code *and* code internal to ASP.NET Core or other libraries that use the Options pattern. There is one potential caveat: ASP.NET Core and other libraries may internally cache options or exhibit other unexpected behavior resulting in the wrong option values!
 
 Consider a typical scenario in ASP.Net Core, starting with a simple class:
 
@@ -47,19 +47,21 @@ public MyController : Controller
 ## Customizing Options Per Tenant
 This sections assumes Finbuckle.MultiTenant is installed and configured. See [Getting Started](GettingStarted) for details.
 
-Call `WithPerTenantOptions<TOptions>` after `AddMultiTenant` in the `ConfigureServices` method:
+Call `WithPerTenantOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
 
 ```cs
-services.AddMultiTenant()...
-    .WithPerTenantOptions<MyOptions>((options, tenantInfo) =>
-    {
-        options.MyOption1 = (int)tenantInfo.Items["someValue"];
-        options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
-    });
+services.AddMultiTenant<TenantInfo>()...
+        .WithPerTenantOptions<MyOptions>((options, tenantInfo) =>
+        {
+            options.MyOption1 = (int)tenantInfo.Items["someValue"];
+            options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
+        });
 ```
 
 The type parameter `TOptions` is the options type being customized per-tenant. The method parameter is an `Action<TOptions, TenantInfo>`. This action will modify the options instance *after* the options normal configuration and *before* its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions).
 
+`WithPerTenantOptions<TOptions>` can be called multiple times on the same `TOptions`
+type and the configuration will run in the respective order.
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 

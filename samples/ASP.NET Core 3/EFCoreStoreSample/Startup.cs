@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EFCoreStoreSample
 {
@@ -22,8 +23,8 @@ namespace EFCoreStoreSample
             services.AddControllersWithViews();
 
             services.AddMultiTenant<TenantInfo>()
-                .WithEFCoreStore<AppDbContext, TenantInfo>()
-                .WithRouteStrategy();
+                    .WithEFCoreStore<MultiTenantStoreDbContext, TenantInfo>()
+                    .WithRouteStrategy();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

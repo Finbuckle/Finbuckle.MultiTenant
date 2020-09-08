@@ -7,11 +7,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.4" />
-    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.0.0-preview5" />
-    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.0.0-preview5" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" /> -->
+    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" /> -->
+    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj" /> -->
   </ItemGroup>
 </Project>

@@ -75,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a IMultiTenantStore to the application using a factory method.
         /// </summary>
         /// <param name="lifetime">The service lifetime.</param>
-        /// <param name="factory">A delegate that will create and configure the strategy.</param>
+        /// <param name="factory">A delegate that will create and configure the store.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime, Func<IServiceProvider, TStore> factory)
             where TStore : IMultiTenantStore<TTenantInfo>

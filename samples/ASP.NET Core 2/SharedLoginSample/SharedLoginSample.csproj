@@ -8,8 +8,8 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.14" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" PrivateAssets="All" />
-    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.0.0-preview5" />
-    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.0.0-preview5" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

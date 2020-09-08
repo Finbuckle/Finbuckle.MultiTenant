@@ -1,6 +1,5 @@
 # Core Concepts
-
-The library uses standard ASP.Net Core conventions and most of the internal details are abstracted away from app code. However, there are a few important specifics to be aware of.
+The library uses standard .NET Core conventions and most of the internal details are abstracted away from app code. However, there are a few important specifics to be aware of.
 
 ## IMultiTenantContext
 Interface for a type containing information about the current multitenant environment.
@@ -9,16 +8,20 @@ Interface for a type containing information about the current multitenant enviro
 * Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext` object. The implementation used with ASP.NET Core middleware has read only properties. The `HttpContext` extension method `TrySetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this. 
 * A custom implementation can be defined for more advanced use cases.
 
-## TenantInfo
+## ITenantInfo and TenantInfo
 Contains information about a tenant. Usually an app will get the current `TenantInfo` object from the `MultiTenantContext` instance for that request. Instances of `TenantInfo` can also be passed to multitenant stores for adding, removing, updating the store.
 
-Includes properties for `Id`, `Identifier`, `Name`, `ConnectionString`, and `Items`.
+`ITenantInfo` defines properties for `Id`, `Identifier`, `Name`, `ConnectionString`.
 
 * `Id` is a unique id for a tenant in the app and should never change.
 * `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for the app (i.e. no crazy symbols in a web app where the identifier will be part of the URL). Unlike `Id`, `Identifier` can be changed if necessary.
 * `Name` is a display name for the tenant.
 * `ConnectionString` is a connection string that should be used for database operations for this tenant. It might connect to a shared database or a dedicated database for the single tenant.
-* The `Items` object is a general purpose `IDictionary<string, object>` container.
+
+`TenantInfo` is a basic implementation of `ITenantInfo` with only the required properties.
+An app can define a custom `ITenantInfo` and add any other needed properties.
+When calling `AddMultiTenant<T>` the type passed into the type parameter defines the
+`ITenantInfo` use through the library and thus the app.
 
 ## StrategyInfo
 Contains information about the multitenant strategy used to create the `MultiTenantContext`. Accessible as a property on `MultiTenantContext`.

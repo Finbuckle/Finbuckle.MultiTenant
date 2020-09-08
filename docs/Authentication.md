@@ -7,7 +7,7 @@ for a different tenant (e.g. a different path when using the route strategy),
 will not leak the previous login session into the tenant. This feature also
 avoids the need to create separate authentication schemes for each tenant.
 
-Common authentication options are supported per-tenant by default, but
+Common authentication options are supported per-tenant as discussed below, but
 additional authetication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
@@ -24,10 +24,12 @@ The `WithPerTenantAuthentication()` method can be called after
 options based on public properties of the `ITenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
+- Cookie signin events are modified to add a tenant claim during signin. Existing
+  signin events are preserved.
+- Cookie validation events are modified to validate that a tenant claim exists
+  which matches the current requests tenant. Existin validation events are
+  preserved.
 - The default challenge scheme is set to the `ChallengeScheme` property
-  of the `ITenantInfo` implementation.
-- Cookie names are appended with the tenant id.
-- 'Path' for cookie authentication is set to the `CookiePath` property
   of the `ITenantInfo` implementation.
 - 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
   of the `ITenantInfo` implementation.
@@ -44,20 +46,29 @@ The following happens when `WithPerTenantAuthentication()` is called:
 - `ClientSecret` for OpenID connect authentication is set to the
   `OpenIdConnectClientSecret` property of the `ITenantInfo` implementation.
 
-If the `ITenantInfo` implementation lacks one of the properties there is no
+If the `ITenantInfo` implementation lacks one of these properties there is no
 impact on the respective authentication property.
+
+The cookie signin and validation events ensure that a tenant signin does not
+leak over to a request for another tenant within the same browser or agent. By
+default, if a new signin occurs under a new tenant then tenant claim is replaced
+and the prior tenant session is effectively signed off. Any request to the prior
+tenant will lack the correct tenant claim value and validation will reject the
+authentication. This behavior means only a single tenant signin can be active.
+See [other authentication options](#other-authentication-options) below if a
+separate signin cookie for each tenant is required.
 
 By changing the default challenge per-tenant, the user can be redirected to a
 different scheme as needed. Combined with a per-tenant OpenID Connect authority,
 this can route to shared or tenant specific authentication infrastructure.
 
-The `CookiePath`, `CookieLoginPath`, `CookieLogoutPath`, and
+The `CookieLoginPath`, `CookieLogoutPath`, and
 `CookieAccessDeniedPath` properties can use a template format where `__tenant__`
 will be replaced with the identifier for each specific tenant. For example, a
 `CookieLoginPath` of "/\_\_tenant\_\_/Identity/Account/Login" will result in
 "/initech/Identity/Account/Login" for the Initech tenant.
 
-The code setup straight-forward:
+The code setup is straight-forward:
 
 ```cs
 public void ConfigureServices(IServiceCollection services)
@@ -68,7 +79,7 @@ public void ConfigureServices(IServiceCollection services)
             .AddCookie()
             .AddOpenIdConnect();
 
-    services.AddMultiTenant<AppTenantInfo>()
+    services.AddMultiTenant<TenantInfo>()
             .WithConfigurationStore()
             .WithRouteStrategy()
             .WithPerTenantAuthentication();
@@ -102,7 +113,6 @@ work.
 "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
     "Defaults": {
         "ConnectionString": "",
-        "CookiePath": "/__tenant__",
         "CookieLoginPath": "/__tenant__/home/login",
         "CookieLogoutPath": "/__tenant__/home/logout"
     },
@@ -137,7 +147,7 @@ work.
 
 ## Other Authentication Options
 
-Internally `WithPerTenantAuthentication()` makes heavy use of
+Internally `WithPerTenantAuthentication()` makes use of
 [per-tenant options](Options). For authentication options not covered by
 `WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
 
@@ -146,7 +156,7 @@ different recognized authority for token validation we can add a field to the
 `ITenantInfo` implementation and configure the option per-tenant:
 
 ```cs
-services.AddMultiTenant<AppTenantInfo>()
+services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantOptions<JwtBearerOptions>((o, tenantInfo) =>
@@ -158,3 +168,21 @@ services.AddMultiTenant<AppTenantInfo>()
 
 The same approach can be used for cookie, OpenID Connect, or any other
 authentication options type.
+
+Another common use case is the need to have separate cookies per tenant in
+addition to the functionality provided by `WithPerTenantOptions` which by
+default only uses a single cookie for all tenants. By using per-tenant options
+we can give each tenant's cookie a different name. This effectively maintains
+existing tenant signins when switching between requests on the same browser or
+agent because new signins are not replacing the existing cookie:
+
+```cs
+services.AddMultiTenant<TenantInfo>()
+        .WithConfigurationStore()
+        .WithRouteStrategy()
+        .WithPerTenantAuthentication()
+        .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
+        {
+            o.Cookie.Name = "SigninCookie - " + tenantInfo.Id;
+        });
+```
