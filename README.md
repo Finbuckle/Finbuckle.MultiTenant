@@ -1,4 +1,4 @@
-# Finbuckle.MultiTenant 6.0.0-preview5
+# Finbuckle.MultiTenant 6.0.0
 
 Finbuckle.MultiTenant is a multitenancy library for .NET Core. It provides functionality for tenant resolution, per-tenant app configuration, and per-tenant data isolation.
 
