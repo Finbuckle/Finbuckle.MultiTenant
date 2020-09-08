@@ -47,10 +47,10 @@ Default entity types exist such as the `IdentityUser`, `IdentityRole`, and `Iden
 
 Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all of the default entity types and `string` for `TKey`. All entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest. `TUser` will not be configured as multitenant by default, and it is up to the programmer to do so as desribed above. All other entity types will be configured as multitenant.
+Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the rest. `TUser` will not be configured as multitenant by default, and it is up to the programmer to do so as described above. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as multitenant by default, and it is up to the programmer to do so as desribed above if desired. All other entity types will be configured as multitenant.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as multitenant by default, and it is up to the programmer to do so as described above if desired. All other entity types will be configured as multitenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters. No entity types will be configured as multitenant, and it is up to the programmer to do so as desribed above if desired.
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will only use provided parameters. No entity types will be configured as multitenant, and it is up to the programmer to do so as described above if desired.
 
 When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]` attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the base class `OnModelCreating`.

@@ -1,7 +1,6 @@
 # MultiTenant Stores
 A multitenant store is responsible for retrieving information about a tenant based on an identifier string determined by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which provides the current tenant information to an app.
 
-
 Finbuckle.MultiTenant provides three basic multitenant stores
 - `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
 - `ConfigurationStore` - a read-only store that is backed by app configuration (e.g. appsettings.json).
@@ -17,7 +16,7 @@ from JSON for the configuration store if using json file configuration sources.
 The examples in this documentation use the `TenantInfo` basic implementation.
 
 ## IMultiTenantStore and Custom Stores
-If the provided multitenant stores are not suitable then a custom store can be created by implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type parameter passed to `AddMultiTenant<T>` at compile time. The implementation must defines `TryAddAsync`, `TryUpdateAsync`, `TryRemoveAsyc`, `TryGetByIdentifierAsync`, and `TryGetAsync` methods. `TryGetByIdentifierAsync` and `TryGetAsync` should return null if there is no suitable tenant match.
+If the provided multitenant stores are not suitable then a custom store can be created by implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type parameter passed to `AddMultiTenant<T>` at compile time. The implementation must defines `TryAddAsync`, `TryUpdateAsync`, `TryRemoveAsyc`, `TryGetByIdentifierAsync`, `TryGetAsync`, and `GetAllAsync` methods. `TryGetByIdentifierAsync` and `TryGetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses dependency injection along with any passed parameters to construct the implementation instance. An alternative overload accepts a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a wrapper providing basic logging and exception handling.
 
@@ -56,6 +55,10 @@ var store = serviceProvider.GetService<IEnumerable<IMultiTenantStore<TenantInfo>
 // Add some tenants...
 await store.TryAddAsync(new TenantInfo{...});
 ```
+
+## Getting All Tenants from Store
+If implemented, `GetAllAsync` will return an `IEnumerable<TTenantInfo>` listing of all  tenants in the store.
+Currently `InMemoryStore`, `ConfigurationStore`, and `EFCoreStore` implement `GetAllAsync`.
 
 ## In-Memory Store
 > NuGet package: Finbuckle.MultiTenant

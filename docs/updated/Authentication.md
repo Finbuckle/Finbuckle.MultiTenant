@@ -55,7 +55,8 @@ default, if a new signin occurs under a new tenant then tenant claim is replaced
 and the prior tenant session is effectively signed off. Any request to the prior
 tenant will lack the correct tenant claim value and validation will reject the
 authentication. This behavior means only a single tenant signin can be active.
-See  
+See [other authentication options](#other-authentication-options) below if a
+separate signin cookie for each tenant is required.
 
 By changing the default challenge per-tenant, the user can be redirected to a
 different scheme as needed. Combined with a per-tenant OpenID Connect authority,
