@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 using System.Linq;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -23,14 +23,7 @@ using Xunit;
 
 namespace EFCoreStoreShould
 {
-    public class TestEFCoreStoreDbContext : EFCoreStoreDbContext
-    {
-        public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
-        {
-        }
-    }
-
-    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext>>
+    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>>
     {
         private static IProperty GetModelProperty(string propName)
         {
@@ -45,7 +38,7 @@ namespace EFCoreStoreShould
             return prop;
         }
 
-        protected override IMultiTenantStore CreateTestStore()
+        protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
             var connection = new SqliteConnection("DataSource=:memory:");
             connection.Open();
@@ -54,13 +47,13 @@ namespace EFCoreStoreShould
                     .Options;
             var dbContext = new TestEFCoreStoreDbContext(options);
             dbContext.Database.EnsureCreated();
-
-            var store = new EFCoreStore<TestEFCoreStoreDbContext >(dbContext);
+            
+            var store = new EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>(dbContext);
 
             return PopulateTestStore(store);
         }
 
-        protected override IMultiTenantStore PopulateTestStore(IMultiTenantStore store)
+        protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
         {
             return base.PopulateTestStore(store);
         }
@@ -84,34 +77,6 @@ namespace EFCoreStoreShould
         {
             var prop = GetModelProperty("Identifier");
             Assert.True(prop.IsIndex());
-        }
-
-        [Fact]
-        public void AddNameRequiredConstraint()
-        {
-            var prop = GetModelProperty("Name");
-            Assert.False(prop.IsNullable);
-        }
-
-        [Fact]
-        public void AddConnectionStringRequiredConstraint()
-        {
-            var prop = GetModelProperty("ConnectionString");
-            Assert.False(prop.IsNullable);
-        }
-
-        [Fact]
-        public void IgnoreItemsCollectionProperty()
-        {
-            var prop = GetModelProperty("Items");
-            Assert.Null(prop);
-        }
-
-        [Fact]
-        public void IgnoreMultiTenantContextProperty()
-        {
-            var prop = GetModelProperty("MultiTenantContext");
-            Assert.Null(prop);
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs

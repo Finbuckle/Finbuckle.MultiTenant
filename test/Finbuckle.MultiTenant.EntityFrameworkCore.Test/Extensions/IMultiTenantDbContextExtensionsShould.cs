@@ -1,4 +1,4 @@
-// Copyright 2019 Andrew White
+// Copyright 2018-2020 Andrew White
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,8 +40,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantNotSetMode.Throw, should act as Overwrite when adding
                 using (var db = new TestBlogDbContext(tenant1, _options))
@@ -81,8 +86,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantMismatchMode.Throw
                 using (var db = new TestBlogDbContext(tenant1, _options))
@@ -138,8 +148,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantNotSetMode.Throw
                 using (var db = new TestBlogDbContext(tenant1, _options))
@@ -186,8 +201,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantMismatchMode.Throw
                 using (var db = new TestBlogDbContext(tenant1, _options))
@@ -251,8 +271,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantNotSetMode.Throw
                 using (var db = new TestBlogDbContext(tenant1, _options))
@@ -300,8 +325,13 @@ namespace IMultiTenantDbContextExtensionShould
             try
             {
                 _connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 // TenantMismatchMode.Throw
                 using (var db = new TestBlogDbContext(tenant1, _options))

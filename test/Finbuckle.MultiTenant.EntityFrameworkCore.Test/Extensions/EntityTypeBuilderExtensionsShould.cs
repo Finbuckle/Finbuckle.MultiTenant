@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ namespace EntityTypeBuilderExtensionsShould
                 var prop = db.Model.FindEntityType(typeof(MyThingWithTenantId)).FindProperty("TenantId");
 
                 Assert.Equal(typeof(string), prop.ClrType);
-                // IsShadowProperty doesn't work?
+                // TODO: IsShadowProperty doesn't work?
                 // Assert.False(prop.IsShadowProperty());
                 Assert.NotNull(prop.FieldInfo);
             }
@@ -158,7 +158,7 @@ namespace EntityTypeBuilderExtensionsShould
             {
                 var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing)).FindProperty("TenantId");
 
-                Assert.Equal(Finbuckle.MultiTenant.Core.Constants.TenantIdMaxLength, prop.GetMaxLength());
+                Assert.Equal(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
             }
         }
 
@@ -174,8 +174,13 @@ namespace EntityTypeBuilderExtensionsShould
                 var options = new DbContextOptionsBuilder()
                     .UseSqlite(connection)
                     .Options;
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
 
                 using (var db = new TestBlogDbContext(tenant1, options))
                 {
@@ -189,8 +194,13 @@ namespace EntityTypeBuilderExtensionsShould
                     db.SaveChanges();
                 }
 
-                var tenant2 = new TenantInfo("123", "123", "123",
-                    "DataSource=testdb.db", null);
+                var tenant2 = new TenantInfo
+                {
+                    Id = "123",
+                    Identifier = "123",
+                    Name = "123",
+                    ConnectionString = "DataSource=testdb.db"
+                };
                 using (var db = new TestBlogDbContext(tenant2, options))
                 {
                     var blog1 = new Blog { Title = "123" };
@@ -221,7 +231,7 @@ namespace EntityTypeBuilderExtensionsShould
         public void RespectExistingQueryFilter()
         {
             // Doesn't appear to be a way to test this except to try it out...
-            
+
             var connection = new SqliteConnection("DataSource=:memory:");
             var options = new DbContextOptionsBuilder()
                     .UseSqlite(connection)
@@ -229,8 +239,14 @@ namespace EntityTypeBuilderExtensionsShould
             try
             {
                 connection.Open();
-                var tenant1 = new TenantInfo("abc", "abc", "abc",
-                    "DataSource=testdb.db", null);
+                var tenant1 = new TenantInfo
+                {
+                    Id = "abc",
+                    Identifier = "abc",
+                    Name = "abc",
+                    ConnectionString = "DataSource=testdb.db"
+                };
+
                 using (var db = new TestDbContextWithExistingGlobalFilter(tenant1, options))
                 {
                     db.Database.EnsureDeleted();
@@ -265,8 +281,14 @@ namespace EntityTypeBuilderExtensionsShould
         [Fact]
         public void AdjustRoleIndex()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
+
             using (var c = GetTestIdentityDbContext(tenant1))
             {
                 var props = new List<IProperty>();
@@ -282,8 +304,14 @@ namespace EntityTypeBuilderExtensionsShould
         [Fact]
         public void AdjustUserLoginKey()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
+
             using (var c = GetTestIdentityDbContext(tenant1))
             {
                 Assert.True(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("Id").IsPrimaryKey());
@@ -293,8 +321,14 @@ namespace EntityTypeBuilderExtensionsShould
         [Fact]
         public void AddUserLoginIndex()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
+
             using (var c = GetTestIdentityDbContext(tenant1))
             {
                 var props = new List<IProperty>();
@@ -311,8 +345,14 @@ namespace EntityTypeBuilderExtensionsShould
         [Fact]
         public void AdjustUserIndex()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
+
             using (var c = GetTestIdentityDbContext(tenant1))
             {
                 var props = new List<IProperty>();

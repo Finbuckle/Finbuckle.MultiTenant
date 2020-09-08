@@ -1,0 +1,140 @@
+﻿@model SampleTenantInfo
+
+@if(Model != null)
+{
+    @if(!User.Identity.IsAuthenticated)
+    {
+        <p><a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a></p>
+        <p>For external login:<br/>Username: <i>alice</i> or <i>bob</i><br />Password: <i>Pass123$</i></p>
+    } else
+    {
+        <a asp-action="Logout" class="btn btn-secondary">Logout</a>
+    }
+
+    <h3 class="mt-4">TenantInfo Values</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:25%">Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach(var prop in @Model.GetType().GetProperties())
+            {
+                <tr>
+                    <td>@prop.Name</td>
+                    <td>@prop.GetValue(@Model)</td>
+                </tr>   
+            }
+        </tbody>
+    
+    </table>
+}
+else
+{
+    <div class="jumbotron">
+        <h1 class="display-4">Hello, world!</h1>
+        <p class="lead">This sample highlights <a href="https://www.finbuckle.com/MultiTenant/Docs/Authentication">per-tenant authentication options</a>.</p>
+        <hr class="my-4">
+        <p>
+            This sample demonstrates use of <code>WithPerTenantAuthentication()
+            </code>. As you can see in the <code>ConfigureServices</code> and
+            <code>Configure</code> methods shown below, there isn't much code
+            needed.
+        </p>
+        <p>
+            In this sample the MegaCorp tenant just uses local cookies to
+            "signin" and "signout". The ACME and Initech tenants use different
+            OpenID Connect servers for their respective authentication.
+        </p>
+        <p>
+            The magic happens in the <code>appsettings.json</code>, where the
+            configured tenants have properties that
+            <code>WithPerTenantAuthentication()</code> uses to configure cookie
+            and OpenIdConnect options to ensure sessions are isolated and
+            authentication per-tenant. See the documentation for more details on
+            the supported properties.
+        </p>
+        <p>
+            Configuration in <code>Startup.cs</code>:
+        </p>
+<pre><code>public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllersWithViews();
+    
+    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie()
+            .AddOpenIdConnect(options =>
+            {
+                options.Prompt = "login consent"; // For sample purposes.
+            });
+
+    services.AddMultiTenant&lt;SampleTenantInfo&gt;()
+            .WithConfigurationStore()
+            .WithRouteStrategy()
+            .WithPerTenantAuthentication();
+}
+
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.EnvironmentName == "Development")
+    {
+        app.UseDeveloperExceptionPage();
+    }
+
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseMultiTenant();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
+    });
+}</code></pre>
+    <p>
+        Tenant configuration in <code>appSettings.json</code>:
+    </p>
+<code><pre>
+"Finbuckle:MultiTenant:Stores:ConfigurationStore": {
+    "Defaults": {
+        "ConnectionString": "",
+        "CookiePath": "/__tenant__",
+        "CookieLoginPath": "/__tenant__/home/login",
+        "CookieLogoutPath": "/__tenant__/home/logout"
+    },
+    "Tenants": [
+        {
+            "Id": "93f330717e5d4f039cd05da312d559cc",
+            "Identifier": "megacorp",
+            "Name": "MegaCorp",
+            "ChallengeScheme": "Cookies"
+        },
+        {
+            "Id": "505c5c97f4e2442394610c673ac91f61",
+            "Identifier": "acme",
+            "Name": "ACME",
+            "ChallengeScheme": "OpenIdConnect",
+            "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
+            "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
+            "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+        },
+        {
+            "Id": "4ee609d6da0342e682012232566cff0e",
+            "Identifier": "initech",
+            "Name": "Initech",
+            "ChallengeScheme": "OpenIdConnect",
+            "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
+            "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
+            "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+        }
+    ]
+}
+</pre></code>
+        <p>Click the links on the navbar to see it in action!</p>
+    </div>
+}

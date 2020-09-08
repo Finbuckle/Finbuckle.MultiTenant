@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 using System;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Core;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;

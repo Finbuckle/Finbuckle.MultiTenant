@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
         /// <param name="schemes">The dictionary used to store authentication schemes.</param>
-        protected MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
+        public MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
         {
             _optionsProvider = options;
 

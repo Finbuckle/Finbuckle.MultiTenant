@@ -10,10 +10,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" PrivateAssets="All" />
-    <PackageReference Include="Finbuckle.MultiTenant" Version="5.0.4" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" /> -->
+    <!-- <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" /> -->
   </ItemGroup>
 </Project>

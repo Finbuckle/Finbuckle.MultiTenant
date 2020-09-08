@@ -13,9 +13,9 @@ namespace SharedLoginSample.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IMultiTenantStore store;
+        private readonly IMultiTenantStore<TenantInfo> store;
 
-        public HomeController(IMultiTenantStore store)
+        public HomeController(IMultiTenantStore<TenantInfo> store)
         {
             this.store = store;
         }
@@ -73,11 +73,11 @@ namespace SharedLoginSample.Controllers
                 }
 
                 // Save the original TenantInfo and service provider.
-                var originalTenantInfo = HttpContext.GetMultiTenantContext()?.TenantInfo;
+                var originalTenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
                 var orignalServiceProvider = HttpContext.RequestServices;
 
                 // Set the new TenantInfo and reset the service provider.
-                HttpContext.TrySetTenantInfo(tenantInfo, resetServiceProvider: true);
+                HttpContext.TrySetTenantInfo(tenantInfo, resetServiceProviderScope: true);
                 
                 // Now sign in and redirect (using Identity in this example). Since TenantInfo is set the options that the signin
                 // uses internally will be for this tenant.
@@ -93,7 +93,7 @@ namespace SharedLoginSample.Controllers
                 // In case an error signing in, reset the TenantInfo and ServiceProvider so that the
                 // view in unaffected.
                 HttpContext.RequestServices = orignalServiceProvider;
-                HttpContext.TrySetTenantInfo(originalTenantInfo, resetServiceProvider: false);
+                HttpContext.TrySetTenantInfo(originalTenantInfo, resetServiceProviderScope: false);
             }
 
         // We should only reach this if there was a problem signing in. The view will dispay the errors.

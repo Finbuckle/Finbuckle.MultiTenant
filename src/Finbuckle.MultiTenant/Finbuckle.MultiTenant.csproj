@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Description>Metapackage for Finbuckle.MultiTenant.</Description>
-    <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
+    
+    <Title>Finbuckle.MultiTenant</Title>
+    <Description>Main library package for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-      <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
-      <ProjectReference Include="../Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
-      <ProjectReference Include="../Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
+
+<Choose>
+    <When Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+      <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.1" />
+      </ItemGroup>
+    </When>
+    <When Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+      <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.4" />
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>

@@ -1,4 +1,4 @@
-﻿//    Copyright 2018 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
 
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
-    internal class MultiTenantAuthenticationService : IAuthenticationService
+    internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
+        where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IAuthenticationService inner;
 
@@ -28,29 +31,43 @@ namespace Finbuckle.MultiTenant.AspNetCore
             this.inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
         }
 
+        private static void AddTenantIdentiferToProperties(HttpContext context, ref AuthenticationProperties properties)
+        {
+            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
+            var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
+            if (multiTenantContext?.TenantInfo != null)
+            {
+                properties = properties ?? new AuthenticationProperties();
+                if(!properties.Items.Keys.Contains(Constants.TenantToken))
+                    properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
+            }
+        }
+
         public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string scheme)
             => inner.AuthenticateAsync(context, scheme);
 
-        public Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        public async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
-            var multiTenantContext = context.GetMultiTenantContext();
-            if (multiTenantContext.TenantInfo != null)
-            {
-                properties = properties ?? new AuthenticationProperties();
-                properties.Items.Add("tenantIdentifier", multiTenantContext.TenantInfo.Identifier);
-            }
-
-            return inner.ChallengeAsync(context, scheme, properties);
+            AddTenantIdentiferToProperties(context, ref properties);
+            await inner.ChallengeAsync(context, scheme, properties);
         }
 
-        public Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
-            => inner.ForbidAsync(context, scheme, properties);
+        public async Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        {
+            AddTenantIdentiferToProperties(context, ref properties);
+            await inner.ForbidAsync(context, scheme, properties);
+        }
 
-        public Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
-            => inner.SignInAsync(context, scheme, principal, properties);
+        public async Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
+        {
+            AddTenantIdentiferToProperties(context, ref properties);
+            await inner.SignInAsync(context, scheme, principal, properties);
+        }
 
-        public Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
-            => inner.SignOutAsync(context, scheme, properties);
+        public async Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
+        {
+            AddTenantIdentiferToProperties(context, ref properties);
+            await inner.SignOutAsync(context, scheme, properties);
+        }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EFCoreStoreSample
 {
@@ -21,9 +22,9 @@ namespace EFCoreStoreSample
         {
             services.AddControllersWithViews();
 
-            services.AddMultiTenant()
-                .WithEFCoreStore<AppDbContext>()
-                .WithRouteStrategy();
+            services.AddMultiTenant<TenantInfo>()
+                    .WithEFCoreStore<MultiTenantStoreDbContext, TenantInfo>()
+                    .WithRouteStrategy();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -49,10 +50,10 @@ namespace EFCoreStoreSample
         private void SetupStore(IServiceProvider sp)
         {
             var scopeServices = sp.CreateScope().ServiceProvider;
-            var store = scopeServices.GetRequiredService<IMultiTenantStore>();
+            var store = scopeServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
 
-            store.TryAddAsync(new TenantInfo("tenant-finbuckle-d043favoiaw", "finbuckle", "Finbuckle", "finbuckle_conn_string", null)).Wait();
-            store.TryAddAsync(new TenantInfo("tenant-initech-341ojadsfa", "initech", "Initech LLC", "initech_conn_string", null)).Wait();
+            store.TryAddAsync(new TenantInfo{ Id = "tenant-finbuckle-d043favoiaw", Identifier = "finbuckle", Name = "Finbuckle", ConnectionString = "finbuckle_conn_string"}).Wait();
+            store.TryAddAsync(new TenantInfo{Id = "tenant-initech-341ojadsfa", Identifier = "initech", Name = "Initech LLC", ConnectionString = "initech_conn_string"}).Wait();
         }
     }
 }

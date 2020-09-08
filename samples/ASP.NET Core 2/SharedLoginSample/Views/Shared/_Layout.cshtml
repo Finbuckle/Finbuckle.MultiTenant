@@ -12,11 +12,11 @@
             <a class="navbar-brand" href="/">Home</a>
             <div class="navbar-nav mr-auto">
                 <a class="nav-item nav-link" href="/SharedLogin">Shared Login</a>
-                <a asp-controller="Home" asp-action="Index" asp-route-__tenant__="finbuckle" class="nav-item nav-link">Finbuckle</a>
+                <a asp-controller="Home" asp-action="Index" asp-route-__tenant__="acme" class="nav-item nav-link">ACME</a>
                 <a asp-controller="Home" asp-action="Index" asp-route-__tenant__="megacorp" class="nav-item nav-link">MegaCorp</a>
                 <a asp-controller="Home" asp-action="Index" asp-route-__tenant__="initech" class="nav-item nav-link">Initech</a>
             </div>
-            @if (Context.GetMultiTenantContext().TenantInfo != null)
+            @if (Context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
             {
                 <partial name="_LoginPartial" />
             }

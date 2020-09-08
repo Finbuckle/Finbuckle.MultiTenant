@@ -1,4 +1,5 @@
 ﻿using Finbuckle.MultiTenant;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityDataIsolationSample.Controllers
@@ -7,7 +8,18 @@ namespace IdentityDataIsolationSample.Controllers
     {
         public IActionResult Index()
         {
-            return View(HttpContext.GetMultiTenantContext()?.TenantInfo);
+            var ti = HttpContext.GetMultiTenantContext<SampleTenantInfo>()?.TenantInfo;
+            return View(ti);
+        }
+
+        public IActionResult ReturnChallenge()
+        {
+            return Challenge();
+        }
+
+        public IActionResult ReturnForbid()
+        {
+            return Forbid();
         }
     }
 }

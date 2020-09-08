@@ -1,4 +1,21 @@
 ## Version
+**6.0.0**
+* Customizable `TenantInfo`. Implement `ITenantInfo` as needed or use the basic `TenantInfo` implementation. Should work with most strategies and stores. This was a major overhaul to the library. See docs for more information.
+* Changed nuget structure: use `Finbuckle.MultiTenant.AspNetCore` for web apps and if needed add `Finbuckle.MultiTenant.EntityFrameworkCore`.
+* `WithPerTenantAuthentication` - Adds support for common per-tenant authentication scenarios. See docs for full details.
+* Multiple strategies and stores can be registered. They will run in the order registered and the first tenant returned by a strategy/store combination is used.
+* New `ClaimStrategy` checks for a tenant claim to resolve the tenant.
+* New `SessionStategy` uses a session variable to resolve the tenant.
+* Refefactored `InMemoryStore`, removed deprecated configuration functionality.
+* Improved Blazor support.
+* Improved support for non ASP.NET Core use cases.
+* Removed support for ASP.NET 3.0.
+* Removed `FallbackStrategy`, `StaticStrategy` is a better alternative.
+* Bug fixes, refactors, and tweaks.
+* Improved unit tests.
+* Updated and improved documentation.
+* Updated sample. Removed some older ASP.NET Core 2.1 samples.
+
 **5.0.4**
 * Fixed a conflicting assembly and nuget versions.
 * Minor documentation fix.

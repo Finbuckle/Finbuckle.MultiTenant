@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
-    var tenantInfo = Context.GetMultiTenantContext()?.TenantInfo;
+    var tenantInfo = Context.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
 }
 
 @using Finbuckle.MultiTenant.AspNetCore
@@ -58,7 +58,7 @@
                     A real app would probably query a database or call an API. Check the <em>SharedLogin</em> action in the <em>Home</em> controller to see the code.
                 </p>
                 <p>
-                    In order to sign in from the shared login page, users need to be registered. Select a tenant on the navbar and register a few users with email addresses ending in @@finbuckle.com, @@megacorp.com, or @@initech.com (matching the tenant).
+                    In order to sign in from the shared login page, users need to be registered. Select a tenant on the navbar and register a few users with email addresses ending in @@acme.com, @@megacorp.com, or @@initech.com (matching the tenant).
                     For this sample, it is not important if these are real email addresses.
                 </p>
             </div>

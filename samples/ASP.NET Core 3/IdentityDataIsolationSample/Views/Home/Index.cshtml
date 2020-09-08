@@ -1,15 +1,17 @@
-﻿@model TenantInfo
+﻿@model SampleTenantInfo
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-@using Finbuckle.MultiTenant.AspNetCore
 
 <div class="row">
     <div class="col">
         @if (Model != null)
         {
+            <a asp-controller="Home" asp-action="ReturnChallenge" class="nav-link">Authentication Challenge</a>
+            <a asp-controller="Home" asp-action="ReturnForbid" class="nav-link">Authentication Forbid</a>
+
             <h3 class="mt-4">TenantInfo Values</h3>
 
             <table class="table">
@@ -21,22 +23,13 @@
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td>@nameof(Model.Id)</td>
-                        <td>@Model.Id</td>
-                    </tr>
-                    <tr>
-                        <td>@nameof(Model.Identifier)</td>
-                        <td>@Model.Identifier</td>
-                    </tr>
-                    <tr>
-                        <td>@nameof(Model.Name)</td>
-                        <td>@Model.Name</td>
-                    </tr>
-                    <tr>
-                        <td>@nameof(Model.ConnectionString)</td>
-                        <td>@Model.ConnectionString</td>
-                    </tr>
+                    @foreach(var prop in @Model.GetType().GetProperties())
+                    {
+                        <tr>
+                            <td>@prop.Name</td>
+                            <td>@prop.GetValue(@Model)</td>
+                        </tr>   
+                    }
                 </tbody>
             
             </table>
@@ -103,7 +96,7 @@ services.AddControllersWithViews()
 // Wrap the default link generator with one that will preserve the tenant route parameter for links.
 services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
 
-services.AddMultiTenant()... // Similar to setup in the AuthenticationOptionsSample.
+services.AddMultiTenant&lt;TenantInfo&gt;()... // Similar to setup in the AuthenticationOptionsSample.
 </code></pre>
             <p>Click the links on the navbar to it in action!</p>
             </div>

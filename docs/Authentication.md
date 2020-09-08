@@ -1,138 +1,188 @@
 # Per-Tenant Authentication
 
-Finbuckle.MultiTenant's support for [per-tenant options](Options) is enhanced specifically to let apps customize ASP.NET Core 2.1+ authentication options. For example, `CookieAuthenticationOptions` or `OpenIdConnectOptions` can be configured separately per tenant to provide unique cookie names or OpenID Connect providers. This prevents sessions under a tenant from spilling over to another tenant if the same user-agent is used to access both. This design also prevents the need for a separate authentication schemes for every tenant.
+Finbuckle.MultiTenant provides built-in support for isolating tenant
+authentication. This means that the login session for a given request will only
+be valid for the current tenant. Subsequent requests from the same client, but
+for a different tenant (e.g. a different path when using the route strategy),
+will not leak the previous login session into the tenant. This feature also
+avoids the need to create separate authentication schemes for each tenant.
 
-This functionality works by giving each tenant an opportunity to customize options as they are first created, and caching the resulting options for each tenant. The options are only created once an app initiates an authentication related activity such as when `UseAuthentication` is called in the app pipeline.
+Common authentication options are supported per-tenant as discussed below, but
+additional authetication options can be configured per-tenant using
+[per-tenant options](Options) as needed.
 
-Additionally, some types of authentication such as OpenID Connect and OAuth-based social providers require that the `WithRemoteAuthentication` method is called after `AddMultiTenant` during app configuration.
+See the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
+for a demonstration of the features discussed in this topic.
 
-The sections below assume Finbuckle.MultiTenant is installed and configured. See [Getting Started](GettingStarted) for details.
+The sections below assume Finbuckle.MultiTenant is installed and configured. See
+[Getting Started](GettingStarted) for details.
 
-## General Authentication Options
+## Using WithPerTenantAuthentication()
 
-General authentication options such as `DefaultScheme` and `DefaultChallenge` schemes can be configured per-tenant. This can be useful if some tenants prefer local sign-in and other prefer to use OpenID Connect. See the [AuthenticationOptionsSamples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/AuthenticationOptionsSample) for a complete example.
+The `WithPerTenantAuthentication()` method can be called after
+`AddMultiTenant<T>()` and uses conventions to configure common authentication
+options based on public properties of the `ITenantInfo` type parameter.
+
+The following happens when `WithPerTenantAuthentication()` is called:
+- Cookie signin events are modified to add a tenant claim during signin. Existing
+  signin events are preserved.
+- Cookie validation events are modified to validate that a tenant claim exists
+  which matches the current requests tenant. Existin validation events are
+  preserved.
+- The default challenge scheme is set to the `ChallengeScheme` property
+  of the `ITenantInfo` implementation.
+- 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
+  of the `ITenantInfo` implementation.
+- 'LogoutPath' for cookie authentication is set to the `CookieLogoutPath`
+  property of the `ITenantInfo` implementation.
+- 'AccessDeniedPath' for cookie authentication is set to the
+  `CookieAccessDeniedPath` property of the `ITenantInfo` implementation.
+- Seveal internal services are registered to support remote authentication such
+  as OAuth 2.0 and OpenID Connect.
+- `Authority` for OpenID connect authentication is set to the
+  `OpenIdConnectAuthority` property of the `ITenantInfo` implementation.
+- `ClientId` for OpenID connect authentication is set to the
+  `OpenIdConnectClientId` property of the `ITenantInfo` implementation.
+- `ClientSecret` for OpenID connect authentication is set to the
+  `OpenIdConnectClientSecret` property of the `ITenantInfo` implementation.
+
+If the `ITenantInfo` implementation lacks one of these properties there is no
+impact on the respective authentication property.
+
+The cookie signin and validation events ensure that a tenant signin does not
+leak over to a request for another tenant within the same browser or agent. By
+default, if a new signin occurs under a new tenant then tenant claim is replaced
+and the prior tenant session is effectively signed off. Any request to the prior
+tenant will lack the correct tenant claim value and validation will reject the
+authentication. This behavior means only a single tenant signin can be active.
+See [other authentication options](#other-authentication-options) below if a
+separate signin cookie for each tenant is required.
+
+By changing the default challenge per-tenant, the user can be redirected to a
+different scheme as needed. Combined with a per-tenant OpenID Connect authority,
+this can route to shared or tenant specific authentication infrastructure.
+
+The `CookieLoginPath`, `CookieLogoutPath`, and
+`CookieAccessDeniedPath` properties can use a template format where `__tenant__`
+will be replaced with the identifier for each specific tenant. For example, a
+`CookieLoginPath` of "/\_\_tenant\_\_/Identity/Account/Login" will result in
+"/initech/Identity/Account/Login" for the Initech tenant.
+
+The code setup is straight-forward:
 
 ```cs
-services.AddMultiTenant().
-    WithStore(...).
-    WithStrategy(...).
-    WithRemoteAuthentication().
-    WithPerTenantOptions<AuthenticationOptions>((options, tenantInfo) =>
-    {
-        // Allow each tenant to have a different default challenge scheme.
-        // Here the scheme is assumed to be configured in the TenantInfo's 
-        // Items property.
-        if (tenantInfo.Items.TryGetValue("ChallengeScheme", out object challengeScheme))
-        {
-            options.DefaultChallengeScheme = (string)challengeScheme;
-        }
-    })...
-```
-
-## Cookie Authentication Options
-
-See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant cookie options.
-
-In the `Startup` class, [configure cookie authentication as usual](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie) for ASP.NET Core 2.1+:
-
-```cs
-public class Startup
+public void ConfigureServices(IServiceCollection services)
 {
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.AddMultiTenant()...
-        ...
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).
-            AddCookie(options =>
-            {
-                options.Cookie.Name = "MyAppCookie.";
-            });
-    }
+    services.AddControllersWithViews();
+    
+    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie()
+            .AddOpenIdConnect();
+
+    services.AddMultiTenant<TenantInfo>()
+            .WithConfigurationStore()
+            .WithRouteStrategy()
+            .WithPerTenantAuthentication();
 }
- ```
 
-Call `WithPerTenantOptions<CookieAuthenticationOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `CookieAuthenticationOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, CookieAuthenticationOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are appending the tenant's ID to the cookie name:
-
-```cs
-services.AddMultiTenant()...
-    .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    if (env.EnvironmentName == "Development")
     {
-        o.Cookie.Name += tenantInfo.Id;
+        app.UseDeveloperExceptionPage();
+    }
+
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.UseMultiTenant();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
     });
+}
 ```
 
-This will cause the ASP.NET Core 2.1+ authentication middleware to only process the cookie for the specific tenant. All of the other cookie options are set normally, but each tenant's version of the options will be customized accordingly.
+The code above paired with the `appSettings.json` tenant configuration below
+produces the behavior described. Any tenant store configured similarly will also
+work.
 
-Depending on the [multitenant strategy](Strategies) being used, the following properties should be especially considered for per-tenant customization:
+```json
+"Finbuckle:MultiTenant:Stores:ConfigurationStore": {
+    "Defaults": {
+        "ConnectionString": "",
+        "CookieLoginPath": "/__tenant__/home/login",
+        "CookieLogoutPath": "/__tenant__/home/logout"
+    },
+    "Tenants": [
+        {
+            "Id": "93f330717e5d4f039cd05da312d559cc",
+            "Identifier": "megacorp",
+            "Name": "MegaCorp",
+            "ChallengeScheme": "Cookies"
+        },
+        {
+            "Id": "505c5c97f4e2442394610c673ac91f61",
+            "Identifier": "acme",
+            "Name": "ACME",
+            "ChallengeScheme": "OpenIdConnect",
+            "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
+            "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
+            "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+        },
+        {
+            "Id": "4ee609d6da0342e682012232566cff0e",
+            "Identifier": "initech",
+            "Name": "Initech",
+            "ChallengeScheme": "OpenIdConnect",
+            "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
+            "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
+            "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+        }
+    ]
+}
+```
 
-* `AccessDeniedPath`
-* `Cookie.Domain`
-* `Cookie.Name`
-* `Cookie.Path`
-* `DataProtectionProvider`
-* `LoginPath` 
-* `LogoutPath`
+## Other Authentication Options
 
-See the [CookieAuthenticationOptions documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.cookies.cookieauthenticationoptions) for details on the options that can be customized.
+Internally `WithPerTenantAuthentication()` makes use of
+[per-tenant options](Options). For authentication options not covered by
+`WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
 
-These customizations apply to all authentication schemes using `AuthenticationCookieOptions`, including Identity's "application" and "external" cookies.
-
-## JWT Bearer Authentication Options
-
-In the `Startup` class, configure JWT Bearer authentication as usual. The ASP.NET Core documentation does not cover this, but the official code repository contains a [sample project](https://github.com/aspnet/Security/tree/master/samples/JwtBearerSample).
-
- Call `WithPerTenantOptions<JwtBearerOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `JwtBearerOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, JwtBearerOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are setting the authority from the `Items` collection in the `TenantInfo`:
+For example, if we want to configure JWT tokens so that each tenant has a
+different recognized authority for token validation we can add a field to the
+`ITenantInfo` implementation and configure the option per-tenant:
 
 ```cs
-services.AddMultiTenant()...
-    .WithPerTenantOptions<JwtBearerOptions>((o, tenantInfo) =>
-    {
-        // Assume tenants are configured with an authority string to use here.
-        o.Authority = (string)tenantInfo.Items["JwtAuthority"];
-    });
+services.AddMultiTenant<TenantInfo>()
+        .WithConfigurationStore()
+        .WithRouteStrategy()
+        .WithPerTenantOptions<JwtBearerOptions>((o, tenantInfo) =>
+        {
+            // Assume tenants are configured with an authority string to use here.
+            o.Authority = tenantInfo.JwtAuthority;
+        });
 ```
-The following properties should be especially considered for per-tenant customization:
 
-* `Authority`
-* `Audience`
+The same approach can be used for cookie, OpenID Connect, or any other
+authentication options type.
 
-See the [JwtBearerOptions documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.jwtbearer.jwtbeareroptions) for details on the options that can be customized.
-
-These customizations apply to all authentication schemes using `JwtBearerOptions`.
-
-## OpenID Connect Authentication Options
-
-See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant OpenID Connect options.
-
-In the `Startup` class, configure OpenID Connect authentication as usual. The ASP.NET Core documentation does not cover this, but the official code repository contains a [sample project](https://github.com/aspnet/Security/tree/master/samples/OpenIdConnectSample).
-
- Call `WithRemoteAuthentication` and `WithPerTenantOptions<OpenIdConnectOptions>` after `AddMultiTenant` in the `ConfigureServices` method. The generic type parameter `OpenIdConnectOptions` is the options type we are customizing. The method parameter is an `Action<TOptions, OpenIdConnectOptions>` which will modify the options instance using information from the `TenantInfo`. In this case we are setting the authority from the `Items` collection in the `TenantInfo`:
+Another common use case is the need to have separate cookies per tenant in
+addition to the functionality provided by `WithPerTenantOptions` which by
+default only uses a single cookie for all tenants. By using per-tenant options
+we can give each tenant's cookie a different name. This effectively maintains
+existing tenant signins when switching between requests on the same browser or
+agent because new signins are not replacing the existing cookie:
 
 ```cs
-services.AddMultiTenant()...
-    .WithRemoteAuthentication() // Important!
-    .WithPerTenantOptions<OpenIdConnectOptions>((o, tenantInfo) =>
-    {
-        // Assume tenants are configured with a client Id string to use here.
-        o.ClientId = (string)tenantInfo.Items["ClientId"];
-
-        // Assume tenants are configured with an authority string to use here.
-        o.Authority = (string)tenantInfo.Items["Authority"];
-    });
+services.AddMultiTenant<TenantInfo>()
+        .WithConfigurationStore()
+        .WithRouteStrategy()
+        .WithPerTenantAuthentication()
+        .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
+        {
+            o.Cookie.Name = "SigninCookie - " + tenantInfo.Id;
+        });
 ```
-The following properties should be especially considered for per-tenant customization:
-
-* `ClientId`
-* `Authority`
-
-**Do not** modify the `CallbackPath` property per-tenant&mdash;Finbuckle.MultiTenant handles this automatically via the `WithRemoteAuthentication` configuration method.
-
-See the [OpenIdConnectOptions documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.openidconnect.openidconnectoptions) for details on the options that can be customized.
-
-These customizations apply to all authentication schemes using `OpenIdConnectOptions`.
-
-## Other Authentication Methods
-
-See the authentication options sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for a examples of per-tenant Facebook authentication options.
-
-Finbuckle.MultiTenant per-tenant options work with most of the [built-in ASP.NET Core 2.1+ authentication methods](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/). Social login and other external providers require that `WithRemoteAuthentication` be called after `AddMultiTenant` in the `ConfigureServices` method. Each authentication method has its own options class, but the general approach is the same.

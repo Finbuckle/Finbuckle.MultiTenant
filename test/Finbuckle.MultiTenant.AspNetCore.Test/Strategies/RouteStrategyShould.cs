@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ public class RouteStrategyShould
         return new WebHostBuilder()
                     .ConfigureServices(services =>
                     {
-                        services.AddMultiTenant().WithRouteStrategy(configRoutes).WithInMemoryStore();
+                        services.AddMultiTenant<TenantInfo>().WithRouteStrategy(configRoutes).WithInMemoryStore();
                         services.AddMvc();
                     })
                     .Configure(app =>
@@ -98,14 +98,14 @@ public class RouteStrategyShould
                         app.UseMultiTenant();
                         app.Run(async context =>
                         {
-                            if (context.GetMultiTenantContext().TenantInfo != null)
+                            if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                             {
-                                await context.Response.WriteAsync(context.GetMultiTenantContext().TenantInfo.Id);
+                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()?.TenantInfo.Id);
                             }
                         });
 
-                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAddAsync(new TenantInfo(identifier, identifier, null, null, null)).Wait();
+                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                        store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
                     });
     }
 }
@@ -176,7 +176,7 @@ public class RouteStrategyShould
         return new WebHostBuilder()
                     .ConfigureServices(services =>
                     {
-                        services.AddMultiTenant().WithRouteStrategy().WithInMemoryStore();
+                        services.AddMultiTenant<TenantInfo>().WithRouteStrategy().WithInMemoryStore();
                         services.AddMvc();
                     })
                     .Configure(app =>
@@ -187,15 +187,15 @@ public class RouteStrategyShould
                         {
                             endpoints.Map(routePattern, async context =>
                             {
-                                if (context.GetMultiTenantContext().TenantInfo != null)
+                                if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                                 {
-                                    await context.Response.WriteAsync(context.GetMultiTenantContext().TenantInfo.Id);
+                                    await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>().TenantInfo.Id);
                                 }
                             });
                         });
 
-                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore>();
-                        store.TryAddAsync(new TenantInfo(identifier, identifier, null, null, null)).Wait();
+                        var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                        store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
                     });
     }
 }

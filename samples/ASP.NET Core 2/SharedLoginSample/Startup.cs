@@ -47,19 +47,10 @@ namespace SharedLoginSample
                     });
                 });
 
-            services.AddMultiTenant()
+            services.AddMultiTenant<TenantInfo>()
                 .WithRouteStrategy(ConfigRoutes)
                 .WithConfigurationStore()
-                .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-                {
-                   // Since we are using the route strategy configure each tenant
-                   // to have a different cookie name and adjust the paths.
-                   options.Cookie.Name = $"{tenantInfo.Id}_{options.Cookie.Name}";
-                   // See below for why this is commented out.
-                   //options.LoginPath = $"/{tenantInfo.Identifier}/Home/Login";
-                   //options.LogoutPath = $"/{tenantInfo.Identifier}";
-                   options.Cookie.Path = $"/{tenantInfo.Identifier}";
-                });
+                .WithPerTenantAuthentication();
 
             // Required due to a bug in ASP.NET Core Identity (https://github.com/aspnet/Identity/issues/2019)
             services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, options =>

@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,10 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Data.Common;
-using System.Linq;
 using Finbuckle.MultiTenant;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -26,8 +23,13 @@ namespace MultiTenantDbContextShould
         [Fact]
         public void WorkWithSingleParamCtor()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestBlogDbContext(tenant1);
 
             Assert.NotNull(c);
@@ -36,8 +38,13 @@ namespace MultiTenantDbContextShould
         [Fact]
         public void WorkWithTwoParamCtor()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestBlogDbContext(tenant1, new DbContextOptions<TestBlogDbContext>());
 
             Assert.NotNull(c);

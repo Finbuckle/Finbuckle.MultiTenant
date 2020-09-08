@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
@@ -34,11 +33,11 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public abstract class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -61,11 +60,11 @@ namespace Finbuckle.MultiTenant
     public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
         where TUser : IdentityUser
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -90,11 +89,11 @@ namespace Finbuckle.MultiTenant
         where TRole : IdentityRole<TKey>
         where TKey : IEquatable<TKey>
     {
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo) : base(tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
         {
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
         }
 
@@ -127,29 +126,18 @@ namespace Finbuckle.MultiTenant
         where TUserToken : IdentityUserToken<TKey>
         where TKey : IEquatable<TKey>
     {
-        public TenantInfo TenantInfo { get; }
+        public ITenantInfo TenantInfo { get; }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
-        [Obsolete]
-        internal IImmutableList<IEntityType> MultiTenantEntityTypes
-        {
-            get
-            {
-                return Model.GetMultiTenantEntityTypes().ToImmutableList();
-            }
-        }
-
-        protected string ConnectionString => TenantInfo.ConnectionString;
-
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
         }
 
-        protected MultiTenantIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
+        protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
         {
             this.TenantInfo = tenantInfo;
         }

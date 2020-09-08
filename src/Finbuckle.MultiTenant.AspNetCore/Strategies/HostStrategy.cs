@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Internal;
 
 namespace Finbuckle.MultiTenant.Strategies
 {
@@ -26,9 +27,9 @@ namespace Finbuckle.MultiTenant.Strategies
         public HostStrategy(string template)
         {
             // New in 2.1, match whole domain if just "__tenant__".
-            if (template == "__tenant__")
+            if (template == Constants.TenantToken)
             {
-                template = template.Replace("__tenant__", @"(?<identifier>.+)");
+                template = template.Replace(Constants.TenantToken, @"(?<identifier>.+)");
             }
             else
             {
@@ -65,7 +66,7 @@ namespace Finbuckle.MultiTenant.Strategies
                 wildcardSegmentsPattern = @"([^\.]+\.)*";
                 template = template.Replace(@"*\.", wildcardSegmentsPattern);
                 template = template.Replace("?", singleSegmentPattern);
-                template = template.Replace("__tenant__", @"(?<identifier>[^\.]+)");
+                template = template.Replace(Constants.TenantToken, @"(?<identifier>[^\.]+)");
             }
 
             this.regex = $"^{template}$";

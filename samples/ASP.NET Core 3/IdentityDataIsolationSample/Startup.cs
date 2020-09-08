@@ -48,18 +48,10 @@ namespace IdentityDataIsolationSample
             
             services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
 
-            services.AddMultiTenant()
+            services.AddMultiTenant<SampleTenantInfo>()
                     .WithRouteStrategy()
                     .WithConfigurationStore()
-                    .WithPerTenantOptions<CookieAuthenticationOptions>((options, tenantInfo) =>
-                    {
-                        // Since we are using the route strategy configure each tenant
-                        // to have a different cookie name and adjust the paths.
-                        options.Cookie.Path = $"/{tenantInfo.Identifier}";
-                        options.Cookie.Name = $"{tenantInfo.Id}_authentication";
-                        options.LoginPath = $"{options.Cookie.Path}{options.LoginPath}";
-                        options.LogoutPath = $"{options.Cookie.Path}{options.LogoutPath}";
-                    });
+                    .WithPerTenantAuthentication();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

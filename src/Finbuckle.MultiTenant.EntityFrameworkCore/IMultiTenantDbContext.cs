@@ -1,4 +1,4 @@
-﻿//    Copyright 2018 Andrew White
+﻿//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,15 +12,11 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Collections.Immutable;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
     public interface IMultiTenantDbContext
     {
-        TenantInfo TenantInfo { get; }
+        ITenantInfo TenantInfo { get; }
         TenantMismatchMode TenantMismatchMode { get; }
         TenantNotSetMode TenantNotSetMode { get; }
     }

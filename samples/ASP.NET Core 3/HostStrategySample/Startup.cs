@@ -20,7 +20,7 @@ namespace HostStrategySample
         {
             services.AddControllersWithViews();
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithHostStrategy();
         }

@@ -1,4 +1,4 @@
-//    Copyright 2018 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -96,14 +96,19 @@ namespace MultiTenantIdentityDbContextShould
         [Fact]
         public void WorkWithSingleParamCtor()
         {
-            var tenant1 = new TenantInfo("abc", "abc", "abc",
-                "DataSource=testdb.db", null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestIdentityDbContext(tenant1);
 
             Assert.NotNull(c);
         }
 
-        
+
 
         [Theory]
         [InlineData(typeof(IdentityUser), true)]
@@ -115,11 +120,13 @@ namespace MultiTenantIdentityDbContextShould
         [InlineData(typeof(IdentityUserToken<string>), true)]
         public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType, bool isMultiTenant)
         {
-            var tenant1 = new TenantInfo("abc",
-                                         "abc",
-                                         "abc",
-                                         "DataSource=testdb.db",
-                                         null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestIdentityDbContext(tenant1, _options);
             var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
 
@@ -136,11 +143,13 @@ namespace MultiTenantIdentityDbContextShould
         [InlineData(typeof(IdentityUserToken<string>), true)]
         public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType, bool isMultiTenant)
         {
-            var tenant1 = new TenantInfo("abc",
-                                         "abc",
-                                         "abc",
-                                         "DataSource=testdb.db",
-                                         null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestIdentityDbContext_TUser(tenant1, _options);
             var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
 
@@ -157,11 +166,13 @@ namespace MultiTenantIdentityDbContextShould
         [InlineData(typeof(IdentityUserToken<string>), true)]
         public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType, bool isMultiTenant)
         {
-            var tenant1 = new TenantInfo("abc",
-                                         "abc",
-                                         "abc",
-                                         "DataSource=testdb.db",
-                                         null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestIdentityDbContext_TUser_TRole(tenant1, _options);
             var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
 
@@ -178,11 +189,13 @@ namespace MultiTenantIdentityDbContextShould
         [InlineData(typeof(IdentityUserToken<string>), false)]
         public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType, bool isMultiTenant)
         {
-            var tenant1 = new TenantInfo("abc",
-                                         "abc",
-                                         "abc",
-                                         "DataSource=testdb.db",
-                                         null);
+            var tenant1 = new TenantInfo
+            {
+                Id = "abc",
+                Identifier = "abc",
+                Name = "abc",
+                ConnectionString = "DataSource=testdb.db"
+            };
             var c = new TestIdentityDbContext_All(tenant1, _options);
             var multitenantEntities = c.Model.GetEntityTypes().Where(et => et.IsMultiTenant()).Select(et => et.ClrType).ToList();
 

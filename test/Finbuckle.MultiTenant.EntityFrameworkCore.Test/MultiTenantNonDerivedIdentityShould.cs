@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class NonDerivedIdenityDbContext : IdentityDbContext, IMultiTenantDbConte
         TenantInfo = tenantInfo;
     }
 
-    public TenantInfo TenantInfo { get; }
+    public ITenantInfo TenantInfo { get; }
     public TenantMismatchMode TenantMismatchMode => TenantMismatchMode.Throw;
     public TenantNotSetMode TenantNotSetMode => TenantNotSetMode.Throw;
 
@@ -61,8 +61,13 @@ public class MultiTenantNonDerivedIdentityShould
     [Fact]
     public void AdjustUserIndex()
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc",
+            ConnectionString = "DataSource=testdb.db"
+        };
         var c = new NonDerivedIdenityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();
@@ -77,8 +82,13 @@ public class MultiTenantNonDerivedIdentityShould
     [Fact]
     public void AdjustRoleIndex()
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc",
+            ConnectionString = "DataSource=testdb.db"
+        };
         var c = new NonDerivedIdenityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();
@@ -93,8 +103,13 @@ public class MultiTenantNonDerivedIdentityShould
     [Fact]
     public void AdjustUserLoginKey()
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc",
+            ConnectionString = "DataSource=testdb.db"
+        };
         var c = new NonDerivedIdenityDbContext(tenant1, _options);
 
         Assert.True(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("Id").IsPrimaryKey());
@@ -103,8 +118,13 @@ public class MultiTenantNonDerivedIdentityShould
     [Fact]
     public void AddUserLoginIndex()
     {
-        var tenant1 = new TenantInfo("abc", "abc", "abc",
-            "DataSource=testdb.db", null);
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc",
+            ConnectionString = "DataSource=testdb.db"
+        };
         var c = new NonDerivedIdenityDbContext(tenant1, _options);
 
         var props = new List<IProperty>();

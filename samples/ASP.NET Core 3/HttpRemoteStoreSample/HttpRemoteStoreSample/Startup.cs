@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+﻿using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +18,7 @@ namespace HttpRemoteStoreSample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddMultiTenant()
+            services.AddMultiTenant<TenantInfo>()
                     .WithRouteStrategy()
                     .WithHttpRemoteStore("http://localhost:5004/tenants/"); // Use https in real apps!
         }

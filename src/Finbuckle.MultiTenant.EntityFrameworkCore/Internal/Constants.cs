@@ -1,4 +1,4 @@
-//    Copyright 2019 Andrew White
+//    Copyright 2018-2020 Andrew White
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -17,11 +17,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
     /// <summary>
     /// Contains constant values for Finbuckle.MultiTenant.EntityFrameworkCore.
     /// </summary>
-    internal static class Constants
+    internal class Constants
     {
-        /// <summary>
-        /// The annotation name used for configuring MultiTenant entities.
-        /// </summary>
-        public const string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
+        public static readonly string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
     }
 }

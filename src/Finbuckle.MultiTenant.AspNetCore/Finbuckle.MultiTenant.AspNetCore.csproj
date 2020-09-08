@@ -1,33 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Finbuckle.MultiTenant.Core/Finbuckle.MultiTenant.Core.csproj" />
+    <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
 
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
       <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.1" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.1.4" />
       </ItemGroup>
     </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
       <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="3.0.2" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' " >
-      <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.16" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.16" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="2.1.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.1.2" />
       </ItemGroup>
     </When>
   </Choose>

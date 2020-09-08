@@ -1,14 +1,10 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Options;
 using IdentityDataIsolationSample.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace IdentityDataIsolationSample
 {
@@ -22,12 +18,12 @@ namespace IdentityDataIsolationSample
             var env = host.Services.GetService<IWebHostEnvironment>();
             if (env.EnvironmentName == "Development")
             {
-                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/SharedIdentity.db", null)))
+                using (var db = new ApplicationDbContext(new TenantInfo { ConnectionString = "Data Source=Data/SharedIdentity.db" }))
                 {
                     await db.Database.MigrateAsync();
                 }
 
-                using (var db = new ApplicationDbContext(new TenantInfo(null, null, null, "Data Source=Data/InitechIdentity.db", null)))
+                using (var db = new ApplicationDbContext(new TenantInfo { ConnectionString = "Data Source=Data/InitechIdentity.db" }))
                 {
                     await db.Database.MigrateAsync();
                 }

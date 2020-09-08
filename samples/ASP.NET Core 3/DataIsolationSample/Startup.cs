@@ -22,7 +22,7 @@ namespace DataIsolationSample
         {
             services.AddControllersWithViews();
 
-            services.AddMultiTenant().
+            services.AddMultiTenant<TenantInfo>().
                 WithConfigurationStore().
                 WithRouteStrategy();
 
@@ -52,7 +52,7 @@ namespace DataIsolationSample
 
         private void SetupDb()
         {
-            var ti = new TenantInfo("finbuckle", null, null, "Data Source=Data/ToDoList.db", null);
+            var ti = new TenantInfo { Id = "finbuckle", ConnectionString = "Data Source=Data/ToDoList.db" };
             using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();
@@ -63,7 +63,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            ti = new TenantInfo("megacorp", null, null, "Data Source=Data/ToDoList.db", null);
+            ti = new TenantInfo { Id = "megacorp", ConnectionString = "Data Source=Data/ToDoList.db" };
             using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureCreated();
@@ -73,7 +73,7 @@ namespace DataIsolationSample
                 db.SaveChanges();
             }
 
-            ti = new TenantInfo("initech", null, null, "Data Source=Data/Initech_ToDoList.db", null);
+            ti = new TenantInfo { Id = "initech", ConnectionString = "Data Source=Data/Initech_ToDoList.db" };
             using (var db = new ToDoDbContext(ti))
             {
                 db.Database.EnsureDeleted();

@@ -1,4 +1,4 @@
-// Copyright 2019 Andrew White
+// Copyright 2018-2020 Andrew White
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             try
             {
-                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Core.Constants.TenantIdMaxLength);
+                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
             }
             catch (Exception ex)
             {
@@ -78,21 +78,20 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 entityParamExp = existingQueryFilter.Parameters.First();
             }
 
-            // build up expression tree for EF.Property<string>(e, "TenantId")
+            // build up expression tree for: EF.Property<string>(e, "TenantId")
             var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-            var efPropertyExp = Expression.Call(typeof(EF), "Property", new[] { typeof(string) }, entityParamExp, tenantIdExp);
+            var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
             var leftExp = efPropertyExp;
 
-            var scope = new ExpressionVariableScope();
-            var scopeConstantExp = Expression.Constant(scope);
-
-            // EF will rewrite the IMultiTenantDbContext reference to the correct context type
-            var contextVariableExp = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
-            var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextVariableExp);
+            // build up express tree for: TenantInfo.Id
+            // EF will magically sub the current db context in for scope.Context
+            var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
+            var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
+            var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
+            var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
+            var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
 
             // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
-            var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-            var rightExp = Expression.Property(contextTenantInfoExp, nameof(TenantInfo.Id));
             var predicate = Expression.Equal(leftExp, rightExp);
 
             // combine with existing filter

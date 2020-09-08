@@ -18,17 +18,17 @@ namespace DataIsolationSample
             var env = host.Services.GetService<IWebHostEnvironment>();
             if (env.EnvironmentName == "Development")
             {
-                using (var db = new ToDoDbContext(new TenantInfo(null, null, null, "Data Source=Data/ToDoList.db", null)))
+                using (var db = new ToDoDbContext(new TenantInfo { ConnectionString = "Data Source=Data/ToDoList.db" }))
                 {
                     db.Database.MigrateAsync().Wait();
                 }
 
-                using (var db = new ToDoDbContext(new TenantInfo(null, null, null, "Data Source=Data/Initech_ToDoList.db", null)))
+                using (var db = new ToDoDbContext(new TenantInfo { ConnectionString = "Data Source=Data/Initech_ToDoList.db" }))
                 {
                     db.Database.MigrateAsync().Wait();
                 }
             }
-            
+
             host.Run();
         }
 
