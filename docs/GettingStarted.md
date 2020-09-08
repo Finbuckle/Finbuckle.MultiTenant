@@ -9,12 +9,7 @@ Install the Finbuckle.MultiTenant.AspNetCore NuGet package.
 
 .NET Core CLI
 ```bash
-$ dotnet add package Finbuckle.MultiTenant
-```
-
-Package Manager
-```bash
-> Install-Package Finbuckle.MultiTenant.AspNetCore
+$ dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
 ## Basics
