@@ -1,0 +1,47 @@
+﻿@model TenantInfo
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+@if(Context.GetMultiTenantContext<TenantInfo>() != null)
+{
+    var tenantInfo = Context.GetMultiTenantContext<TenantInfo>().TenantInfo;
+        
+    @* @if(!User.Identity.IsAuthenticated)
+    {
+        <p><a asp-controller="Home" asp-action="Authenticate" class="btn btn-primary">Login</a></p>
+        <p>For external login:<br/>Username: <i>alice</i> or <i>bob</i><br />Password: <i>Pass123$</i></p>
+    } else
+    {
+        <a asp-action="Logout" class="btn btn-secondary">Logout</a>
+    } *@
+
+    <h3 class="mt-4">TenantInfo Values</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width:25%">Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach(var prop in tenantInfo.GetType().GetProperties())
+            {
+                <tr>
+                    <td>@prop.Name</td>
+                    <td>@prop.GetValue(tenantInfo)</td>
+                </tr>   
+            }
+        </tbody>
+    
+    </table>
+}
