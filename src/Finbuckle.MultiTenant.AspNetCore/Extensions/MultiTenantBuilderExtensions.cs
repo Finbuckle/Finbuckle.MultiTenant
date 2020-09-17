@@ -45,11 +45,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
                 options.Events.OnValidatePrincipal = async context =>
                 {
+
                     await origOnValidatePrincipal(context);
 
-                    if(context.Principal == null)
+                    // Skip if no principal or bypass set
+                    if(context.Principal == null || context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principle__"))
                         return;
-                    
+
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
                     
                     // If no current tenant and no tenant claim then OK
@@ -73,7 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     var identity = (ClaimsIdentity)context.Principal.Identity;
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
 
-                    if(currentTenant != null)
+                    if(currentTenant != null &&
+                       !identity.Claims.Where(c => c.Type == Constants.TenantToken && c.Value == currentTenant).Any())
                         identity.AddClaim(new Claim(Constants.TenantToken, currentTenant));
                 };
             });
