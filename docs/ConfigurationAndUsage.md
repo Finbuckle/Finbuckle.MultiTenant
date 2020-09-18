@@ -94,7 +94,7 @@ var newTenantInfo = new TenantInfo(...);
 if(HttpContext.TrySetTenantInfo(newTenantInfo, resetServiceProvider: true))
 {
     // This will be the new tenant.
-    var tenant = HttpContext.GetMultiTenantContext().TenantIno;
+    var tenant = HttpContext.GetMultiTenantContext().TenantInfo;
 
     // This will regenerate the options class.
     var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
