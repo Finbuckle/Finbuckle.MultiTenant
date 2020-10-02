@@ -34,6 +34,7 @@ namespace EntityTypeExtensionsShould
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<MyMultiTenantThing>().IsMultiTenant();
+            builder.Entity<MyMultiTenantChildThing>();
         }
     }
 
@@ -45,6 +46,11 @@ namespace EntityTypeExtensionsShould
     public class MyThing
     {
         public int Id { get; set; }
+    }
+
+    public class MyMultiTenantChildThing : MyMultiTenantThing
+    {
+        
     }
 
     public class EntityTypeExtensionShould
@@ -64,6 +70,14 @@ namespace EntityTypeExtensionsShould
             var db = GetDbContext();
 
             Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant());
+        }
+        
+        [Fact]
+        public void ReturnTrueOnIsMultiTenantOnIfAncestorIsMultiTenant()
+        {
+            var db = GetDbContext();
+
+            Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantChildThing)).IsMultiTenant());
         }
 
         [Fact]
