@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.Stores
         private readonly string keyPrefix;
         private readonly TimeSpan? slidingExpiration;
 
-        public DistributedCacheStore(IDistributedCache cache, string keyPrefix, TimeSpan slidingExpiration)
+        public DistributedCacheStore(IDistributedCache cache, string keyPrefix, TimeSpan? slidingExpiration)
         {
             this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
             this.keyPrefix = keyPrefix ?? throw new ArgumentNullException(nameof(keyPrefix));
