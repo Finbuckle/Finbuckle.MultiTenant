@@ -41,7 +41,7 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<bool> TryRemoveAsync(string id);
+        Task<bool> TryRemoveAsync(string identifier);
 
         /// <summary>
         /// Retrieve the TTenantInfo for a given identifier.

@@ -76,13 +76,13 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<bool> TryRemoveAsync(string id)
+        public async Task<bool> TryRemoveAsync(string identifier)
         {
-            var result = await TryGetAsync(id);
+            var result = await TryGetByIdentifierAsync(identifier);
             if (result == null)
                 return false;
 
-            await cache.RemoveAsync($"{keyPrefix}id__{id}");
+            await cache.RemoveAsync($"{keyPrefix}id__{result.Id}");
             await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}");
 
             return true;

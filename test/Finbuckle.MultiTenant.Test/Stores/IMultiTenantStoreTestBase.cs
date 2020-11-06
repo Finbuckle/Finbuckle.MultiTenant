@@ -84,9 +84,8 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
     public virtual void RemoveTenantInfoFromStore()
     {
         var store = CreateTestStore();
-        // TODO: Change to use Id instead of identifier
         Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
-        Assert.True(store.TryRemoveAsync("initech-id").Result);
+        Assert.True(store.TryRemoveAsync("initech").Result);
         Assert.Null(store.TryGetByIdentifierAsync("initech").Result);
     }
 

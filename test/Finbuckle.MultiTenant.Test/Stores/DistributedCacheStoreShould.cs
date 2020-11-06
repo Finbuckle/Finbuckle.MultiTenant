@@ -35,7 +35,7 @@ public class DistributedCacheStoreShould : IMultiTenantStoreTestBase<InMemorySto
     {
         var store = CreateTestStore();
 
-        var r = store.TryRemoveAsync("lol-id").Result;
+        var r = store.TryRemoveAsync("lol").Result;
         Assert.True(r);
 
         var t1 = store.TryGetAsync("lol-id").Result;
