@@ -37,8 +37,8 @@ namespace Finbuckle.MultiTenant.Stores
         {
             var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
             var bytes = JsonConvert.SerializeObject(tenantInfo);
-            await cache.SetStringAsync($"{keyPrefix}id_{tenantInfo.Id}", bytes, options);
-            await cache.SetStringAsync($"{keyPrefix}identifier_{tenantInfo.Identifier}", bytes, options);
+            await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options);
+            await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options);
 
             return true;
         }
@@ -83,7 +83,7 @@ namespace Finbuckle.MultiTenant.Stores
                 return false;
 
             await cache.RemoveAsync($"{keyPrefix}id__{id}");
-            await cache.RemoveAsync($"{keyPrefix}id__{result.Id}");
+            await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}");
 
             return true;
         }

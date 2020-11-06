@@ -47,7 +47,7 @@ namespace EFCoreStoreShould
                     .Options;
             var dbContext = new TestEFCoreStoreDbContext(options);
             dbContext.Database.EnsureCreated();
-            
+
             var store = new EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>(dbContext);
 
             return PopulateTestStore(store);
@@ -121,6 +121,12 @@ namespace EFCoreStoreShould
         public override void UpdateTenantInfoInStore()
         {
             base.UpdateTenantInfoInStore();
+        }
+
+        [Fact]
+        public override void GetAllTenantsFromStoreAsync()
+        {
+            base.GetAllTenantsFromStoreAsync();
         }
     }
 }
