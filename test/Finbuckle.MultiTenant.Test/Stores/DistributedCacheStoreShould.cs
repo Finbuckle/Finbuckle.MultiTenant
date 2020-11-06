@@ -12,11 +12,9 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Distributed;
 using Xunit;
 using System;
@@ -24,32 +22,6 @@ using Finbuckle.MultiTenant.Internal;
 
 public class DistributedCacheStoreShould : IMultiTenantStoreTestBase<InMemoryStore<TenantInfo>>
 {
-    private IMultiTenantStore<TenantInfo> CreateCaseSensitiveTestStore()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions().AddDistributedMemoryCache();
-        var sp = services.BuildServiceProvider();
-
-        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromSeconds(5));
-        
-        var ti1 = new TenantInfo
-        {
-            Id = "initech",
-            Identifier = "initech",
-            Name = "initech"
-        };
-        var ti2 = new TenantInfo
-        {
-            Id = "lol",
-            Identifier = "lol",
-            Name = "lol"
-        };
-        store.TryAddAsync(ti1).Wait();
-        store.TryAddAsync(ti2).Wait();
-
-        return store;
-    }
-
     [Fact]
     public void ThrownOnGetAllTenantsFromStoreAsync()
     {
@@ -87,7 +59,26 @@ public class DistributedCacheStoreShould : IMultiTenantStoreTestBase<InMemorySto
     
     protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
-        var store = new InMemoryStore<TenantInfo>(null);
+        var services = new ServiceCollection();
+        services.AddOptions().AddDistributedMemoryCache();
+        var sp = services.BuildServiceProvider();
+
+        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromSeconds(5));
+        
+        var ti1 = new TenantInfo
+        {
+            Id = "initech",
+            Identifier = "initech",
+            Name = "initech"
+        };
+        var ti2 = new TenantInfo
+        {
+            Id = "lol",
+            Identifier = "lol",
+            Name = "lol"
+        };
+        store.TryAddAsync(ti1).Wait();
+        store.TryAddAsync(ti2).Wait();
 
         return PopulateTestStore(store);
     }
