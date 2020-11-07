@@ -11,7 +11,7 @@ Configuring an Identity db context to be multitenant is identical to that of a r
 
 The simplest approach is to derive a db context from `MultiTenantIdentityDbContext` (which itself derives from `IdentityDbContext`) and configure Identity to use the derived context.
 
-When customizing the Identity data model, for example deriving a user entity type class from `IdenityUser`, to designate the customized entity type as multitenant either:
+When customizing the Identity data model, for example deriving a user entity type class from `IdentityUser`, to designate the customized entity type as multitenant either:
 - Add the `[MultiTenant]` data attribute to the entity type class, or
 - use the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating` method (to ensure the Identity model exists).
 
