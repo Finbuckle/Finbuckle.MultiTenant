@@ -4,7 +4,6 @@ A multitenant strategy is responsible for defining how the tenant is determined.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 
-
 The `Strategy` property on the `StrategyInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()` returns the actual strategy used to resolve the tenant information for the current context.
 
 ## IMultiTenantStrategy and Custom Strategies
