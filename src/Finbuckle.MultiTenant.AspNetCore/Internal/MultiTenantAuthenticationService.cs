@@ -48,6 +48,11 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
+            var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
+            // Do not challenge if there is no tenant
+            if (multiTenantContext?.TenantInfo == null)
+                return;
+
             AddTenantIdentiferToProperties(context, ref properties);
             await inner.ChallengeAsync(context, scheme, properties);
         }

@@ -89,6 +89,8 @@ namespace Finbuckle.MultiTenant
 
                     if (result != null)
                         break;
+
+                    await options.CurrentValue?.Events?.OnTenantNotFound(new TenantNotFoundContext() { Context = context, Identifier = identifier });
                 }
             }
 
