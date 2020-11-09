@@ -24,6 +24,30 @@ using Finbuckle.MultiTenant.Stores;
 public class MultiTenantBuilderExtensionsShould
 {
     [Fact]
+    public void AddDistributedCacheStoreDefault()
+    {
+        var services = new ServiceCollection();
+        services.AddDistributedMemoryCache();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithDistributedCacheStore();
+        var sp = services.BuildServiceProvider();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+    }
+
+    [Fact]
+    public void AddDistributedCacheStoreWithSlidingExpiration()
+    {
+        var services = new ServiceCollection();
+        services.AddDistributedMemoryCache();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithDistributedCacheStore(TimeSpan.FromMinutes(5));
+        var sp = services.BuildServiceProvider();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+    }
+
+    [Fact]
     public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
     {
         var services = new ServiceCollection();

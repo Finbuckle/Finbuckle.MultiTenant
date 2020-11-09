@@ -290,5 +290,5 @@ services.AddMultiTenant<TenantInfo>()
 
 // This will set a 5 minute sliding expiration.
 services.AddMultiTenant<TenantInfo>()
-        .WithDistributedCacheStore(Timespan.FromMinutes(5));
+        .WithDistributedCacheStore(TimeSpan.FromMinutes(5));
 ```
