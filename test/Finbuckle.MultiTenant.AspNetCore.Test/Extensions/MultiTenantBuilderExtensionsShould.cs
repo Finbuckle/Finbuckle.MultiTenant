@@ -154,6 +154,30 @@ public partial class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
+    public void AddClaimStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithClaimStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<ClaimStrategy>(strategy);
+    }
+
+    [Fact]
+    public void AddHeaderStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithHeaderStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<HeaderStrategy>(strategy);
+    }
+
+    [Fact]
     public void AddHostStrategy()
     {
         var services = new ServiceCollection();

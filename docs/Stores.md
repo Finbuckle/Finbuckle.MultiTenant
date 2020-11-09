@@ -1,11 +1,8 @@
 # MultiTenant Stores
 A multitenant store is responsible for retrieving information about a tenant based on an identifier string determined by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which provides the current tenant information to an app.
 
-Finbuckle.MultiTenant provides three basic multitenant stores
-- `InMemoryStore` - a simple, thread safe in-memory implementation based on `ConcurrentDictionary<string, object>`.
-- `ConfigurationStore` - a read-only store that is backed by app configuration (e.g. appsettings.json).
-- `EFCoreStore` - an Entity Framework Core based implementation to query tenant information from a database.
-- `HttpRemoteStore` - a read-only store that sends the tenant identifier to an http(s) endpoint to get the tenant information.
+Finbuckle.MultiTenant supports several "out-of-the-box" stores for resolving the
+tenant. Custom stores can be created by implementing `IMultiTenantStore`.
 
 ## Custom ITenantInfo Support
 MultiTenant stores support custom `ITenantInfo` implementations. but complex
@@ -16,7 +13,7 @@ from JSON for the configuration store if using json file configuration sources.
 The examples in this documentation use the `TenantInfo` basic implementation.
 
 ## IMultiTenantStore and Custom Stores
-If the provided multitenant stores are not suitable then a custom store can be created by implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type parameter passed to `AddMultiTenant<T>` at compile time. The implementation must defines `TryAddAsync`, `TryUpdateAsync`, `TryRemoveAsyc`, `TryGetByIdentifierAsync`, `TryGetAsync`, and `GetAllAsync` methods. `TryGetByIdentifierAsync` and `TryGetAsync` should return null if there is no suitable tenant match.
+If the provided multitenant stores are not suitable then a custom store can be created by implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type parameter passed to `AddMultiTenant<T>` at compile time. The implementation must define `TryAddAsync`, `TryUpdateAsync`, `TryRemoveAsync`, `TryGetByIdentifierAsync`, `TryGetAsync`, and `GetAllAsync` methods. `TryGetByIdentifierAsync` and `TryGetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses dependency injection along with any passed parameters to construct the implementation instance. An alternative overload accepts a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a wrapper providing basic logging and exception handling.
 
@@ -206,6 +203,9 @@ Entity Framework Core works with any dbcontext.
 
 Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object in return. The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HttpRemoteStoreSample) projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
 
+Note, make sure the tenant info type will support basic JSON serialization and
+deserialiation.
+
 For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`, `Name`, and `ConnectionString` and other properties which will be mapped into a `TenantInfo` object with the type passed to `AddMultiTenant<T>`.
 
 Any non-200 response code results in a null `TenantInfo`.
@@ -257,4 +257,38 @@ services.AddMultiTenant<TenantInfo>()
         {
             httpClientBuilder.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(2));
         });
+```
+
+## Distributed Cache Store
+> NuGet package: Finbuckle.MultiTenant
+
+Uses the ASP.NET Core [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1)
+mechanism. The distributed cache can use Redis, SQl Server, NCache, or an in-memory (for
+testing purposes) implementation. A sliding expiration is also supported.
+
+Note, make sure the tenant info type will support basic JSON serialization and
+deserialiation.
+
+Each tenant info instance is actually stored twice in the cache, once using the
+Tenant Id as the key and another using the Tenant Identifier as the key. Calls
+to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will keep these dual
+cache entries synched.
+
+This store does not implement `GetAllAsync`.
+
+Configure by calling `WithDistributedCacheStore` after `AddMultiTenant<T>` in
+the `ConfigureServices` method of the app's `Startup` class. By default no
+entries do not expire, but a `Timespan` can be passed to be used as a sliding
+expiration for all entries.
+
+Note that the store does not interact with any other stores by default.
+
+```cs
+// This will use the default configuration with no sliding expiration.
+services.AddMultiTenant<TenantInfo>()
+        .WithDistributedCacheStore()...
+
+// This will set a 5 minute sliding expiration.
+services.AddMultiTenant<TenantInfo>()
+        .WithDistributedCacheStore(TimeSpan.FromMinutes(5));
 ```

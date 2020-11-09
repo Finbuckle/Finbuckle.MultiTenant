@@ -96,13 +96,6 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
-    [Fact]
-    public void GetAllTenantsFromStoreAsync()
-    {
-        var store = CreateTestStore();
-        Assert.Equal(2, store.GetAllAsync().Result.Count());
-    }
-
     // [Fact(Skip = "Not valid for this store.")]
     public override void AddTenantInfoToStore()
     {
@@ -116,5 +109,11 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
     // [Fact(Skip = "Not valid for this store.")]
     public override void UpdateTenantInfoInStore()
     {
+    }
+
+    [Fact]
+    public override void GetAllTenantsFromStoreAsync()
+    {
+        base.GetAllTenantsFromStoreAsync();
     }
 }

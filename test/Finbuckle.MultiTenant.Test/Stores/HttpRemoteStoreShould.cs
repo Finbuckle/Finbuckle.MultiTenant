@@ -145,4 +145,10 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore<T
     public override void UpdateTenantInfoInStore()
     {
     }
+
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void GetAllTenantsFromStoreAsync()
+    {
+        base.GetAllTenantsFromStoreAsync();
+    }
 }
