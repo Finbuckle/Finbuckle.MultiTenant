@@ -21,11 +21,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
       </ItemGroup>
     </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
-      </ItemGroup>
-    </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
       <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.0" />
