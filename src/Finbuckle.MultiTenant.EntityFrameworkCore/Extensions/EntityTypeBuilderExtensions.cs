@@ -34,13 +34,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         }
 
         internal static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
-        {
-#if NETSTANDARD2_1
-            return builder.Metadata.GetQueryFilter();
-#elif NETSTANDARD2_0
+        {         
+#if NETSTANDARD2_0
             return builder.Metadata.QueryFilter;
 #else
-#error No valid path!
+            return builder.Metadata.GetQueryFilter();
 #endif
         }
 
@@ -72,7 +70,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             var existingQueryFilter = builder.GetQueryFilter();
 
-            // override to match existing query paraameter if applicable
+            // override to match existing query parameter if applicable
             if (existingQueryFilter != null)
             {
                 entityParamExp = existingQueryFilter.Parameters.First();
@@ -134,13 +132,21 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
+#if NET // Covers .NET 5.0 and later.
+            builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
+#else   // .NET Core 2.1 and 3.1
             builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
+#endif
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedName");
+#if NET // Covers .NET 5.0 and later.
+            builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
+#else // .NET Core 2.1 and 3.1
             builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
+#endif
         }
 
         private static void UpdateIdentityUserLoginPrimaryKey(this EntityTypeBuilder builder)
@@ -158,16 +164,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         }
 
         private static void RemoveIndex(this EntityTypeBuilder builder, string propName)
-        {
-#if NETSTANDARD2_1
-            var prop = builder.Metadata.FindProperty(propName);
-            var index = builder.Metadata.FindIndex(prop);
-            builder.Metadata.RemoveIndex(index);
-#elif NETSTANDARD2_0
+        {        
+#if NETSTANDARD2_0
             var props = new List<IProperty>(new[] { builder.Metadata.FindProperty(propName) });
             builder.Metadata.RemoveIndex(props);
 #else
-#error No valid path!
+            var prop = builder.Metadata.FindProperty(propName);
+            var index = builder.Metadata.FindIndex(prop);
+            builder.Metadata.RemoveIndex(index);
 #endif
         }
     }
