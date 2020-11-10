@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -23,6 +23,30 @@ using Finbuckle.MultiTenant.Stores;
 
 public class MultiTenantBuilderExtensionsShould
 {
+    [Fact]
+    public void AddDistributedCacheStoreDefault()
+    {
+        var services = new ServiceCollection();
+        services.AddDistributedMemoryCache();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithDistributedCacheStore();
+        var sp = services.BuildServiceProvider();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+    }
+
+    [Fact]
+    public void AddDistributedCacheStoreWithSlidingExpiration()
+    {
+        var services = new ServiceCollection();
+        services.AddDistributedMemoryCache();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithDistributedCacheStore(TimeSpan.FromMinutes(5));
+        var sp = services.BuildServiceProvider();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+    }
+
     [Fact]
     public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
     {

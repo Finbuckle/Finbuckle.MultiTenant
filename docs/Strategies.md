@@ -4,7 +4,6 @@ A multitenant strategy is responsible for defining how the tenant is determined.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 
-
 The `Strategy` property on the `StrategyInfo` member of `MultiTenantContext` instance returned by `HttpContext.GetMultiTenantContext()` returns the actual strategy used to resolve the tenant information for the current context.
 
 ## IMultiTenantStrategy and Custom Strategies
@@ -12,7 +11,7 @@ All multitenant strategies derive from `IMultiTenantStrategy` and must implement
 
 If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a null `TenantInfo`.
 
-Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. There are several available overrides for configurign the strategy. The first override uses dependency injection along with any passed parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic logging and exception handling.
+Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. There are several available overrides for configuring the strategy. The first override uses dependency injection along with any passed parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic logging and exception handling.
 
 ```cs
 // Register a custom strategy with the templated method.
@@ -100,7 +99,7 @@ This strategy uses the default authentication scheme, which is usually cookie
 based, but does not go so far as to set `HttpContext.User`. Thus the ASP.NET
 Core authentication middleware should still be used as normal, and in most use
 cases should come after `UseMultiTenant` when using `ClaimsStrategy`. Due to how
-the authentication middleware is implemented there is practically no perfomance
+the authentication middleware is implemented there is practically no performance
 penalty when used in conjunction with the `ClaimStrategy`.
 
 Note that this strategy is does not work well with per-tenant cookie names since
@@ -119,7 +118,6 @@ services.AddMultiTenant<TenantInfo>()
 services.AddMultiTenant<TenantInfo>()
         .WithClaimStrategy("MyClaimType")...
 ```
-
 ## Session Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
@@ -173,15 +171,15 @@ public class Startup
 
     public void Configure(IappBuilder app, ...)
     {
-        // Other middlware...
+        // Other middleware...
 
         app.UseRouting(); // Important!
 
-        // Other middlware...
+        // Other middleware...
 
         app.UseMultiTenant();
         
-        // Other middlware...
+        // Other middleware...
         
         app.UseEndpoints(endpoints =>
             {
@@ -218,18 +216,18 @@ public class Startup
 
     public void Configure(IappBuilder app, ...)
     {
-        // Other middlware...
+        // Other middleware...
 
         app.UseMultiTenant();
         
-        // Other middlware...
+        // Other middleware...
         
         app.UseMvc(ConfigRoutes);
     }
 
     private void ConfigRoutes(IRouteBuilder routes)
     {
-        routes.MapRoute("Defaut", "{__tenant__}/{controller=Home}/{action=Index}");
+        routes.MapRoute("Default", "{__tenant__}/{controller=Home}/{action=Index}");
     }
 }
 ```
@@ -256,6 +254,26 @@ services.AddMultiTenant<TenantInfo>()
 // Set a template which selects the main domain segment (see 2nd example above):
 services.AddMultiTenant<TenantInfo>()
         .WithHostStrategy("*.__tenant__.?")...
+```
+
+## Header Strategy
+> NuGet package: Finbuckle.MultiTenant.AspNetCore
+
+Uses an HTTP request header to determine the tenant identifier. By default the header
+with key `__tenant__` is used, but a custom key can also be used.
+
+Configure by calling `WithHeaderStrategy` after `AddMultiTenant<T>` in the
+`ConfigureServices` method of the `Startup` class. An overload to accept a
+custom claim type is also available:
+
+```cs
+// This will check for a claim type __tenant__
+services.AddMultiTenant<TenantInfo>()
+        .WithHeaderStrategy()...
+
+// This will check for a custom claim type
+services.AddMultiTenant<TenantInfo>()
+        .WithHeaderStrategy("MyHeaderKey")...
 ```
 
 ## Remote Authentication Callback Strategy

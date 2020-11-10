@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -96,13 +96,6 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
         base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
-    [Fact]
-    public void GetAllTenantsFromStoreAsync()
-    {
-        var store = CreateTestStore();
-        Assert.Equal(2, store.GetAllAsync().Result.Count());
-    }
-
     // [Fact(Skip = "Not valid for this store.")]
     public override void AddTenantInfoToStore()
     {
@@ -116,5 +109,11 @@ public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationS
     // [Fact(Skip = "Not valid for this store.")]
     public override void UpdateTenantInfoInStore()
     {
+    }
+
+    [Fact]
+    public override void GetAllTenantsFromStoreAsync()
+    {
+        base.GetAllTenantsFromStoreAsync();
     }
 }

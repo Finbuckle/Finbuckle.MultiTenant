@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -151,6 +151,30 @@ public partial class MultiTenantBuilderExtensionsShould
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<BasePathStrategy>(strategy);
+    }
+
+    [Fact]
+    public void AddClaimStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithClaimStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<ClaimStrategy>(strategy);
+    }
+
+    [Fact]
+    public void AddHeaderStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+        builder.WithHeaderStrategy();
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<HeaderStrategy>(strategy);
     }
 
     [Fact]

@@ -1,4 +1,4 @@
-﻿//    Copyright 2018-2020 Andrew White
+﻿//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -144,5 +144,11 @@ public class HttpRemoteStoreShould : IMultiTenantStoreTestBase<HttpRemoteStore<T
     // [Fact(Skip = "Not valid for this store.")]
     public override void UpdateTenantInfoInStore()
     {
+    }
+
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void GetAllTenantsFromStoreAsync()
+    {
+        base.GetAllTenantsFromStoreAsync();
     }
 }

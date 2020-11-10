@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
         var sp = services.BuildServiceProvider();
 
         var store = new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>());
-        
+
         var ti1 = new TenantInfo
         {
             Id = "initech",
@@ -63,15 +63,6 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
     }
 
     [Fact]
-    public void GetAllTenantsFromStoreAsync()
-    {
-        var store = CreateTestStore();
-        Assert.Equal(2, store.GetAllAsync().Result.Count());
-        store.TryAddAsync(new TenantInfo() {Identifier = "test"});
-        Assert.Equal(3, store.GetAllAsync().Result.Count());
-    }
-
-    [Fact]
     public void FailIfAddingDuplicateCaseSensitive()
     {
         var store = CreateCaseSensitiveTestStore();
@@ -97,8 +88,8 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db"});
-            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db"});
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db" });
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db" });
         });
         var sp = services.BuildServiceProvider();
 
@@ -118,7 +109,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo{ Id = id, Identifier = identifier, Name = "LOL", ConnectionString = "Datasource=lol.db"});
+            options.Tenants.Add(new TenantInfo { Id = id, Identifier = identifier, Name = "LOL", ConnectionString = "Datasource=lol.db" });
         });
         var sp = services.BuildServiceProvider();
 
@@ -126,7 +117,7 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
-    
+
     protected override IMultiTenantStore<TenantInfo> CreateTestStore()
     {
         var store = new InMemoryStore<TenantInfo>(null);
@@ -174,10 +165,16 @@ public class InMemoryStoreShould : IMultiTenantStoreTestBase<InMemoryStore<Tenan
     {
         base.RemoveTenantInfoFromStore();
     }
-    
+
     [Fact]
     public override void UpdateTenantInfoInStore()
     {
         base.UpdateTenantInfoInStore();
+    }
+
+    [Fact]
+    public override void GetAllTenantsFromStoreAsync()
+    {
+        base.GetAllTenantsFromStoreAsync();
     }
 }

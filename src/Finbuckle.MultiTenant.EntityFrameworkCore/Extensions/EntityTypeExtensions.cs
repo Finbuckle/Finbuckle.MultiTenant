@@ -1,4 +1,4 @@
-﻿// Copyright 2018-2020 Andrew White
+﻿// Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,15 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <returns><see cref="true"/> if the entity type has MultiTenant configuration, <see cref="false"/> if not.</returns>
         public static bool IsMultiTenant(this IEntityType entityType)
         {
-            return (bool?)entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
+            while (entityType != null)
+            {
+                var hastMultiTenantAnnotation = (bool?) entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
+                if (hastMultiTenantAnnotation)
+                    return true;
+                entityType = entityType.BaseType;
+            }
+
+            return false;
         }
     }
 }

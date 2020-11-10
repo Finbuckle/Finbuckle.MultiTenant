@@ -1,4 +1,4 @@
- //    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System.Linq;
 using Finbuckle.MultiTenant;
 using Xunit;
 
@@ -83,9 +84,15 @@ public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<T
     public virtual void RemoveTenantInfoFromStore()
     {
         var store = CreateTestStore();
-        // TODO: Change to use Id instead of identifier
         Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
         Assert.True(store.TryRemoveAsync("initech").Result);
         Assert.Null(store.TryGetByIdentifierAsync("initech").Result);
+    }
+
+    //[Fact]
+    public virtual void GetAllTenantsFromStoreAsync()
+    {
+        var store = CreateTestStore();
+        Assert.Equal(2, store.GetAllAsync().Result.Count());
     }
 }

@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
@@ -31,22 +32,40 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
-        /// Adds a HttpRemoteSTore to the application.
+        /// Adds a DistributedCacheStore to the application.
         /// </summary>
-        /// <param name="endpointTemplate">The endpoint URI template.</param>
-        /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                      string endpointTemplate) where TTenantInfo : class, ITenantInfo, new()
-        => builder.WithHttpRemoteStore(endpointTemplate, null);
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()   
+            => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
+        
 
         /// <summary>
-        /// Adds a HttpRemoteSTore to the application.
+        /// Adds a DistributedCacheStore to the application.
+        /// </summary>
+        /// <param name="slidingExiration">The timespan for a cache entry's sliding expiration.</param>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            return builder.WithStore<DistributedCacheStore<TTenantInfo>>(ServiceLifetime.Transient, Constants.TenantToken, slidingExpiration);
+        }
+
+        /// <summary>
+        /// Adds a HttpRemoteStore to the application.
+        /// </summary>
+        /// <param name="endpointTemplate">The endpoint URI template.</param>
+        /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string endpointTemplate)
+            where TTenantInfo : class, ITenantInfo, new()
+            => builder.WithHttpRemoteStore(endpointTemplate, null);
+
+        /// <summary>
+        /// Adds a HttpRemoteStore to the application.
         /// </summary>
         /// <param name="endpointTemplate">The endpoint URI template.</param>
         /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                      string endpointTemplate,
-                                                                      Action<IHttpClientBuilder> clientConfig) where TTenantInfo : class, ITenantInfo, new()
+                                                                                                string endpointTemplate,
+                                                                                                Action<IHttpClientBuilder> clientConfig) where TTenantInfo : class, ITenantInfo, new()
         {
             var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName);
             if (clientConfig != null)
@@ -70,8 +89,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration">The IConfiguration to load the section from.</param>
         /// <param name="sectionName">The configuration section to load.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                         IConfiguration configuration,
-                                                                         string sectionName)
+                                                                                                   IConfiguration configuration,
+                                                                                                   string sectionName)
                 where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton, configuration, sectionName);
 
@@ -107,7 +126,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                     string identifier)
+                                                                                               string identifier)
             where TTenantInfo : class, ITenantInfo, new()
         {
             if (string.IsNullOrWhiteSpace(identifier))
@@ -123,7 +142,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="doStrategy">The delegate implementing the strategy.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                       Func<object, Task<string>> doStrategy)
+                                                                                                 Func<object, Task<string>> doStrategy)
             where TTenantInfo : class, ITenantInfo, new()
         {
             if (doStrategy == null)

@@ -26,14 +26,16 @@ Adds and configures an IMultiTenantStore to the application. Only the last store
 - WithInMemoryStore
 - WithConfigurationStore
 - WithEFCoreStore
+- WithDistributedCacheStore
 
 ## WithStrategy Variants
 Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - WithStrategy&lt;TStrategy&gt;
 - WithBasePathStrategy
-- WithClaimsStrategy
+- WithClaimStrategy
 - WithDelegateStrategy
+- WithHeaderStrategy
 - WithHostStrategy
 - WithRouteStrategy
 - WithSessionStrategy

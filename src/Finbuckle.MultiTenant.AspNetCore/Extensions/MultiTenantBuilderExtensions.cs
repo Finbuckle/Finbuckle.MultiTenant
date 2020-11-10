@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -45,11 +45,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
                 options.Events.OnValidatePrincipal = async context =>
                 {
+
                     await origOnValidatePrincipal(context);
 
-                    if(context.Principal == null)
+                    // Skip if no principal or bypass set
+                    if(context.Principal == null || context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principle__"))
                         return;
-                    
+
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
                     
                     // If no current tenant and no tenant claim then OK
@@ -73,7 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     var identity = (ClaimsIdentity)context.Principal.Identity;
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
 
-                    if(currentTenant != null)
+                    if(currentTenant != null &&
+                       !identity.Claims.Where(c => c.Type == Constants.TenantToken && c.Value == currentTenant).Any())
                         identity.AddClaim(new Claim(Constants.TenantToken, currentTenant));
                 };
             });
@@ -93,9 +96,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // remote authentication can get the tenant from the authentication
             // properties in the state parameter.
             if (!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
-                throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAutheorization() in ConfigureServices.");
+                throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAuthorization() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
-            
+
             // Set per-tenant OpenIdConnect options by convention.
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
@@ -247,13 +250,32 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a HostStrategy to the application.
+        /// Adds and configures a ClaimStrategy to the application.
         /// </summary>
         /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
         {
             return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
+        }
+
+        /// <summary>
+        /// Adds and configures a HeaderStrategy with tenantKey "__tenant__" to the application.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
+        {
+            return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
+        }
+
+        /// <summary>
+        /// Adds and configures a Header to the application.
+        /// </summary>
+        /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        {
+            return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, tenantKey);
         }
     }
 }

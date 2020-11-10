@@ -1,4 +1,4 @@
-//    Copyright 2018-2020 Andrew White
+//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace EFCoreStoreShould
                     .Options;
             var dbContext = new TestEFCoreStoreDbContext(options);
             dbContext.Database.EnsureCreated();
-            
+
             var store = new EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>(dbContext);
 
             return PopulateTestStore(store);
@@ -121,6 +121,12 @@ namespace EFCoreStoreShould
         public override void UpdateTenantInfoInStore()
         {
             base.UpdateTenantInfoInStore();
+        }
+
+        [Fact]
+        public override void GetAllTenantsFromStoreAsync()
+        {
+            base.GetAllTenantsFromStoreAsync();
         }
     }
 }
