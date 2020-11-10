@@ -70,7 +70,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             var existingQueryFilter = builder.GetQueryFilter();
 
-            // override to match existing query paraameter if applicable
+            // override to match existing query parameter if applicable
             if (existingQueryFilter != null)
             {
                 entityParamExp = existingQueryFilter.Parameters.First();
@@ -132,13 +132,21 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
+#if NET // Covers .NET 5.0 and later.
+            builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
+#else   // .NET Core 2.1 and 3.1
             builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
+#endif
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedName");
+#if NET // Covers .NET 5.0 and later.
+            builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
+#else // .NET Core 2.1 and 3.1
             builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
+#endif
         }
 
         private static void UpdateIdentityUserLoginPrimaryKey(this EntityTypeBuilder builder)
