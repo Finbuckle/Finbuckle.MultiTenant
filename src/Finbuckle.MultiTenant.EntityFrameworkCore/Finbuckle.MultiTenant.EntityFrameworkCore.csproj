@@ -6,6 +6,11 @@
     <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
+  </ItemGroup>
+
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'net5.0' ">
       <ItemGroup>
@@ -23,9 +28,4 @@
       </ItemGroup>
     </When>
   </Choose>
-
-  <ItemGroup>
-      <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
-  </ItemGroup>
-
 </Project>
