@@ -16,12 +16,12 @@ Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStra
 ```cs
 // Register a custom strategy with the templated method.
 services.AddMultiTenant<TenantInfo>()
-        .WithStrategy<MyStrat>(myParam1, myParam2)...
+        .WithStrategy<MyStrategy>(myParam1, myParam2)...
 
 // Or register a custom strategy with the overload method accepting a factory method.
 // Note that the type parameter for WithStrategy is inferred by the compiler.
 services.AddMultiTenant<TenantInfo>()
-        .WithStrategy(sp => new MyStrat())...
+        .WithStrategy(sp => new MyStrategy())...
 ```
 
 ## Accessing the Strategies at Runtime
@@ -35,9 +35,9 @@ type:
 ```cs
 // Assume we have a service provider. The IEnumerable could be injected via
 // other DI means as well.
-var strat = serviceProvider.GetService<IEnumerable<IMultiTenantStrategy>>
-                           .Where(s => s.ImplementationType == typeof(StaticStrategy))
-                           .SingleOrDefault();
+var strategy = serviceProvider.GetService<IEnumerable<IMultiTenantStrategy>>
+                              .Where(s => s.ImplementationType == typeof(StaticStrategy))
+                              .SingleOrDefault();
 ```
 
 ## Using Multiple Strategies
@@ -60,7 +60,7 @@ services.AddMultiTenant<TenantInfo>()
 ## Delegate Strategy
 > NuGet package: Finbuckle.MultiTenant
 
-Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda function `async context => "contoso"` would use "contoso" as the identifier when resolving the tenant for every request. This strategy is good to use for testing or simple logic. This strategy is configured as transient and multiple instances can be registered.
+Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda function `async context => "initech"` would use "initech" as the identifier when resolving the tenant for every request. This strategy is good to use for testing or simple logic. This strategy is configured as transient and multiple instances can be registered.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. A `Func<object, Task<string>>`is passed in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter:
 
@@ -81,7 +81,7 @@ services.AddMultiTenant<TenantInfo>()
 ## Base Path Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/contoso" would use "contoso" as the identifier when resolving the tenant. This strategy is configured as a singleton.
+Uses the base (i.e. first) path segment to determine the tenant. For example, a request to "https://www.example.com/initech" would use "initech" as the identifier when resolving the tenant. This strategy is configured as a singleton.
 
 Configure by calling `WithBasePathStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class:
 
@@ -142,10 +142,10 @@ Note that an app will have to [configure session state](https://docs.microsoft.c
 
 Note: the configuration and use of this strategy differs in ASP.NET Core 2.1 and ASP.NET Core 3.1+.
 
-Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/contoso/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "contoso" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration. This strategy is configured as a singleton.
+Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "initech" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration. This strategy is configured as a singleton.
 
 **ASP.NET Core 3 or higher**
- The route strategy is made improved in ASP.NET Core 3 due to the new endpoint routing mechanism. Configure by calling `WithRouteStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. A different route parameter name can be specified with the overloaded version. Then in the app pipeline make sure to call `UseRouting` before `UseMultiTenant`:
+ The route strategy is improved in ASP.NET Core 3 due to the new endpoint routing mechanism. Configure by calling `WithRouteStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. A different route parameter name can be specified with the overloaded version. Then in the app pipeline make sure to call `UseRouting` before `UseMultiTenant`:
 
 ```cs
 public class Startup
@@ -169,7 +169,7 @@ public class Startup
         // Other services...
     }
 
-    public void Configure(IappBuilder app, ...)
+    public void Configure(IAppBuilder app, ...)
     {
         // Other middleware...
 
@@ -214,7 +214,7 @@ public class Startup
         // Other services...
     }
 
-    public void Configure(IappBuilder app, ...)
+    public void Configure(IAppBuilder app, ...)
     {
         // Other middleware...
 
@@ -235,7 +235,7 @@ public class Startup
 ## Host Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://contoso.example.com/abc123" would use "contoso" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`. This strategy is configured as a singleton.
+Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://initech.example.com/abc123" would use "initech" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`. This strategy is configured as a singleton.
 
 The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifier using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
   - `__tenant__.*` is the default if no pattern is provided and selects the first domain segment for the tenant identifier.

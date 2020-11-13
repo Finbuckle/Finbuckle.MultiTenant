@@ -8,7 +8,7 @@ will not leak the previous login session into the tenant. This feature also
 avoids the need to create separate authentication schemes for each tenant.
 
 Common authentication options are supported per-tenant as discussed below, but
-additional authetication options can be configured per-tenant using
+additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
 See the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
@@ -24,10 +24,10 @@ The `WithPerTenantAuthentication()` method can be called after
 options based on public properties of the `ITenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
-- Cookie signin events are modified to add a tenant claim during signin. Existing
-  signin events are preserved.
+- Cookie sign-in events are modified to add a tenant claim during sign-in. Existing
+  sign-in events are preserved.
 - Cookie validation events are modified to validate that a tenant claim exists
-  which matches the current requests tenant. Existin validation events are
+  which matches the current requests tenant. Existing validation events are
   preserved.
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `ITenantInfo` implementation.
@@ -37,7 +37,7 @@ The following happens when `WithPerTenantAuthentication()` is called:
   property of the `ITenantInfo` implementation.
 - 'AccessDeniedPath' for cookie authentication is set to the
   `CookieAccessDeniedPath` property of the `ITenantInfo` implementation.
-- Seveal internal services are registered to support remote authentication such
+- Several internal services are registered to support remote authentication such
   as OAuth 2.0 and OpenID Connect.
 - `Authority` for OpenID connect authentication is set to the
   `OpenIdConnectAuthority` property of the `ITenantInfo` implementation.
@@ -49,14 +49,14 @@ The following happens when `WithPerTenantAuthentication()` is called:
 If the `ITenantInfo` implementation lacks one of these properties there is no
 impact on the respective authentication property.
 
-The cookie signin and validation events ensure that a tenant signin does not
+The cookie sign-in and validation events ensure that a tenant sign-in does not
 leak over to a request for another tenant within the same browser or agent. By
-default, if a new signin occurs under a new tenant then tenant claim is replaced
+default, if a new sign-in occurs under a new tenant then tenant claim is replaced
 and the prior tenant session is effectively signed off. Any request to the prior
 tenant will lack the correct tenant claim value and validation will reject the
-authentication. This behavior means only a single tenant signin can be active.
+authentication. This behavior means only a single tenant sign-in can be active.
 See [other authentication options](#other-authentication-options) below if a
-separate signin cookie for each tenant is required.
+separate sign-in cookie for each tenant is required.
 
 By changing the default challenge per-tenant, the user can be redirected to a
 different scheme as needed. Combined with a per-tenant OpenID Connect authority,
@@ -173,8 +173,8 @@ Another common use case is the need to have separate cookies per tenant in
 addition to the functionality provided by `WithPerTenantOptions` which by
 default only uses a single cookie for all tenants. By using per-tenant options
 we can give each tenant's cookie a different name. This effectively maintains
-existing tenant signins when switching between requests on the same browser or
-agent because new signins are not replacing the existing cookie:
+existing tenant sign-ins when switching between requests on the same browser or
+agent because new sign-ins are not replacing the existing cookie:
 
 ```cs
 services.AddMultiTenant<TenantInfo>()
@@ -183,6 +183,6 @@ services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
         .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
         {
-            o.Cookie.Name = "SigninCookie - " + tenantInfo.Id;
+            o.Cookie.Name = "SignInCookie - " + tenantInfo.Id;
         });
 ```
