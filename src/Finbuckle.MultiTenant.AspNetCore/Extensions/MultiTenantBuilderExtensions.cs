@@ -33,10 +33,21 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
+        /// Configure Finbuckle.MultiTenant services for the application.
+        /// </summary>
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            return WithPerTenantAuthentication(builder, _ => { });
+        }
+
+        /// <summary>
         /// Configures authentication options to enable per-tenant behavior.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
             where TTenantInfo : class, ITenantInfo, new()
         {
             builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
@@ -103,9 +114,9 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
-                try { options.Authority = d.OpenIdConnectAuthority; } catch { }
-                try { options.ClientId = d.OpenIdConnectClientId; } catch { }
-                try { options.ClientSecret = d.OpenIdConnectClientSecret; } catch { }
+                try { options.Authority = ((string)d.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.ClientId = ((string)d.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.ClientSecret = ((string)d.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier); } catch { }
             });
 
             // Replace IAuthenticationSchemeProvider so that the options aren't
