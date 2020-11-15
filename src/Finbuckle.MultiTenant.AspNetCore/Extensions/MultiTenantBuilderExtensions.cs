@@ -103,9 +103,9 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
                 var d = (dynamic)tc;
-                try { options.Authority = d.OpenIdConnectAuthority; } catch { }
-                try { options.ClientId = d.OpenIdConnectClientId; } catch { }
-                try { options.ClientSecret = d.OpenIdConnectClientSecret; } catch { }
+                try { options.Authority = ((string)d.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.ClientId = ((string)d.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier); } catch { }
+                try { options.ClientSecret = ((string)d.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier); } catch { }
             });
 
             // Replace IAuthenticationSchemeProvider so that the options aren't
