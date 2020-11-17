@@ -39,6 +39,7 @@ namespace EntityTypeBuilderExtensionsShould
         DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
         DbSet<MyThingWithTenantId> MyThingWithTenantId { get; set; }
         DbSet<MyThingWithIntTenantId> MyThingWithIntTenantId { get; set; }
+        DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingWithAttribute { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -51,10 +52,19 @@ namespace EntityTypeBuilderExtensionsShould
                 builder.Entity<MyMultiTenantThing>().IsMultiTenant();
                 builder.Entity<MyThingWithTenantId>().IsMultiTenant();
             }
+
+            // for MyMultiTenantThingWithAttribute
+            builder.ConfigureMultiTenant();
         }
     }
 
     public class MyMultiTenantThing
+    {
+        public int Id { get; set; }
+    }
+
+    [MultiTenant]
+    public class MyMultiTenantThingWithAttribute
     {
         public int Id { get; set; }
     }
@@ -86,7 +96,7 @@ namespace EntityTypeBuilderExtensionsShould
             var connection = new SqliteConnection("DataSource=:memory:");
             var options = new DbContextOptionsBuilder()
                 .UseSqlite(connection)
-                .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>()
+                .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
                 .Options;
 
             var db = new TestDbContext(config, options);
@@ -179,7 +189,7 @@ namespace EntityTypeBuilderExtensionsShould
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 using (var db = new TestBlogDbContext(tenant1, options))
@@ -199,7 +209,7 @@ namespace EntityTypeBuilderExtensionsShould
                     Id = "123",
                     Identifier = "123",
                     Name = "123",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
                 using (var db = new TestBlogDbContext(tenant2, options))
                 {
@@ -244,7 +254,7 @@ namespace EntityTypeBuilderExtensionsShould
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 using (var db = new TestDbContextWithExistingGlobalFilter(tenant1, options))
@@ -286,7 +296,7 @@ namespace EntityTypeBuilderExtensionsShould
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
 
             using (var c = GetTestIdentityDbContext(tenant1))
@@ -309,7 +319,7 @@ namespace EntityTypeBuilderExtensionsShould
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
 
             using (var c = GetTestIdentityDbContext(tenant1))
@@ -326,7 +336,7 @@ namespace EntityTypeBuilderExtensionsShould
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
 
             using (var c = GetTestIdentityDbContext(tenant1))
@@ -350,7 +360,7 @@ namespace EntityTypeBuilderExtensionsShould
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
 
             using (var c = GetTestIdentityDbContext(tenant1))

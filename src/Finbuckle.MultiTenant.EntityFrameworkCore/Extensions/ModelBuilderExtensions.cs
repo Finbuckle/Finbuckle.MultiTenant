@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
@@ -26,10 +27,25 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </summary>
         public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
         {
-            // Annotate the types marked with the MultiTenant Data Attribute
+            // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
             foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => t.ClrType.HasMultiTenantAttribute()))
             {
-                modelBuilder.Entity(t.ClrType).IsMultiTenant();
+                var entityMi = modelBuilder.GetType()
+                                           .GetMethods()
+                                           .Where(m => m.Name == "Entity"
+                                                       && m.IsGenericMethod
+                                                       && m.ReturnType.IsGenericType
+                                                       && typeof(EntityTypeBuilder).IsAssignableFrom(m.ReturnType))
+                                           .Single()
+                                           .MakeGenericMethod(t.ClrType);
+                                                 
+                var typedBuilder = entityMi.Invoke(modelBuilder, null);
+
+                var isMultiTenantMi = typeof(FinbuckleEntityTypeBuilderExtensions).GetMethods()
+                                                                                  .Where(m => m.Name == nameof(FinbuckleEntityTypeBuilderExtensions.IsMultiTenant))
+                                                                                  .Single()
+                                                                                  .MakeGenericMethod(t.ClrType);
+                isMultiTenantMi.Invoke(null, new[] { typedBuilder } );
             }
 
             return modelBuilder;
