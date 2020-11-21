@@ -107,6 +107,26 @@ namespace MultiTenantEntityTypeBuilderShould
         }
 
         [Fact]
+        public void PreserveUniqueness()
+        {
+            using (var db = GetDbContext(builder =>
+            {
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Id).IsUnique();
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Prop2);
+
+                foreach (var index in builder.Entity<MyMultiTenantThing>().Metadata.GetIndexes().ToList())
+                    builder.Entity<MyMultiTenantThing>().IsMultiTenant().AdjustIndex(index);
+            }))
+            {
+
+                var index = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetIndexes().Where(i => i.Properties.Select(p => p.Name).Contains("Id")).Single();
+                Assert.True(index.IsUnique);
+                index = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetIndexes().Where(i => i.Properties.Select(p => p.Name).Contains("Prop2")).Single();
+                Assert.False(index.IsUnique);
+            }
+        }
+
+        [Fact]
         public void AdjustIndexViaMultiTenantAttribute()
         {
             IMutableIndex origIndex = null;

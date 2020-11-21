@@ -55,19 +55,23 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         public MultiTenantEntityTypeBuilder<T> AdjustIndex(IMutableIndex index)
         {
             // Set the new unique index with TenantId preserving name and database name
+            IndexBuilder indexBuilder = null;
 #if NET
             Builder.Metadata.RemoveIndex(index);
             if (index.Name != null)
-                Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray(), index.Name).IsUnique().HasDatabaseName(index.GetDatabaseName());
+                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray(), index.Name).HasDatabaseName(index.GetDatabaseName());
             else
-                Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).IsUnique().HasDatabaseName(index.GetDatabaseName());
+                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasDatabaseName(index.GetDatabaseName());
 #elif NETSTANDARD2_1
-                Builder.Metadata.RemoveIndex(index.Properties);
-                Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).IsUnique().HasName(index.GetName());
+            Builder.Metadata.RemoveIndex(index.Properties);
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasName(index.GetName());
 #elif NETSTANDARD2_0
-                Builder.Metadata.RemoveIndex(index.Properties);
-                Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).IsUnique().HasName(index.Relational().Name);
+            Builder.Metadata.RemoveIndex(index.Properties);
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasName(index.Relational().Name);
 #endif
+
+            if(index.IsUnique)
+                indexBuilder.IsUnique();
 
             return this;
         }
