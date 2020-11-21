@@ -33,10 +33,10 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
+        /// Configures authentication options to enable per-tenant behavior.
         /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
-        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
-        /// <returns>An new instance of MultiTenantBuilder.</returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
         {
@@ -44,12 +44,10 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="TTenantInfo"></typeparam>
-        /// <param name="builder"></param>
+        /// Configures authentication options to enable per-tenant behavior.
+        /// Configure Finbuckle.MultiTenant services for the application.
         /// <param name="config">Authentication options config</param>
-        /// <returns></returns>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
              where TTenantInfo : class, ITenantInfo, new()
         {
