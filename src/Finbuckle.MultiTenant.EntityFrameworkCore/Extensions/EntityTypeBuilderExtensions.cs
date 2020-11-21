@@ -35,8 +35,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             public IMultiTenantDbContext Context { get; }
         }
 
-        internal static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
-        {         
+        private static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
+        {
 #if NETSTANDARD2_0
             return builder.Metadata.QueryFilter;
 #else
@@ -50,11 +50,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </summary>
         /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
         /// <param name="builder">The entity's type builder</param>
-        /// <returns>The original type builder reference for chaining</returns>
-        public static EntityTypeBuilder<T> IsMultiTenant<T>(this EntityTypeBuilder<T> builder) where T : class
+        /// <returns>A MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
+        public static MultiTenantEntityTypeBuilder<T> IsMultiTenant<T>(this EntityTypeBuilder<T> builder) where T : class
         {
-            if(builder.Metadata.FindAnnotation(Constants.MultiTenantAnnotationName) != null)
-                return builder;
+            if (builder.Metadata.FindAnnotation(Constants.MultiTenantAnnotationName) != null)
+                return new MultiTenantEntityTypeBuilder<T>(builder);
 
             builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
 
@@ -69,10 +69,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
             Expression<Func<T, bool>> tenantFilter = e => EF.Property<string>(e, "TenantId") == (new ExpressionVariableScope()).Context.TenantInfo.Id;
-            
+
             // combine withany existing query filter if it exists
             var existingQueryFilter = builder.GetQueryFilter();
-            if(existingQueryFilter != null)
+            if (existingQueryFilter != null)
             {
                 // replace the parameter node in the tenant filter with the one in the existing filter
                 var filterParam = existingQueryFilter.Parameters.Single();
@@ -83,23 +83,26 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 var combinedExp = Expression.AndAlso(existingQueryFilter.Body, adjustedTenantFilterBody);
                 tenantFilter = (Expression<Func<T, bool>>)Expression.Lambda(combinedExp, filterParam);
             }
-            
+
             builder.HasQueryFilter(tenantFilter);
 
+            // Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
-
             if (clrType != null)
             {
-                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUser<>)))
-                {
-                    UpdateIdentityUserIndex(builder);
-                }
+                    if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUser<>)))
+                    {
+                        UpdateIdentityUserIndex(builder);
+                    }
 
-                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityRole<>)))
-                {
-                    UpdateIdentityRoleIndex(builder);
-                }
+                    if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityRole<>)))
+                    {
+                        UpdateIdentityRoleIndex(builder);
+                    }
+                
 
+                // This is a special case that should still occur.
+                // Note the index below is not unique;
                 if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUserLogin<>)))
                 {
                     UpdateIdentityUserLoginPrimaryKey(builder);
@@ -107,8 +110,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 }
             }
 
-            return builder;
-        }        
+            return new MultiTenantEntityTypeBuilder<T>(builder);
+        }
+
+        
 
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
@@ -139,13 +144,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             builder.Property<string>("Id").ValueGeneratedOnAdd();
         }
 
-        private static void AddIdentityUserLoginIndex(this EntityTypeBuilder builder) 
-        { 
+        private static void AddIdentityUserLoginIndex(this EntityTypeBuilder builder)
+        {
             builder.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique();
         }
 
         private static void RemoveIndex(this EntityTypeBuilder builder, string propName)
-        {        
+        {
 #if NETSTANDARD2_0
             var props = new List<IProperty>(new[] { builder.Metadata.FindProperty(propName) });
             builder.Metadata.RemoveIndex(props);

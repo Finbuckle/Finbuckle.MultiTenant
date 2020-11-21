@@ -38,14 +38,15 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                                                        && typeof(EntityTypeBuilder).IsAssignableFrom(m.ReturnType))
                                            .Single()
                                            .MakeGenericMethod(t.ClrType);
-                                                 
+
                 var typedBuilder = entityMi.Invoke(modelBuilder, null);
 
                 var isMultiTenantMi = typeof(FinbuckleEntityTypeBuilderExtensions).GetMethods()
                                                                                   .Where(m => m.Name == nameof(FinbuckleEntityTypeBuilderExtensions.IsMultiTenant))
                                                                                   .Single()
                                                                                   .MakeGenericMethod(t.ClrType);
-                isMultiTenantMi.Invoke(null, new[] { typedBuilder } );
+
+                isMultiTenantMi.Invoke(null, new[] { typedBuilder });
             }
 
             return modelBuilder;
