@@ -46,7 +46,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                                                                                   .Single()
                                                                                   .MakeGenericMethod(t.ClrType);
 
-                isMultiTenantMi.Invoke(null, new[] { typedBuilder });
+                var multiTenantEntityTypeBuilder = isMultiTenantMi.Invoke(null, new[] { typedBuilder });
+
+                // Adjust all indexes
+                var adjIndexMi = typeof(MultiTenantEntityTypeBuilder<>).MakeGenericType(t.ClrType).GetMethod("AdjustIndex");
+                foreach (var index in modelBuilder.Entity(t.ClrType).Metadata.GetIndexes().ToList())
+                {
+                    adjIndexMi.Invoke(multiTenantEntityTypeBuilder, new[] { index });
+                }
             }
 
             return modelBuilder;

@@ -44,9 +44,11 @@ namespace MultiTenantEntityTypeBuilderShould
         }
     }
 
+    [MultiTenant] // Note this is ignored in some tests.
     public class MyMultiTenantThing
     {
         public int Id { get; set; }
+        public string Prop2 { get; set; }
     }
 
     public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
@@ -88,7 +90,7 @@ namespace MultiTenantEntityTypeBuilderShould
                 builder.Entity<MyMultiTenantThing>().IsMultiTenant().AdjustIndex(origIndex);
             }))
             {
-                
+
                 var index = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetIndexes().First();
                 Assert.NotNull(origIndex);
                 Assert.NotSame(origIndex, index);
@@ -101,6 +103,41 @@ namespace MultiTenantEntityTypeBuilderShould
 #elif NETSTANDARD2_0
                 Assert.Equal("Id", index.Relational.Name);
 #endif
+            }
+        }
+
+        [Fact]
+        public void AdjustIndexViaMultiTenantAttribute()
+        {
+            IMutableIndex origIndex = null;
+
+            using (var db = GetDbContext(builder =>
+            {
+#if NET
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Id, "Id").HasDatabaseName("IdDbName");
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Prop2, "Prop2").HasDatabaseName("Prop2DbName").IsUnique();
+#else
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Id).HasName("Id");
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Prop2).HasName("Prop2").IsUnique();
+#endif
+                origIndex = builder.Entity<MyMultiTenantThing>().Metadata.GetIndexes().First();
+
+                builder.ConfigureMultiTenant();
+            }))
+            {
+                foreach (var index in db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetIndexes())
+                {
+                    Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
+                    var otherProp = index.Properties.Where(p => p.Name != "TenantId").Single();
+#if NET
+                    Assert.Equal(otherProp.Name, index.Name);
+                    Assert.Equal(otherProp.Name + "DbName", index.GetDatabaseName());
+#elif NETSTANDARD2_1
+                    Assert.Equal(otherProp.Name, index.GetName());
+#elif NETSTANDARD2_0
+                    Assert.Equal(otherProp.Name, index.Relational.Name);
+#endif
+                }
             }
         }
     }
