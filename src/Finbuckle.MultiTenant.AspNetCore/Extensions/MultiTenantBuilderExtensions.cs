@@ -33,11 +33,25 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
-        /// Configures authentication options to enable per-tenant behavior.
+        /// Configure Finbuckle.MultiTenant services for the application.
         /// </summary>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+        /// <returns>An new instance of MultiTenantBuilder.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
+        {
+            return WithPerTenantAuthentication(builder, _ => { });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TTenantInfo"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="config">Authentication options config</param>
+        /// <returns></returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
+             where TTenantInfo : class, ITenantInfo, new()
         {
             builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
             {
@@ -53,7 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         return;
 
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
-                    
+
                     // If no current tenant and no tenant claim then OK
                     if(currentTenant == null && !context.Principal.Claims.Any(c => c.Type == Constants.TenantToken))
                         return;
@@ -91,7 +105,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             builder.WithRemoteAuthenticationCallbackStrategy();
-            
+
             // We need to "decorate" IAuthenticationService so callbacks so that
             // remote authentication can get the tenant from the authentication
             // properties in the state parameter.
@@ -117,6 +131,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 builder.WithPerTenantOptions<AuthenticationOptions>((options, tc)
                     => options.DefaultChallengeScheme = (string)challengeSchemeProp.GetValue(tc) ?? options.DefaultChallengeScheme);
             }
+
+            builder.Services.Configure<MultiTenantAuthenticationOptions>(config);
 
             return builder;
         }
@@ -239,7 +255,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, new object[] { template });
         }
-        
+
         /// <summary>
         /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
         /// </summary>
