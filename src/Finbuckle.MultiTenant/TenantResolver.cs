@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace Finbuckle.MultiTenant
                 var _strategy = new MultiTenantStrategyWrapper(strategy, loggerFactory?.CreateLogger(strategy.GetType()));
                 var identifier = await _strategy.GetIdentifierAsync(context);
 
-                if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier))
+                if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
                 {
                     Utilities.TryLoginfo(loggerFactory?.CreateLogger(GetType()), $"Ignored identifier: {identifier}");
                     identifier = null;
