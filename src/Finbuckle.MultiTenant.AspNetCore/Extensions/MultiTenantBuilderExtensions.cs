@@ -90,14 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 try { options.AccessDeniedPath = ((string)d.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier); } catch { }
             });
 
-            builder.WithRemoteAuthenticationCallbackStrategy();
-            
-            // We need to "decorate" IAuthenticationService so callbacks so that
-            // remote authentication can get the tenant from the authentication
-            // properties in the state parameter.
-            if (!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
-                throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAuthorization() in ConfigureServices.");
-            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
+            builder.WithRemoteAuthentication();
 
             // Set per-tenant OpenIdConnect options by convention.
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
@@ -155,6 +148,25 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
+
+        /// <summary>
+        /// Adds and configures support for Remote Authentication
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.></returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRemoteAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            builder.WithRemoteAuthenticationCallbackStrategy();
+
+            // We need to "decorate" IAuthenticationService so callbacks so that
+            // remote authentication can get the tenant from the authentication
+            // properties in the state parameter.
+            if (!builder.Services.Where(s => s.ServiceType == typeof(IAuthenticationService)).Any())
+                throw new MultiTenantException("WithRemoteAuthenticationCallbackStrategy() must be called after AddAuthorization() in ConfigureServices.");
+            builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
+
+            return builder;
+        }
 
 #if NETCOREAPP2_1
         /// <summary>
