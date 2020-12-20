@@ -29,26 +29,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Adds TenantId to all unique indexes.
-        /// </summary>
-        /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
-        public MultiTenantEntityTypeBuilder<T> AdjustUniqueIndexes()
-        {
-            // Update any unique contraints to include TenantId (unless they already do)
-            var indexes = Builder.Metadata.GetIndexes()
-                                          .Where(i => i.IsUnique)
-                                          .Where(i => !i.Properties.Select(p => p.Name).Contains("TenantId"))
-                                          .ToList();
-
-            foreach (var index in indexes)
-            {
-                AdjustIndex(index);
-            }
-
-            return this;
-        }
-
-        /// <summary>
         /// Adds TenantId to the index.
         /// </summary>
         /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>

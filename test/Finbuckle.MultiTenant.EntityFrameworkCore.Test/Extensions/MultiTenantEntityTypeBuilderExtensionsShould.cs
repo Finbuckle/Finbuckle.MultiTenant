@@ -121,5 +121,29 @@ namespace MultiTenantEntityTypeBuilderExtensionsShould
                 }
             }
         }
+        
+        [Fact]
+        public void AdjustAllIndexes()
+        {
+            using (var db = GetDbContext(builder =>
+            {
+#if NET
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Id, nameof(MyMultiTenantThing.Id)).HasDatabaseName(nameof(MyMultiTenantThing.Id) + "DbName").IsUnique();
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Prop2, nameof(MyMultiTenantThing.Prop2)).HasDatabaseName(nameof(MyMultiTenantThing.Prop2) + "DbName");
+#else
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Id).HasName(nameof(MyMultiTenantThing.Id)).IsUnique();
+                builder.Entity<MyMultiTenantThing>().HasIndex(e => e.Prop2).HasName(nameof(MyMultiTenantThing.Prop2));
+#endif
+                builder.Entity<MyMultiTenantThing>().IsMultiTenant().AdjustAllIndexes();
+            }))
+            {
+                var indexes = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetIndexes().Where(i => i.IsUnique);
+
+                foreach (var index in indexes)
+                {
+                    Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
+                }
+            }
+        }
     }
 }
