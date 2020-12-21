@@ -1,4 +1,4 @@
-// Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
+﻿// Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
 namespace Finbuckle.MultiTenant
 {
-    public class MultiTenantOptions
+    public class TenantResolvedContext
     {
-        public IList<string> IgnoredIdentifiers = new List<string>();
-        public MultiTenantEvents Events { get; set; } = new MultiTenantEvents();
+        public object Context { get; set; }
+        public ITenantInfo TenantInfo { get; set; }
     }
 }

@@ -18,6 +18,7 @@ using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
@@ -25,10 +26,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
         where TTenantInfo : class, ITenantInfo, new()
     {
         private readonly IAuthenticationService inner;
+        private readonly IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions;
 
-        public MultiTenantAuthenticationService(IAuthenticationService inner)
+        public MultiTenantAuthenticationService(IAuthenticationService inner, IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions)
         {
             this.inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
+            this.multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
         }
 
         private static void AddTenantIdentiferToProperties(HttpContext context, ref AuthenticationProperties properties)
@@ -48,6 +51,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public async Task ChallengeAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
+            if (multiTenantAuthenticationOptions.CurrentValue.SkipChallengeIfTenantNotResolved)
+            {
+                if (context.GetMultiTenantContext<TTenantInfo>()?.TenantInfo == null)
+                    return;
+            }
+
             AddTenantIdentiferToProperties(context, ref properties);
             await inner.ChallengeAsync(context, scheme, properties);
         }
