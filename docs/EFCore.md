@@ -163,8 +163,8 @@ public class MyDbContext : DbContext, IMultiTenantDbContext
 {
     ...
     public ITenantInfo TenantInfo { get; }
-    public TenantMismatchMode TenantMismatchMode { get; };
-    public TenantNotSetMode TenantNotSetMode { get; };
+    public TenantMismatchMode TenantMismatchMode { get; }
+    public TenantNotSetMode TenantNotSetMode { get; }
     ...
 }
 ```
