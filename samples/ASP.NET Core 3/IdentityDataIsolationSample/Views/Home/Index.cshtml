@@ -69,8 +69,8 @@
                 Some of the highlights are shown below:
             </p>
             <pre><code>// Setup Identity as usual. Note the MultiTenant User and Role type parameters.
-services.AddDefaultIdentity<IdentityUser>()
-        .AddEntityFrameworkStores<ApplicationDbContext>();
+services.AddDefaultIdentity&lt;IdentityUser&gt;()
+        .AddEntityFrameworkStores&lt;ApplicationDbContext&gt;();
 
 // Configure MVC:
 // We modify the Identity razor settings to use our tenant route parameter.
@@ -94,7 +94,7 @@ services.AddControllersWithViews()
     });
 
 // Wrap the default link generator with one that will preserve the tenant route parameter for links.
-services.DecorateService<LinkGenerator, AmbientValueLinkGenerator>(new List<string> { "__tenant__" });
+services.DecorateService&lt;LinkGenerator, AmbientValueLinkGenerator&gt;(new List&lt;string&gt; { "__tenant__" });
 
 services.AddMultiTenant&lt;TenantInfo&gt;()... // Similar to setup in the AuthenticationOptionsSample.
 </code></pre>
