@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class MultiTenantEntityTypeBuilder<T> where T : class
+    public class MultiTenantEntityTypeBuilder
     {
-        public EntityTypeBuilder<T> Builder { get; }
+        public EntityTypeBuilder Builder { get; }
 
-        public MultiTenantEntityTypeBuilder(EntityTypeBuilder<T> builder)
+        public MultiTenantEntityTypeBuilder(EntityTypeBuilder builder)
         {
             Builder = builder;
         }
@@ -31,29 +33,75 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <summary>
         /// Adds TenantId to the index.
         /// </summary>
-        /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
-        public MultiTenantEntityTypeBuilder<T> AdjustIndex(IMutableIndex index)
+        /// <param name="index">The index to adjust for TenantId.</param>
+        /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
+        public MultiTenantEntityTypeBuilder AdjustIndex(IMutableIndex index)
         {
             // Set the new unique index with TenantId preserving name and database name
             IndexBuilder indexBuilder = null;
 #if NET
             Builder.Metadata.RemoveIndex(index);
             if (index.Name != null)
-                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray(), index.Name).HasDatabaseName(index.GetDatabaseName());
+                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
+                                                     .Append("TenantId")
+                                                     .ToArray(),
+                                                index.Name)
+                                      .HasDatabaseName(index.GetDatabaseName());
             else
-                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasDatabaseName(index.GetDatabaseName());
+                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
+                                                     .Append("TenantId")
+                                                     .ToArray())
+                                      .HasDatabaseName(index.GetDatabaseName());
 #elif NETSTANDARD2_1
             Builder.Metadata.RemoveIndex(index.Properties);
-            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasName(index.GetName());
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
+                                                 .Append("TenantId")
+                                                 .ToArray())
+                                  .HasName(index.GetName());
 #elif NETSTANDARD2_0
             Builder.Metadata.RemoveIndex(index.Properties);
-            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray()).HasName(index.Relational().Name);
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
+                                                 .Append("TenantId")
+                                                 .ToArray())
+                                  .HasName(index.Relational()
+                                                .Name);
 #endif
 
-            if(index.IsUnique)
+            if (index.IsUnique)
                 indexBuilder.IsUnique();
 
             return this;
         }
+
+#if NETSTANDARD2_1 || NET
+        /// <summary>
+        /// Adds TenantId to the key.
+        /// </summary>
+        /// <param name="key">The key to adjust for TenantId.</param>
+        /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
+        public MultiTenantEntityTypeBuilder AdjustKey(IMutableKey key, ModelBuilder modelBuilder)
+        {
+            var propertyNames = key.Properties
+                                   .Append(Builder.Metadata.FindProperty("TenantId"))
+                                   .ToList();
+            
+            var newKey = Builder.Metadata.SetPrimaryKey(propertyNames);
+            
+            // first remove any foriegn keys
+            foreach (var fk in key.GetReferencingForeignKeys().ToList())
+            {
+                var fkEntityBuilder = modelBuilder.Entity(fk.DeclaringEntityType.ClrType);
+                fkEntityBuilder.IsMultiTenant();
+                var prop = fk.DeclaringEntityType.FindProperty("TenantId");
+                var props = fk.Properties.Append(prop).Cast<Property>()
+                              .ToList();
+                fk.SetProperties(props, newKey);
+            }
+
+            Builder.Metadata.RemoveKey(key);
+            
+            return this;
+        }
+#endif
     }
 }
