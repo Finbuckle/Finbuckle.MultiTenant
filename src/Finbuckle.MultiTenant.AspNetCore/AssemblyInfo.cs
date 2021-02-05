@@ -14,3 +14,4 @@
 
 using System.Runtime.CompilerServices;
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore.Test")]
+[assembly: InternalsVisibleTo("Finbuckle.MultiTenant.AzureFunctions")]

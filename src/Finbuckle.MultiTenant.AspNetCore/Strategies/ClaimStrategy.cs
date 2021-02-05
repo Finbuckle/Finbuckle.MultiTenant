@@ -37,16 +37,24 @@ namespace Finbuckle.MultiTenant.Strategies
 			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
-			var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-			var authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
-			
-			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
-			await handler.InitializeAsync(authScheme, httpContext);
-			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principle__"] = "true"; // Value doesn't matter.
-			var handlerResult = await handler.AuthenticateAsync();
-			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principle__");
+			if (!httpContext.User.Identity.IsAuthenticated)
+			{
+				var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+				var authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
 
-			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
+				var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
+				await handler.InitializeAsync(authScheme, httpContext);
+				httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principle__"] = "true"; // Value doesn't matter.
+				var handlerResult = await handler.AuthenticateAsync();
+				httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principle__");
+				if (handlerResult != null && handlerResult.Succeeded)
+				{
+					// Make sure to assign the principal back to the httpContext so it can be consumed elsewhere.
+					httpContext.User = handlerResult.Principal;
+				}
+			}
+
+			var identifier = httpContext.User.FindFirst(_tenantKey)?.Value;
 			return await Task.FromResult(identifier);
 		}
 	}
