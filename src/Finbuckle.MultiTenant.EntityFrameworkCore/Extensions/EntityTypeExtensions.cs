@@ -27,8 +27,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             while (entityType != null)
             {
-                var hastMultiTenantAnnotation = (bool?) entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
-                if (hastMultiTenantAnnotation)
+                var hasMultiTenantAnnotation = (bool?) entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
+                if (hasMultiTenantAnnotation)
                     return true;
                 entityType = entityType.BaseType;
             }

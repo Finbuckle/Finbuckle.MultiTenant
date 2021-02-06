@@ -288,6 +288,7 @@ namespace EntityTypeBuilderExtensionsShould
             }
         }
 
+        // The tests below are Identity specific
         [Fact]
         public void AdjustRoleIndex()
         {
