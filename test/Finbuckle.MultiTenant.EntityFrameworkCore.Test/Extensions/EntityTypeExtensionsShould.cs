@@ -13,53 +13,63 @@
 //    limitations under the License.
 
 using System;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using JetBrains.Annotations;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace EntityTypeExtensionsShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
-    public class TestDbContext : DbContext
+    public class EntityTypeExtensionShould : IDisposable
     {
-        public TestDbContext(DbContextOptions options) : base(options)
+        public class TestDbContext : DbContext
         {
+            public TestDbContext(DbContextOptions options) : base(options)
+            {
+            }
+
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            // ReSharper disable once UnusedMember.Local
+            DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            // ReSharper disable once UnusedMember.Local
+            DbSet<MyThing> MyThing { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                builder.Entity<MyMultiTenantThing>().IsMultiTenant();
+                builder.Entity<MyMultiTenantChildThing>();
+            }
         }
 
-        DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
-        DbSet<MyThing> MyThing { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
+        public class MyMultiTenantThing
         {
-            builder.Entity<MyMultiTenantThing>().IsMultiTenant();
-            builder.Entity<MyMultiTenantChildThing>();
+            public int Id { get; set; }
         }
-    }
 
-    public class MyMultiTenantThing
-    {
-        public int Id { get; set; }
-    }
+        // ReSharper disable once MemberCanBePrivate.Global
+        public class MyThing
+        {
+            public int Id { get; set; }
+        }
 
-    public class MyThing
-    {
-        public int Id { get; set; }
-    }
-
-    public class MyMultiTenantChildThing : MyMultiTenantThing
-    {
+        // ReSharper disable once MemberCanBePrivate.Global
+        public class MyMultiTenantChildThing : MyMultiTenantThing
+        {
         
-    }
+        }
+        
+        private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
 
-    public class EntityTypeExtensionShould
-    {
+        public void Dispose()
+        {
+            _connection.Dispose();
+        }
+
         private DbContext GetDbContext()
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open(); 
             var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
+                .UseSqlite(_connection)
                 .Options;
             return new TestDbContext(options);
         }

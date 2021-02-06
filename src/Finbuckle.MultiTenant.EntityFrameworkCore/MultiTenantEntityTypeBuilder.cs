@@ -66,8 +66,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         }
 
         /// <summary>
-        /// Adds TenantId to the key. This will add a TenantId shadow property on any dependent types but will not mark
-        /// them as MultiTenant.
+        /// Adds TenantId to the key and adds a TenantId shadow property on any dependent types' foreign keys.
         /// </summary>
         /// <param name="key">The key to adjust for TenantId.</param>
         /// <param name="modelBuilder">The modelBuilder for the DbContext.</param>
@@ -85,12 +84,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             foreach (var fk in fks)
             {
                 var fkEntityBuilder = modelBuilder.Entity(fk.DeclaringEntityType.ClrType);
-            
+                fkEntityBuilder.Property<string>("TenantId");
                 var props = fk.Properties.Select(p => p.Name).Append("TenantId").ToArray();
-            
                 fkEntityBuilder.HasOne(fk.PrincipalEntityType.ClrType, fk.DependentToPrincipal.Name)
                                .WithMany(fk.PrincipalToDependent.Name)
-                               .HasForeignKey(props);
+                               .HasForeignKey(props)
+                               .HasPrincipalKey(propertyNames);
             }
 
             Builder.Metadata.RemoveKey(key.Properties);

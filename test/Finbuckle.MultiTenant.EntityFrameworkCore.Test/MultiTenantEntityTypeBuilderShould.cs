@@ -181,7 +181,7 @@ namespace MultiTenantEntityTypeBuilderShould
         }
 
         [Fact]
-        public void AdjustDependentForeignKeyOnAdjustKey()
+        public void AdjustDependentForeignKeyOnAdjustPrimaryKey()
         {
             using (var db = GetDbContext(builder =>
                 {
@@ -214,6 +214,29 @@ namespace MultiTenantEntityTypeBuilderShould
                 Assert.Single(key);
                 Assert.Equal(2, key[0].Properties.Count);
                 Assert.Contains("Url", key[0].Properties.Select(p => p.Name));
+                Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
+            }
+        }
+
+        [Fact]
+        public void AdjustDependentForeignKeyOnAdjustAlternateKey()
+        {
+            using (var db = GetDbContext(builder =>
+                {
+                    var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
+                    builder.Entity<Post>()
+                           .HasOne(p => p.Blog)
+                           .WithMany(b => b.Posts)
+                           .HasForeignKey(p => p.Title) // Since Title is a string lets use it as key to Blog.Url
+                           .HasPrincipalKey(b => b.Url);
+                    builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+                }))
+            {
+                var key = db.Model.FindEntityType(typeof(Post)).GetForeignKeys().ToList();
+
+                Assert.Single(key);
+                Assert.Equal(2, key[0].Properties.Count);
+                Assert.Contains("Title", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
             }
         }

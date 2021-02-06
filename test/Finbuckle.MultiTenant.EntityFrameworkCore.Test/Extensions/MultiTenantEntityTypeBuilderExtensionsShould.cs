@@ -15,74 +15,63 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using MultiTenantIdentityDbContextShould;
 using Xunit;
 
-namespace MultiTenantEntityTypeBuilderExtensionsShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
-    public class TestDbContext : MultiTenantDbContext
+    public class MultiTenantEntityTypeBuilderExtensionsShould : IDisposable
     {
-        private readonly Action<ModelBuilder> config;
-
-        public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(new TenantInfo{Id="dummy"}, options)
+        public class TestDbContext : MultiTenantDbContext
         {
-            this.config = config;
+            private readonly Action<ModelBuilder> config;
+
+            public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(
+                new TenantInfo {Id = "dummy"},
+                options)
+            {
+                this.config = config;
+            }
+
+            public DbSet<Blog> Blogs { get; set; }
+            public DbSet<Post> Posts { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                config(builder);
+            }
         }
 
-        public DbSet<Blog> Blogs { get; set; }
-        public DbSet<Post> Posts { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
+        public class Blog
         {
-            config(builder);
+            public int BlogId { get; set; }
+            public string Url { get; set; }
+
+            public List<Post> Posts { get; set; }
         }
-    }
 
-    public class Blog
-    {
-        public int BlogId { get; set; }
-        public string Url { get; set; }
-
-        public List<Post> Posts { get; set; }
-    }
-
-    public class Post
-    {
-        public int PostId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-
-        public Blog Blog { get; set; }
-    }
-
-    public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
-    {
-        public object Create(DbContext context)
+        public class Post
         {
-            return new Object(); // Never cache!
-        }
-    }
+            public int PostId { get; set; }
+            public string Title { get; set; }
+            public string Content { get; set; }
 
-    public class MultiTenantEntityTypeBuilderExtensionsShould
-    {
+            public Blog Blog { get; set; }
+        }
+
+        private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
+
         private TestDbContext GetDbContext(Action<ModelBuilder> config)
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            var options = new DbContextOptionsBuilder().UseSqlite(connection)
-                                                       .ReplaceService<IModelCacheKeyFactory,
-                                                           DynamicModelCacheKeyFactory>() // needed for testing only
-                                                       .Options;
-
+            var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
             var db = new TestDbContext(config, options);
-
             return db;
+        }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
         }
 
         [Fact]
@@ -100,23 +89,13 @@ namespace MultiTenantEntityTypeBuilderExtensionsShould
                            .HasDatabaseName(nameof(Blog.Url) + "DbName")
                            .IsUnique();
 #else
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.BlogId)
-                           .HasName(nameof(Blog.BlogId))
-                           .IsUnique();
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.Url)
-                           .HasName(nameof(Blog.Url))
-                           .IsUnique();
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
+                    builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url)).IsUnique();
 #endif
-                    builder.Entity<Blog>()
-                           .IsMultiTenant()
-                           .AdjustUniqueIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
                 }))
             {
-                var indexes = db.Model.FindEntityType(typeof(Blog))
-                                .GetIndexes()
-                                .Where(i => i.IsUnique);
+                var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
 
                 foreach (var index in indexes.Where(i => i.IsUnique))
                 {
@@ -139,22 +118,13 @@ namespace MultiTenantEntityTypeBuilderExtensionsShould
                            .HasIndex(e => e.Url, nameof(Blog.Url))
                            .HasDatabaseName(nameof(Blog.Url) + "DbName");
 #else
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.BlogId)
-                           .HasName(nameof(Blog.BlogId))
-                           .IsUnique();
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.Url)
-                           .HasName(nameof(Blog.Url));
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
+                    builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url));
 #endif
-                    builder.Entity<Blog>()
-                           .IsMultiTenant()
-                           .AdjustUniqueIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
                 }))
             {
-                var indexes = db.Model.FindEntityType(typeof(Blog))
-                                .GetIndexes()
-                                .Where(i => i.IsUnique);
+                var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
 
                 foreach (var index in indexes.Where(i => !i.IsUnique))
                 {
@@ -177,22 +147,13 @@ namespace MultiTenantEntityTypeBuilderExtensionsShould
                            .HasIndex(e => e.Url, nameof(Blog.Url))
                            .HasDatabaseName(nameof(Blog.Url) + "DbName");
 #else
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.BlogId)
-                           .HasName(nameof(Blog.BlogId))
-                           .IsUnique();
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.Url)
-                           .HasName(nameof(Blog.Url));
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
+                    builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url));
 #endif
-                    builder.Entity<Blog>()
-                           .IsMultiTenant()
-                           .AdjustAllIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustAllIndexes();
                 }))
             {
-                var indexes = db.Model.FindEntityType(typeof(Blog))
-                                .GetIndexes()
-                                .Where(i => i.IsUnique);
+                var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
 
                 foreach (var index in indexes)
                 {
