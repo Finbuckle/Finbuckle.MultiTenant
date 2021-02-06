@@ -25,7 +25,6 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 #if NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
-using Remotion.Linq.Parsing.ExpressionVisitors;
 #endif
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore

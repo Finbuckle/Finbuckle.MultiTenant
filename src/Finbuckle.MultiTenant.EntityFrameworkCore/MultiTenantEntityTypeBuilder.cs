@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions.Internal;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
@@ -42,29 +43,20 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 #if NET
             Builder.Metadata.RemoveIndex(index);
             if (index.Name != null)
-                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
-                                                     .Append("TenantId")
-                                                     .ToArray(),
-                                                index.Name)
-                                      .HasDatabaseName(index.GetDatabaseName());
+                indexBuilder = Builder
+                               .HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray(), index.Name)
+                               .HasDatabaseName(index.GetDatabaseName());
             else
-                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
-                                                     .Append("TenantId")
-                                                     .ToArray())
+                indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
                                       .HasDatabaseName(index.GetDatabaseName());
 #elif NETSTANDARD2_1
             Builder.Metadata.RemoveIndex(index.Properties);
-            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
-                                                 .Append("TenantId")
-                                                 .ToArray())
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
                                   .HasName(index.GetName());
 #elif NETSTANDARD2_0
             Builder.Metadata.RemoveIndex(index.Properties);
-            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name)
-                                                 .Append("TenantId")
-                                                 .ToArray())
-                                  .HasName(index.Relational()
-                                                .Name);
+            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
+                                  .HasName(index.Relational().Name);
 #endif
 
             if (index.IsUnique)
@@ -73,35 +65,36 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return this;
         }
 
-#if NETSTANDARD2_1 || NET
         /// <summary>
-        /// Adds TenantId to the key.
+        /// Adds TenantId to the key. This will add a TenantId shadow property on any dependent types but will not mark
+        /// them as MultiTenant.
         /// </summary>
         /// <param name="key">The key to adjust for TenantId.</param>
+        /// <param name="modelBuilder">The modelBuilder for the DbContext.</param>
         /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
         public MultiTenantEntityTypeBuilder AdjustKey(IMutableKey key, ModelBuilder modelBuilder)
         {
-            var propertyNames = key.Properties
-                                   .Append(Builder.Metadata.FindProperty("TenantId"))
-                                   .ToList();
+            var propertyNames = key.Properties.Select(p => p.Name).Append("TenantId").ToArray();
+            var fks = key.GetReferencingForeignKeys().ToList();
             
-            var newKey = Builder.Metadata.SetPrimaryKey(propertyNames);
+            if (key.IsPrimaryKey())
+                Builder.HasKey(propertyNames);
+            else
+                Builder.HasAlternateKey(propertyNames);
             
-            // first remove any foriegn keys
-            foreach (var fk in key.GetReferencingForeignKeys().ToList())
+            foreach (var fk in fks)
             {
                 var fkEntityBuilder = modelBuilder.Entity(fk.DeclaringEntityType.ClrType);
-                fkEntityBuilder.IsMultiTenant();
-                var prop = fk.DeclaringEntityType.FindProperty("TenantId");
-                var props = fk.Properties.Append(prop).Cast<Property>()
-                              .ToList();
-                fk.SetProperties(props, newKey);
+            
+                var props = fk.Properties.Select(p => p.Name).Append("TenantId").ToArray();
+            
+                fkEntityBuilder.HasOne(fk.PrincipalEntityType.ClrType, fk.DependentToPrincipal.Name)
+                               .WithMany(fk.PrincipalToDependent.Name)
+                               .HasForeignKey(props);
             }
 
-            Builder.Metadata.RemoveKey(key);
-            
+            Builder.Metadata.RemoveKey(key.Properties);
             return this;
         }
-#endif
     }
 }

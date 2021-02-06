@@ -22,6 +22,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MultiTenantIdentityDbContextShould;
 using Xunit;
 
@@ -31,11 +32,13 @@ namespace MultiTenantEntityTypeBuilderShould
     {
         private readonly Action<ModelBuilder> config;
 
-        public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(new TenantInfo{Id="dummy"}, options)
+        public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(
+            new TenantInfo {Id = "dummy"},
+            options)
         {
             this.config = config;
         }
-        
+
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
 
@@ -45,7 +48,6 @@ namespace MultiTenantEntityTypeBuilderShould
         }
     }
 
-    [MultiTenant] // this is ignored in some tests
     public class Blog
     {
         public int BlogId { get; set; }
@@ -54,7 +56,6 @@ namespace MultiTenantEntityTypeBuilderShould
         public List<Post> Posts { get; set; }
     }
 
-    [MultiTenant] // this is ignored in some tests
     public class Post
     {
         public int PostId { get; set; }
@@ -62,6 +63,7 @@ namespace MultiTenantEntityTypeBuilderShould
         public string Content { get; set; }
 
         public Blog Blog { get; set; }
+        // public int BlogId { get; set; }
     }
 
     public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
@@ -74,13 +76,13 @@ namespace MultiTenantEntityTypeBuilderShould
 
     public class MultiTenantEntityTypeBuilderShould
     {
-        private DbContext GetDbContext(Action<ModelBuilder> config)
+        private TestDbContext GetDbContext(Action<ModelBuilder> config)
         {
             var connection = new SqliteConnection("DataSource=:memory:");
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
-                .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
-                .Options;
+            var options = new DbContextOptionsBuilder().UseSqlite(connection)
+                                                       .ReplaceService<IModelCacheKeyFactory,
+                                                           DynamicModelCacheKeyFactory>() // needed for testing only
+                                                       .Options;
 
             var db = new TestDbContext(config, options);
 
@@ -94,22 +96,18 @@ namespace MultiTenantEntityTypeBuilderShould
 
             using (var db = GetDbContext(builder =>
                 {
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.BlogId);
-                    
-                origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
-                builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
-            }))
-            {
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId);
 
-                var index = db.Model.FindEntityType(typeof(Blog))
-                              .GetIndexes()
-                              .First();
+                    origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
+                }))
+            {
+                var index = db.Model.FindEntityType(typeof(Blog)).GetIndexes().First();
                 Assert.Contains("BlogId", index.Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
             }
         }
-        
+
         [Fact]
         public void PreserveIndexNameOnAdjustIndex()
         {
@@ -118,15 +116,16 @@ namespace MultiTenantEntityTypeBuilderShould
             using (var db = GetDbContext(builder =>
                 {
 #if NET
-                    builder.Entity<Blog>().HasIndex(e => e.BlogId, "CustomIndexName").HasDatabaseName("CustomIndexDbName");
+                    builder.Entity<Blog>()
+                           .HasIndex(e => e.BlogId, "CustomIndexName")
+                           .HasDatabaseName("CustomIndexDbName");
 #else
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName("CustomIndexName");
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName("CustomIndexName");
 #endif
                     origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
                     builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
                 }))
             {
-
                 var index = db.Model.FindEntityType(typeof(Blog)).GetIndexes().First();
 #if NET
                 Assert.Equal("CustomIndexName", index.Name);
@@ -143,75 +142,36 @@ namespace MultiTenantEntityTypeBuilderShould
         public void PreserveIndexUniquenessOnAdjustIndex()
         {
             using (var db = GetDbContext(builder =>
-            {
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique();
-                builder.Entity<Blog>().HasIndex(e => e.Url);
+                {
+                    builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique();
+                    builder.Entity<Blog>().HasIndex(e => e.Url);
 
-                foreach (var index in builder.Entity<Blog>().Metadata.GetIndexes().ToList())
-                    builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
-            }))
+                    foreach (var index in builder.Entity<Blog>().Metadata.GetIndexes().ToList())
+                        builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
+                }))
             {
-
-                var index = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Single(i => i.Properties.Select(p => p.Name).Contains("BlogId"));
+                var index = db.Model.FindEntityType(typeof(Blog))
+                              .GetIndexes()
+                              .Single(i => i.Properties.Select(p => p.Name).Contains("BlogId"));
                 Assert.True(index.IsUnique);
-                index = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Single(i => i.Properties.Select(p => p.Name).Contains("Url"));
+                index = db.Model.FindEntityType(typeof(Blog))
+                          .GetIndexes()
+                          .Single(i => i.Properties.Select(p => p.Name).Contains("Url"));
                 Assert.False(index.IsUnique);
             }
         }
 
         [Fact]
-        public void AdjustIndexViaMultiTenantAttribute()
-        {
-            IMutableIndex origIndex = null;
-
-            using (var db = GetDbContext(builder =>
-            {
-#if NET
-                builder.Entity<Blog>().HasIndex(e => e.BlogId, "Id").HasDatabaseName("IdDbName");
-                builder.Entity<Blog>().HasIndex(e => e.Url, "Url").HasDatabaseName("UrlDbName").IsUnique();
-#else
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName("Id");
-                builder.Entity<Blog>().HasIndex(e => e.Url).HasName("Url").IsUnique();
-#endif
-                origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
-
-                builder.ConfigureMultiTenant();
-            }))
-            {
-                foreach (var index in db.Model.FindEntityType(typeof(Blog)).GetIndexes())
-                {
-                    Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
-                    var otherProp = index.Properties.Single(p => p.Name != "TenantId");
-#if NET
-                    Assert.Equal(otherProp.Name, index.Name);
-                    Assert.Equal(otherProp.Name + "DbName", index.GetDatabaseName());
-#elif NETCOREAPP3_1
-                    Assert.Equal(otherProp.Name, index.GetName());
-#elif NETCOREAPP2_1
-                    Assert.Equal(otherProp.Name, index.Relational().Name);
-#endif
-                }
-            }
-        }
-        
-#if NETCOREAPP3_1 || NET
-        [Fact]
-        public void AdjustPrimaryKeyOnAdjustPrimaryKey()
+        public void AdjustPrimaryKeyOnAdjustKey()
         {
             using (var db = GetDbContext(builder =>
                 {
-                    var key = builder.Entity<Blog>()
-                                     .Metadata.GetKeys()
-                                     .First();
-                    
-                    builder.Entity<Blog>()
-                           .IsMultiTenant()
-                           .AdjustKey(key, builder);
+                    var key = builder.Entity<Blog>().Metadata.GetKeys().First();
+
+                    builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
                 }))
             {
-
-                var key = db.Model.FindEntityType(typeof(Blog)).GetKeys()
-                            .ToList();
+                var key = db.Model.FindEntityType(typeof(Blog)).GetKeys().ToList();
 
                 Assert.Single(key);
                 Assert.Equal(2, key[0].Properties.Count);
@@ -219,6 +179,43 @@ namespace MultiTenantEntityTypeBuilderShould
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
             }
         }
-#endif
+
+        [Fact]
+        public void AdjustDependentForeignKeyOnAdjustKey()
+        {
+            using (var db = GetDbContext(builder =>
+                {
+                    var key = builder.Entity<Blog>().Metadata.GetKeys().First();
+
+                    builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+                }))
+            {
+                var key = db.Model.FindEntityType(typeof(Post)).GetForeignKeys().ToList();
+
+                Assert.Single(key);
+                Assert.Equal(2, key[0].Properties.Count);
+                Assert.Contains("BlogId", key[0].Properties.Select(p => p.Name));
+                Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
+            }
+        }
+
+        [Fact]
+        public void AdjustAlternateKeyOnAdjustKey()
+        {
+            using (var db = GetDbContext(builder =>
+                {
+                    var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
+
+                    builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+                }))
+            {
+                var key = db.Model.FindEntityType(typeof(Blog)).GetKeys().Where(k => !k.IsPrimaryKey()).ToList();
+
+                Assert.Single(key);
+                Assert.Equal(2, key[0].Properties.Count);
+                Assert.Contains("Url", key[0].Properties.Select(p => p.Name));
+                Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
+            }
+        }
     }
 }
