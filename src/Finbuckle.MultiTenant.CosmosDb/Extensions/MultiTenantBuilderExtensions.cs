@@ -33,8 +33,9 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var cosmosClient = services.GetRequiredService<CosmosClient>();
                 var dbContext = DatabaseContextBuilder(cosmosClient, services);
-                
+
                 // Can't think of a good way around .GetAwaiter().GetResult()
+                dbContext.InitializeDatabaseAsync().GetAwaiter().GetResult();
                 dbContext.InitializeAsync().GetAwaiter().GetResult();
 
                 return dbContext;
