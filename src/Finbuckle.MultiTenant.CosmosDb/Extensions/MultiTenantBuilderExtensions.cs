@@ -13,19 +13,19 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a CosmosDb based multi-tenant store to the application. Will also create the database context service unless it's already exists.
         /// </summary>
-        /// <typeparam name="CosmosDbStoreContext"></typeparam>
+        /// <typeparam name="TDatabaseContext"></typeparam>
         /// <typeparam name="TTenantInfo"></typeparam>
         /// <param name="builder"></param>
         /// <param name="connectionString">CosmosDb Connection String.</param>
         /// <param name="serializationOptions">Default CosmosDb Serialization options.</param>
         /// <param name="cosmosDbStoreContext">Function to select the container to use when looking up the <see cref="ITenantInfo"/>.</param>
         /// <returns>The same <see cref="FinbuckleMultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithCosmosDbStore<TDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithCosmosDbStore<TDatabaseContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
             string connectionString,
             CosmosSerializationOptions serializationOptions,
-            Func<TDbContext, Container> cosmosDbStoreContext)
+            Func<TDatabaseContext, Container> cosmosDbStoreContext)
             where TTenantInfo : class, ITenantInfo, new()
-            where TDbContext : DbContext
+            where TDatabaseContext : DatabaseContext
         {
             var cosmosClient = new CosmosClientBuilder(connectionString)
                 .WithSerializerOptions(serializationOptions)
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddSingleton(services =>
             {
-                var dbContext = ActivatorUtilities.CreateInstance<TDbContext>(services, cosmosClient);
+                var dbContext = ActivatorUtilities.CreateInstance<TDatabaseContext>(services, cosmosClient);
                 
                 // Can't think of a good way around .GetAwaiter().GetResult()
                 dbContext.InitializeAsync().GetAwaiter().GetResult();
@@ -43,7 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddSingleton(services =>
             {
-                var dbContext = services.GetRequiredService<TDbContext>();
+                var dbContext = services.GetRequiredService<TDatabaseContext>();
                 var container = cosmosDbStoreContext(dbContext);
                 return new CosmosDbStoreContext(container);
             });
@@ -54,17 +54,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a CosmosDb based multi-tenant store to the application. Will also create the database context service unless it's already exists.
         /// </summary>
-        /// <typeparam name="CosmosDbStoreContext"></typeparam>
+        /// <typeparam name="TDatabaseContext"></typeparam>
         /// <typeparam name="TTenantInfo"></typeparam>
         /// <param name="builder"></param>
         /// <param name="connectionString">CosmosDb Connection String.</param>
         /// <param name="cosmosDbStoreContext">Function to select the container to use when looking up the <see cref="ITenantInfo"/>.</param>
         /// <returns>The same <see cref="FinbuckleMultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithCosmosDbStore<TDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithCosmosDbStore<TDatabaseContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
             string connectionString,
-            Func<TDbContext, Container> cosmosDbStoreContext)
+            Func<TDatabaseContext, Container> cosmosDbStoreContext)
             where TTenantInfo : class, ITenantInfo, new()
-            where TDbContext : DbContext
+            where TDatabaseContext : DatabaseContext
         {
             return WithCosmosDbStore(builder, connectionString, new CosmosSerializationOptions(), cosmosDbStoreContext);
         }

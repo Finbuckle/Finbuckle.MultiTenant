@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.CosmosDb.Stores
 {
-    public abstract class DbContext
+    public abstract class DatabaseContext
     {
-        private readonly ILogger<DbContext> _logger;
+        private readonly ILogger<DatabaseContext> _logger;
 
         public CosmosClient Client { get; private set; }
 
-        public DbContext(CosmosClient client)
+        public DatabaseContext(CosmosClient client)
         {
             Client = client;
         }
 
-        public DbContext(CosmosClient client, ILogger<DbContext> logger)
+        public DatabaseContext(CosmosClient client, ILogger<DatabaseContext> logger)
         {
             Client = client;
             _logger = logger;
