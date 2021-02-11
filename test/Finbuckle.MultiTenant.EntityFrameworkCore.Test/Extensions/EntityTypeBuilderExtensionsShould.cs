@@ -17,12 +17,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Test;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using MultiTenantIdentityDbContextShould;
 using Xunit;
 
 namespace EntityTypeBuilderExtensionsShould
