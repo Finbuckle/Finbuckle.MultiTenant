@@ -1,11 +1,11 @@
 //    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
+//
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
 //    You may obtain a copy of the License at
-// 
+//
 //        http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 //    Unless required by applicable law or agreed to in writing, software
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies
@@ -27,15 +26,15 @@ namespace Finbuckle.MultiTenant.Strategies
 
         public MultiTenantStrategyWrapper(IMultiTenantStrategy strategy, ILogger logger)
         {
-            this.Strategy = strategy;
-            this.logger = logger;
+            this.Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<string> GetIdentifierAsync(object context)
         {
             if (context == null)
             {
-                throw new System.ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(context));
             }
 
             string identifier = null;
@@ -46,18 +45,23 @@ namespace Finbuckle.MultiTenant.Strategies
             }
             catch (Exception e)
             {
-                var errorMessage = $"Exception in {Strategy.GetType()}.GetIdentifierAsync.";
-                Utilities.TryLogError(logger, errorMessage, e);
-                throw new MultiTenantException(errorMessage, e);
+                logger.LogError(e, "Exception in GetIdentifierAsync");
+                throw new MultiTenantException($"Exception in {Strategy.GetType()}.GetIdentifierAsync.", e);
             }
 
             if(identifier != null)
-            {                
-                Utilities.TryLogDebug(logger, $"{Strategy.GetType()}.GetIdentifierAsync: Found identifier: \"{identifier}\".");
+            {
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("GetIdentifierAsync: Found identifier: \"{Identifier}\"", identifier);
+                }
             }
             else
             {
-                Utilities.TryLogDebug(logger, $"{Strategy.GetType()}.GetIdentifierAsync: No identifier found.");
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("GetIdentifierAsync: No identifier found");
+                }
             }
 
             return identifier;
