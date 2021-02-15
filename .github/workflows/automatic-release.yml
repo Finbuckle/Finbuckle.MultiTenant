@@ -3,7 +3,7 @@ name: Automatic Release
 on:
   push:
     branches:
-      - master
+      - develop
 
 jobs:
   build-test-prep:
