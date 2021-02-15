@@ -1,0 +1,41 @@
+name: Automatic Release
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-test-prep:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: setup .net
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: build and test
+        run: |
+          dotnet restore
+          dotnet build -c Release --no-restore
+          dotnet test --no-build -c Release
+      - name: Create the package
+        run: dotnet pack --no-build --include-symbols -c Release --output nupkgs
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - name: setup semantic-release
+        run: |
+          npm install -D semantic-release
+          npm install -D @semantic-release/git
+          npm install -D @semantic-release/changelog
+          npm install -D @semantic-release/exec
+      - name: run semantic-release
+        env: 
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
+      # - name: Publish the package to GPR
+      #   run: dotnet nuget push nupkgs/*.nupkg --source 'https://nuget.pkg.github.com/andrewtriestocode/index.json' --api-key ${{secrets.GITHUB_TOKEN}}

@@ -1,0 +1,19 @@
+
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    ["@semantic-release/exec", {
+      "prepareCmd": "sed -i.bak 's/<Version>.*<\\/Version>/<Version>${nextRelease.version}<\\/Version>/' Directory.Build.props"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG.md", "Directory.Build.props"]
+    }],
+    ["@semantic-release/github", {
+      "assets": ["nupkgs"]
+    }]
+  ],
+  "ci": true,
+  "dryRun": false
+}
