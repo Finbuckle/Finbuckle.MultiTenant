@@ -98,7 +98,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 
 ## Using the fluent API
 The fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the
-multitenant functionality for entitty types:
+multitenant functionality for entity types:
 
 ```cs
 protected override void OnModelCreating(ModelBuilder builder)
@@ -163,14 +163,14 @@ public class MyDbContext : DbContext, IMultiTenantDbContext
 {
     ...
     public ITenantInfo TenantInfo { get; }
-    public TenantMismatchMode TenantMismatchMode { get; };
-    public TenantNotSetMode TenantNotSetMode { get; };
+    public TenantMismatchMode TenantMismatchMode { get; }
+    public TenantNotSetMode TenantNotSetMode { get; }
     ...
 }
 ```
 The db context will need to ensure that these properties haves values, e.g. through constructors, setters, or default values.
 
-Finally, call the library extension methods as decribed below. This requires overriding the `OnModelCreating`, `SaveChanges`, and `SaveChangesAsync` methods.
+Finally, call the library extension methods as described below. This requires overriding the `OnModelCreating`, `SaveChanges`, and `SaveChangesAsync` methods.
 
 In `OnModelCreating` use the `EntityTypeBuilder` fluent API extension method `IsMultiTenant` to designate entity types as multitenant. Call `ConfigureMultiTenant` on the `ModelBuilder` to configure each entity type marked with the `[MultiTenant]` data attribute. This is only needed if using the attribute and internally uses the `IsMultiTenant` fluent API. Make sure to call the base class `OnModelCreating` method if necessary, such as if inheriting from `IdentityDbContext`.
 
@@ -211,10 +211,10 @@ for the current tenant.
 
 ## Deriving from MultiTenantDbContext
 This approach is easier bit requires inheriting from `MultiTenantDbContext` which
-may not alway be possible. It is simply a preconfigured implementation of
+may not alway be possible. It is simply a pre-configured implementation of
 `IMultiTenantDbContext` with the helper methods as described below in
 (Adding MultiTenant Functionality to an Existing DbContext)
-[#adding-multitenant-functionality-to-anexisting-dbcontext]
+[#adding-multitenant-functionality-to-an-existing-dbcontext]
 
 Start by adding the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
 ```{.bash}
@@ -285,7 +285,7 @@ For this reason it is recommended to use a [design time factory](https://docs.mi
 
 ## Registering with ASP.NET Core
 
-When registering the db context as a service in ASP.NET Core it is important to take into account whether the connection string and/or provider will vary per-tenant. If so, it is recommended to set the connection string and provider in the `OnConfiguring` db context method as desribed above rather than in the `AddDbContext` service registration method.
+When registering the db context as a service in ASP.NET Core it is important to take into account whether the connection string and/or provider will vary per-tenant. If so, it is recommended to set the connection string and provider in the `OnConfiguring` db context method as described above rather than in the `AddDbContext` service registration method.
 
 ## Adding Data
 Added entities are automatically associated with the current `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`.

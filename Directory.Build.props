@@ -1,12 +1,13 @@
 <Project>
     <PropertyGroup>
-        <Version>6.1.0</Version>
+        <Version>6.2.0</Version>
         <Authors>Finbuckle LLC</Authors>
         <Copyright>Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <PackageProjectUrl>https://www.finbuckle.com</PackageProjectUrl>
+        <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>

@@ -84,7 +84,7 @@ public class ServiceCollectionExtensionsShould
     }
 
     [Fact]
-    public void RegisterIMultitenantContextAccessorInDI()
+    public void RegisterIMultiTenantContextAccessorInDI()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
@@ -97,7 +97,7 @@ public class ServiceCollectionExtensionsShould
     }
 
     [Fact]
-    public void RegisterIMultitenantContextAccessorGenericInDI()
+    public void RegisterIMultiTenantContextAccessorGenericInDI()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();

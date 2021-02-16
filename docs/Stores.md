@@ -118,6 +118,12 @@ services.AddMultiTenant<TenantInfo>()
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation of `ITenantInfo` properties are mapped from the JSON automatically.
 
+> Note: Finbuckle.MultiTenant versions prior to 6.0 had an `Index` collection
+> property to store custom data. This was removed because custom `ITenantInfo`
+> implementations can use normal properties for custom data. Older examples
+> might show an `Index` sub-object in the configuration json that may not be
+> applicable.
+
 ```json
 {
   "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
@@ -128,7 +134,7 @@ The configuration section should use this JSON format shown below. Any fields in
       {
         "Id": "unique-id-0ff4adaf",
         "Identifier": "tenant-1",
-        "Name": "Tenant 1 Company Name"
+        "Name": "Tenant 1 Company Name",
         "ACustomProperty": "VIP Customer"
       },
       {

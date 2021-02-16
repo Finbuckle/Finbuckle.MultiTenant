@@ -18,6 +18,10 @@ Contains information about a tenant. Usually an app will get the current `Tenant
 * `Name` is a display name for the tenant.
 * `ConnectionString` is a connection string that should be used for database operations for this tenant. It might connect to a shared database or a dedicated database for the single tenant.
 
+> Note: Finbuckle.MultiTenant versions prior to v6.0.0 had an `Items` dictioanry
+> property for custom data. This was removed in favor of custom `ITenantInfo`
+> support where custom data can simply be made properties of the implementation.
+
 `TenantInfo` is a basic implementation of `ITenantInfo` with only the required properties.
 An app can define a custom `ITenantInfo` and add any other needed properties.
 When calling `AddMultiTenant<T>` the type passed into the type parameter defines the

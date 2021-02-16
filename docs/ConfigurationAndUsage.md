@@ -16,8 +16,8 @@ public void ConfigureServices(IServiceCollection services)
 
 ## AddMultiTenant<T>
 `AddMultiTenant<T>` is an extension method on `IServiceCollection` which registers the basic dependencies needed by the library.
-The `T` type paramter determines the type of the `ITenantInfo` object used throughout the library. `TenantInfo` provides a basic
-immplementation of `ITenantInfo`, but a custom implementation can and should be provided. It returns a `MultiTenantBuilder<T>` instance on which the methods below can be called for further configuration. Each of these methods returns the same `MultiTenantBuilder<T>` instance allowing for chaining method calls.
+The `T` type parameter determines the type of the `ITenantInfo` object used throughout the library. `TenantInfo` provides a basic
+implementation of `ITenantInfo`, but a custom implementation can and should be provided. It returns a `MultiTenantBuilder<T>` instance on which the methods below can be called for further configuration. Each of these methods returns the same `MultiTenantBuilder<T>` instance allowing for chaining method calls.
 
 ## WithStore Variants
 Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used. See [MultiTenant Stores](Stores) for more information on each type.
