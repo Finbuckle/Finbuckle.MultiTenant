@@ -22,5 +22,9 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 2.1.x
-      - name: build and test
-        run: dotnet test
+      - name: restore
+        run: dotnet restore
+      - name: build
+        run: dotnet build --no-restore
+      - name: test
+        run: dotnet test --no-build
