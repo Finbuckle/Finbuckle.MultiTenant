@@ -1,4 +1,3 @@
-## Version
 **6.2.0**
 * Added a new events system. See PR #359 Thanks to **@natelaff**!
 * Some internal refactoring.

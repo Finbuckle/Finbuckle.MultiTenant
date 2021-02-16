@@ -72,6 +72,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             
             // combine withany existing query filter if it exists
             var existingQueryFilter = builder.GetQueryFilter();
+
             if(existingQueryFilter != null)
             {
                 // replace the parameter node in the tenant filter with the one in the existing filter
