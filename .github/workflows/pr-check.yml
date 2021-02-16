@@ -10,15 +10,15 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
-      - name: setup .net
+      - name: setup .net 5.0
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.x
-      - name: setup .net
+      - name: setup .net 3.1
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
-      - name: setup .net
+      - name: setup .net 2.1
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 2.1.x
