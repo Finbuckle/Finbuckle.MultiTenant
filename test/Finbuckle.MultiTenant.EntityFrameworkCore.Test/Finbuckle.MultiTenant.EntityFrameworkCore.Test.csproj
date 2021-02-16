@@ -29,7 +29,7 @@
   </Choose>
 
   <ItemGroup>
-    <ProjectReference Include="../Finbuckle.MultiTenant.Test/Finbuckle.Multitenant.Test.csproj" />
+    <ProjectReference Include="../Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj" />
     <ProjectReference Include="../../src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
   </ItemGroup>
 </Project>
