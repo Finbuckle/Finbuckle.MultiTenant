@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Title>Finbuckle.MultiTenant.AzureFunctions</Title>
     <Description>Azure Functions support for Finbuckle.MultiTenant</Description>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -16,12 +16,8 @@ namespace Finbuckle.MultiTenant.AzureFunctions
     {
         public void Initialize(ExtensionConfigContext context)
         {
-            //context.AddOpenConverter<HttpRequest, TenantOpenType>(typeof(TenantConverter<>));
-
             // Creates a rule that links the attribute to the binding
-
-            var provider = new TenantBindingProvider();
-            var rule = context.AddBindingRule<TenantAttribute>().Bind(provider);
+            context.AddBindingRule<TenantAttribute>().Bind(new TenantBindingProvider());
         }
     }
 }

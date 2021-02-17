@@ -25,8 +25,7 @@ namespace Finbuckle.MultiTenant.AzureFunctions.Bindings
             {
                 throw new ArgumentNullException(nameof(context));
             }
-            var request = context.BindingData[TenantBindingProvider.RequestBindingName] as HttpRequest;
-            if (request is null)
+            if (context.BindingData[TenantBindingProvider.RequestBindingName] is not HttpRequest request)
             {
                 throw new NotSupportedException($"Argument {nameof(HttpRequest)} is null. {nameof(TenantAttribute)} must work with HttpTrigger.");
             }
@@ -36,8 +35,7 @@ namespace Finbuckle.MultiTenant.AzureFunctions.Bindings
 
         public Task<IValueProvider> BindAsync(object value, ValueBindingContext context)
         {
-            var request = value as HttpRequest;
-            if (request != null)
+            if (value is HttpRequest request)
             {
                 return Task.FromResult<IValueProvider>(new TenantValueProvider<TTenantInfo>(request));
             }
