@@ -30,7 +30,7 @@ The Identity option to require a unique email address per user will require emai
 ## Authentication
 ASP.NET Core Identity cookies for authentication. It uses a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration), but under the hood standard ASP.NET Core authentication is used.
 
-Finbuckle.Multitenant can isolate Identity authentication per tenant so that user sessions are unique per tenant. See [per-tenant authentication](Authentication) for information on how to customize authentication options per tenant.
+Finbuckle.MultiTenant can isolate Identity authentication per tenant so that user sessions are unique per tenant. See [per-tenant authentication](Authentication) for information on how to customize authentication options per tenant.
 
 ## Identity Model Customization with MultiTenantIdentityDbContext
 The [ASP.NET Core Identity data model](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-2.2#the-identity-model) relies on several types which are passed to the database context as generic parameters: 

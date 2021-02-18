@@ -1,4 +1,10 @@
-## Version
+**6.2.0**
+* Added a new events system. See PR #359 Thanks to **@natelaff**!
+* Some internal refactoring.
+* Various documentation fixes.
+* Added sourcelink to allow debugging into remote source code.
+* Added a security policy.
+
 **6.1.0**
 * .NET 5.0 support.
 * New `DistributedCacheStore` uses the ASP.NET Core distributed cache for tenant resolution.

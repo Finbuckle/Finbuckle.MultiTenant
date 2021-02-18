@@ -73,30 +73,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // combine withany existing query filter if it exists
             var existingQueryFilter = builder.GetQueryFilter();
 
-            // override to match existing query parameter if applicable
-            if (existingQueryFilter != null)
-            {
-                entityParamExp = existingQueryFilter.Parameters.First();
-            }
-
-            // build up expression tree for: EF.Property<string>(e, "TenantId")
-            var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-            var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
-            var leftExp = efPropertyExp;
-
-            // build up express tree for: TenantInfo.Id
-            // EF will magically sub the current db context in for scope.Context
-            var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
-            var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
-            var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
-            var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-            var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
-
-            // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
-            var predicate = Expression.Equal(leftExp, rightExp);
-
-            // combine with existing filter
-            if (existingQueryFilter != null)
+            if(existingQueryFilter != null)
             {
                 // replace the parameter node in the tenant filter with the one in the existing filter
                 var filterParam = existingQueryFilter.Parameters.Single();
