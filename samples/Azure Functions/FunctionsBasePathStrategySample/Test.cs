@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AzureFunctions;
 
 namespace FunctionsBasePathStrategySample
 {
@@ -16,27 +17,26 @@ namespace FunctionsBasePathStrategySample
         [FunctionName("Test")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{tenant}/Test")] HttpRequest req,
-            string tenant,
+            [Tenant]TenantInfo? tenant,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             log.LogInformation($"Route Tenant: {tenant}");
 
-            string name = req.Query["name"];
+            string? name = req.Query["name"];
 
-            var ti = req.HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
-            if (ti is null)
+            if (tenant is null)
             {
                 log.LogInformation("No tenant found.");
             }
             else
             {
-                log.LogInformation($"Tenant Information: {ti.Id}, {ti.Name}, {ti.Identifier}, {ti.ConnectionString}");
+                log.LogInformation($"Tenant Information: {tenant.Id}, {tenant.Name}, {tenant.Identifier}, {tenant.ConnectionString}");
             }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            dynamic? data = JsonConvert.DeserializeObject(requestBody);
+            name ??= data?.name;
 
             string responseMessage = string.IsNullOrEmpty(name)
                 ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."

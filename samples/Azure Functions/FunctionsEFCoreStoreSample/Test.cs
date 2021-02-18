@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AzureFunctions;
 
 namespace FunctionsEFCoreStoreSample
 {
@@ -16,7 +17,7 @@ namespace FunctionsEFCoreStoreSample
         [FunctionName("Test")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{tenant}/Test")] HttpRequest req,
-            string tenant,
+            [Tenant]TenantInfo tenant,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -24,14 +25,13 @@ namespace FunctionsEFCoreStoreSample
 
             string name = req.Query["name"];
 
-            var ti = req.HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
-            if (ti is null)
+            if (tenant is null)
             {
                 log.LogInformation("No tenant found.");
             }
             else
             {
-                log.LogInformation($"Tenant Information: {ti.Id}, {ti.Name}, {ti.Identifier}, {ti.ConnectionString}");
+                log.LogInformation($"Tenant Information: {tenant.Id}, {tenant.Name}, {tenant.Identifier}, {tenant.ConnectionString}");
             }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();

@@ -16,28 +16,8 @@ namespace FunctionsBasePathStrategySample
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddMultiTenant<TenantInfo>()
-#if Release
-                //.WithConfigurationStore()
-#else
-                .WithInMemoryStore(config =>
-                {
-                    config.Tenants.Add(new TenantInfo()
-                    {
-                        Id = "tenant-finbuckle-d043favoiaw",
-                        Identifier = "finbuckle",
-                        Name = "Finbuckle"
-                    });
-                    config.Tenants.Add(new TenantInfo()
-                    {
-                        Id = "tenant-initech-341ojadsfa",
-                        Identifier = "initech",
-                        Name = "Initech LLC"
-                    });
-                })
-#endif
-                .WithBasePathStrategy(routePrefix: PathString.FromUriComponent("/api"));
-
-            builder.UseMultiTenant();
+                .WithConfigurationStore()
+                .WithBasePathStrategy();
         }
     }
 }

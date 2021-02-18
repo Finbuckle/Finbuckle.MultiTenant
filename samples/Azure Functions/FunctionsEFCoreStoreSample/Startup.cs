@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Finbuckle.MultiTenant;
+﻿using Finbuckle.MultiTenant;
 
 using FunctionsEFCoreStoreSample.Data;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+
+using System;
 
 [assembly: FunctionsStartup(typeof(FunctionsBasePathStrategySample.Startup))]
 namespace FunctionsBasePathStrategySample
@@ -19,16 +16,14 @@ namespace FunctionsBasePathStrategySample
         {
             builder.Services.AddMultiTenant<TenantInfo>()
                 .WithEFCoreStore<MultiTenantStoreDbContext, TenantInfo>()
-                .WithBasePathStrategy(routePrefix: PathString.FromUriComponent("/api"));
+                .WithBasePathStrategy();
 
-            builder.UseMultiTenant();
-
-            throw new NotImplementedException("Still need to finish the Seeding function. <see cref=\"Startup\"/>");
-            // SetupStore( ??? ); // Not sure if I can resolve the service at this point (I know docs say you shouldn't but for testing).
+            SetupStore(builder.Services.BuildServiceProvider());
         }
 
         private void SetupStore(IServiceProvider sp)
         {
+
             var scopeServices = sp.CreateScope().ServiceProvider;
             var store = scopeServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
 

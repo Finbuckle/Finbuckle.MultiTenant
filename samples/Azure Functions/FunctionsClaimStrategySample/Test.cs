@@ -9,20 +9,28 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AzureFunctions;
+using FunctionsClaimStrategySample.Extensions;
 
-namespace FunctionsDelegateStrategySample
+namespace FunctionsClaimStrategySample
 {
     public static class Test
     {
         [FunctionName("Test")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req,
-            [Tenant] TenantInfo tenant,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{tenant}/Test")] HttpRequest req,
+            [Tenant]TenantInfo? tenant,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation($"Route Tenant: {tenant}");
 
-            string name = req.Query["name"];
+            string? name = req.Query["name"];
+
+            var authResult = await req.ValidateAuthAsync(log).ConfigureAwait(false);
+            if (!authResult.Succeeded)
+            {
+                return authResult.ActionResult!;
+            }
 
             if (tenant is null)
             {
@@ -34,8 +42,8 @@ namespace FunctionsDelegateStrategySample
             }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            dynamic? data = JsonConvert.DeserializeObject(requestBody);
+            name ??= data?.name;
 
             string responseMessage = string.IsNullOrEmpty(name)
                 ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."

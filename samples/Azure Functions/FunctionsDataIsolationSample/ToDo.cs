@@ -1,18 +1,18 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AzureFunctions;
+
+using FunctionsDataIsolationSample.Data;
+using FunctionsDataIsolationSample.Models;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Finbuckle.MultiTenant;
-using System.Collections;
-using FunctionsDataIsolationSample.Models;
+
 using System.Collections.Generic;
-using FunctionsDataIsolationSample.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FunctionsDataIsolationSample
 {
@@ -28,7 +28,7 @@ namespace FunctionsDataIsolationSample
         [FunctionName("ToDo")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{tenant}/ToDo")] HttpRequest req,
-            string tenant,
+            [Tenant]TenantInfo tenant,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -36,14 +36,13 @@ namespace FunctionsDataIsolationSample
 
             IEnumerable<ToDoItem> toDoItems = null;
 
-            var ti = req.HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
-            if (ti is null)
+            if (tenant is null)
             {
                 log.LogInformation("No tenant found.");
             }
             else
             {
-                log.LogInformation($"Tenant Information: {ti.Id}, {ti.Name}, {ti.Identifier}, {ti.ConnectionString}");
+                log.LogInformation($"Tenant Information: {tenant.Id}, {tenant.Name}, {tenant.Identifier}, {tenant.ConnectionString}");
                 toDoItems = _dbContext.ToDoItems.ToList();
             }
 
