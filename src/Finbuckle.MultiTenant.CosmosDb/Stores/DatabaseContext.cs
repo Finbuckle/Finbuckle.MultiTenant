@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.CosmosDb.Stores
 
         public abstract Task InitializeAsync(CancellationToken cancellationToken = default);
 
-        internal async ValueTask InitializeDatabaseAsync()
+        internal async Task InitializeDatabaseAsync()
         {
             if (_database is null)
             {
