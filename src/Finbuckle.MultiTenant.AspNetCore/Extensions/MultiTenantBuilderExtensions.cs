@@ -300,9 +300,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme = null) where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
         }
 
         /// <summary>
