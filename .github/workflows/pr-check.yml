@@ -2,7 +2,7 @@ name: Pull Request - Run Tests
 
 on:
   pull_request:
-    types: [synchronize]
+    types: [open, reopen, synchronize]
 
 jobs:
   run-tests:
