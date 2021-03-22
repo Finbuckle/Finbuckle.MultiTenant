@@ -27,11 +27,11 @@ jobs:
           dotnet-version: 2.1.x
       - name: test Finbuckle.MultiTenanant
         run: dotnet test
-        working-directory: ./test/Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj
+        working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenanant.AspNetCore
         run: dotnet test
-        working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test/Finbuckle.MultiTenant.AspNetCore.Test.csproj
+        working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
         run: dotnet test
-        working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test/Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj
+        working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
         
