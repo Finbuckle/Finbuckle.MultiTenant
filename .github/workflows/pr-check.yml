@@ -1,4 +1,4 @@
-name: Pull Request - Run Tests
+name: Pull Request Checks
 
 on:
   pull_request:
@@ -10,6 +10,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        test-project:
+          - Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj
+          - Finbuckle.MultiTenant.AspNetCore.Test/Finbuckle.MultiTenant.AspNetCore.Test.csproj
+          - Finbuckle.MultiTenant.EntityFrameworkCore.Test/Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -27,3 +31,4 @@ jobs:
           dotnet-version: 2.1.x
       - name: test
         run: dotnet test
+        working-directory: ${{ matrix.test-project }}
