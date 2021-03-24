@@ -48,6 +48,72 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after 
         /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
         /// </summary>
+        /// <param name="builder">The entity's type builder</param>
+        /// <returns>The original type builder reference for chaining</returns>
+        public static EntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
+        {
+            if (builder.Metadata.FindAnnotation(Constants.MultiTenantAnnotationName) != null)
+                return builder;
+
+            builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
+
+            try
+            {
+                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
+            }
+            catch (Exception ex)
+            {
+                throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
+            }
+
+            // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
+            Expression<Func<object, bool>> tenantFilter = e => EF.Property<string>(e, "TenantId") == (new ExpressionVariableScope()).Context.TenantInfo.Id;
+
+            // combine withany existing query filter if it exists
+            var existingQueryFilter = builder.GetQueryFilter();
+
+            if (existingQueryFilter != null)
+            {
+                // replace the parameter node in the tenant filter with the one in the existing filter
+                var filterParam = existingQueryFilter.Parameters.Single();
+                var adjustedTenantFilterBody = ReplacingExpressionVisitor.Replace(tenantFilter.Parameters.Single(),
+                                                                              filterParam,
+                                                                              tenantFilter.Body);
+
+                var combinedExp = Expression.AndAlso(existingQueryFilter.Body, adjustedTenantFilterBody);
+                tenantFilter = (Expression<Func<object, bool>>)Expression.Lambda(combinedExp, filterParam);
+            }
+
+            builder.HasQueryFilter(tenantFilter);
+
+            Type clrType = builder.Metadata.ClrType;
+
+            if (clrType != null)
+            {
+                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUser<>)))
+                {
+                    UpdateIdentityUserIndex(builder);
+                }
+
+                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityRole<>)))
+                {
+                    UpdateIdentityRoleIndex(builder);
+                }
+
+                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUserLogin<>)))
+                {
+                    UpdateIdentityUserLoginPrimaryKey(builder);
+                    AddIdentityUserLoginIndex(builder);
+                }
+            }
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after 
+        /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
+        /// </summary>
         /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
         /// <param name="builder">The entity's type builder</param>
         /// <returns>The original type builder reference for chaining</returns>
