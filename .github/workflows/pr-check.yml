@@ -2,7 +2,7 @@ name: Pull Request Checks
 
 on:
   pull_request:
-    types: [open, reopen, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
   os-tests:
