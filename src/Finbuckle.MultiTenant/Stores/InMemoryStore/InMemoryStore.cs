@@ -88,10 +88,11 @@ namespace Finbuckle.MultiTenant.Stores
 
             if(existingTenantInfo != null)
             {
-                existingTenantInfo = tenantInfo;
+                var result =  tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
+                return await Task.FromResult(result);
             }
 
-            return existingTenantInfo != null;
+            return await Task.FromResult(false);
         }
     }
 }
