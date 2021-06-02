@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+    
+    <Title>Finbuckle.MultiTenant.CosmosDb</Title>
+    <Description>CosmosDb support for Finbuckle.MultiTenant.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.16.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+  </ItemGroup>
+
+</Project>
