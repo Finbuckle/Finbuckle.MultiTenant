@@ -108,9 +108,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
 
             Assert.NotNull(c);
         }
-
-
-
+        
         [Theory]
         [InlineData(typeof(IdentityUser), true)]
         [InlineData(typeof(IdentityRole), true)]
