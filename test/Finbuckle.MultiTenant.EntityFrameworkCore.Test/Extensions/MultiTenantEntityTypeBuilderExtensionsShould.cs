@@ -134,7 +134,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
         }
 
         [Fact]
-        public void AdjustAllIndexesOnAdjustAllIndexes()
+        public void AdjustAllIndexesOnAdjustIndexes()
         {
             using (var db = GetDbContext(builder =>
                 {
@@ -150,7 +150,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                     builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
                     builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url));
 #endif
-                    builder.Entity<Blog>().IsMultiTenant().AdjustAllIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustIndexes();
                 }))
             {
                 var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
