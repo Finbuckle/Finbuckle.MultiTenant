@@ -19,15 +19,26 @@ using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 #if NETSTANDARD2_0
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
-using Remotion.Linq.Parsing.ExpressionVisitors;
 #endif
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
+    public class TenantIdGenerator : ValueGenerator<string>
+    {
+        public override string Next(EntityEntry entry)
+        {
+            return ((IMultiTenantDbContext)entry.Context).TenantInfo.Id;
+        }
+
+        public override bool GeneratesTemporaryValues => false;
+    }
+    
     public static class FinbuckleEntityTypeBuilderExtensions
     {
         private class ExpressionVariableScope
@@ -35,8 +46,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             public IMultiTenantDbContext Context { get; }
         }
 
-        internal static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
-        {         
+        private static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
+        {
 #if NETSTANDARD2_0
             return builder.Metadata.QueryFilter;
 #else
@@ -49,18 +60,21 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
         /// </summary>
         /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
-        /// <param name="builder">The entity's type builder</param>
-        /// <returns>The original type builder reference for chaining</returns>
-        public static EntityTypeBuilder<T> IsMultiTenant<T>(this EntityTypeBuilder<T> builder) where T : class
+        /// <param name="builder">The typed EntityTypeBuilder instance.</param>
+        /// <returns>A MultiTenantEntityTypeBuilder instance.</returns>
+        public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
         {
-            if(builder.Metadata.FindAnnotation(Constants.MultiTenantAnnotationName) != null)
-                return builder;
+            if (builder.Metadata.IsMultiTenant())
+                return new MultiTenantEntityTypeBuilder(builder);
 
             builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
 
             try
             {
-                builder.Property<string>("TenantId").IsRequired().HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
+                builder.Property<string>("TenantId")
+                       .IsRequired()
+                       .HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength)
+                       .HasValueGenerator<TenantIdGenerator>();
             }
             catch (Exception ex)
             {
@@ -68,27 +82,50 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             }
 
             // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
-            Expression<Func<T, bool>> tenantFilter = e => EF.Property<string>(e, "TenantId") == (new ExpressionVariableScope()).Context.TenantInfo.Id;
-            
-            // combine withany existing query filter if it exists
+
+            // where e is one of our entity types
+            // will need this ParameterExpression for next step and for final step
+            var entityParamExp = Expression.Parameter(builder.Metadata.ClrType, "e");
+
             var existingQueryFilter = builder.GetQueryFilter();
 
-            if(existingQueryFilter != null)
+            // override to match existing query parameter if applicable
+            if (existingQueryFilter != null)
             {
-                // replace the parameter node in the tenant filter with the one in the existing filter
-                var filterParam = existingQueryFilter.Parameters.Single();
-                var adjustedTenantFilterBody = ReplacingExpressionVisitor.Replace(tenantFilter.Parameters.Single(),
-                                                                              filterParam,
-                                                                              tenantFilter.Body);
-
-                var combinedExp = Expression.AndAlso(existingQueryFilter.Body, adjustedTenantFilterBody);
-                tenantFilter = (Expression<Func<T, bool>>)Expression.Lambda(combinedExp, filterParam);
+                entityParamExp = existingQueryFilter.Parameters.First();
             }
+
+            // build up expression tree for: EF.Property<string>(e, "TenantId")
+            var tenantIdExp = Expression.Constant("TenantId", typeof(string));
+            var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
+            var leftExp = efPropertyExp;
+
+            // build up express tree for: TenantInfo.Id
+            // EF will magically sub the current db context in for scope.Context
+            var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
+            var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
+            var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
+            var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
+            var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
+
+            // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
+            var predicate = Expression.Equal(leftExp, rightExp);
+
+            // combine with existing filter
+            if (existingQueryFilter != null)
+            {
+                predicate = Expression.AndAlso(existingQueryFilter.Body, predicate);
+            }
+
+            // build the final expression tree
+            var delegateType = Expression.GetDelegateType(builder.Metadata.ClrType, typeof(bool));
+            var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
+
+            // set the filter
+            builder.HasQueryFilter(lambdaExp);
             
-            builder.HasQueryFilter(tenantFilter);
-
+            // TODO: Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
-
             if (clrType != null)
             {
                 if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUser<>)))
@@ -100,7 +137,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 {
                     UpdateIdentityRoleIndex(builder);
                 }
-
+                
+                // This is a special case that should still occur.
+                // Note the index below is not unique;
                 if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUserLogin<>)))
                 {
                     UpdateIdentityUserLoginPrimaryKey(builder);
@@ -108,9 +147,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 }
             }
 
-            return builder;
-        }        
-
+            return new MultiTenantEntityTypeBuilder(builder);
+        }
+        
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
@@ -140,13 +179,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             builder.Property<string>("Id").ValueGeneratedOnAdd();
         }
 
-        private static void AddIdentityUserLoginIndex(this EntityTypeBuilder builder) 
-        { 
+        private static void AddIdentityUserLoginIndex(this EntityTypeBuilder builder)
+        {
             builder.HasIndex("LoginProvider", "ProviderKey", "TenantId").IsUnique();
         }
 
         private static void RemoveIndex(this EntityTypeBuilder builder, string propName)
-        {        
+        {
 #if NETSTANDARD2_0
             var props = new List<IProperty>(new[] { builder.Metadata.FindProperty(propName) });
             builder.Metadata.RemoveIndex(props);

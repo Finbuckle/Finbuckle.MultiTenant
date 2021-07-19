@@ -13,84 +13,85 @@
 //    limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-namespace MultiTenantIdentityDbContextShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
 {
-    public class TestIdentityDbContext : MultiTenantIdentityDbContext
+    public class MultiTenantIdentityDbContextShould : IDisposable
     {
-        public TestIdentityDbContext(TenantInfo tenantInfo)
-            : base(tenantInfo)
+        public class TestIdentityDbContext : MultiTenantIdentityDbContext
         {
+            public TestIdentityDbContext(TenantInfo tenantInfo)
+                : base(tenantInfo)
+            {
+            }
+
+            public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
+                : base(tenantInfo, options)
+            {
+            }
         }
 
-        public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
-            : base(tenantInfo, options)
+        public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<IdentityUser>
         {
-        }
-    }
+            public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
+                : base(tenantInfo)
+            {
+            }
 
-    public class TestIdentityDbContext_TUser : MultiTenantIdentityDbContext<IdentityUser>
-    {
-        public TestIdentityDbContext_TUser(TenantInfo tenantInfo)
-            : base(tenantInfo)
-        {
-        }
-
-        public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
-            : base(tenantInfo, options)
-        {
-        }
-    }
-
-    public class TestIdentityDbContext_TUser_TRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string>
-    {
-        public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo)
-            : base(tenantInfo)
-        {
+            public TestIdentityDbContext_TUser(TenantInfo tenantInfo, DbContextOptions options)
+                : base(tenantInfo, options)
+            {
+            }
         }
 
-        public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo, DbContextOptions options)
-            : base(tenantInfo, options)
+        public class TestIdentityDbContext_TUser_TRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string>
         {
+            public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo)
+                : base(tenantInfo)
+            {
+            }
+
+            public TestIdentityDbContext_TUser_TRole(TenantInfo tenantInfo, DbContextOptions options)
+                : base(tenantInfo, options)
+            {
+            }
         }
-    }
 
-    public class TestIdentityDbContext_All : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
-    {
-
-        public TestIdentityDbContext_All(TenantInfo tenantInfo)
-            : base(tenantInfo)
+        public class TestIdentityDbContext_All : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
         {
-        }
 
-        public TestIdentityDbContext_All(TenantInfo tenantInfo, DbContextOptions options)
-            : base(tenantInfo, options)
-        {
-        }
-    }
+            public TestIdentityDbContext_All(TenantInfo tenantInfo)
+                : base(tenantInfo)
+            {
+            }
 
-    public class MultiTenantIdentityDbContextShould
-    {
-        private DbContextOptions _options;
-        private DbConnection _connection;
+            public TestIdentityDbContext_All(TenantInfo tenantInfo, DbContextOptions options)
+                : base(tenantInfo, options)
+            {
+            }
+        }
+        
+        private readonly DbContextOptions _options;
+        private readonly DbConnection _connection = new SqliteConnection("DataSource=:memory:");
 
         public MultiTenantIdentityDbContextShould()
         {
-            _connection = new SqliteConnection("DataSource=:memory:");
+            _connection.Open();
             _options = new DbContextOptionsBuilder()
                     .UseSqlite(_connection)
                     .Options;
 
+        }
+
+        public void Dispose()
+        {
+            _connection.Close();
         }
 
         [Fact]
@@ -107,9 +108,7 @@ namespace MultiTenantIdentityDbContextShould
 
             Assert.NotNull(c);
         }
-
-
-
+        
         [Theory]
         [InlineData(typeof(IdentityUser), true)]
         [InlineData(typeof(IdentityRole), true)]

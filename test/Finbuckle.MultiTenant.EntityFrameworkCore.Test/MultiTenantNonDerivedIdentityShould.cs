@@ -23,7 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-public class NonDerivedIdenityDbContext : IdentityDbContext, IMultiTenantDbContext
+public class NonDerivedIdenityDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>, IMultiTenantDbContext
 {
     public NonDerivedIdenityDbContext(TenantInfo tenantInfo, DbContextOptions options)
         : base(options)

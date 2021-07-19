@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
@@ -28,24 +29,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
         {
             // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
-            foreach (var t in modelBuilder.Model.GetEntityTypes().Where(t => t.ClrType.HasMultiTenantAttribute()))
+            foreach (var clrType in modelBuilder.Model.GetEntityTypes()
+                                                 .Where(et => et.ClrType.HasMultiTenantAttribute())
+                                                 .Select(et => et.ClrType))
             {
-                var entityMi = modelBuilder.GetType()
-                                           .GetMethods()
-                                           .Where(m => m.Name == "Entity"
-                                                       && m.IsGenericMethod
-                                                       && m.ReturnType.IsGenericType
-                                                       && typeof(EntityTypeBuilder).IsAssignableFrom(m.ReturnType))
-                                           .Single()
-                                           .MakeGenericMethod(t.ClrType);
-                                                 
-                var typedBuilder = entityMi.Invoke(modelBuilder, null);
-
-                var isMultiTenantMi = typeof(FinbuckleEntityTypeBuilderExtensions).GetMethods()
-                                                                                  .Where(m => m.Name == nameof(FinbuckleEntityTypeBuilderExtensions.IsMultiTenant))
-                                                                                  .Single()
-                                                                                  .MakeGenericMethod(t.ClrType);
-                isMultiTenantMi.Invoke(null, new[] { typedBuilder } );
+                modelBuilder.Entity(clrType)
+                            .IsMultiTenant();
             }
 
             return modelBuilder;

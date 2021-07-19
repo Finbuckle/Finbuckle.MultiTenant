@@ -10,15 +10,15 @@
 //    distributed under the License is distributed on an "AS IS" BASIS,
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
-//    limitations under the License.
+//    limitations under the 
 
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Stores;
-using Microsoft.EntityFrameworkCore;
-
-public class TestEFCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public TestEFCoreStoreDbContext(DbContextOptions options) : base(options)
+    /// <summary>
+    /// Contains constant values for Finbuckle.MultiTenant.EntityFrameworkCore.
+    /// </summary>
+    public class Constants
     {
+        public static readonly string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
     }
 }

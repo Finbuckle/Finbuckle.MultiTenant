@@ -108,28 +108,10 @@ protected override void OnModelCreating(ModelBuilder builder)
 }
 ```
 
-The fluent API can also be used from within `IEntityTypeConfiguration<TEntity>` classes.
-
-```cs
-public class BlogEntityTypeConfiguration : IEntityTypeConfiguration<Blog>
-{
-    public void Configure(EntityTypeBuilder<Blog> builder)
-    {
-        builder.IsMultiTenant();
-    }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.ApplyConfiguration(new BlogEntityTypeConfiguration());
-        // or builder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);
-
-        base.OnModelCreating(builder);
-    }
-}
-```
-
 This approach is more flexible than using the `[MultiTenant]` attribute because
 it can be used for types which do not have the attribute, e.g. from another assembly.
+
+`IsMultiTenant()` returns an `MultiTenantEntityTypeBuilder` instance which enables further multitenant configuration of the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes] for more details.
 
 ## Existing Query Filters
 `IsMultiTenant` and the `[MultiTenant]` attribute use a query filter for data isolation and will automatically merge its query filter with an existing query filter is one is present. For that reason, if the type to be multitenant has a existing query filter, `IsMultiTenant` and `ConfigureMultiTenant` should be called *after* the existing query filter is configured: 
@@ -345,6 +327,24 @@ await db.SaveChangesAsync(); // Throws MultiTenantException.
 
 db.Blogs.Remove(myBlog);
 await db.SaveChangesAsync(); // Throws MultiTenantException.
+```
+
+## Keys and Indexes
+
+When configuring a multitenant entity type it is often useful to include the implicit `TenantId` column in the primary key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `IsMultiTenant()` provides the following methods for this purpose:
+
+* `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
+* `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
+* `AdjustIndexes()` - Alters all existing indexes to include te implicit `TenantId`.
+* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
+
+```cs
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // Configure an entity type to be multitenant, adjust the existing keys and indexes
+    var key = builder.Entity<Blog>().Metadata.GetKeys().First();
+    builder.Entity<MyEntityType>().IsMultiTenant().AdjustKey(key, builder).AdjustIndexes();
+}
 ```
 
 ## Tenant Mismatch Mode

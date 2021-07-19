@@ -76,11 +76,11 @@ public class TestDbContextWithExistingGlobalFilter : TestBlogDbContext
 //     { }
 // }
 
-public class NonMultiTenantThing
-{
-    public int Id { get; set; }
-    public List<Blog> Blogs { get; set; }
-}
+// public class NonMultiTenantThing
+// {
+//     public int Id { get; set; }
+//     public List<Blog> Blogs { get; set; }
+// }
 
 [MultiTenant]
 public class Blog

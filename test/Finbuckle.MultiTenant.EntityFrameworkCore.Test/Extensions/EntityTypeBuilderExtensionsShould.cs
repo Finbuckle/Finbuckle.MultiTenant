@@ -15,102 +15,116 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using MultiTenantIdentityDbContextShould;
+using MultiTenantEntityTypeBuilderShould;
 using Xunit;
 
-namespace EntityTypeBuilderExtensionsShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
-    public class TestDbContext : DbContext
-    {
-        private readonly Action<ModelBuilder> config;
-
-        public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(options)
-        {
-            this.config = config;
-        }
-
-        DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
-        DbSet<MyThingWithTenantId> MyThingWithTenantId { get; set; }
-        DbSet<MyThingWithIntTenantId> MyThingWithIntTenantId { get; set; }
-        DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingWithAttribute { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            if (config != null)
-            {
-                config(builder);
-            }
-            else
-            {
-                builder.Entity<MyMultiTenantThing>().IsMultiTenant();
-                builder.Entity<MyThingWithTenantId>().IsMultiTenant();
-            }
-
-            // for MyMultiTenantThingWithAttribute
-            builder.ConfigureMultiTenant();
-        }
-    }
-
-    public class MyMultiTenantThing
-    {
-        public int Id { get; set; }
-    }
-
-    [MultiTenant]
-    public class MyMultiTenantThingWithAttribute
-    {
-        public int Id { get; set; }
-    }
-
-    public class MyThingWithTenantId
-    {
-        public int Id { get; set; }
-        public string TenantId { get; set; }
-    }
-
-    public class MyThingWithIntTenantId
-    {
-        public int Id { get; set; }
-        public int TenantId { get; set; }
-    }
-
-    public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
-    {
-        public object Create(DbContext context)
-        {
-            return new Object(); // Never cache!
-        }
-    }
-
     public class EntityTypeBuilderExtensionsShould
     {
-        private DbContext GetDbContext(Action<ModelBuilder> config = null)
+        public class TestIdentityDbContext : MultiTenantIdentityDbContext
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
-                .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
-                .Options;
+            public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
+                : base(tenantInfo, options)
+            {
+            }
+        }
+        
+        public class TestDbContext : DbContext
+        {
+            private readonly Action<ModelBuilder> config;
 
-            var db = new TestDbContext(config, options);
+            public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(options)
+            {
+                this.config = config;
+            }
 
-            return db;
+            DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
+            DbSet<MyThingWithTenantId> MyThingWithTenantId { get; set; }
+            DbSet<MyThingWithIntTenantId> MyThingWithIntTenantId { get; set; }
+            DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingWithAttribute { get; set; }
+
+            protected override void OnModelCreating(ModelBuilder builder)
+            {
+                // If the test passed in a custom builder use it
+                if (config != null)
+                    config(builder);
+                // Of use the standard builder configuration
+                else
+                {
+                    builder.Entity<MyMultiTenantThing>().IsMultiTenant();
+                    builder.Entity<MyThingWithTenantId>().IsMultiTenant();
+                    
+                    // for MyMultiTenantThingWithAttribute
+                    builder.ConfigureMultiTenant();
+                }
+            }
         }
 
-        private TestIdentityDbContext GetTestIdentityDbContext(TenantInfo tenant1)
+        public class MyMultiTenantThing
         {
-            var _connection = new SqliteConnection("DataSource=:memory:");
+            public int Id { get; set; }
+        }
+
+        [MultiTenant]
+        public class MyMultiTenantThingWithAttribute
+        {
+            public int Id { get; set; }
+        }
+
+        public class MyThingWithTenantId
+        {
+            public int Id { get; set; }
+            public string TenantId { get; set; }
+        }
+
+        public class MyThingWithIntTenantId
+        {
+            public int Id { get; set; }
+            public int TenantId { get; set; }
+        }
+        
+        #if NETCOREAPP2_1
+        public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
+        {
+            public object Create(DbContext context)
+            {
+                return new Object(); // Never cache!
+            }
+        }
+        #endif
+        
+        private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+        }
+
+        private DbContext GetDbContext(Action<ModelBuilder> config = null)
+        {
+            _connection.Open(); 
+            var options = new DbContextOptionsBuilder()
+                .UseSqlite(_connection)
+                #if NETCOREAPP2_1
+                .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
+                #endif
+                .Options;
+            return new TestDbContext(config, options);
+        }
+
+        private TestIdentityDbContext GetTestIdentityDbContext(TenantInfo tenant)
+        {
+            _connection.Open();
             var options = new DbContextOptionsBuilder()
                     .UseSqlite(_connection)
                     .Options;
-            return new TestIdentityDbContext(tenant1, options);
+            return new TestIdentityDbContext(tenant, options);
         }
 
         [Fact]
@@ -176,13 +190,11 @@ namespace EntityTypeBuilderExtensionsShould
         public void SetGlobalFilterQuery()
         {
             // Doesn't appear to be a way to test this except to try it out...
-
-            var connection = new SqliteConnection("DataSource=:memory:");
             try
             {
-                connection.Open();
+                _connection.Open();
                 var options = new DbContextOptionsBuilder()
-                    .UseSqlite(connection)
+                    .UseSqlite(_connection)
                     .Options;
                 var tenant1 = new TenantInfo
                 {
@@ -233,7 +245,7 @@ namespace EntityTypeBuilderExtensionsShould
             }
             finally
             {
-                connection.Close();
+                _connection.Close();
             }
         }
 
@@ -241,14 +253,12 @@ namespace EntityTypeBuilderExtensionsShould
         public void RespectExistingQueryFilter()
         {
             // Doesn't appear to be a way to test this except to try it out...
-
-            var connection = new SqliteConnection("DataSource=:memory:");
             var options = new DbContextOptionsBuilder()
-                    .UseSqlite(connection)
+                    .UseSqlite(_connection)
                     .Options;
             try
             {
-                connection.Open();
+                _connection.Open();
                 var tenant1 = new TenantInfo
                 {
                     Id = "abc",
@@ -284,10 +294,11 @@ namespace EntityTypeBuilderExtensionsShould
             }
             finally
             {
-                connection.Close();
+                _connection.Close();
             }
         }
 
+        // The tests below are Identity specific
         [Fact]
         public void AdjustRoleIndex()
         {

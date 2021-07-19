@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.Core
         internal static AsyncLocal<IMultiTenantContext<T>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<T>>();
 
         public IMultiTenantContext<T> MultiTenantContext
-        {
+        { 
             get
             {
                 return _asyncLocalContext.Value;
