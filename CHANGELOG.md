@@ -1,23 +1,10 @@
-# Changelog
+**6.2.0**
+* Added a new events system. See PR #359 Thanks to **@natelaff**!
+* Some internal refactoring.
+* Various documentation fixes.
+* Added sourcelink to allow debugging into remote source code.
+* Added a security policy.
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
-
-## [6.1.0](https://github.com/finbuckle/finbuckle.multitenant/compare/v6.0.0...v6.1.0) (2021-01-29)
-
-
-### Features
-
-* distributed cache store ([#345](https://github.com/finbuckle/finbuckle.multitenant/issues/345)) ([7599288](https://github.com/finbuckle/finbuckle.multitenant/commit/759928864a7d9220937f3bc5ec6e665920470fe4))
-* entity is multi-tenant if ancestor is multi-tenant ([#332](https://github.com/finbuckle/finbuckle.multitenant/issues/332)) ([bb8468a](https://github.com/finbuckle/finbuckle.multitenant/commit/bb8468af4fb24615f8c02db403a8ab5f00310f05))
-* events system ([#359](https://github.com/finbuckle/finbuckle.multitenant/issues/359)) ([00ab4e4](https://github.com/finbuckle/finbuckle.multitenant/commit/00ab4e403a91fd7d1caada59f604f797ce508dbd)), closes [#338](https://github.com/finbuckle/finbuckle.multitenant/issues/338) [#338](https://github.com/finbuckle/finbuckle.multitenant/issues/338)
-* Header Strategy ([#339](https://github.com/finbuckle/finbuckle.multitenant/issues/339)) ([1aedc4a](https://github.com/finbuckle/finbuckle.multitenant/commit/1aedc4aebe4fb565144bc0411ade5591e2f132be))
-
-
-### Bug Fixes
-
-* claim strategy per tenant authentication compat ([#343](https://github.com/finbuckle/finbuckle.multitenant/issues/343)) ([eec3c50](https://github.com/finbuckle/finbuckle.multitenant/commit/eec3c5034f00714256037cf35f12cf46e975bc57)), closes [#324](https://github.com/finbuckle/finbuckle.multitenant/issues/324)
-
-## Version
 **6.1.0**
 * .NET 5.0 support.
 * New `DistributedCacheStore` uses the ASP.NET Core distributed cache for tenant resolution.

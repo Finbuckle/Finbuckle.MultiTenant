@@ -1,0 +1,37 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  os-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: setup dotnet 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: setup dotnet 3.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+      - name: setup dotnet 2.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.1.x
+      - name: test Finbuckle.MultiTenanant
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.Test
+      - name: test Finbuckle.MultiTenanant.AspNetCore
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
+      - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
+        
