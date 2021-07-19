@@ -124,7 +124,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // set the filter
             builder.HasQueryFilter(lambdaExp);
             
-            // Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
+            // TODO: Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
             if (clrType != null)
             {

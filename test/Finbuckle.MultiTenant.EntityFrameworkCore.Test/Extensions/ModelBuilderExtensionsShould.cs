@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
@@ -57,12 +58,21 @@ namespace ModelBuiikderExtensionShould
             return new TestDbContext(options);
         }
 
+        // [Fact]
+        // public void SetMultiTenantOnTypeWithMultiTenantAttribute()
+        // {
+        //     var db = GetDbContext();
+        //
+        //     Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant());
+        // }
+        
         [Fact]
-        public void SetMultiTenantOnTypeWithMultiTenantAttribute()
+        public void AdjustKeyOnTypeWithMultiTenantAttribute()
         {
             var db = GetDbContext();
 
-            Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant());
+            var adjustedKey = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetKeys().Where(k => k.Properties.Select(p => p.Name).Contains("TenantId")).SingleOrDefault();
+            Assert.NotNull(adjustedKey);
         }
 
         [Fact]
