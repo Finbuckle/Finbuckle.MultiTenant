@@ -1,4 +1,5 @@
 # Getting Started
+
 Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This introduction assumes a standard ASP.NET Core
 use case, but any application using .NET dependency injection can work with the library.
 
@@ -42,6 +43,7 @@ public void Configure(IApplicationBuilder app)
 That's all that is needed to get going. Let's breakdown each line:
 
 `services.AddMultiTenant<TenantInfo>()`
+
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at runtime.
 
 The type parameter for `AddMultiTenant<T>` must be an implementation of `ITenantInfo` and holds basic information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom implementation can be used if more properties are needed.
@@ -49,11 +51,13 @@ The type parameter for `AddMultiTenant<T>` must be an implementation of `ITenant
 See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
 
 `.WithHostStrategy()`
+
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which defaults to the extracting the subdomain as a tenant identifier.
 
 See [Strategies](Strategies) for more information.
 
 `.WithConfigurationStore()`
+
 This line tells the app that information for all tenants are in the `appsettings.json` file used for app configuration. If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the current request.
 
 See [Stores](Stores) for more information.
@@ -61,6 +65,7 @@ See [Stores](Stores) for more information.
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various ways.
 
 `app.UseEndPoints`
+
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other settings. Be sure to call it before calling `UseEndpoints` and other middleware which will use per-tenant functionality, e.g. `UseAuthentication`.
 
 ## Basic Usage
@@ -111,6 +116,7 @@ $ dotnet build
 ```
 
 ## Running Unit Tests
+
 Run the unit tests from the command line with `dotnet test` from the solution directory.
 
 ```bash
