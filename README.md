@@ -37,9 +37,11 @@ public void ConfigureServices(IServiceCollection services)
             .WithConfigurationStore()
     ...
 }
+```
 
 Finally, in the `Configure` method call `UseMultiTenant()` to register the middleware:
 
+```cs
 public void Configure(IApplicationBuilder app)
 {
     ...
