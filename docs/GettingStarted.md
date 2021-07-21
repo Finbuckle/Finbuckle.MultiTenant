@@ -1,23 +1,20 @@
 # Getting Started
-Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET
-Core conventions as much as possible. This guide assumes a standard ASP.NET Core
-use case
+
+Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This introduction assumes a standard ASP.NET Core
+use case, but any application using .NET dependency injection can work with the library.
 
 ## Installation
 
-Install the Finbuckle.MultiTenant.AspNetCore NuGet package.
+First, install the Finbuckle.MultiTenant.AspNetCore NuGet package:
 
 .NET Core CLI
 ```bash
 $ dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
-## Basics
+## Basic Configuration
 
-Configure the services by calling `AddMultiTenant<T>` followed by its builder methods in the app's `ConfigureServices` method. Here we are using the basic `TenantInfo` implementation, the host strategy and the configuration store.
-Finbuckle.MultiTenant comes with several other multitenant [strategies](Strategies) and [stores](Stores).
-
-The `TenantInfo` class holds basic details about a tenant and is used throughout the library. See [Core Concepts](CoreConcepts) for more information.
+Next, in the app's startup `ConfigureServices` method call `AddMultiTenant<T>` and its various builder methods:
 
 ```cs
 public void ConfigureServices(IServiceCollection services)
@@ -30,7 +27,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Configure the middleware by calling `UseMultiTenant` in the app's `Configure` method. Be sure to call it before calling `UseMvc` and other middleware which will use per-tenant functionality.
+Finally, in the `Configure` method call `UseMultiTenant()` to register the middleware:
 
 ```cs
 public void Configure(IApplicationBuilder app)
@@ -38,15 +35,45 @@ public void Configure(IApplicationBuilder app)
     ...
     app.UseMultiTenant(); // Before UseMvc!
     ...
-    app.UseMvc();
+    //app.UseMvc(); // for .NET Core 3.1
+    app.UseEndpoints(...); // for .NET 5.0+
 }
 ```
 
-With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext` object accessed from the `GetMultiTenantContext` extension method. If the current tenant could not be determined then `TenantInfo` will be null. The type of the `TenantInfo` property depends on the type passed when calling
-`AddMultiTenant<T>` during configuration.
+That's all that is needed to get going. Let's breakdown each line:
+
+`services.AddMultiTenant<TenantInfo>()`
+
+This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at runtime.
+
+The type parameter for `AddMultiTenant<T>` must be an implementation of `ITenantInfo` and holds basic information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom implementation can be used if more properties are needed.
+
+See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
+
+`.WithHostStrategy()`
+
+The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which defaults to the extracting the subdomain as a tenant identifier.
+
+See [Strategies](Strategies) for more information.
+
+`.WithConfigurationStore()`
+
+This line tells the app that information for all tenants are in the `appsettings.json` file used for app configuration. If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the current request.
+
+See [Stores](Stores) for more information.
+
+Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various ways.
+
+`app.UseEndPoints`
+
+This line configures the middleware which resolves the tenant using the registered strategies, stores, and other settings. Be sure to call it before calling `UseEndpoints` and other middleware which will use per-tenant functionality, e.g. `UseAuthentication`.
+
+## Basic Usage
+
+With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext` object accessed from the `GetMultiTenantContext<T>` extension method:
 
 ```cs
-var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
+var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
 
 if(tenantInfo != null)
 {
@@ -55,6 +82,25 @@ if(tenantInfo != null)
     var name = tenantInfo.Name;
 }
 ```
+
+The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<T>` during configuration. If the current tenant could not be determined then `TenantInfo` will be null.
+
+The `ITenantInfo` instance and/or the typed instance are also available directly through dependency injection.
+
+See [Configuration and Usage](ConfigurationAndUsage) for more information.
+
+## Advanced Usage
+
+The library builds on this basic functionality to provide a variety of higher level features. See the documentation for more details:
+
+* [Per-tenant Options](Options)
+* [Per-tenant Authentication](Authentication)
+* [Entity Framework Core Data Isolation](EFCore)
+* [ASP.NET Core Identity Data Isolation](Identity)
+
+## Samples
+
+A variety of sample projects are available in the `samples` directory. Be sure to read the information on the index page of each sample and the code comments in the `Startup` class.
 
 ## Compiling from Source
 
@@ -68,6 +114,8 @@ Cloning into 'Finbuckle.MultiTenant'...
 $ cd Finbuckle.MultiTenant
 $ dotnet build
 ```
+
+## Running Unit Tests
 
 Run the unit tests from the command line with `dotnet test` from the solution directory.
 

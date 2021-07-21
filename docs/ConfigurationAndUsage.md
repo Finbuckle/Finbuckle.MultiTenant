@@ -53,7 +53,7 @@ Most of the capability enabled by Finbuckle.MultiTenant is utilized through its 
 
 In addition, there are a few methods available for directly accessing and settings the tenant information if needed.
 
-## UseMultiTenant
+## MultiTenant Middleware
 Configures the middleware handling tenant resolution via the multitenant strategy and the multitenant store. `UseMultiTenant` should usually be called before `UseAuthentication` and `UseMvc` in the `Configure` method of the app's `Startup` class. Additionally, if any other middleware uses per-tenant options then that middleware should come after `UseMultiTenant`. In ASP.NET Core 3 or later `UseRouting` should come before `UseMultiTenant` if the route strategy is used.
 
 ```cs
@@ -65,15 +65,16 @@ public void Configure(IApplicationBuilder app)
     ...
     app.UseAuthentication();
     ...
-    app.UseMvc();
+    //app.UseMvc(); // for .NET Core 3.1
+    app.UseEndpoints(...); // for .NET 5.0+
 }
 ```
 
-## GetMultiTenantContext
+## GetMultiTenantContext<T>
 Extension method of `HttpContext` that returns the `MultiTenantContext` instance for the current request. If there is no current tenant the `TenantInfo` property will be null.
 
 ```cs
-var tenantInfo = HttpContext.GetMultiTenantContext().TenantInfo;
+var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
 
 if(tenantInfo != null)
 {
