@@ -61,19 +61,19 @@ This line registers the base services and designates `TenantInfo` as the class t
 
 The type parameter for `AddMultiTenant<T>` must be an implementation of `ITenantInfo` and holds basic information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom implementation can be used if more properties are needed.
 
-See [Core Concepts](https://www.finbuckle.com/MultitTenant/Docs/CoreConcepts) for more information on `ITenantInfo`.
+See [Core Concepts](https://www.finbuckle.com/MultiTenant/Docs/CoreConcepts) for more information on `ITenantInfo`.
 
 `.WithHostStrategy()`
 
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which defaults to the extracting the subdomain as a tenant identifier.
 
-See [Strategies](https://www.finbuckle.com/MultitTenant/Docs/Strategies) for more information.
+See [Strategies](https://www.finbuckle.com/MultiTenant/Docs/Strategies) for more information.
 
 `.WithConfigurationStore()`
 
 This line tells the app that information for all tenants are in the `appsettings.json` file used for app configuration. If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the current request.
 
-See [Stores](https://www.finbuckle.com/MultitTenant/Docs/Stores) for more information.
+See [Stores](https://www.finbuckle.com/MultiTenant/Docs/Stores) for more information.
 
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various ways.
 
@@ -100,16 +100,16 @@ The type of the `TenantInfo` property depends on the type passed when calling `A
 
 The `ITenantInfo` instance and/or the typed instance are also available directly through dependency injection.
 
-See [Configuration and Usage](https://www.finbuckle.com/MultitTenant/Docs/ConfigurationAndUsage) for more information.
+See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/ConfigurationAndUsage) for more information.
 
 ## Advanced Usage
 
 The library builds on this basic functionality to provide a variety of higher level features. See the documentation for more details:
 
-* [Per-tenant Options](https://www.finbuckle.com/MultitTenant/Docs/Options)
-* [Per-tenant Authentication](https://www.finbuckle.com/MultitTenant/Docs/Authentication)
-* [Entity Framework Core Data Isolation](https://www.finbuckle.com/MultitTenant/Docs/EFCore)
-* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/MultitTenant/Docs/Identity)
+* [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
+* [Per-tenant Authentication](https://www.finbuckle.com/MultiTenant/Docs/Authentication)
+* [Entity Framework Core Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/EFCore)
+* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/Identity)
 
 ## Samples
 
