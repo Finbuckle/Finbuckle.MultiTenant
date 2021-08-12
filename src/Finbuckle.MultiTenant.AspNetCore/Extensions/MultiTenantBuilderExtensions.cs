@@ -146,11 +146,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 null)
             where TTenantInfo : class, ITenantInfo, new()
         {
-#if NETCOREAPP2_1
-            config = config ?? new Action<MultiTenantAuthenticationOptions>(_ => { });
-#else
+
             config ??= _ => { };
-#endif
             builder.Services.Configure<MultiTenantAuthenticationOptions>(config);
             
             // We need to "decorate" IAuthenticationService so callbacks so that
@@ -201,42 +198,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
-
-#if NETCOREAPP2_1
-        /// <summary>
-        /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
-        /// </summary>
-        /// <param name="configRoutes">Delegate to configure the routes.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                    Action<IRouteBuilder> configRoutes)
-                where TTenantInfo : class, ITenantInfo, new()
-            => builder.WithRouteStrategy(Constants.TenantToken, configRoutes);
-
-        /// <summary>
-        /// Adds and configures a RouteStrategy to the application.
-        /// </summary>
-        /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
-        /// <param name="configRoutes">Delegate to configure the routes.</param>
-        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                    string tenantParam,
-                                                                    Action<IRouteBuilder> configRoutes)
-            where TTenantInfo : class, ITenantInfo, new()
-        {
-            if (string.IsNullOrWhiteSpace(tenantParam))
-            {
-                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
-            }
-
-            if (configRoutes == null)
-            {
-                throw new ArgumentNullException(nameof(configRoutes));
-            }
-
-            return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam, configRoutes });
-        }
-#else
+        
         /// <summary>
         /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
         /// </summary>
@@ -260,7 +222,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam });
         }
-#endif
+// #endif
 
         /// <summary>
         /// Adds and configures a HostStrategy with template "__tenant__.*" to the application.
