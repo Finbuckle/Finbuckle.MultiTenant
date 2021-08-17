@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <typeparam name="TTenantInfo"></typeparam>
         /// <param name="builder"></param>
         /// <param name="CosmosClientBuilder"><see cref="CosmosClient"/> Builder</param>
-        /// <param name="DatabaseContextBuilder"><see cref="DatabaseContext"/> Builder</param>
+        /// <param name="DatabaseContextBuilder"><see cref="CosmosStoreDbContext"/> Builder</param>
         /// <param name="TenantContainerSelector">Get the <see cref="ITenantInfo"/> <see cref="Container"/>.</param>
         /// <returns>The same <see cref="FinbuckleMultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithCosmosDbStore<TDatabaseContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Func<CosmosClient, IServiceProvider, TDatabaseContext> DatabaseContextBuilder,
             Func<TDatabaseContext, Container> tenantContainerSelector)
             where TTenantInfo : class, ITenantInfo, new()
-            where TDatabaseContext : DatabaseContext
+            where TDatabaseContext : CosmosStoreDbContext
         {
             builder.Services.AddSingleton(services => CosmosClientBuilder(services));
 

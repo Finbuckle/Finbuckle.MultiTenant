@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CosmosStoreSample.Data
 {
-    public class MultiTenantStoreDbContext : DatabaseContext
+    public class MultiTenantStoreDbContext : CosmosStoreDbContext
     {
         public DatabaseCollection Tenants { get; set; }
 

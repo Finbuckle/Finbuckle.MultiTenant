@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.CosmosDb.Stores
 {
-    public abstract class DatabaseContext
+    public abstract class CosmosStoreDbContext
     {
-        private readonly ILogger<DatabaseContext> _logger;
+        private readonly ILogger<CosmosStoreDbContext> _logger;
         private readonly string _databaseName;
         private readonly ThroughputProperties _databaseThroughput;
 
@@ -17,7 +17,7 @@ namespace Finbuckle.MultiTenant.CosmosDb.Stores
 
         public CosmosClient Client { get; private set; }
 
-        public DatabaseContext(CosmosClient client, string databaseName, ThroughputProperties databaseThroughput, ILogger<DatabaseContext> logger)
+        public CosmosStoreDbContext(CosmosClient client, string databaseName, ThroughputProperties databaseThroughput, ILogger<CosmosStoreDbContext> logger)
         {
             Client = client;
             _databaseName = databaseName;

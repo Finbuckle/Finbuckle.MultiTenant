@@ -298,3 +298,54 @@ services.AddMultiTenant<TenantInfo>()
 services.AddMultiTenant<TenantInfo>()
         .WithDistributedCacheStore(TimeSpan.FromMinutes(5));
 ```
+
+## CosmosDB Store
+> NuGet package: Finbuckle.MultiTenant.CosmosDb
+
+Uses a CosmosDb database context as the backing store. This store is case-sensitive when retrieving tenant information by tenant identifier.
+
+The database context should derive from `CosmosStoreDbContext`. The code examples below are taken from the [CosmosDB Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/CosmosStoreSample).
+
+The database context used with the CosmosDb store must derive from `CosmosStoreDbContext`, but other entities can be added:
+
+```cs
+public class MultiTenantStoreDbContext : CosmosStoreDbContext
+{
+    public DatabaseCollection Tenants { get; set; }
+
+    public MultiTenantStoreDbContext(CosmosClient client, string databaseName, ILogger<MultiTenantStoreDbContext> logger)
+        : base(client, databaseName, ThroughputProperties.CreateManualThroughput(400), logger)
+    {
+        // Add other DatabaseCollection's as needed.
+        Tenants = new DatabaseCollection(nameof(Tenants), $"/{nameof(TenantInfo.Id).ToLower()}", ThroughputProperties.CreateManualThroughput(400));
+    }
+
+    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        var createContainerTasks = new List<Task>();
+
+        createContainerTasks.Add(RegisterContainerAsync(Tenants));
+
+        await Task.WhenAll(createContainerTasks);
+    }
+}
+```
+
+The above code will create the database if it doesn't exist with the configured throughput, make sure to read the [documentation](https://docs.microsoft.com/en-us/azure/cosmos-db/set-throughput) and configure those values to your requirements or you could risk an unexpectly high bill.
+
+The database context can be configured during `Startup` when registering as a service.
+```cs
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddMultiTenant<TenantInfo>()
+            .WithCosmosDbStore(
+                services => new CosmosClientBuilder(Configuration.GetConnectionString("Database"))
+                    .WithSerializerOptions(new Microsoft.Azure.Cosmos.CosmosSerializationOptions() { PropertyNamingPolicy = Microsoft.Azure.Cosmos.CosmosPropertyNamingPolicy.CamelCase })
+                    .Build(),
+                (client, services) => ActivatorUtilities.CreateInstance<MultiTenantStoreDbContext>(services,client, "DatabaseName"),
+                context => context.Tenants.Container)
+            .WithRouteStrategy();
+        }
+```
+
+In addition the underlying db context can be used to modify data in the same way the CosmosDb API works.
