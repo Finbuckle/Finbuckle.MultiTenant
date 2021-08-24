@@ -21,10 +21,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1.x
-      - name: setup dotnet 2.1.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 2.1.x
       - name: test Finbuckle.MultiTenanant
         run: dotnet test
         working-directory: ./test/Finbuckle.MultiTenant.Test
