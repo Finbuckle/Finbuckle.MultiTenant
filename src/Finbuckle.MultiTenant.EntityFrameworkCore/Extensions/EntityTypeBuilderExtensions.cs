@@ -22,11 +22,6 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-#if NETSTANDARD2_0
-using Microsoft.EntityFrameworkCore.Metadata;
-using System.Collections.Generic;
-#endif
-
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
     public class TenantIdGenerator : ValueGenerator<string>
@@ -48,11 +43,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         private static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
         {
-#if NETSTANDARD2_0
-            return builder.Metadata.QueryFilter;
-#else
             return builder.Metadata.GetQueryFilter();
-#endif
         }
 
         /// <summary>
@@ -153,11 +144,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
-#if NET // Covers .NET 5.0 and later.
+ #if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
-#else   // .NET Core 2.1 and 3.1
+ #elif NETCOREAPP3_1 // .NET Core 3.1
             builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
-#endif
+ #endif
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
@@ -165,7 +156,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             builder.RemoveIndex("NormalizedName");
 #if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
-#else // .NET Core 2.1 and 3.1
+#elif NETCOREAPP3_1 // .NET Core 3.1
             builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
 #endif
         }
@@ -186,14 +177,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
         private static void RemoveIndex(this EntityTypeBuilder builder, string propName)
         {
-#if NETSTANDARD2_0
-            var props = new List<IProperty>(new[] { builder.Metadata.FindProperty(propName) });
-            builder.Metadata.RemoveIndex(props);
-#else
             var prop = builder.Metadata.FindProperty(propName);
             var index = builder.Metadata.FindIndex(prop);
             builder.Metadata.RemoveIndex(index);
-#endif
         }
     }
 }

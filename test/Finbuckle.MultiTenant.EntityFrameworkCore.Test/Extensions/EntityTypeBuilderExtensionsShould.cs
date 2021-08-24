@@ -25,7 +25,7 @@ using Xunit;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
-    public class EntityTypeBuilderExtensionsShould
+    public class EntityTypeBuilderExtensionsShould : IDisposable
     {
         public class TestIdentityDbContext : MultiTenantIdentityDbContext
         {

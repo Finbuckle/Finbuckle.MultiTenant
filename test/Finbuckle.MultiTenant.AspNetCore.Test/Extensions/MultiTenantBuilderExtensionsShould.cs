@@ -311,43 +311,7 @@ public partial class MultiTenantBuilderExtensionsShould
         Assert.Throws<ArgumentException>(()
             => builder.WithHostStrategy(null));
     }
-
-#if NETCOREAPP2_1
-    [Fact]
-    public void AddRouteStrategy()
-    {
-        var services = new ServiceCollection();
-        var adcp = new Mock<IActionDescriptorCollectionProvider>().Object;
-        services.AddSingleton<IActionDescriptorCollectionProvider>(adcp);
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        builder.WithRouteStrategy("routeParam", cr => cr.MapRoute("test", "test"));
-        var sp = services.BuildServiceProvider();
-
-        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
-        Assert.IsType<RouteStrategy>(strategy);
-    }
-
-    [Fact]
-    public void ThrowIfNullParamAddingRouteStrategy()
-    {
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        Assert.Throws<ArgumentException>(()
-            => builder.WithRouteStrategy(null, rb => rb.GetType()));
-    }
-
-    [Fact]
-    public void ThrowIfNullRouteConfigAddingRouteStrategy()
-    {
-        var services = new ServiceCollection();
-        var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-        Assert.Throws<ArgumentNullException>(()
-            => builder.WithRouteStrategy(null));
-        Assert.Throws<ArgumentNullException>(()
-            => builder.WithRouteStrategy("param", null));
-    }
-
-#else
+    
     [Fact]
     public void AddRouteStrategy()
     {
@@ -368,5 +332,4 @@ public partial class MultiTenantBuilderExtensionsShould
         Assert.Throws<ArgumentException>(()
             => builder.WithRouteStrategy(null));
     }
-#endif
 }
