@@ -1,20 +1,34 @@
 # ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant 6.2.0
 
-Finbuckle.MultiTenant is open source multitenancy middleware for .NET.
+## About Finbuckle.MultiTenant
 
-* Enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
+Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation. See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-* .NET 5.0, .NET Core 3.1, and .NET Core 2.1 are supported.
 
-* Finbuckle.MultiTenant is proud to be a member of the [.NET Foundation](https://www.dotnetfoundation.org).
+## Main Build and Test Status
 
-* See [https://www.finbuckle.com](https://www.finbuckle.com) for more details and documentation.  
+![Build Status Linux 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-3.1.yml/badge.svg)  
+![Build Status MacOS 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-3.1.yml/badge.svg?)  
+![Build Status Windows 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-3.1.yml/badge.svg)
 
-* See [CHANGELOG](CHANGELOG.md) for version history details.
+![Build Status Linux 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-5.0.yml/badge.svg)  
+![Build Status MacOS 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-5.0.yml/badge.svg)  
+![Build Status Windows 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-5.0.yml/badge.svg)
 
-* See [LICENSE](LICENSE) file for license information.
+## License
 
-## Getting Started
+This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for license information.
+
+## .NET Foundation
+
+This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
+
+## Code of Conduct
+
+This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our community.
+For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct) or the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+## Quick Start
 
 Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This introduction assumes a standard ASP.NET Core
 use case, but any application using .NET dependency injection can work with the library.
