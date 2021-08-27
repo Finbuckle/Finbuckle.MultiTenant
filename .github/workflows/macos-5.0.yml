@@ -15,11 +15,11 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: test Finbuckle.MultiTenanant
-        run: dotnet test
+        run: dotnet test -f .net5.0
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenanant.AspNetCore
-        run: dotnet test
+        run: dotnet test -f .net5.0
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
-        run: dotnet test
+        run: dotnet test -f .net5.0
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
