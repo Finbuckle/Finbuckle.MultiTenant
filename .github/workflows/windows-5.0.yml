@@ -1,0 +1,25 @@
+name: Windows (.NET 5.0)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  os-tests:
+    runs-on: windows-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: setup dotnet 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: test Finbuckle.MultiTenanant
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.Test
+      - name: test Finbuckle.MultiTenanant.AspNetCore
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
+      - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
+        run: dotnet test
+        working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
