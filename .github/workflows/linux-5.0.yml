@@ -1,4 +1,4 @@
-name: Main Build Check
+name: Linux (.NET 5.0)
 
 on:
   push:
