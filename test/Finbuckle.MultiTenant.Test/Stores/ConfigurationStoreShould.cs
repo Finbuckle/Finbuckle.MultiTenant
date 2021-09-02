@@ -22,6 +22,17 @@ using Xunit;
 public class ConfigurationStoreShould : IMultiTenantStoreTestBase<ConfigurationStore<TenantInfo>>
 {
     [Fact]
+    public void NotThrowIfNoDefaultSection()
+    {
+        // See https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/426
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings_NoDefaults.json");
+        IConfiguration configuration = configBuilder.Build();
+        
+        var store = new ConfigurationStore<TenantInfo>(configuration);
+    }
+    
+    [Fact]
     public void ThrowIfNullConfiguration()
     {
         Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null));
