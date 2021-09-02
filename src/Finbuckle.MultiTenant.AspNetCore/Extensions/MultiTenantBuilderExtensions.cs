@@ -72,7 +72,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
                 options.Events.OnValidatePrincipal = async context =>
                 {
-
                     await origOnValidatePrincipal(context);
 
                     // Skip if no principal or bypass set
