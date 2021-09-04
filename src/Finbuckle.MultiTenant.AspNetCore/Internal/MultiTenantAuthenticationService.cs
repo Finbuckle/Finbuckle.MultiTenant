@@ -34,7 +34,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             this.multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
         }
 
-        private static void AddTenantIdentiferToProperties(HttpContext context, ref AuthenticationProperties properties)
+        private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties properties)
         {
             // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
@@ -57,25 +57,25 @@ namespace Finbuckle.MultiTenant.AspNetCore
                     return;
             }
 
-            AddTenantIdentiferToProperties(context, ref properties);
+            AddTenantIdentifierToProperties(context, ref properties);
             await inner.ChallengeAsync(context, scheme, properties);
         }
 
         public async Task ForbidAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, ref properties);
+            AddTenantIdentifierToProperties(context, ref properties);
             await inner.ForbidAsync(context, scheme, properties);
         }
 
         public async Task SignInAsync(HttpContext context, string scheme, ClaimsPrincipal principal, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, ref properties);
+            AddTenantIdentifierToProperties(context, ref properties);
             await inner.SignInAsync(context, scheme, principal, properties);
         }
 
         public async Task SignOutAsync(HttpContext context, string scheme, AuthenticationProperties properties)
         {
-            AddTenantIdentiferToProperties(context, ref properties);
+            AddTenantIdentifierToProperties(context, ref properties);
             await inner.SignOutAsync(context, scheme, properties);
         }
     }

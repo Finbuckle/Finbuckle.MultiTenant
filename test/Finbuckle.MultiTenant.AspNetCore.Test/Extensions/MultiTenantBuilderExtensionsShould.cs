@@ -13,22 +13,224 @@
 //    limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Moq;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Finbuckle.MultiTenant.AspNetCore;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Linq;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http;
+using Moq;
+using Constants = Finbuckle.MultiTenant.Internal.Constants;
 
-public partial class MultiTenantBuilderExtensionsShould
+public class MultiTenantBuilderExtensionsShould
 {
+    public class TestTenantInfo : ITenantInfo
+    {
+        public string Id { get; set; }
+        public string Identifier { get; set; }
+        public string Name { get; set; }
+        public string ConnectionString { get; set; }
+        public string ChallengeScheme { get; set; }
+        public string CookiePath { get; set; }
+        public string CookieLoginPath { get; set; }
+        public string CookieLogoutPath { get; set; }
+        public string CookieAccessDeniedPath { get; set; }
+        public string OpenIdConnectAuthority { get; set; }
+        public string OpenIdConnectClientId { get; set; }
+        public string OpenIdConnectClientSecret { get; set; }
+    }
+    
+    [Fact]
+    public void NotThrowIfOriginalPrincipalValidationNotSet()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var called = false;
+        services.AddAuthentication().AddCookie();
+        services.AddMultiTenant<TenantInfo>()
+            .WithPerTenantAuthentication();
+        var sp = services.BuildServiceProvider();
+
+        // Fake a resolved tenant
+        var mtc = new MultiTenantContext<TenantInfo>();
+        mtc.TenantInfo = new TenantInfo { Identifier = "abc" };
+        sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+        // Trigger the ValidatePrincipal event
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object>());
+        var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+            .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+        var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+        authTicket.Properties.Items[Constants.TenantToken] = "abc";
+        var cookieValidationContext =
+            new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+        options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+        Assert.True(true);
+    }
+
+    [Fact]
+    public void CallOriginalPrincipalValidation()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var called = false;
+        services.AddAuthentication().AddCookie(options =>
+        {
+#pragma warning disable 1998
+            options.Events.OnValidatePrincipal = async context =>
+#pragma warning restore 1998
+            {
+                called = true;
+            };
+        });
+        services.AddMultiTenant<TenantInfo>()
+            .WithPerTenantAuthentication();
+        var sp = services.BuildServiceProvider();
+        
+
+        // Fake a resolved tenant
+        var mtc = new MultiTenantContext<TenantInfo>();
+        mtc.TenantInfo = new TenantInfo { Identifier = "abc" };
+        sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+        // Trigger the ValidatePrincipal event
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object>());
+        var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+            .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+        var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+        authTicket.Properties.Items[Constants.TenantToken] = "abc";
+        var cookieValidationContext =
+            new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+        options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+        Assert.True(called);
+    }
+    
+    [Fact]
+    public void PassPrincipleValidationIfTenantMatch()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddAuthentication().AddCookie();
+        services.AddMultiTenant<TenantInfo>()
+            .WithPerTenantAuthentication();
+        var sp = services.BuildServiceProvider();
+        
+
+        // Fake a resolved tenant
+        var mtc = new MultiTenantContext<TenantInfo>();
+        mtc.TenantInfo = new TenantInfo { Identifier = "abc" };
+        sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+        // Trigger the ValidatePrincipal event
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object>());
+        var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+            .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+        var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+        authTicket.Properties.Items[Constants.TenantToken] = "abc";
+        var cookieValidationContext =
+            new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+        options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+        Assert.NotNull(cookieValidationContext);
+    }
+    
+    [Fact]
+    public void SkipPrincipleValidationIfBypassSet()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        var called = false;
+#pragma warning disable 1998
+        services.AddAuthentication().AddCookie(o => o.Events.OnValidatePrincipal = async c => called = true);
+#pragma warning restore 1998
+        services.AddMultiTenant<TenantInfo>()
+            .WithPerTenantAuthentication();
+        var sp = services.BuildServiceProvider();
+        
+        // Fake a resolved tenant
+        var mtc = new MultiTenantContext<TenantInfo>();
+        mtc.TenantInfo = new TenantInfo { Identifier = "abc1" };
+        sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+        // Trigger the ValidatePrincipal event
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        var httpContextItems = new Dictionary<object, object>();
+        httpContextItems[$"{Constants.TenantToken}__bypass_validate_principle__"] = true;
+        httpContextMock.Setup(c => c.Items).Returns(httpContextItems);
+        var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+            .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+        var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+        authTicket.Properties.Items[Constants.TenantToken] = "abc2";
+        var cookieValidationContext =
+            new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+        options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+        Assert.NotNull(cookieValidationContext.Principal);
+        Assert.False(called);
+    }
+    
+    [Fact]
+    public void RejectPrincipleValidationIfTenantMatch()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddAuthentication().AddCookie();
+        services.AddMultiTenant<TenantInfo>()
+            .WithPerTenantAuthentication();
+        var sp = services.BuildServiceProvider();
+        
+
+        // Fake a resolved tenant
+        var mtc = new MultiTenantContext<TenantInfo>();
+        mtc.TenantInfo = new TenantInfo { Identifier = "abc1" };
+        sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+        // Trigger the ValidatePrincipal event
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+        httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object>());
+        var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+            .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(new ClaimsIdentity());
+        var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+        authTicket.Properties.Items[Constants.TenantToken] = "abc2";
+        var cookieValidationContext =
+            new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+        options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+        Assert.Null(cookieValidationContext.Principal);
+    }
+    
     [Fact]
     public void ConfigurePerTenantAuthentication_RegisterServices()
     {

@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Security.Claims;
 using Finbuckle.MultiTenant.Internal;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -72,39 +73,28 @@ namespace Microsoft.Extensions.DependencyInjection
                 var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
                 options.Events.OnValidatePrincipal = async context =>
                 {
-
-                    await origOnValidatePrincipal(context);
-
-                    // Skip if no principal or bypass set
-                    if(context.Principal == null || context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principle__"))
+                    // Skip if bypass set (e.g. ClaimsStrategy in effect)
+                    if(context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principle__"))
                         return;
-
+                    
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
+                    string authTenant = null;
+                    if (context.Properties.Items.ContainsKey(Constants.TenantToken))
+                    {
+                        authTenant = context.Properties.Items[Constants.TenantToken];
+                    }
+                    else
+                    {
+                        var loggerFactory = context.HttpContext.RequestServices.GetService<ILoggerFactory>();
+                        loggerFactory.CreateLogger(typeof(FinbuckleMultiTenantBuilderExtensions)).LogWarning("No tenant found in authentication properties.");
+                    }
 
-                    // If no current tenant and no tenant claim then OK
-                    if(currentTenant == null && !context.Principal.Claims.Any(c => c.Type == Constants.TenantToken))
-                        return;
-
-                    // Does a tenant claim for the principal match the current tenant?
-                    if(!context.Principal.Claims.Where(c => c.Type == Constants.TenantToken && String.Equals(c.Value, currentTenant, StringComparison.OrdinalIgnoreCase)).Any())
+                    // Does the current tenant match the auth property tenant?
+                    if(!string.Equals(currentTenant, authTenant, StringComparison.OrdinalIgnoreCase))
                         context.RejectPrincipal();
-                };
-
-                // Set the tenant claim when signing in.
-                var origOnSigningIn = options.Events.OnSigningIn;
-                options.Events.OnSigningIn = async context =>
-                {
-                    await origOnSigningIn(context);
-
-                    if(context.Principal == null)
-                        return;
-
-                    var identity = (ClaimsIdentity)context.Principal.Identity;
-                    var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
-
-                    if(currentTenant != null &&
-                       !identity.Claims.Where(c => c.Type == Constants.TenantToken && c.Value == currentTenant).Any())
-                        identity.AddClaim(new Claim(Constants.TenantToken, currentTenant));
+                    
+                    if(origOnValidatePrincipal != null)
+                        await origOnValidatePrincipal(context);
                 };
             });
 
