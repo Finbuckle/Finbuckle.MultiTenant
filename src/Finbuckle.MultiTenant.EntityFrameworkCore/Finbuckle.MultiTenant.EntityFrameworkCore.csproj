@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
-    <Title>Finbuckle.MultiTenant.EntityFrameworkCore3_1</Title>
+    <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
     <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>
 

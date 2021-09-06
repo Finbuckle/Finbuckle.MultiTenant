@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
-    
     <Title>Finbuckle.MultiTenant</Title>
     <Description>Main library package for Finbuckle.MultiTenant.</Description>
   </PropertyGroup>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using IdentityDataIsolationSample.Data;
@@ -30,6 +31,7 @@ namespace IdentityDataIsolationSample
 
             services.AddDefaultIdentity<IdentityUser>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages(options =>
