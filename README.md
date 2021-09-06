@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant 6.2.0
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant 6.3.0
 
 ## About Finbuckle.MultiTenant
 
@@ -27,6 +27,14 @@ This project is supported by the [.NET Foundation](https://dotnetfoundation.org)
 
 This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our community.
 For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct) or the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+## Community
+
+Check out the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant) to ask a question, make a request, or check out the code!
+
+## Sample Projects
+
+In addition to this documentation a variety of sample projects are available in the 'samples' directory. Be sure to read the information on the index page of each sample and the code comments in the `Startup` class.
 
 ## Quick Start
 

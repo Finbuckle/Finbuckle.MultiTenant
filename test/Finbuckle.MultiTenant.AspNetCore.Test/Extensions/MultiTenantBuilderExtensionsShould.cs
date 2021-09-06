@@ -52,7 +52,6 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         services.AddLogging();
-        var called = false;
         services.AddAuthentication().AddCookie();
         services.AddMultiTenant<TenantInfo>()
             .WithPerTenantAuthentication();
