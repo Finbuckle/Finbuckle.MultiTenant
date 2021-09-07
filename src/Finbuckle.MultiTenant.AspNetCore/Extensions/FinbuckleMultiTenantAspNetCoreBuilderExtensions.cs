@@ -145,7 +145,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // remote authentication can get the tenant from the authentication
             // properties in the state parameter.
             if (builder.Services.All(s => s.ServiceType != typeof(IAuthenticationService)))
-                throw new MultiTenantException("WithPerTenantAuthenticationCore() must be called after AddAuthorization() in ConfigureServices.");
+                throw new MultiTenantException("WithPerTenantAuthenticationCore() must be called after AddAuthentication() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
             
             // Replace IAuthenticationSchemeProvider so that the options aren't
