@@ -18,7 +18,7 @@ Contains information about a tenant. Usually an app will get the current `Tenant
 * `Name` is a display name for the tenant.
 * `ConnectionString` is a connection string that should be used for database operations for this tenant. It might connect to a shared database or a dedicated database for the single tenant.
 
-> Note: Finbuckle.MultiTenant versions prior to v6.0.0 had an `Items` dictioanry
+> Note: Finbuckle.MultiTenant versions prior to v6.0.0 had an `Items` dictionary
 > property for custom data. This was removed in favor of custom `ITenantInfo`
 > support where custom data can simply be made properties of the implementation.
 
