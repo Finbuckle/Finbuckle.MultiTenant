@@ -49,7 +49,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             else
                 indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
                                       .HasDatabaseName(index.GetDatabaseName());
-#elif NETCOREAPP3_1
+#elif NETSTANDARD2_1
             Builder.Metadata.RemoveIndex(index.Properties);
             indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
                                   .HasName(index.GetName());
