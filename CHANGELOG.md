@@ -5,6 +5,13 @@
 
 * revert some platform targets to netstandard ([#469](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/469)) ([aceff1d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/aceff1d73540b22ef64c6cec0fd50e43eff5387b))
 
+## [6.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.3.1) (2021-09-30)
+
+
+### Bug Fixes
+
+* revert some platform targets to netstandard ([#469](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/469)) ([aceff1d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/aceff1d73540b22ef64c6cec0fd50e43eff5387b))
+
 **6.3.0**
 * Removed support for .NET Core 2.1 which ended Microsoft support in August 2020.
 * Retargeted specifically to .netcoreapp3.1 and .net5.0 across all packages.
