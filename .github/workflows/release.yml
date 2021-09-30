@@ -1,0 +1,27 @@
+name: Release
+
+on: [workflow_dispatch]
+
+jobs:
+  build-test-prep-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: build and test
+        run: |
+          dotnet restore
+          dotnet build -c Release --no-restore
+          dotnet test -c Release --no-build
+      - name: setup semantic-release
+        run: |
+          npm install -D semantic-release
+          npm install -D @semantic-release/git
+          npm install -D @semantic-release/changelog
+          npm install -D @semantic-release/exec
+      - name: run semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release

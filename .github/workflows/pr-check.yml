@@ -1,8 +1,6 @@
 name: Pull Request Checks
 
-on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+on: [workflow_dispatch]
 
 jobs:
   os-tests:
