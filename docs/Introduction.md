@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant 6.3.0
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.3.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -17,7 +17,7 @@ Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. I
 
 ## License
 
-This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for license information.
+This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See the LICENSE file for license information.
 
 ## .NET Foundation
 
@@ -26,7 +26,7 @@ This project is supported by the [.NET Foundation](https://dotnetfoundation.org)
 ## Code of Conduct
 
 This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our community.
-For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct) or the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct) or the CONTRIBUTING.md file.
 
 ## Community
 
