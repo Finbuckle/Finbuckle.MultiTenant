@@ -1,0 +1,16 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/github",
+    "@semantic-release/changelog",
+    ["@semantic-release/exec", {
+      "prepareCmd": "sed -E -i 's/<(Version|span class=\"_version\")>.*<\\/(Version|span)>/<\\1>${nextRelease.version}<\\/\\2>/' Directory.Build.props *.md docs/*.md"
+    }],
+    ["@semantic-release/git", {
+      "assets": ["Directory.Build.props", "*.md", "docs"],
+      "message": "chore(release-prep): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    }]
+  ]
+}
