@@ -15,12 +15,13 @@
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Stores;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckleMultiTenantBuilderExtensions
+    public static class FinbuckleMultiTenantBuilderExtensionsEntityFrameworkCore
     {
         /// <summary>
         /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.

@@ -144,11 +144,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
- #if NET // Covers .NET 5.0 and later.
+#if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
- #elif NETCOREAPP3_1 // .NET Core 3.1
+#elif NETSTANDARD2_1 // .NET Core 3.1
             builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
- #endif
+#endif
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
@@ -156,7 +156,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             builder.RemoveIndex("NormalizedName");
 #if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
-#elif NETCOREAPP3_1 // .NET Core 3.1
+#elif NETSTANDARD2_1 // .NET Core 3.1
             builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
 #endif
         }

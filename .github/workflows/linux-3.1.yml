@@ -3,6 +3,7 @@ name: Linux (.NET Core 3.1)
 on:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
   os-tests:

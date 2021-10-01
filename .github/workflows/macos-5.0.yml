@@ -3,6 +3,7 @@ name: MacOS (.NET 5.0)
 on:
   push:
     branches: [main]
+  pull_request:
 
 jobs:
   os-tests:
