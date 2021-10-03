@@ -1,9 +1,11 @@
-﻿using DataIsolationSample.Data;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using DataIsolationSample.Data;
 using DataIsolationSample.Models;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -83,11 +85,6 @@ namespace DataIsolationSample
                 db.ToDoItems.Add(new ToDoItem { Title = "Write Memo", Completed = false });
                 db.SaveChanges();
             }
-        }
-
-        private void ConfigRoutes(IRouteBuilder routes)
-        {
-            routes.MapRoute("Defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
         }
     }
 }

@@ -1,32 +1,20 @@
-// Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System.Data.Common;
 using System.Linq;
-using Finbuckle.MultiTenant;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace IMultiTenantDbContextExtensionShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
-    public class IMultiTenantDbContextExtensionShould
+    public class MultiTenantDbContextExtensionShould
     {
         private DbContextOptions _options;
         private DbConnection _connection;
 
-        public IMultiTenantDbContextExtensionShould()
+        public MultiTenantDbContextExtensionShould()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
             _options = new DbContextOptionsBuilder()
@@ -45,7 +33,7 @@ namespace IMultiTenantDbContextExtensionShould
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=TestDb.db"
                 };
 
                 // TenantNotSetMode.Throw, should act as Overwrite when adding
@@ -58,7 +46,7 @@ namespace IMultiTenantDbContextExtensionShould
                     var blog1 = new Blog { Title = "abc" };
                     db.Blogs.Add(blog1);
                     db.SaveChanges();
-                    Assert.Equal(tenant1.Identifier, db.Entry<Blog>(blog1).Property("TenantId").CurrentValue);
+                    Assert.Equal(tenant1.Identifier, db.Entry(blog1).Property("TenantId").CurrentValue);
                 }
 
                 // TenantNotSetMode.Overwrite
@@ -71,7 +59,7 @@ namespace IMultiTenantDbContextExtensionShould
                     var blog1 = new Blog { Title = "abc2" };
                     db.Blogs.Add(blog1);
                     db.SaveChanges();
-                    Assert.Equal(tenant1.Id, db.Entry<Blog>(blog1).Property("TenantId").CurrentValue);
+                    Assert.Equal(tenant1.Id, db.Entry(blog1).Property("TenantId").CurrentValue);
                 }
             }
             finally
@@ -105,7 +93,7 @@ namespace IMultiTenantDbContextExtensionShould
                     db.Blogs.Add(blog1);
                     db.Entry(blog1).Property("TenantId").CurrentValue = "77";
 
-                    var e = Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+                    Assert.Throws<MultiTenantException>(() => db.SaveChanges());
                 }
 
                 // TenantMismatchMode.Ignore 
@@ -169,7 +157,7 @@ namespace IMultiTenantDbContextExtensionShould
                     db.TenantNotSetMode = TenantNotSetMode.Throw;
                     db.Entry(blog1).Property("TenantId").CurrentValue = null;
 
-                    var e = Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+                    Assert.Throws<MultiTenantException>(() => db.SaveChanges());
                 }
 
                 // TenantNotSetMode.Overwrite
@@ -222,7 +210,7 @@ namespace IMultiTenantDbContextExtensionShould
                     db.TenantMismatchMode = TenantMismatchMode.Throw;
                     db.Entry(blog1).Property("TenantId").CurrentValue = "11";
 
-                    var e = Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+                    Assert.Throws<MultiTenantException>(() => db.SaveChanges());
                 }
 
                 // TenantMismatchMode.Ignore
@@ -293,7 +281,7 @@ namespace IMultiTenantDbContextExtensionShould
                     db.Entry(blog1).Property("TenantId").CurrentValue = null;
                     db.Blogs.Remove(blog1);
 
-                    var e = Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+                    Assert.Throws<MultiTenantException>(() => db.SaveChanges());
                 }
 
                 // TenantNotSetMode.Overwrite
@@ -347,7 +335,7 @@ namespace IMultiTenantDbContextExtensionShould
                     db.Entry(blog1).Property("TenantId").CurrentValue = "17";
                     db.Blogs.Remove(blog1);
 
-                    var e = Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+                    Assert.Throws<MultiTenantException>(() => db.SaveChanges());
                 }
 
                 // TenantMismatchMode.Ignore

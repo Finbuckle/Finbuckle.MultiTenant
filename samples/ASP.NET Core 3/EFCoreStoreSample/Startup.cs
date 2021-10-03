@@ -1,11 +1,13 @@
-﻿using System;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System;
 using EFCoreStoreSample.Data;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EFCoreStoreSample
 {
@@ -40,7 +42,7 @@ namespace EFCoreStoreSample
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute("defaut", "{__tenant__=}/{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
             });
 
             // Seed the database the multitenant store will need.
@@ -51,9 +53,9 @@ namespace EFCoreStoreSample
         {
             var scopeServices = sp.CreateScope().ServiceProvider;
             var store = scopeServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-
-            store.TryAddAsync(new TenantInfo{ Id = "tenant-finbuckle-d043favoiaw", Identifier = "finbuckle", Name = "Finbuckle", ConnectionString = "finbuckle_conn_string"}).Wait();
-            store.TryAddAsync(new TenantInfo{Id = "tenant-initech-341ojadsfa", Identifier = "initech", Name = "Initech LLC", ConnectionString = "initech_conn_string"}).Wait();
+            
+            store.TryAddAsync(new TenantInfo{ Id = "tenant-finbuckle-241", Identifier = "finbuckle", Name = "Finbuckle", ConnectionString = "finbuckle_conn_string"}).Wait();
+            store.TryAddAsync(new TenantInfo{Id = "tenant-initech-235", Identifier = "initech", Name = "Initech LLC", ConnectionString = "initech_conn_string"}).Wait();
         }
     }
 }

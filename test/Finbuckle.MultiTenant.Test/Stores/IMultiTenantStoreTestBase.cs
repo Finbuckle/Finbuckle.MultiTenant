@@ -1,99 +1,89 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
-using System.Data;
 using System.Linq;
-using Finbuckle.MultiTenant;
 using Xunit;
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 
-public abstract class IMultiTenantStoreTestBase<T> where T : IMultiTenantStore<TenantInfo>
+namespace Finbuckle.MultiTenant.Test.Stores
 {
-    protected abstract IMultiTenantStore<TenantInfo> CreateTestStore();
-
-    protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    public abstract class MultiTenantStoreTestBase
     {
-        var r1 = store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech", ConnectionString = "connstring" }).Result;
-        r1 = store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc.", ConnectionString = "connstring2" }).Result;
+        protected abstract IMultiTenantStore<TenantInfo> CreateTestStore();
 
-        return store;
-    }
+        protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+        {
+            store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech", ConnectionString = "ConnString" }).Wait();
+            store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc.", ConnectionString = "ConnString2" }).Wait();
 
-    //[Fact]
-    public virtual void GetTenantInfoFromStoreById()
-    {
-        var store = CreateTestStore();
+            return store;
+        }
 
-        Assert.Equal("initech", store.TryGetAsync("initech-id").Result.Identifier);
-    }
+        //[Fact]
+        public virtual void GetTenantInfoFromStoreById()
+        {
+            var store = CreateTestStore();
 
-    //[Fact]
-    public virtual void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
-    {
-        var store = CreateTestStore();
+            Assert.Equal("initech", store.TryGetAsync("initech-id").Result.Identifier);
+        }
 
-        Assert.Null(store.TryGetAsync("fake123").Result);
-    }
+        //[Fact]
+        public virtual void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+        {
+            var store = CreateTestStore();
 
-    //[Fact]
-    public virtual void GetTenantInfoFromStoreByIdentifier()
-    {
-        var store = CreateTestStore();
+            Assert.Null(store.TryGetAsync("fake123").Result);
+        }
 
-        Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
-    }
+        //[Fact]
+        public virtual void GetTenantInfoFromStoreByIdentifier()
+        {
+            var store = CreateTestStore();
 
-    //[Fact]
-    public virtual void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
-    {
-        var store = CreateTestStore();
-        Assert.Null(store.TryGetByIdentifierAsync("fake123").Result);
-    }
+            Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
+        }
 
-    //[Fact]
-    public virtual void AddTenantInfoToStore()
-    {
-        var store = CreateTestStore();
+        //[Fact]
+        public virtual void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+        {
+            var store = CreateTestStore();
+            Assert.Null(store.TryGetByIdentifierAsync("fake123").Result);
+        }
 
-        Assert.Null(store.TryGetByIdentifierAsync("identifier").Result);
-        Assert.True(store.TryAddAsync(new TenantInfo { Id = "id", Identifier = "identifier", Name = "name", ConnectionString = "cs" }).Result);
-        Assert.NotNull(store.TryGetByIdentifierAsync("identifier").Result);
-    }
+        //[Fact]
+        public virtual void AddTenantInfoToStore()
+        {
+            var store = CreateTestStore();
 
-    //[Fact]
-    public virtual void UpdateTenantInfoInStore()
-    {
-        var store = CreateTestStore();
+            Assert.Null(store.TryGetByIdentifierAsync("identifier").Result);
+            Assert.True(store.TryAddAsync(new TenantInfo { Id = "id", Identifier = "identifier", Name = "name", ConnectionString = "cs" }).Result);
+            Assert.NotNull(store.TryGetByIdentifierAsync("identifier").Result);
+        }
 
-        var result = store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2", Name = "Initech2", ConnectionString = "connstring2" }).Result;
-        Assert.True(result);
-    }
+        //[Fact]
+        public virtual void UpdateTenantInfoInStore()
+        {
+            var store = CreateTestStore();
 
-    //[Fact]
-    public virtual void RemoveTenantInfoFromStore()
-    {
-        var store = CreateTestStore();
-        Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
-        Assert.True(store.TryRemoveAsync("initech").Result);
-        Assert.Null(store.TryGetByIdentifierAsync("initech").Result);
-    }
+            var result = store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2", Name = "Initech2", ConnectionString = "connstring2" }).Result;
+            Assert.True(result);
+        }
 
-    //[Fact]
-    public virtual void GetAllTenantsFromStoreAsync()
-    {
-        var store = CreateTestStore();
-        Assert.Equal(2, store.GetAllAsync().Result.Count());
+        //[Fact]
+        public virtual void RemoveTenantInfoFromStore()
+        {
+            var store = CreateTestStore();
+            Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
+            Assert.True(store.TryRemoveAsync("initech").Result);
+            Assert.Null(store.TryGetByIdentifierAsync("initech").Result);
+        }
+
+        //[Fact]
+        public virtual void GetAllTenantsFromStoreAsync()
+        {
+            var store = CreateTestStore();
+            Assert.Equal(2, store.GetAllAsync().Result.Count());
+        }
     }
 }

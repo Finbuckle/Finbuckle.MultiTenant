@@ -1,124 +1,115 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System.Linq;
-using Finbuckle.MultiTenant;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-public class ServiceCollectionExtensionsShould
+namespace Finbuckle.MultiTenant.Test.Extensions
 {
-    [Fact]
-    public void RegisterITenantResolverInDI()
+    public class ServiceCollectionExtensionsShould
     {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterITenantResolverInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.ServiceType == typeof(ITenantResolver)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterITenantResolverGenericInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterITenantResolverGenericInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterIMultiTenantContextInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterIMultiTenantContextInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(IMultiTenantContext<TenantInfo>)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
+                                                        s.ServiceType == typeof(IMultiTenantContext<TenantInfo>));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterTenantInfoInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterTenantInfoInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(TenantInfo)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
+                                                        s.ServiceType == typeof(TenantInfo));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterITenantInfoInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterITenantInfoInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                            s.ServiceType == typeof(ITenantInfo)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
+                                                        s.ServiceType == typeof(ITenantInfo));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterIMultiTenantContextAccessorInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterIMultiTenantContextAccessorInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                            s.ServiceType == typeof(IMultiTenantContextAccessor)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
+                                                        s.ServiceType == typeof(IMultiTenantContextAccessor));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterIMultiTenantContextAccessorGenericInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterIMultiTenantContextAccessorGenericInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                            s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
+                                                        s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
-    }
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+        }
 
-    [Fact]
-    public void RegisterMultiTenantOptionsInDI()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        [Fact]
+        public void RegisterMultiTenantOptionsInDi()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
 
-        var service = services.Where(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                            s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>)).SingleOrDefault();
+            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
+                                                        s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>));
 
-        Assert.NotNull(service);
-        Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+            Assert.NotNull(service);
+            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+        }
     }
 }

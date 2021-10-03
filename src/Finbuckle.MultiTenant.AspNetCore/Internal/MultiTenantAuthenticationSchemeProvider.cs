@@ -1,19 +1,8 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 //    Portions of this file are derived from the .NET Foundation source file located at:
-//    https://github.com/aspnet/HttpAbstractions/blob/dev/src/Microsoft.AspNetCore.Authentication.Core/AuthenticationSchemeProvider.cs
+//    https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Core/src/AuthenticationSchemeProvider.cs
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
+// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
@@ -55,6 +45,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
             foreach (var builder in _optionsProvider.Value.Schemes)
             {
                 var scheme = builder.Build();
+                // ReSharper disable once VirtualMemberCallInConstructor
+                // As-is from MS source.
                 AddScheme(scheme);
             }
         }
@@ -138,6 +130,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <returns>The schemes in priority order for request handling</returns>
         public virtual Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync()
+            // ReSharper disable once InconsistentlySynchronizedField
+            // As-is from MS source
             => Task.FromResult<IEnumerable<AuthenticationScheme>>(_requestHandlers);
 
         /// <summary>
