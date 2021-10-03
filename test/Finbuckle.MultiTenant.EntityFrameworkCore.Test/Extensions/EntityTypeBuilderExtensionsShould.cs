@@ -1,26 +1,14 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using MultiTenantEntityTypeBuilderShould;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
@@ -35,25 +23,26 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
             }
         }
         
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         public class TestDbContext : DbContext
         {
-            private readonly Action<ModelBuilder> config;
+            private readonly Action<ModelBuilder> _config;
 
             public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(options)
             {
-                this.config = config;
+                this._config = config;
             }
 
-            DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
-            DbSet<MyThingWithTenantId> MyThingWithTenantId { get; set; }
-            DbSet<MyThingWithIntTenantId> MyThingWithIntTenantId { get; set; }
-            DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingWithAttribute { get; set; }
+            DbSet<MyMultiTenantThing> MyMultiTenantThings { get; set; }
+            DbSet<MyThingWithTenantId> MyThingsWithTenantIds { get; set; }
+            DbSet<MyThingWithIntTenantId> MyThingsWithIntTenantId { get; set; }
+            DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingsWithAttribute { get; set; }
 
             protected override void OnModelCreating(ModelBuilder builder)
             {
                 // If the test passed in a custom builder use it
-                if (config != null)
-                    config(builder);
+                if (_config != null)
+                    _config(builder);
                 // Of use the standard builder configuration
                 else
                 {
@@ -88,17 +77,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
             public int Id { get; set; }
             public int TenantId { get; set; }
         }
-        
-        #if NETCOREAPP2_1
-        public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
-        {
-            public object Create(DbContext context)
-            {
-                return new Object(); // Never cache!
-            }
-        }
-        #endif
-        
+
         private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
 
         public void Dispose()
@@ -182,7 +161,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
             {
                 var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing)).FindProperty("TenantId");
 
-                Assert.Equal(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
+                Assert.Equal(Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
             }
         }
 
