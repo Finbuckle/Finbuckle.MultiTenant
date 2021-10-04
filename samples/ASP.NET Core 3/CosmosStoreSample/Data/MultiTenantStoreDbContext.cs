@@ -28,7 +28,7 @@ namespace CosmosStoreSample.Data
 
             createContainerTasks.Add(RegisterContainerAsync(Tenants));
 
-            await Task.WhenAll(createContainerTasks);
+            await Task.WhenAll(createContainerTasks).ConfigureAwait(false);
         }
     }
 }

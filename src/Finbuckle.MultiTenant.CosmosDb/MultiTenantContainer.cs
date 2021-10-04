@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;

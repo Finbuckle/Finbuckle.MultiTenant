@@ -1,4 +1,7 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 
 using System;

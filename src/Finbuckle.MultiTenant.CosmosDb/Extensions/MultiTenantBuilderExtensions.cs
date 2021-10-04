@@ -1,10 +1,12 @@
-﻿using Finbuckle.MultiTenant;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System;
+
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.CosmosDb.Stores;
 
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Fluent;
-
-using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
