@@ -1,16 +1,5 @@
-// Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System;
 using System.Collections.Generic;
@@ -19,6 +8,7 @@ using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant
@@ -39,18 +29,8 @@ namespace Finbuckle.MultiTenant
             Stores = stores;
             this.options = options;
             this.loggerFactory = loggerFactory;
-
-#if !NETSTANDARD2_0
+            
             Strategies = strategies.OrderByDescending(s => s.Priority);
-#else
-            // Can't rely on Priority property so move RemoteAuth and Statics to end.
-            var statics = strategies.Where(s => s.GetType() == typeof(StaticStrategy)).ToList();
-            var remotes = strategies.Where(s => s.GetType().Name == "RemoteAuthenticationCallbackStrategy").ToList();
-            var others = strategies.Where(s => !statics.Contains(s) && !remotes.Contains(s)).ToList();
-            others.AddRange(remotes);
-            others.AddRange(statics);
-            Strategies = others;
-#endif
         }
 
         public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
@@ -62,12 +42,12 @@ namespace Finbuckle.MultiTenant
 
             foreach (var strategy in Strategies)
             {
-                var _strategy = new MultiTenantStrategyWrapper(strategy, loggerFactory?.CreateLogger(strategy.GetType()));
+                var _strategy = new MultiTenantStrategyWrapper(strategy, loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance);
                 var identifier = await _strategy.GetIdentifierAsync(context);
 
                 if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
                 {
-                    Utilities.TryLoginfo(loggerFactory?.CreateLogger(GetType()), $"Ignored identifier: {identifier}");
+                    (loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance).LogInformation("Ignored identifier: {Identifier}", identifier);
                     identifier = null;
                 }
 
@@ -75,7 +55,7 @@ namespace Finbuckle.MultiTenant
                 {
                     foreach (var store in Stores)
                     {
-                        var _store = new MultiTenantStoreWrapper<T>(store, loggerFactory?.CreateLogger(store.GetType()));
+                        var _store = new MultiTenantStoreWrapper<T>(store, loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance);
                         var tenantInfo = await _store.TryGetByIdentifierAsync(identifier);
                         if (tenantInfo != null)
                         {

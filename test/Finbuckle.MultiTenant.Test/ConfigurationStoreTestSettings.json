@@ -7,8 +7,7 @@
       {
         "Id":  "initech-id",
         "Identifier": "initech",
-        "Name": "Initech",
-        "Items": { "test_item": "1234"}
+        "Name": "Initech"
       },
       {
         "Id": "lol-id",

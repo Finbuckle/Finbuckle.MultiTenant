@@ -1,33 +1,22 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace ModelBuiikderExtensionShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
     public class TestDbContext : DbContext
     {
         public TestDbContext(DbContextOptions options) : base(options)
         {
         }
 
-        DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
-        DbSet<MyThing> MyThing { get; set; }
+        DbSet<MyMultiTenantThing> MyMultiTenantThings { get; set; }
+        DbSet<MyThing> MyThings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -61,9 +50,18 @@ namespace ModelBuiikderExtensionShould
         public void SetMultiTenantOnTypeWithMultiTenantAttribute()
         {
             var db = GetDbContext();
-
+        
             Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant());
         }
+        
+        // [Fact]
+        // public void AdjustKeyOnTypeWithMultiTenantAttribute()
+        // {
+        //     var db = GetDbContext();
+        //
+        //     var adjustedKey = db.Model.FindEntityType(typeof(MyMultiTenantThing)).GetKeys().Where(k => k.Properties.Select(p => p.Name).Contains("TenantId")).SingleOrDefault();
+        //     Assert.NotNull(adjustedKey);
+        // }
 
         [Fact]
         public void DoNotSetMultiTenantOnTypeWithoutMultiTenantAttribute()

@@ -1,16 +1,5 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options/OptionsManager.cs
@@ -23,7 +12,7 @@ namespace Finbuckle.MultiTenant.Options
     /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
     /// </summary>
     /// <typeparam name="TOptions"></typeparam>
-    internal class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
+    public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
     {
         private readonly IOptionsFactory<TOptions> _factory;
         private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache

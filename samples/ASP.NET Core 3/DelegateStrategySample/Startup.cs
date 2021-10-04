@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +13,12 @@ namespace HttpRemoteStoreSampleServer.Controllers
     public class TenantsController : ControllerBase
     {
         private readonly ILogger<TenantsController> _logger;
-        private readonly IMultiTenantStore<TenantInfo> store;
+        private readonly IMultiTenantStore<TenantInfo> _store;
 
         public TenantsController(ILogger<TenantsController> logger, IMultiTenantStore<TenantInfo> store)
         {
             _logger = logger;
-            this.store = store;
+            this._store = store;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace HttpRemoteStoreSampleServer.Controllers
         {
             _logger.LogInformation("Tenants endpoint called with identifier \"{identifier}\".", identifier);
 
-            var tenantInfo = await store.TryGetByIdentifierAsync(identifier);
+            var tenantInfo = await _store.TryGetByIdentifierAsync(identifier);
             if(tenantInfo != null)
             {
                 _logger.LogInformation("Tenant \"{name}\" found for identifier \"{identifier}\".", tenantInfo.Name, identifier);

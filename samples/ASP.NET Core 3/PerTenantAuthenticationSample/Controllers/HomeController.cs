@@ -1,4 +1,7 @@
-﻿using System.Security.Claims;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Authentication;

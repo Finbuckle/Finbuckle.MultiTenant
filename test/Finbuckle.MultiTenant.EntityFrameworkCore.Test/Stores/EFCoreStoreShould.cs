@@ -1,58 +1,57 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
+using System;
 using System.Linq;
-using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Test.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-namespace EFCoreStoreShould
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
 {
-    public class EFCoreStoreShould : IMultiTenantStoreTestBase<EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>>
+    public class EfCoreStoreShould
+        : MultiTenantStoreTestBase, IDisposable
     {
-        private static IProperty GetModelProperty(string propName)
+        public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            var options = new DbContextOptionsBuilder()
-                    .UseSqlite(connection)
-                    .Options;
-            var dbContext = new TestEFCoreStoreDbContext(options);
+            public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
+            {
+            }
+        }
+
+        private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+        }
+
+        private IProperty GetModelProperty(string propName)
+        {
+            _connection.Open();
+            var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
+            var dbContext = new TestEfCoreStoreDbContext(options);
 
             var model = dbContext.Model.FindEntityType(typeof(TenantInfo));
-            var prop = model.GetProperties().Where(p => p.Name == propName).SingleOrDefault();
+            var prop = model.GetProperties().SingleOrDefault(p => p.Name == propName);
             return prop;
         }
 
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
-            var options = new DbContextOptionsBuilder()
-                    .UseSqlite(connection)
-                    .Options;
-            var dbContext = new TestEFCoreStoreDbContext(options);
+            _connection.Open();
+            var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
+            var dbContext = new TestEfCoreStoreDbContext(options);
             dbContext.Database.EnsureCreated();
 
-            var store = new EFCoreStore<TestEFCoreStoreDbContext, TenantInfo>(dbContext);
-
+            var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
             return PopulateTestStore(store);
         }
 
+        // ReSharper disable once RedundantOverriddenMember
         protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
         {
             return base.PopulateTestStore(store);
@@ -62,7 +61,7 @@ namespace EFCoreStoreShould
         public void AddTenantIdLengthConstraint()
         {
             var prop = GetModelProperty("Id");
-            Assert.Equal(Constants.TenantIdMaxLength, prop.GetMaxLength());
+            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
         }
 
         [Fact]
