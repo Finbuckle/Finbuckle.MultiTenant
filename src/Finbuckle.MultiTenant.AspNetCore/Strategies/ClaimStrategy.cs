@@ -33,7 +33,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
 		public async Task<string> GetIdentifierAsync(object context)
 		{
-			if (context is not HttpContext httpContext)
+			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
 			if (httpContext.User.Identity is { IsAuthenticated: true })
