@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        // ReSharper disable once InconsistentNaming
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
             where TTenantInfo : class, ITenantInfo, new()
