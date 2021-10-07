@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
@@ -13,12 +14,14 @@ namespace Finbuckle.MultiTenant.Strategies
 	public class ClaimStrategy : IMultiTenantStrategy
 	{
 		private readonly string _tenantKey;
-		public ClaimStrategy(string template)
+		private readonly string _authenticationScheme;
+		public ClaimStrategy(string template, string authenticationScheme = null)
 		{
 			if (string.IsNullOrWhiteSpace(template))
 				throw new ArgumentException(nameof(template));
 
 			_tenantKey = template;
+			_authenticationScheme = authenticationScheme;
 		}
 
 		public async Task<string> GetIdentifierAsync(object context)
@@ -26,16 +29,27 @@ namespace Finbuckle.MultiTenant.Strategies
 			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
-			var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-			var authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
-			
-			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
-			await handler.InitializeAsync(authScheme, httpContext);
-			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
-			var handlerResult = await handler.AuthenticateAsync();
-			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
+			if (!httpContext.User.Identity.IsAuthenticated)
+			{
+				AuthenticationScheme authScheme;
+				var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+				if (_authenticationScheme is null)
+				{
+					authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
+				}
+				else
+				{
+					authScheme = (await schemeProvider.GetAllSchemesAsync()).FirstOrDefault(x => x.Name == _authenticationScheme);
+				}
 
-			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
+				var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
+				await handler.InitializeAsync(authScheme, httpContext);
+				httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principle__"] = "true"; // Value doesn't matter.
+				var handlerResult = await handler.AuthenticateAsync();
+				httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principle__");
+			}
+
+			var identifier = httpContext.User.FindFirst(_tenantKey)?.Value;
 			return await Task.FromResult(identifier);
 		}
 	}
