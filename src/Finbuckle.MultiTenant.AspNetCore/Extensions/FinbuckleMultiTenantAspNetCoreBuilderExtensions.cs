@@ -38,6 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="config">Authentication options config.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        // ReSharper disable once MemberCanBePrivate.Global
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
              where TTenantInfo : class, ITenantInfo, new()
         {
@@ -202,7 +203,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
-                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
+                throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
             }
 
             return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, tenantParam);
@@ -235,23 +236,55 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
+        /// Adds and configures a ClaimStrategy for claim name "__tenant__" to the application. Uses the default authentication handler scheme.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
+            return builder.WithClaimStrategy(Constants.TenantToken);
+        }
+        
+        /// <summary>
+        /// Adds and configures a ClaimStrategy to the application. Uses the default authentication handler scheme.
+        /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
+        /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        {
+            BypassSessionPrincipalValidation(builder);
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
         }
 
         /// <summary>
         /// Adds and configures a ClaimStrategy to the application.
         /// </summary>
         /// <param name="builder">MultiTenantBuilder instance.</param>
-        /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
+        /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
+        /// <param name="authenticationScheme">The authentication scheme to check for claims.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme = null) where TTenantInfo : class, ITenantInfo, new()
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme) where TTenantInfo : class, ITenantInfo, new()
         {
+            BypassSessionPrincipalValidation(builder);
             return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
+        }
+
+        private static void BypassSessionPrincipalValidation<TTenantInfo>(FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
+            {
+                var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
+                options.Events.OnValidatePrincipal = async context =>
+                {
+                    // Skip if bypass set (e.g. ClaimStrategy in effect)
+                    if (context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principal__"))
+                        return;
+
+                    if (origOnValidatePrincipal != null)
+                        await origOnValidatePrincipal(context);
+                };
+            });
         }
 
         /// <summary>

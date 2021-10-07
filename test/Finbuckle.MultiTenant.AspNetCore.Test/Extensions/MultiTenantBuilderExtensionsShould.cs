@@ -147,7 +147,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         }
     
         [Fact]
-        public void SkipprincipalValidationIfBypassSet()
+        public void SkipPrincipalValidationIfBypassSet_WithPerTenantAuthentication()
         {
             var services = new ServiceCollection();
             services.AddLogging();
@@ -184,9 +184,50 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(cookieValidationContext.Principal);
             Assert.False(called);
         }
+        
+        [Fact]
+        public void SkipPrincipalValidationIfBypassSet_WithClaimStrategy()
+        {
+            var services = new ServiceCollection();
+            services.AddLogging();
+            var called = false;
+#pragma warning disable 1998
+            services.AddAuthentication().AddCookie(o => o.Events.OnValidatePrincipal = async _ => called = true);
+#pragma warning restore 1998
+            services.AddMultiTenant<TenantInfo>()
+                .WithClaimStrategy();
+            var sp = services.BuildServiceProvider();
+        
+            // Fake a resolved tenant
+            var mtc = new MultiTenantContext<TenantInfo>
+            {
+                TenantInfo = new TenantInfo { Identifier = "abc1" }
+            };
+            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+        
+            // Trigger the ValidatePrincipal event
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+            var httpContextItems = new Dictionary<object, object>();
+            httpContextItems[$"{Constants.TenantToken}__bypass_validate_principal__"] = true;
+            httpContextMock.Setup(c => c.Items).Returns(httpContextItems);
+            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>().Get(CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(new ClaimsIdentity());
+            var authTicket = new AuthenticationTicket(principal, CookieAuthenticationDefaults.AuthenticationScheme);
+            authTicket.Properties.Items[Constants.TenantToken] = "abc2";
+            var cookieValidationContext =
+                new CookieValidatePrincipalContext(httpContextMock.Object, scheme, options, authTicket);
+
+            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+
+            Assert.NotNull(cookieValidationContext.Principal);
+            Assert.False(called);
+        }
     
         [Fact]
-        public void RejectprincipalValidationIfTenantMatch()
+        public void RejectPrincipalValidationIfTenantMatch()
         {
             var services = new ServiceCollection();
             services.AddLogging();
