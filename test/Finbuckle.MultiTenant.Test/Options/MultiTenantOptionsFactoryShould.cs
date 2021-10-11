@@ -78,5 +78,21 @@ namespace Finbuckle.MultiTenant.Test.Options
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value;
             Assert.Equal($"beginend", options.DefaultConnectionString);
         }
+
+        [Fact]
+        public void ValidateOptions()
+        {
+            var services = new ServiceCollection();
+            services.AddOptions<TestOptions>()
+                .Configure(o => o.DefaultConnectionString = "begin")
+                .ValidateDataAnnotations();
+            services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
+            services.AddMultiTenant<TenantInfo>().WithPerTenantOptions<TestOptions>((o, ti) => o.DefaultConnectionString = null);
+            var sp = services.BuildServiceProvider();
+            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
+            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "id", Identifier = "identifier" } };
+
+            Assert.Throws<OptionsValidationException>(() => sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value);
+        }
     }
 }
