@@ -1,11 +1,14 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more inforation.
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace PerTenantAuthenticationSample
 {
