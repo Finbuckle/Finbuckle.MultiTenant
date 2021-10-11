@@ -26,6 +26,8 @@ namespace PerTenantAuthenticationSample
                     .AddCookie()
                     .AddOpenIdConnect(options =>
                     {
+                        options.ClientId = "__invalid"; // Needed for validation, will be overwritten per-tenant.
+                        options.Authority = "https://__invalid"; // Needed for validation, will be overwritten per-tenant.
                         options.Prompt = "login consent"; // For sample purposes.
                     });
 
