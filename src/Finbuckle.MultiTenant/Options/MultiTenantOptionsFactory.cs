@@ -1,23 +1,11 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 //    Portions of this file are derived from the .NET Foundation source file located at:
-//    https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options/OptionsFactory.cs
+//    https://github.com/dotnet/runtime/blob/5aad989cebe00f0987fcb842ea5b7cbe986c67df/src/libraries/Microsoft.Extensions.Options/src/OptionsFactory.cs
 
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options
@@ -30,28 +18,34 @@ namespace Finbuckle.MultiTenant.Options
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly IEnumerable<IConfigureOptions<TOptions>> configureOptions;
-        private readonly IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions;
-        private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
-        private readonly IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions;
+        private readonly IConfigureOptions<TOptions>[] _configureOptions;
+        private readonly IPostConfigureOptions<TOptions>[] _postConfigureOptions;
+        private readonly IValidateOptions<TOptions>[] _validations;
+
+        private readonly ITenantConfigureOptions<TOptions, TTenantInfo>[] _tenantConfigureOptions;
+        private readonly IMultiTenantContextAccessor<TTenantInfo> _multiTenantContextAccessor;
 
         /// <summary>
         /// Initializes a new instance with the specified options configurations.
         /// </summary>
-        /// <param name="configureOptions">The configuration actions to run.</param>
-        /// <param name="postConfigures">The initialization actions to run.</param>
-        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions, IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions, IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions, IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
+        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions, IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions, IEnumerable<IValidateOptions<TOptions>> validations, IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions,  IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
         {
-            this.configureOptions = configureOptions;
-            this.tenantConfigureOptions = tenantConfigureOptions;
-            this.multiTenantContextAccessor = multiTenantContextAccessor;
-            this.postConfigureOptions = postConfigureOptions;
+            // The default DI container uses arrays under the covers. Take advantage of this knowledge
+            // by checking for an array and enumerate over that, so we don't need to allocate an enumerator.
+            // When it isn't already an array, convert it to one, but don't use System.Linq to avoid pulling Linq in to
+            // small trimmed applications.
+            
+            _configureOptions = configureOptions as IConfigureOptions<TOptions>[] ?? new List<IConfigureOptions<TOptions>>(configureOptions).ToArray();
+            _postConfigureOptions = postConfigureOptions as IPostConfigureOptions<TOptions>[] ?? new List<IPostConfigureOptions<TOptions>>(postConfigureOptions).ToArray();
+            _validations = validations as IValidateOptions<TOptions>[] ?? new List<IValidateOptions<TOptions>>(validations).ToArray();
+            _tenantConfigureOptions = tenantConfigureOptions as ITenantConfigureOptions<TOptions, TTenantInfo>[] ?? new List<ITenantConfigureOptions<TOptions, TTenantInfo>>(tenantConfigureOptions).ToArray();
+            _multiTenantContextAccessor = multiTenantContextAccessor;
         }
 
         public TOptions Create(string name)
         {
             var options = new TOptions();
-            foreach (var setup in configureOptions)
+            foreach (var setup in _configureOptions)
             {
                 if (setup is IConfigureNamedOptions<TOptions> namedSetup)
                 {
@@ -64,16 +58,34 @@ namespace Finbuckle.MultiTenant.Options
             }
 
             // Configure tenant options.
-            if(multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
+            if(_multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
             {
-                foreach(var tenantConfigureOption in tenantConfigureOptions)
-                    tenantConfigureOption.Configure(options, multiTenantContextAccessor.MultiTenantContext.TenantInfo);
+                foreach(var tenantConfigureOption in _tenantConfigureOptions)
+                    tenantConfigureOption.Configure(options, _multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }
 
-            foreach (var post in postConfigureOptions)
+            foreach (var post in _postConfigureOptions)
             {
                 post.PostConfigure(name, options);
             }
+            
+            if (_validations.Length > 0)
+            {
+                var failures = new List<string>();
+                foreach (IValidateOptions<TOptions> validate in _validations)
+                {
+                    ValidateOptionsResult result = validate.Validate(name, options);
+                    if (result is { Failed: true })
+                    {
+                        failures.AddRange(result.Failures);
+                    }
+                }
+                if (failures.Count > 0)
+                {
+                    throw new OptionsValidationException(name, typeof(TOptions), failures);
+                }
+            }
+            
             return options;
         }
     }

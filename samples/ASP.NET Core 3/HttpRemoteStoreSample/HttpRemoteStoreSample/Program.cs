@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
 namespace HttpRemoteStoreSample

@@ -1,3 +1,6 @@
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
 using Finbuckle.MultiTenant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -1,3 +1,22 @@
+## [6.4.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.0...v6.4.1) (2021-10-11)
+
+
+### Bug Fixes
+
+* options not validating ([d4c6f30](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d4c6f30d8d78b9e1c42a627f426a8ca867bc860f))
+
+# [6.4.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.1...v6.4.0) (2021-10-07)
+
+
+### Bug Fixes
+
+* ClaimStrategy bypass cookie principal validation ([#475](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/475)) ([cd38a7f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/cd38a7f25f3eb4ccbf3fcc546cf93f2d2463df39))
+
+
+### Features
+
+* add optional parameter to specify the ClaimStrategy authentication scheme. ([#398](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/398)) thanks @Valks! ([d74ae41](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d74ae41a71b9df6a95a711ef3bad6d4ebc9f73f7))
+
 ## [6.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.3.1) (2021-09-30)
 
 

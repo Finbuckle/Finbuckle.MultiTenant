@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
 using System.Security.Claims;
-using System.Threading.Tasks;
 using ClaimStrategySample.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace ClaimStrategySample
 {
@@ -30,17 +27,17 @@ namespace ClaimStrategySample
                 if (userManager.FindByNameAsync("alice@initech.com").Result == null)
                 {
                     var alice = new IdentityUser{ UserName = "alice@initech.com", Email = "alice@initech.com", EmailConfirmed = true};
-                    var result = userManager.CreateAsync(alice).Result;
-                    result = userManager.AddPasswordAsync(alice, "Pass123$").Result;
-                    result = userManager.AddClaimAsync(alice, new Claim("__tenant__", "initech")).Result;
+                    userManager.CreateAsync(alice).Wait();
+                    userManager.AddPasswordAsync(alice, "Pass123$").Wait();
+                    userManager.AddClaimAsync(alice, new Claim("__tenant__", "initech")).Wait();
                 }
 
                 if (userManager.FindByNameAsync("bob@megacorp.com").Result == null)
                 {
                     var bob = new IdentityUser{ UserName = "bob@megacorp.com", Email = "bob@megacorp.com", EmailConfirmed = true};
-                    var result = userManager.CreateAsync(bob).Result;
-                    result = userManager.AddPasswordAsync(bob, "Pass123$").Result;
-                    result = userManager.AddClaimAsync(bob, new Claim("__tenant__", "megacorp")).Result;
+                    userManager.CreateAsync(bob).Wait();
+                    userManager.AddPasswordAsync(bob, "Pass123$").Wait();
+                    userManager.AddClaimAsync(bob, new Claim("__tenant__", "megacorp")).Wait();
                 }
             }
 

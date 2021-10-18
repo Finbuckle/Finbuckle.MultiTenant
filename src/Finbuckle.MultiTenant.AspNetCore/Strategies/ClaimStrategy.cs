@@ -1,35 +1,34 @@
-//    Copyright 2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
+// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant.Strategies
 {
+	// ReSharper disable once ClassNeverInstantiated.Global
 	public class ClaimStrategy : IMultiTenantStrategy
 	{
 		private readonly string _tenantKey;
-		public ClaimStrategy(string template)
+		private readonly string _authenticationScheme;
+
+		public ClaimStrategy(string template) : this(template, null)
+		{
+		}
+		
+		public ClaimStrategy(string template, string authenticationScheme)
 		{
 			if (string.IsNullOrWhiteSpace(template))
 				throw new ArgumentException(nameof(template));
 
 			_tenantKey = template;
+			_authenticationScheme = authenticationScheme;
 		}
 
 		public async Task<string> GetIdentifierAsync(object context)
@@ -37,8 +36,22 @@ namespace Finbuckle.MultiTenant.Strategies
 			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
+			if (httpContext.User.Identity is { IsAuthenticated: true })
+				return httpContext.User.FindFirst(_tenantKey)?.Value;
+			
+			AuthenticationScheme authScheme;
 			var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-			var authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
+			if (_authenticationScheme is null)
+			{
+				authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
+			}
+			else
+			{
+				authScheme = (await schemeProvider.GetAllSchemesAsync()).FirstOrDefault(x => x.Name == _authenticationScheme);
+			}
+
+			if (authScheme is null)
+				throw new NullReferenceException("No authentication scheme found.");
 			
 			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
 			await handler.InitializeAsync(authScheme, httpContext);

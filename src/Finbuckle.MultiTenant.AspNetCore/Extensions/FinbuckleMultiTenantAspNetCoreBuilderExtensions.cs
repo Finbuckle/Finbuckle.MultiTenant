@@ -1,29 +1,17 @@
-//    Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors
-// 
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-// 
-//        http://www.apache.org/licenses/LICENSE-2.0
-// 
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
 
 using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.AspNetCore.Authentication;
-using Finbuckle.MultiTenant.AspNetCore;
-using Finbuckle.MultiTenant.Strategies;
-using Finbuckle.MultiTenant;
-using Microsoft.AspNetCore.Routing;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Strategies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using System.Security.Claims;
-using Finbuckle.MultiTenant.Internal;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 // ReSharper disable once CheckNamespace
@@ -47,8 +35,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures per-tenant authentication behavior.
         /// </summary>
-        /// <param name="config">Authentication options config</param>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
+        /// <param name="config">Authentication options config.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        // ReSharper disable once MemberCanBePrivate.Global
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
              where TTenantInfo : class, ITenantInfo, new()
         {
@@ -63,6 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configures conventional functionality for per-tenant authentication.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        [SuppressMessage("ReSharper", "EmptyGeneralCatchClause")]
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
             this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config = null)
             where TTenantInfo : class, ITenantInfo, new()
@@ -75,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Events.OnValidatePrincipal = async context =>
                 {
                     // Skip if bypass set (e.g. ClaimsStrategy in effect)
-                    if(context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principle__"))
+                    if(context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principal__"))
                         return;
                     
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
@@ -130,6 +121,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Configures core functionality for per-tenant authentication.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="config">Authentication options config</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationCore<TTenantInfo>(
@@ -139,7 +131,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
 
             config ??= _ => { };
-            builder.Services.Configure<MultiTenantAuthenticationOptions>(config);
+            builder.Services.Configure(config);
             
             // We need to "decorate" IAuthenticationService so callbacks so that
             // remote authentication can get the tenant from the authentication
@@ -158,6 +150,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a SessionStrategy to the application.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
@@ -166,6 +159,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a SessionStrategy to the application.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="tenantKey">The session key to use.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
@@ -201,6 +195,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a RouteStrategy to the application.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantParam)
@@ -208,10 +203,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
-                throw new ArgumentException("Invalud value for \"tenantParam\"", nameof(tenantParam));
+                throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
             }
 
-            return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, new object[] { tenantParam });
+            return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, tenantParam);
         }
 // #endif
 
@@ -226,6 +221,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a HostStrategy to the application.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="template">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string template)
@@ -236,26 +232,59 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentException("Invalid value for \"template\"", nameof(template));
             }
 
-            return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, new object[] { template });
+            return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, template);
         }
 
         /// <summary>
-        /// Adds and configures a ClaimStrategy with tenantKey "__tenant__" to the application.
+        /// Adds and configures a ClaimStrategy for claim name "__tenant__" to the application. Uses the default authentication handler scheme.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
+            return builder.WithClaimStrategy(Constants.TenantToken);
+        }
+        
+        /// <summary>
+        /// Adds and configures a ClaimStrategy to the application. Uses the default authentication handler scheme.
+        /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
+        /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        {
+            BypassSessionPrincipalValidation(builder);
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
         }
 
         /// <summary>
         /// Adds and configures a ClaimStrategy to the application.
         /// </summary>
-        /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
+        /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
+        /// <param name="authenticationScheme">The authentication scheme to check for claims.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme) where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
+            BypassSessionPrincipalValidation(builder);
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
+        }
+
+        private static void BypassSessionPrincipalValidation<TTenantInfo>(FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new()
+        {
+            builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
+            {
+                var origOnValidatePrincipal = options.Events.OnValidatePrincipal;
+                options.Events.OnValidatePrincipal = async context =>
+                {
+                    // Skip if bypass set (e.g. ClaimStrategy in effect)
+                    if (context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principal__"))
+                        return;
+
+                    if (origOnValidatePrincipal != null)
+                        await origOnValidatePrincipal(context);
+                };
+            });
         }
 
         /// <summary>
@@ -270,6 +299,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a Header to the application.
         /// </summary>
+        /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey) where TTenantInfo : class, ITenantInfo, new()
