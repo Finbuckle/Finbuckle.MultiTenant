@@ -15,12 +15,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TVersionTenantInfo>
             WithPerTenantManagedCacheOptions<TVersionTenantInfo, TOptions>(
-            FinbuckleMultiTenantBuilder<TVersionTenantInfo> builder,
+            this FinbuckleMultiTenantBuilder<TVersionTenantInfo> builder,
             Action<TOptions, TVersionTenantInfo> tenantConfigureOptions)
         where TOptions : class, new()
         where TVersionTenantInfo : class, IVersionTenantInfo, new()
-
-    {
+        {
         builder.WithPerTenantOptions(tenantConfigureOptions);
         builder.Services.TryAddSingleton<TenantVersionStore>();
         builder.Services.TryAddSingleton(new MultiTenantOptionMark(typeof(TOptions)));
