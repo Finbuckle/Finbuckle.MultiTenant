@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset.Internal
 {
@@ -42,12 +40,12 @@ namespace Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset.Internal
                 foreach (var tenantOptionMark in context.RequestServices.GetServices<MultiTenantOptionMark>())
                 {
                     (_serviceProvider.GetRequiredService(tenantOptionMark.OptionsMonitorCacheOptionType) as
-                        IOptionsMonitorCache<object>)?.Clear();
-                    
+                        IClearableMultiTenantOptionsCache)?.Clear();
+
                     (_serviceProvider.GetRequiredService(tenantOptionMark.OptionsCacheOptionType) as
-                        MultiTenantOptionsManager<object>)?.Reset();
-                    
-                }            
+                        IResettableMultiTenantOptionsManager)?.Reset();
+                }          
+            
             _tenantVersionStore.SetVersion(tenantInfo.Id, tenantInfo.Version);
             
             if (_next != null)
