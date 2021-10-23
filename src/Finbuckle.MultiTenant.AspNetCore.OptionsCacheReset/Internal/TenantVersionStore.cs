@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset.Internal
         /// <returns> Tenant version </returns>
         public int GetVersion(string tenantId)
         {
-            return _tenantVersionDictionary.TryGetValue(tenantId, out var version) ? 0 : version;
+            return _tenantVersionDictionary.TryGetValue(tenantId, out var version) ? version : 0;
         }
 
         /// <summary>
