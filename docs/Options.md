@@ -95,3 +95,22 @@ In some situations cached options may need to be cleared so that the options can
 When using per-tenant options via `IOptions<TOptions>` and `IOptionsSnapshot<TOptions>` the injected instance is of type `MultiTenantOptionsManager<TOptions>`. Casting to this type exposes the `Reset()` method which clears any internal caching for the current tenant and cause the options to be regenerated when next accessed via `Value` or `Get(string name)`.
 
 When using per-tenant options with `IOptionsMonitor<TOptions>` each injected instance uses a shared persistent cache. This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>` which has a `Clear()` method that will clear the cache for the current tenant. Casting the `IOptionsMonitorCache<TOptions>` instance to `MultiTenantOptionsCache<TOptions>` exposes the `Clear(string tenantId)` and `ClearAll()` methods. `Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if the parameter is empty or null). `ClearAll()` clears all cached options (including regular non per-tenant options).
+
+You can also use the automatic cache reset feature by install the `Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset`  NuGet package :
+
+.NET Core CLI
+```bash
+$ dotnet add package Finbuckle.MultiTenant.AspNetCore.OptionsCacheReset
+```
+
+### how Work?
+this Helper Track Tenant Version during request and if Version of Option in the cache is not equal to tenant resolve by `app.UseMultiTenant()` will clear cached options of the current Tenant
+
+### Usage
+1. use `IVersionTenantInfo` instead of `ITenantInfo`
+2. use `WithPerTenantManagedCacheOptions<TVersionTenantInfo, TOption>` instead of `WithPerTenantOptions<TOption>`
+3. add `app.UseMultiTenantOptionsResetManager<YourTenantInfo>()` after `app.UseMultiTenant()`
+
+now change value of `TenantInfo.Version` when some tenant options need to change 
+
+See the AutoOptionsCacheReset sample projects in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples)
