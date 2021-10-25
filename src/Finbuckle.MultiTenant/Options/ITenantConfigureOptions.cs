@@ -3,7 +3,7 @@
 
 namespace Finbuckle.MultiTenant.Options
 {
-    interface ITenantConfigureOptions<TOptions, TTenantInfo>
+    public interface ITenantConfigureOptions<TOptions, TTenantInfo>
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()
     {
