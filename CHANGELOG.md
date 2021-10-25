@@ -1,3 +1,10 @@
+## [6.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.1...v6.4.2) (2021-10-25)
+
+
+### Bug Fixes
+
+* change Options types from internal to public ([#483](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/483)) ([af9521d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/af9521d993ce1c0369662c8db26d790c06c521f3))
+
 ## [6.4.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.0...v6.4.1) (2021-10-11)
 
 
