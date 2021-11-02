@@ -6,17 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions
 {
     public class MultiTenantBuilderExtensionsShould
     {
-        public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
-        {
-            public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
-            {
-            }
-        }
-
         [Fact]
         public void AddEfCoreStore()
         {

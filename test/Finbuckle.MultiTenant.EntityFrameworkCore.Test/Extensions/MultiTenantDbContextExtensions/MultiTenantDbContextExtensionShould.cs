@@ -7,14 +7,14 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantDbContextExtensions
 {
-    public class MultiTenantDbContextExtensionShould
+    public class MultiTenantDbContextExtensionsShould
     {
-        private DbContextOptions _options;
-        private DbConnection _connection;
+        private readonly DbContextOptions _options;
+        private readonly DbConnection _connection;
 
-        public MultiTenantDbContextExtensionShould()
+        public MultiTenantDbContextExtensionsShould()
         {
             _connection = new SqliteConnection("DataSource=:memory:");
             _options = new DbContextOptionsBuilder()
@@ -37,7 +37,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantNotSetMode.Throw, should act as Overwrite when adding
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -50,7 +50,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantNotSetMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -83,7 +83,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantMismatchMode.Throw
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -97,7 +97,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Ignore 
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -111,7 +111,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -145,7 +145,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantNotSetMode.Throw
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -161,7 +161,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantNotSetMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -198,7 +198,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantMismatchMode.Throw
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -214,7 +214,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Ignore
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -231,7 +231,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -268,7 +268,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantNotSetMode.Throw
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -285,7 +285,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantNotSetMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -322,7 +322,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 };
 
                 // TenantMismatchMode.Throw
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();
@@ -339,7 +339,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Ignore
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.TenantMismatchMode = TenantMismatchMode.Ignore;
                     var blog1 = db.Blogs.First();
@@ -350,7 +350,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions
                 }
 
                 // TenantMismatchMode.Overwrite
-                using (var db = new TestBlogDbContext(tenant1, _options))
+                using (var db = new TestDbContext(tenant1, _options))
                 {
                     db.Database.EnsureDeleted();
                     db.Database.EnsureCreated();

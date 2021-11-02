@@ -4,7 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
 {
     public class MultiTenantDbContextShould
     {

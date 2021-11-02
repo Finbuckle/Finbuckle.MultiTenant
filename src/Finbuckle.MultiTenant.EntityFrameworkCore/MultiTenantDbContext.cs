@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     {
-        public ITenantInfo TenantInfo { get; }
+        public ITenantInfo TenantInfo { get; internal set; }
 
         public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
