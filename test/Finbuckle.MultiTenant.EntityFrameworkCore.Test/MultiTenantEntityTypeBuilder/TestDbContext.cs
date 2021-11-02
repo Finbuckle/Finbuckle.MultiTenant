@@ -1,0 +1,57 @@
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more inforation.
+
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantEntityTypeBuilder
+{
+    public class TestDbContext : MultiTenant.MultiTenantDbContext
+    {
+        private readonly Action<ModelBuilder> _config;
+
+        public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(
+            new TenantInfo { Id = "dummy" },
+            options)
+        {
+            this._config = config;
+        }
+
+        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Post> Posts { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            _config(builder);
+        }
+    }
+    
+    public class Blog
+    {
+        public int BlogId { get; set; }
+        public string Url { get; set; }
+
+        public List<Post> Posts { get; set; }
+    }
+
+    public class Post
+    {
+        public int PostId { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
+
+        public Blog Blog { get; set; }
+        // public int BlogId { get; set; }
+    }
+        
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
+    {
+        public object Create(DbContext context)
+        {
+            return new Object(); // Never cache!
+        }
+    }
+}

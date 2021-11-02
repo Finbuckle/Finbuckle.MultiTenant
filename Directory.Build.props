@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Version>6.4.2</Version>
         <Authors>Finbuckle LLC</Authors>
-        <Copyright>Copyright 2018-2020 Finbuckle LLC, Andrew White, and Contributors</Copyright>
+        <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>

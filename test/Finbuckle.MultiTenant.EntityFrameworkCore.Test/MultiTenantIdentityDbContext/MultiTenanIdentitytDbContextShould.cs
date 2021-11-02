@@ -2,86 +2,14 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
-using System.Data.Common;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbContext
 {
-    public class MultiTenantIdentityDbContextShould : IDisposable
+    public class MultiTenantIdentityDbContextShould
     {
-        public class TestIdentityDbContext : MultiTenantIdentityDbContext
-        {
-            public TestIdentityDbContext(TenantInfo tenantInfo)
-                : base(tenantInfo)
-            {
-            }
-
-            public TestIdentityDbContext(TenantInfo tenantInfo, DbContextOptions options)
-                : base(tenantInfo, options)
-            {
-            }
-        }
-
-        public class TestIdentityDbContextTUser : MultiTenantIdentityDbContext<IdentityUser>
-        {
-            public TestIdentityDbContextTUser(TenantInfo tenantInfo)
-                : base(tenantInfo)
-            {
-            }
-
-            public TestIdentityDbContextTUser(TenantInfo tenantInfo, DbContextOptions options)
-                : base(tenantInfo, options)
-            {
-            }
-        }
-
-        public class TestIdentityDbContextTUserTRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string>
-        {
-            public TestIdentityDbContextTUserTRole(TenantInfo tenantInfo)
-                : base(tenantInfo)
-            {
-            }
-
-            public TestIdentityDbContextTUserTRole(TenantInfo tenantInfo, DbContextOptions options)
-                : base(tenantInfo, options)
-            {
-            }
-        }
-
-        public class TestIdentityDbContextAll : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
-        {
-
-            public TestIdentityDbContextAll(TenantInfo tenantInfo)
-                : base(tenantInfo)
-            {
-            }
-
-            public TestIdentityDbContextAll(TenantInfo tenantInfo, DbContextOptions options)
-                : base(tenantInfo, options)
-            {
-            }
-        }
-        
-        private readonly DbContextOptions _options;
-        private readonly DbConnection _connection = new SqliteConnection("DataSource=:memory:");
-
-        public MultiTenantIdentityDbContextShould()
-        {
-            _connection.Open();
-            _options = new DbContextOptionsBuilder()
-                    .UseSqlite(_connection)
-                    .Options;
-
-        }
-
-        public void Dispose()
-        {
-            _connection.Close();
-        }
-
         [Fact]
         public void WorkWithSingleParamCtor()
         {
@@ -90,13 +18,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
-            var c = new TestIdentityDbContext(tenant1);
+            using var c = new TestIdentityDbContext(tenant1);
 
             Assert.NotNull(c);
         }
-        
+
         [Theory]
         [InlineData(typeof(IdentityUser), true)]
         [InlineData(typeof(IdentityRole), true)]
@@ -112,9 +40,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
-            var c = new TestIdentityDbContext(tenant1, _options);
+            using var c = new TestIdentityDbContext(tenant1);
 
             Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
         }
@@ -134,9 +62,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
-            var c = new TestIdentityDbContextTUser(tenant1, _options);
+            using var c = new TestIdentityDbContextTUser(tenant1);
 
             Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
         }
@@ -156,9 +84,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
-            var c = new TestIdentityDbContextTUserTRole(tenant1, _options);
+            using var c = new TestIdentityDbContextTUserTRole(tenant1);
 
             Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
         }
@@ -178,9 +106,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
-            var c = new TestIdentityDbContextAll(tenant1, _options);
+            using var c = new TestIdentityDbContextAll(tenant1);
 
             Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
         }
