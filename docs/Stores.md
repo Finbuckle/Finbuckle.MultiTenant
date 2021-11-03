@@ -132,7 +132,7 @@ The configuration section should use this JSON format shown below. Any fields in
       },
     "Tenants": [
       {
-        "Id": "unique-id-0ff4adaf",
+        "Id": "unique-id-0ff4daf",
         "Identifier": "tenant-1",
         "Name": "Tenant 1 Company Name",
         "ACustomProperty": "VIP Customer"
@@ -278,7 +278,7 @@ deserialization.
 Each tenant info instance is actually stored twice in the cache, once using the
 Tenant Id as the key and another using the Tenant Identifier as the key. Calls
 to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will keep these dual
-cache entries synched.
+cache entries synced.
 
 This store does not implement `GetAllAsync`.
 

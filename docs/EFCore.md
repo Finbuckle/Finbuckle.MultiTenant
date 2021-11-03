@@ -193,7 +193,7 @@ for the current tenant.
 
 ## Deriving from MultiTenantDbContext
 This approach is easier bit requires inheriting from `MultiTenantDbContext` which
-may not alway be possible. It is simply a pre-configured implementation of
+may not always be possible. It is simply a pre-configured implementation of
 `IMultiTenantDbContext` with the helper methods as described below in
 (Adding MultiTenant Functionality to an Existing DbContext)
 [#adding-multitenant-functionality-to-an-existing-dbcontext]
@@ -359,7 +359,7 @@ By default attempting to add or update an entity with a different `TenantId` pro
 
 ## Tenant Not Set Mode
 
-If the `TenantId` on an entity is manually set to null the default behavior is to overwrite the `TenantId` for adde entities or to throw a `MultiTenantException` for updated entities. This occurs during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSetMode' property on the database context:
+If the `TenantId` on an entity is manually set to null the default behavior is to overwrite the `TenantId` for added entities or to throw a `MultiTenantException` for updated entities. This occurs during a call to `SaveChanges` or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSetMode' property on the database context:
 
 * TenantNotSetMode.Throw - For added entities the null `TenantId` will be overwritten to match the database context's current `TenantInfo`. For updated entities a `MultiTenantException` is thrown (default).
 * TenantNotSetMode.Overwrite - The entity's `TenantId` is overwritten to match the database context's current `TenantInfo`.
