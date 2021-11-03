@@ -17,7 +17,7 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: true
         env:
-          DOTNET_INSTALL_DOR: 'C:\Program Files\dotnet'
+          DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
       - name: test Finbuckle.MultiTenanant
         run: dotnet test -f net5.0
         working-directory: ./test/Finbuckle.MultiTenant.Test
