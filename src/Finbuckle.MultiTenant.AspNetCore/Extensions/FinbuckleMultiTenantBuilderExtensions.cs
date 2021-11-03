@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Provides builder methods for Finbuckle.MultiTenant services and configuration.
     /// </summary>
-    public static class FinbuckleMultiTenantBuilderExtensionsAspNetCore
+    public static class FinbuckleMultiTenantBuilderExtensions
     {
         /// <summary>
         /// Configures authentication options to enable per-tenant behavior.
@@ -78,7 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     else
                     {
                         var loggerFactory = context.HttpContext.RequestServices.GetService<ILoggerFactory>();
-                        loggerFactory.CreateLogger(typeof(FinbuckleMultiTenantBuilderExtensionsAspNetCore)).LogWarning("No tenant found in authentication properties.");
+                        loggerFactory.CreateLogger<FinbuckleMultiTenantBuilder<TTenantInfo>>().LogWarning("No tenant found in authentication properties.");
                     }
 
                     // Does the current tenant match the auth property tenant?

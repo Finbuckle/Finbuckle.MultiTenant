@@ -108,16 +108,15 @@ namespace MultiTenantEntityTypeBuilderShould
         {
             using (var db = GetDbContext(builder =>
                 {
-                    var key = builder.Entity<Blog>().Metadata.GetKeys().First();
-
-                    builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+                    var key = builder.Entity<Post>().Metadata.GetKeys().First();
+                    builder.Entity<Post>().IsMultiTenant().AdjustKey(key, builder);
                 }))
             {
-                var key = db.Model.FindEntityType(typeof(Blog)).GetKeys().ToList();
+                var key = db.Model.FindEntityType(typeof(Post)).GetKeys().ToList();
 
                 Assert.Single(key);
                 Assert.Equal(2, key[0].Properties.Count);
-                Assert.Contains("BlogId", key[0].Properties.Select(p => p.Name));
+                Assert.Contains("PostId", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
             }
         }
@@ -147,7 +146,6 @@ namespace MultiTenantEntityTypeBuilderShould
             using (var db = GetDbContext(builder =>
                 {
                     var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
-
                     builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
                 }))
             {
