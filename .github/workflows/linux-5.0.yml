@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
-      - name: setup dotnet 5.0.x
+      - name: setup dotnet
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0'
