@@ -140,12 +140,7 @@ Note that an app will have to [configure session state](https://docs.microsoft.c
 ## Route Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Note: the configuration and use of this strategy differs in ASP.NET Core 2.1 and ASP.NET Core 3.1+.
-
 Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}` would use "initech" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in the route path configuration. This strategy is configured as a singleton.
-
-**ASP.NET Core 3 or higher**
- The route strategy is improved in ASP.NET Core 3 due to the new endpoint routing mechanism. Configure by calling `WithRouteStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. A different route parameter name can be specified with the overloaded version. Then in the app pipeline make sure to call `UseRouting` before `UseMultiTenant`:
 
 ```cs
 public class Startup
@@ -159,12 +154,12 @@ public class Startup
                 .WithRouteStrategy()...
         
         // Alternatively set a different route parameter name of "MyTenantRouteParam":
-        services.AddMultiTenant<TenantInfo>()
-                .WithRouteStrategy("MyTenantRouteParam")...
+        // services.AddMultiTenant<TenantInfo>()
+        //         .WithRouteStrategy("MyTenantRouteParam")...
         
         // Other services...
 
-        services.AddMvc();
+        services.AddControllersWithViews(); // /AddMvc() for ASP.NET Core 3.1
 
         // Other services...
     }
@@ -189,59 +184,16 @@ public class Startup
 }
 ```
 
-**ASP.NET Core 2.1**
-Configure by calling `WithRouteStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. An `Action<IRouteBuilder>` parameter which configures the routing is passed in which should always match the routes configured with MVC.  A different route parameter name can be specified with the overloaded version:
-
-```cs
-public class Startup
-{
-    public void ConfigureServices(IServiceCollection services)
-    {
-        // Other services...
-
-        // Use the default route parameter name "__tenant__":
-        services.AddMultiTenant<TenantInfo>()
-                .WithRouteStrategy(configRoutes)...
-        
-        // Alternatively set a different route parameter name of "MyTenantRouteParam":
-        services.AddMultiTenant<TenantInfo>()
-                .WithRouteStrategy("MyTenantRouteParam", configRoutes)...
-        
-        // Other services...
-
-        services.AddMvc();
-
-        // Other services...
-    }
-
-    public void Configure(IAppBuilder app, ...)
-    {
-        // Other middleware...
-
-        app.UseMultiTenant();
-        
-        // Other middleware...
-        
-        app.UseMvc(ConfigRoutes);
-    }
-
-    private void ConfigRoutes(IRouteBuilder routes)
-    {
-        routes.MapRoute("Default", "{__tenant__}/{controller=Home}/{action=Index}");
-    }
-}
-```
-
 ## Host Strategy
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
 Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request to "https://initech.example.com/abc123" would use "initech" as the identifier when resolving the tenant. This strategy can be difficult to use in a development environment. Make sure the development system is configured properly to allow subdomains on `localhost`. This strategy is configured as a singleton.
 
 The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern specifies the location for the tenant identifier using "\_\_tenant\_\_" and can contain other valid domain characters. It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
-  - `__tenant__.*` is the default if no pattern is provided and selects the first domain segment for the tenant identifier.
-  - `*.__tenant__.?` selects the main domain as the tenant identifier and ignores any subdomains and the top level domain.
+  - `__tenant__.*` is the default if no pattern is provided and selects the first (or only) domain segment as the tenant identifier.
+  - `*.__tenant__.?` selects the main domain (or second to last) as the tenant identifier.
   - `__tenant__.example.com` will always use the subdomain for the tenant identifier, but only if there are no prior subdomains and the overall host ends with "example.com".
-  - `*.__tenant.__.?.?` is similar to the above example except it will select the first subdomain even if others exist and doesn't require ".com".
+  - `*.__tenant__.?.?` is similar to the above example except it will select the first subdomain even if others exist and doesn't require ".com".
   - As a special case, a pattern string of just `__tenant__` will use the entire host as the tenant identifier, as opposed to a single segment.
 
 Configure by calling `WithHostStrategy` after `AddMultiTenant<T>` in the `ConfigureServices` method of the `Startup` class. A template pattern can be specified with the overloaded version:
