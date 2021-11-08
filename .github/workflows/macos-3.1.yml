@@ -14,8 +14,7 @@ jobs:
       - name: setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0'
-          include-prerelease: true
+          dotnet-version: '6.0.x'
       - name: test Finbuckle.MultiTenanant
         run: dotnet test -f netcoreapp3.1
         working-directory: ./test/Finbuckle.MultiTenant.Test
