@@ -1,4 +1,4 @@
-name: Windows (.NET 5.0)
+name: Windows (.NET 6.0)
 
 on:
   push:
@@ -19,11 +19,11 @@ jobs:
         env:
           DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
       - name: test Finbuckle.MultiTenanant
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenanant.AspNetCore
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test

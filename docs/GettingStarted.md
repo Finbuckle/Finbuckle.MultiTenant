@@ -64,13 +64,13 @@ See [Stores](Stores) for more information.
 
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various ways.
 
-`app.UseEndPoints`
+`app.UseMultiTenant()`
 
-This line configures the middleware which resolves the tenant using the registered strategies, stores, and other settings. Be sure to call it before calling `UseEndpoints` and other middleware which will use per-tenant functionality, e.g. `UseAuthentication`.
+This line configures the middleware which resolves the tenant using the registered strategies, stores, and other settings. Be sure to call it before calling `UseEndpoints()` and other middleware which will use per-tenant functionality, e.g. `UseAuthentication()`.
 
 ## Basic Usage
 
-With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext` object accessed from the `GetMultiTenantContext<T>` extension method:
+With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on the `MultiTenantContext<T>` object accessed from the `GetMultiTenantContext<T>` extension method:
 
 ```cs
 var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;

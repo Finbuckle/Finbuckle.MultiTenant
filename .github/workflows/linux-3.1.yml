@@ -11,10 +11,13 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
-      - name: setup dotnet 3.1.x
+      - name: setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: '6.0'
+          include-prerelease: true
+        env:
+          DOTNET_INSTALL_DIR: /usr/share/dotnet
       - name: test Finbuckle.MultiTenanant
         run: dotnet test -f netcoreapp3.1
         working-directory: ./test/Finbuckle.MultiTenant.Test

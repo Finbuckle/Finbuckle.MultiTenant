@@ -1,4 +1,4 @@
-name: Windows (.NET 5.0)
+name: Linux (.NET 6.0)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   os-tests:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -17,13 +17,14 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: true
         env:
-          DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
+          DOTNET_INSTALL_DIR: /usr/share/dotnet
       - name: test Finbuckle.MultiTenanant
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenanant.AspNetCore
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
-        run: dotnet test -f net5.0
+        run: dotnet test -f net6.0
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
+        

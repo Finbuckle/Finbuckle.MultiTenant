@@ -11,17 +11,20 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
-      - name: setup dotnet 5.0.x
+      - name: setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.x
+          dotnet-version: '6.0'
+          include-prerelease: true
+        env:
+          DOTNET_INSTALL_DIR: /usr/share/dotnet
       - name: test Finbuckle.MultiTenanant
         run: dotnet test -f net5.0
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenanant.AspNetCore
-        run: dotnet test -f .net5.0
+        run: dotnet test -f net5.0
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenanant.EntityFrameworkCore
-        run: dotnet test -f .net5.0
+        run: dotnet test -f net5.0
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
         
