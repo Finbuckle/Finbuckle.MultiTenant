@@ -1,3 +1,10 @@
+# [6.5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.2...v6.5.0) (2021-11-08)
+
+
+### Features
+
+* add .NET 6 support ([#489](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/489)) ([a2d0416](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a2d041670bf7efb198b06a864bad0a4cfc490a0c))
+
 ## [6.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.1...v6.4.2) (2021-10-25)
 
 
