@@ -4,16 +4,19 @@
 
 Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation. See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-
 ## Main Build and Test Status
 
-![Build Status Linux 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-3.1.yml/badge.svg)  
-![Build Status MacOS 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-3.1.yml/badge.svg?)  
-![Build Status Windows 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-3.1.yml/badge.svg)
+![Build Status Linux 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-6.0.yml/badge.svg)  
+![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-6.0.yml/badge.svg)  
+![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-6.0.yml/badge.svg)
 
 ![Build Status Linux 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-5.0.yml/badge.svg)  
 ![Build Status MacOS 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-5.0.yml/badge.svg)  
 ![Build Status Windows 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-5.0.yml/badge.svg)
+
+![Build Status Linux 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-3.1.yml/badge.svg)  
+![Build Status MacOS 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-3.1.yml/badge.svg?)  
+![Build Status Windows 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-3.1.yml/badge.svg)
 
 ## License
 
@@ -71,10 +74,9 @@ Finally, in the `Configure` method call `UseMultiTenant()` to register the middl
 public void Configure(IApplicationBuilder app)
 {
     ...
-    app.UseMultiTenant(); // Before UseMvc!
+    app.UseMultiTenant(); // Before UseEndpoints!
     ...
-    //app.UseMvc(); // for .NET Core 3.1
-    app.UseEndpoints(...); // for .NET 5.0+
+    app.UseEndpoints(...);
 }
 ```
 
