@@ -13,7 +13,7 @@ jobs:
         env:
           DOTNET_INSTALL_DIR: /usr/share/dotnet
       - name: Create the package
-        run: dotnet test -c Release || dotnet pack --no-build -c Release --output nupkgs
+        run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
       - name: Publish the package to NuGet.org
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
