@@ -15,7 +15,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0'
-          include-prerelease: true
         env:
           DOTNET_INSTALL_DIR: 'C:\Program Files\dotnet'
       - name: test Finbuckle.MultiTenanant
