@@ -33,10 +33,9 @@ Finally, in the `Configure` method call `UseMultiTenant()` to register the middl
 public void Configure(IApplicationBuilder app)
 {
     ...
-    app.UseMultiTenant(); // Before UseMvc!
+    app.UseMultiTenant(); // Before UseEndponts
     ...
-    //app.UseMvc(); // for .NET Core 3.1
-    app.UseEndpoints(...); // for .NET 5.0+
+    app.UseEndpoints(...);
 }
 ```
 

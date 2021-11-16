@@ -61,12 +61,11 @@ public void Configure(IApplicationBuilder app)
 {
     app.UseRouting(); // In ASP.NET Core 3.1 this should be before UseMultiTenant!
     ...
-    app.UseMultiTenant(); // Before UseAuthentication and UseMvc!
+    app.UseMultiTenant(); // Before UseAuthentication and UseEndpoints
     ...
     app.UseAuthentication();
     ...
-    //app.UseMvc(); // for .NET Core 3.1
-    app.UseEndpoints(...); // for .NET 5.0+
+    app.UseEndpoints(...);
 }
 ```
 

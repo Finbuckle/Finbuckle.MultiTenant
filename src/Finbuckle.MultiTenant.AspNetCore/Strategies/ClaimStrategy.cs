@@ -55,9 +55,9 @@ namespace Finbuckle.MultiTenant.Strategies
 			
 			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
 			await handler.InitializeAsync(authScheme, httpContext);
-			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principle__"] = "true"; // Value doesn't matter.
+			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
 			var handlerResult = await handler.AuthenticateAsync();
-			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principle__");
+			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
 
 			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
 			return await Task.FromResult(identifier);
