@@ -1,3 +1,10 @@
+## [6.5.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.0...v6.5.1) (2021-11-17)
+
+
+### Bug Fixes
+
+* ClaimStrategy validation bypass type principle changed to principal ([#493](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/493)) ([fbfd022](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fbfd0228c8b30a5f663fd2dfade0ae1b5bda09da))
+
 # [6.5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.2...v6.5.0) (2021-11-08)
 
 
