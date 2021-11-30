@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.Stores
     {
         private static readonly string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
-        private ConcurrentDictionary<string, TTenantInfo> tenantMap;
+        private ConcurrentDictionary<string, TTenantInfo>? tenantMap;
 
         public ConfigurationStore(IConfiguration configuration) : this(configuration, defaultSectionName)
         {
@@ -50,12 +50,11 @@ namespace Finbuckle.MultiTenant.Stores
 
             foreach(var tenantSection in tenants)
             {
-                var newTenant = section.GetSection("Defaults").Get<TTenantInfo>((options => options.BindNonPublicProperties = true)) ?? new TTenantInfo();
+                var newTenant = section.GetSection("Defaults").Get<TTenantInfo>(options => options.BindNonPublicProperties = true) ?? new TTenantInfo();
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
                 newMap.TryAdd(newTenant.Identifier, newTenant);
             }
 
-            var oldMap = tenantMap;
             tenantMap = newMap;
         }
 
