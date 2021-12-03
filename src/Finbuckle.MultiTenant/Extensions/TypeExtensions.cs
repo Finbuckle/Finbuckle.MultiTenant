@@ -16,7 +16,7 @@ namespace Finbuckle.MultiTenant
                 return source.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == unboundGeneric);
             }
 
-            Type toCheck = source;
+            Type? toCheck = source;
 
             if (unboundGeneric != toCheck)
             {

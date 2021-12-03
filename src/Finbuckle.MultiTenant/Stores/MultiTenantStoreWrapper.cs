@@ -23,14 +23,14 @@ namespace Finbuckle.MultiTenant.Stores
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<TTenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo?> TryGetAsync(string id)
         {
             if (id == null)
             {
                 throw new ArgumentNullException(nameof(id));
             }
 
-            TTenantInfo result = null;
+            TTenantInfo? result = null;
 
             try
             {
@@ -58,7 +58,7 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
-            IEnumerable<TTenantInfo> result = null;
+            IEnumerable<TTenantInfo>? result = null;
 
             try
             {
@@ -72,14 +72,14 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            TTenantInfo result = null;
+            TTenantInfo? result = null;
 
             try
             {

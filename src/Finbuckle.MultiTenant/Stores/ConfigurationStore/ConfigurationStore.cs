@@ -52,7 +52,11 @@ namespace Finbuckle.MultiTenant.Stores
             {
                 var newTenant = section.GetSection("Defaults").Get<TTenantInfo>(options => options.BindNonPublicProperties = true) ?? new TTenantInfo();
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-                newMap.TryAdd(newTenant.Identifier, newTenant);
+
+                if (newTenant.Identifier != null)
+                {
+                    newMap.TryAdd(newTenant.Identifier, newTenant);
+                }
             }
 
             tenantMap = newMap;
@@ -63,26 +67,31 @@ namespace Finbuckle.MultiTenant.Stores
             throw new NotImplementedException();
         }
 
-        public async Task<TTenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo?> TryGetAsync(string id)
         {
             if (id is null)
             {
                 throw new ArgumentNullException(nameof(id));
             }
 
-            return await Task.FromResult(tenantMap.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
+            return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
         }
 
         public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
-            return await Task.FromResult(tenantMap.Select(x => x.Value).ToList());
+            return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>());
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier is null)
             {
                 throw new ArgumentNullException(nameof(identifier));
+            }
+
+            if (tenantMap is null)
+            {
+                return null;
             }
 
             return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);

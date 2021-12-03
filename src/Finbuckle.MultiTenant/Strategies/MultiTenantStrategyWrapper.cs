@@ -19,14 +19,14 @@ namespace Finbuckle.MultiTenant.Strategies
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            string identifier = null;
+            string? identifier = null;
 
             try
             {

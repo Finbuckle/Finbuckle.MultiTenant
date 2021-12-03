@@ -41,7 +41,7 @@ namespace Finbuckle.MultiTenant.Stores
             throw new System.NotImplementedException();
         }
 
-        public Task<TTenantInfo> TryGetAsync(string id)
+        public Task<TTenantInfo?> TryGetAsync(string id)
         {
             throw new System.NotImplementedException();
         }
@@ -51,7 +51,7 @@ namespace Finbuckle.MultiTenant.Stores
 	        throw new NotImplementedException();
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             var result = await client.TryGetByIdentifierAsync(endpointTemplate, identifier);
             return result;

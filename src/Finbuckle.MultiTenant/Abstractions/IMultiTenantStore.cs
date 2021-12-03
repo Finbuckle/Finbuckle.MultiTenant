@@ -37,14 +37,14 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        Task<TTenantInfo> TryGetByIdentifierAsync(string identifier);
+        Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier);
 
         /// <summary>
         /// Retrieve the TTenantInfo for a given tenant Id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<TTenantInfo> TryGetAsync(string id);
+        Task<TTenantInfo?> TryGetAsync(string id);
 
 
         /// <summary>

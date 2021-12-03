@@ -10,7 +10,12 @@ namespace Finbuckle.MultiTenant
     /// </summary>
     public class MultiTenantException : Exception
     {
-        public MultiTenantException(string message, Exception innerException = null)
-            : base(message, innerException) { }
+        public MultiTenantException(string? message) : base(message)
+        {
+        }
+
+        public MultiTenantException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
     }
 }
