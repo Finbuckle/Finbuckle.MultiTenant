@@ -69,7 +69,7 @@ namespace Finbuckle.MultiTenant.Stores
                 logger.LogError(e, "Exception in GetAllAsync");
             }
 
-            return result;
+            return result != null ? result : new List<TTenantInfo>();
         }
 
         public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
