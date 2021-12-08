@@ -7,7 +7,6 @@ namespace Finbuckle.MultiTenant
 {
     public class StoreInfo<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
-        // TODO: Should these be null?
         public Type? StoreType { get; internal set; }
         public IMultiTenantStore<TTenantInfo>? Store { get; internal set; }
     }

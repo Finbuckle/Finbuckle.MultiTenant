@@ -58,7 +58,7 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
-            IEnumerable<TTenantInfo>? result = null;
+            IEnumerable<TTenantInfo> result = new List<TTenantInfo>();
 
             try
             {
@@ -69,7 +69,7 @@ namespace Finbuckle.MultiTenant.Stores
                 logger.LogError(e, "Exception in GetAllAsync");
             }
 
-            return result != null ? result : new List<TTenantInfo>();
+            return result;
         }
 
         public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)

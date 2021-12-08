@@ -53,10 +53,8 @@ namespace Finbuckle.MultiTenant.Stores
                 var newTenant = section.GetSection("Defaults").Get<TTenantInfo>(options => options.BindNonPublicProperties = true) ?? new TTenantInfo();
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
 
-                if (newTenant.Identifier != null)
-                {
-                    newMap.TryAdd(newTenant.Identifier, newTenant);
-                }
+                // Throws an ArgumentNullException if the identifier is null.
+                newMap.TryAdd(newTenant.Identifier!, newTenant);
             }
 
             tenantMap = newMap;
