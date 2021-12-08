@@ -22,16 +22,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<ITenantResolver<T>, TenantResolver<T>>();
             services.AddScoped<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
 
-            services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext);
-            
-            services.AddScoped<T>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo);
-            services.AddScoped<ITenantInfo>(sp => sp.GetService<T>());
-            
+            services.AddScoped<IMultiTenantContext<T>>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext!);
+
+            services.AddScoped<T>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo!);
+            services.AddScoped<ITenantInfo>(sp => sp.GetService<T>()!);
+
             services.AddSingleton<IMultiTenantContextAccessor<T>, MultiTenantContextAccessor<T>>();
             services.AddSingleton<IMultiTenantContextAccessor>(sp => (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<T>>());
-            
+
             services.Configure<MultiTenantOptions>(config);
-            
+
             return new FinbuckleMultiTenantBuilder<T>(services);
         }
 
@@ -55,13 +55,13 @@ namespace Microsoft.Extensions.DependencyInjection
             var newService = new ServiceDescriptor(existingService.ServiceType,
                                            sp =>
                                            {
-                                               TService inner = (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
+                                               TService inner = (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType!);
 
                                                var parameters2 = new object[parameters.Length + 1];
                                                Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
                                                parameters2[0] = inner;
 
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2);
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                                            },
                                            existingService.Lifetime);
 
@@ -71,7 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                            sp =>
                                            {
                                                TService inner = (TService)existingService.ImplementationInstance;
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters);
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
                                            },
                                            existingService.Lifetime);
             }
@@ -81,7 +81,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                            sp =>
                                            {
                                                TService inner = (TService)existingService.ImplementationFactory(sp);
-                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters);
+                                               return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
                                            },
                                            existingService.Lifetime);
             }

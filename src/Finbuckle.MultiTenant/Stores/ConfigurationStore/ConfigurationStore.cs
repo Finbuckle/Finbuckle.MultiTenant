@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
-        private static readonly string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
+        private const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
         private ConcurrentDictionary<string, TTenantInfo>? tenantMap;
 
@@ -97,7 +97,7 @@ namespace Finbuckle.MultiTenant.Stores
             return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
         }
 
-        public Task<bool> TryRemoveAsync(string id)
+        public Task<bool> TryRemoveAsync(string identifier)
         {
             throw new NotImplementedException();
         }

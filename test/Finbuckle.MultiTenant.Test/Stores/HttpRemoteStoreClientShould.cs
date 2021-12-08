@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         [Fact]
         public void ThrowIfHttpClientFactoryIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo>(null));
-        }   
+            Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo>(null!));
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
-            var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+            var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
 
             manager.Get(optionName);
 
@@ -32,9 +32,9 @@ namespace Finbuckle.MultiTenant.Test.Options
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
-            var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+            var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
 
-            manager.Get(null);
+            manager.Get(null!);
 
             mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == Microsoft.Extensions.Options.Options.DefaultName), It.IsAny<Func<Object>>()), Times.Once);
         }
@@ -45,7 +45,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
-            var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+            var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
 
             var dummy = manager.Value;
 
@@ -58,7 +58,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var mock = new Mock<TestOptionsCache<Object>>();
             mock.Setup(i => i.Clear());
 
-            var manager = new MultiTenantOptionsManager<Object>(null, mock.Object);
+            var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
             manager.Reset();
 
             mock.Verify(i => i.Clear(), Times.Once);

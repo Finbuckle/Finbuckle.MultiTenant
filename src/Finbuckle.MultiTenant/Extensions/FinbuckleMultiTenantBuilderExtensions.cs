@@ -23,9 +23,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds a DistributedCacheStore to the application.
         /// </summary>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
-            where TTenantInfo : class, ITenantInfo, new()   
+            where TTenantInfo : class, ITenantInfo, new()
             => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
-        
+
 
         /// <summary>
         /// Adds a DistributedCacheStore to the application.
@@ -121,10 +121,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
-                throw new ArgumentException("Invalid value for \"identifier\"", nameof(identifier));
+                throw new ArgumentNullException(nameof(identifier), "Invalid value for \"identifier\"");
             }
 
-            return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, new object[] { identifier }); ;
+            return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, new object[] { identifier });
         }
 
         /// <summary>

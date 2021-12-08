@@ -164,18 +164,18 @@ namespace Finbuckle.MultiTenant.Stores
             return result;
         }
 
-        public async Task<bool> TryRemoveAsync(string id)
+        public async Task<bool> TryRemoveAsync(string identifier)
         {
-            if (id == null)
+            if (identifier == null)
             {
-                throw new ArgumentNullException(nameof(id));
+                throw new ArgumentNullException(nameof(identifier));
             }
 
             var result = false;
 
             try
             {
-                result = await Store.TryRemoveAsync(id);
+                result = await Store.TryRemoveAsync(identifier);
             }
             catch (Exception e)
             {
@@ -184,11 +184,11 @@ namespace Finbuckle.MultiTenant.Stores
 
             if (result)
             {
-                logger.LogDebug("TryRemoveAsync: Tenant Id: \"{TenantId}\" removed", id);
+                logger.LogDebug("TryRemoveAsync: Tenant Identifier: \"{TenantIdentifier}\" removed", identifier);
             }
             else
             {
-                logger.LogDebug("TryRemoveAsync: Unable to remove Tenant Id: \"{TenantId}\"", id);
+                logger.LogDebug("TryRemoveAsync: Unable to remove Tenant Identifier: \"{TenantIdentifier}\"", identifier);
             }
 
             return result;

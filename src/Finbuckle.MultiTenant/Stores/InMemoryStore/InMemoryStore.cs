@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.Stores
             var stringComparer = StringComparer.OrdinalIgnoreCase;
             if(this.options.IsCaseSensitive)
                 stringComparer = StringComparer.Ordinal;
-            
+
             tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
             foreach(var tenant in this.options.Tenants)
             {
@@ -41,14 +41,14 @@ namespace Finbuckle.MultiTenant.Stores
         public virtual async Task<TTenantInfo?> TryGetAsync(string id)
         {
             var result = tenantMap.Values.Where(ti => ti.Id == id).SingleOrDefault();
-            
+
             return await Task.FromResult(result);
         }
 
         public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             tenantMap.TryGetValue(identifier, out var result);
-            
+
             return await Task.FromResult(result);
         }
 

@@ -29,7 +29,7 @@ namespace Finbuckle.MultiTenant
             Stores = stores;
             this.options = options;
             this.loggerFactory = loggerFactory;
-            
+
             Strategies = strategies.OrderByDescending(s => s.Priority);
         }
 

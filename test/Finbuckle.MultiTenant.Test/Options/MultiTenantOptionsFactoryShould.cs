@@ -25,7 +25,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "test-id-123" } };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Get(name);
-            Assert.Equal($"{name}_begin_{accessor.MultiTenantContext.TenantInfo.Id}_end", options.DefaultConnectionString);
+            Assert.Equal($"{name}_begin_{accessor.MultiTenantContext.TenantInfo!.Id}_end", options.DefaultConnectionString);
         }
 
         [Theory]
@@ -46,7 +46,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "id", Identifier = "identifier" } };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Get(name);
-            Assert.Equal($"{name}_begin_{accessor.MultiTenantContext.TenantInfo.Id}_{accessor.MultiTenantContext.TenantInfo.Identifier}_end", options.DefaultConnectionString);
+            Assert.Equal($"{name}_begin_{accessor.MultiTenantContext.TenantInfo!.Id}_{accessor.MultiTenantContext.TenantInfo.Identifier}_end", options.DefaultConnectionString);
         }
 
         [Fact]
