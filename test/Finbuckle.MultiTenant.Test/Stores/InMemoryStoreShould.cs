@@ -72,6 +72,19 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         [Fact]
+        public void FailIfAddingWithoutTenantIdentifier()
+        {
+            var store = CreateCaseSensitiveTestStore();
+            var ti = new TenantInfo
+            {
+                Id = "NullTenant",
+                Name = "NullTenant"
+            };
+
+            Assert.False(store.TryAddAsync(ti).Result);
+        }
+
+        [Fact]
         public void ThrowIfDuplicateIdentifierInOptionsTenants()
         {
             var services = new ServiceCollection();

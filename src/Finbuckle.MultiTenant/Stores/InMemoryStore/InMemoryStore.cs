@@ -59,8 +59,7 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
-            // Throws an ArgumentNullException if the identifier is null.
-            var result = tenantMap.TryAdd(tenantInfo.Identifier!, tenantInfo);
+            var result = tenantInfo.Identifier != null && tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
             return await Task.FromResult(result);
         }
