@@ -9,18 +9,18 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class BasePathStrategy : IMultiTenantStrategy
     {
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
-            if(!(context is HttpContext))
+            if(!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
-            var path = (context as HttpContext).Request.Path;
+            var path = httpContext.Request.Path;
 
             var pathSegments =
-                path.Value.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                path.Value?.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (pathSegments.Length == 0)
+            if (pathSegments is null || pathSegments.Length == 0)
                 return null;
 
             string identifier = pathSegments[0];

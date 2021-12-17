@@ -21,16 +21,14 @@ namespace Finbuckle.MultiTenant.Strategies
             this.tenantParam = tenantParam;
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
 
-            if (!(context is HttpContext))
+            if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
-            var httpContext = context as HttpContext;
-
-            object identifier = null;
+            object? identifier;
             httpContext.Request.RouteValues.TryGetValue(tenantParam, out identifier);
 
             return await Task.FromResult(identifier as string);

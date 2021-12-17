@@ -18,6 +18,5 @@ namespace Microsoft.AspNetCore.Builder
         /// <returns>The same IApplicationBuilder passed into the method.</returns>
         public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder)
             => builder.UseMiddleware<MultiTenantMiddleware>();
-        
     }
 }

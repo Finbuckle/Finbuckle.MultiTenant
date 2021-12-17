@@ -57,18 +57,18 @@ namespace Finbuckle.MultiTenant.AspNetCore
         private readonly IDictionary<string, AuthenticationScheme> _schemes;
         private readonly List<AuthenticationScheme> _requestHandlers;
 
-        private Task<AuthenticationScheme> GetDefaultSchemeAsync()
+        private Task<AuthenticationScheme?> GetDefaultSchemeAsync()
             => _optionsProvider.Value.DefaultScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultScheme)
-            : Task.FromResult<AuthenticationScheme>(null);
+            : Task.FromResult<AuthenticationScheme?>(null);
 
         /// <summary>
         /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.AuthenticateAsync(HttpContext, string)"/>.
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultAuthenticateScheme"/>.
         /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
         /// </summary>
-        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.AuthenticateAsync(HttpContext, string)"/>.</returns>
-        public virtual Task<AuthenticationScheme> GetDefaultAuthenticateSchemeAsync()
+        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.AuthenticateAsync(HttpContext, string)"/> or null if not found.</returns>
+        public virtual Task<AuthenticationScheme?> GetDefaultAuthenticateSchemeAsync()
             => _optionsProvider.Value.DefaultAuthenticateScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultAuthenticateScheme)
             : GetDefaultSchemeAsync();
@@ -78,8 +78,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultChallengeScheme"/>.
         /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
         /// </summary>
-        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ChallengeAsync(HttpContext, string, AuthenticationProperties)"/>.</returns>
-        public virtual Task<AuthenticationScheme> GetDefaultChallengeSchemeAsync()
+        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ChallengeAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
+        public virtual Task<AuthenticationScheme?> GetDefaultChallengeSchemeAsync()
             => _optionsProvider.Value.DefaultChallengeScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultChallengeScheme)
             : GetDefaultSchemeAsync();
@@ -89,8 +89,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultForbidScheme"/>.
         /// Otherwise, this will fallback to <see cref="GetDefaultChallengeSchemeAsync"/> .
         /// </summary>
-        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ForbidAsync(HttpContext, string, AuthenticationProperties)"/>.</returns>
-        public virtual Task<AuthenticationScheme> GetDefaultForbidSchemeAsync()
+        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ForbidAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
+        public virtual Task<AuthenticationScheme?> GetDefaultForbidSchemeAsync()
             => _optionsProvider.Value.DefaultForbidScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultForbidScheme)
             : GetDefaultChallengeSchemeAsync();
@@ -100,8 +100,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultSignInScheme"/>.
         /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
         /// </summary>
-        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignInAsync(HttpContext, string, System.Security.Claims.ClaimsPrincipal, AuthenticationProperties)"/>.</returns>
-        public virtual Task<AuthenticationScheme> GetDefaultSignInSchemeAsync()
+        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignInAsync(HttpContext, string, System.Security.Claims.ClaimsPrincipal, AuthenticationProperties)"/> or null if not found.</returns>
+        public virtual Task<AuthenticationScheme?> GetDefaultSignInSchemeAsync()
             => _optionsProvider.Value.DefaultSignInScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultSignInScheme)
             : GetDefaultSchemeAsync();
@@ -111,8 +111,8 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultSignOutScheme"/>.
         /// Otherwise this will fallback to <see cref="GetDefaultSignInSchemeAsync"/> if that supoorts sign out.
         /// </summary>
-        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/>.</returns>
-        public virtual Task<AuthenticationScheme> GetDefaultSignOutSchemeAsync()
+        /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
+        public virtual Task<AuthenticationScheme?> GetDefaultSignOutSchemeAsync()
             => _optionsProvider.Value.DefaultSignOutScheme != null
             ? GetSchemeAsync(_optionsProvider.Value.DefaultSignOutScheme)
             : GetDefaultSignInSchemeAsync();
@@ -122,7 +122,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="name">The name of the authenticationScheme.</param>
         /// <returns>The scheme or null if not found.</returns>
-        public virtual Task<AuthenticationScheme> GetSchemeAsync(string name)
+        public virtual Task<AuthenticationScheme?> GetSchemeAsync(string name)
             => Task.FromResult(_schemes.ContainsKey(name) ? _schemes[name] : null);
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
             => Task.FromResult<IEnumerable<AuthenticationScheme>>(_requestHandlers);
 
         /// <summary>
-        /// Registers a scheme for use by <see cref="IAuthenticationService"/>. 
+        /// Registers a scheme for use by <see cref="IAuthenticationService"/>.
         /// </summary>
         /// <param name="scheme">The scheme.</param>
         public virtual void AddScheme(AuthenticationScheme scheme)

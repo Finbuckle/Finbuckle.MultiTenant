@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         [SuppressMessage("ReSharper", "EmptyGeneralCatchClause")]
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
-            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config = null)
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions>? config = null)
             where TTenantInfo : class, ITenantInfo, new()
         {
             // Set events to set and validate tenant for each cookie based authentication principal.
@@ -68,9 +68,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     // Skip if bypass set (e.g. ClaimsStrategy in effect)
                     if(context.HttpContext.Items.Keys.Contains($"{Constants.TenantToken}__bypass_validate_principal__"))
                         return;
-                    
+
                     var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>()?.TenantInfo?.Identifier;
-                    string authTenant = null;
+                    string? authTenant = null;
                     if (context.Properties.Items.ContainsKey(Constants.TenantToken))
                     {
                         authTenant = context.Properties.Items[Constants.TenantToken];
@@ -78,15 +78,14 @@ namespace Microsoft.Extensions.DependencyInjection
                     else
                     {
                         var loggerFactory = context.HttpContext.RequestServices.GetService<ILoggerFactory>();
-                        loggerFactory.CreateLogger<FinbuckleMultiTenantBuilder<TTenantInfo>>().LogWarning("No tenant found in authentication properties.");
+                        loggerFactory?.CreateLogger<FinbuckleMultiTenantBuilder<TTenantInfo>>().LogWarning("No tenant found in authentication properties.");
                     }
 
                     // Does the current tenant match the auth property tenant?
                     if(!string.Equals(currentTenant, authTenant, StringComparison.OrdinalIgnoreCase))
                         context.RejectPrincipal();
-                    
-                    if(origOnValidatePrincipal != null)
-                        await origOnValidatePrincipal(context);
+
+                    await origOnValidatePrincipal(context);
                 };
             });
 
@@ -107,14 +106,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 try { options.ClientId = ((string)d.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier); } catch { }
                 try { options.ClientSecret = ((string)d.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier); } catch { }
             });
-            
+
             var challengeSchemeProp = typeof(TTenantInfo).GetProperty("ChallengeScheme");
             if (challengeSchemeProp != null && challengeSchemeProp.PropertyType == typeof(string))
             {
                 builder.WithPerTenantOptions<AuthenticationOptions>((options, tc)
-                    => options.DefaultChallengeScheme = (string)challengeSchemeProp.GetValue(tc) ?? options.DefaultChallengeScheme);
+                    => options.DefaultChallengeScheme = (string?)challengeSchemeProp.GetValue(tc) ?? options.DefaultChallengeScheme);
             }
-            
+
             return builder;
         }
 
@@ -125,21 +124,21 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="config">Authentication options config</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationCore<TTenantInfo>(
-            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config =
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions>? config =
                 null)
             where TTenantInfo : class, ITenantInfo, new()
         {
 
             config ??= _ => { };
             builder.Services.Configure(config);
-            
+
             // We need to "decorate" IAuthenticationService so callbacks so that
             // remote authentication can get the tenant from the authentication
             // properties in the state parameter.
             if (builder.Services.All(s => s.ServiceType != typeof(IAuthenticationService)))
                 throw new MultiTenantException("WithPerTenantAuthenticationCore() must be called after AddAuthentication() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
-            
+
             // Replace IAuthenticationSchemeProvider so that the options aren't
             // cached and can be used per-tenant.
             builder.Services.Replace(ServiceDescriptor.Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
@@ -183,7 +182,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStrategy<BasePathStrategy>(ServiceLifetime.Singleton);
-        
+
         /// <summary>
         /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
         /// </summary>
@@ -243,7 +242,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             return builder.WithClaimStrategy(Constants.TenantToken);
         }
-        
+
         /// <summary>
         /// Adds and configures a ClaimStrategy to the application. Uses the default authentication handler scheme.
         /// </summary>

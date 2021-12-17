@@ -4,6 +4,7 @@
     <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

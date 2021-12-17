@@ -30,10 +30,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
                 accessor.MultiTenantContext = multiTenantContext;
             }
 
-            if (next != null)
-            {
-                await next(context);
-            }
+            await next(context);
         }
     }
 }

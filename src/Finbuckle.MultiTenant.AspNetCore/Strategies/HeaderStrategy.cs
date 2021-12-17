@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.Strategies
             _headerKey = headerKey;
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
