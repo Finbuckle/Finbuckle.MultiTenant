@@ -19,7 +19,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
             var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
             var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(IMultiTenantContext<TenantInfo>));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(TenantInfo));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(ITenantInfo));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(IMultiTenantContextAccessor));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Singleton, service!.Lifetime);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(IMultiTenantContextAccessor<TenantInfo>));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Singleton, service!.Lifetime);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
                                                         s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>));
 
             Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
+            Assert.Equal(ServiceLifetime.Singleton, service!.Lifetime);
         }
     }
 }

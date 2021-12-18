@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<string> GetIdentifierAsync(object context);
+        Task<string?> GetIdentifierAsync(object context);
         
         /// <summary>
         ///  Determines strategy execution order. Normally handled in the order registered.

@@ -10,13 +10,13 @@ namespace Finbuckle.MultiTenant.Strategies
         internal readonly string identifier;
 
         public int Priority { get => -1000; }
-        
+
         public StaticStrategy(string identifier)
         {
             this.identifier = identifier;
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
             return await Task.FromResult(identifier);
         }

@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -17,16 +18,16 @@ namespace Finbuckle.MultiTenant.Test.Stores
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings_NoDefaults.json");
             IConfiguration configuration = configBuilder.Build();
-        
+
             // ReSharper disable once ObjectCreationAsStatement
             // Will throw if fail
             new ConfigurationStore<TenantInfo>(configuration);
         }
-    
+
         [Fact]
         public void ThrowIfNullConfiguration()
         {
-            Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null));
+            Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null!));
         }
 
         [Fact]
@@ -37,7 +38,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             IConfiguration configuration = configBuilder.Build();
 
             Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, ""));
-            Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null));
+            Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null!));
         }
 
         [Fact]
@@ -55,7 +56,15 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result.Identifier);
+            Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result!.Identifier);
+        }
+
+        [Fact]
+        public void ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
+        {
+            var store = CreateTestStore();
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs

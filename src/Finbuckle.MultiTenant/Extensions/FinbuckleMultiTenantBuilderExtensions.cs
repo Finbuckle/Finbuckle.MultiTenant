@@ -23,9 +23,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds a DistributedCacheStore to the application.
         /// </summary>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
-            where TTenantInfo : class, ITenantInfo, new()   
+            where TTenantInfo : class, ITenantInfo, new()
             => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
-        
+
 
         /// <summary>
         /// Adds a DistributedCacheStore to the application.
@@ -34,7 +34,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
             where TTenantInfo : class, ITenantInfo, new()
         {
-            return builder.WithStore<DistributedCacheStore<TTenantInfo>>(ServiceLifetime.Transient, Constants.TenantToken, slidingExpiration);
+            var storeParams = slidingExpiration is null ? new object[] { Constants.TenantToken } : new object[] { Constants.TenantToken, slidingExpiration };
+
+            return builder.WithStore<DistributedCacheStore<TTenantInfo>>(ServiceLifetime.Transient, storeParams);
         }
 
         /// <summary>
@@ -53,10 +55,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                                                 string endpointTemplate,
-                                                                                                Action<IHttpClientBuilder> clientConfig) where TTenantInfo : class, ITenantInfo, new()
+                                                                                                Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : class, ITenantInfo, new()
         {
-            var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName);
-            if (clientConfig != null)
+            var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
+            if (clientConfig != null && httpClientBuilder != null)
                 clientConfig(httpClientBuilder);
 
             builder.Services.TryAddSingleton<HttpRemoteStoreClient<TTenantInfo>>();
@@ -119,10 +121,10 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
-                throw new ArgumentException("Invalid value for \"identifier\"", nameof(identifier));
+                throw new ArgumentNullException(nameof(identifier), "Invalid value for \"identifier\"");
             }
 
-            return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, new object[] { identifier }); ;
+            return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, new object[] { identifier });
         }
 
         /// <summary>

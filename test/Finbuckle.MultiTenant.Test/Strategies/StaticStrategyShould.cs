@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Strategies;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace Finbuckle.MultiTenant.Test.Strategies
         [InlineData("")] // empty string
         [InlineData("    ")] // whitespace
         [InlineData(null)] // null
-        public async void ReturnExpectedIdentifier(string staticIdentifier)
+        public async Task ReturnExpectedIdentifier(string staticIdentifier)
         {
             var strategy = new StaticStrategy(staticIdentifier);
 

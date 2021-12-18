@@ -17,28 +17,28 @@ namespace Finbuckle.MultiTenant
         where T : class, ITenantInfo, new()
     {
         private readonly IOptionsMonitor<MultiTenantOptions> options;
-        private readonly ILoggerFactory loggerFactory;
+        private readonly ILoggerFactory? loggerFactory;
 
         public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options) :
             this(strategies, stores, options, null)
         {
         }
 
-        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory loggerFactory)
+        public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory? loggerFactory)
         {
             Stores = stores;
             this.options = options;
             this.loggerFactory = loggerFactory;
-            
+
             Strategies = strategies.OrderByDescending(s => s.Priority);
         }
 
         public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
         public IEnumerable<IMultiTenantStore<T>> Stores { get; set; }
 
-        public async Task<IMultiTenantContext<T>> ResolveAsync(object context)
+        public async Task<IMultiTenantContext<T>?> ResolveAsync(object context)
         {
-            IMultiTenantContext<T> result = null;
+            IMultiTenantContext<T>? result = null;
 
             foreach (var strategy in Strategies)
             {
@@ -64,7 +64,7 @@ namespace Finbuckle.MultiTenant
                             result.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
                             result.TenantInfo = tenantInfo;
 
-                            await options.CurrentValue?.Events?.OnTenantResolved(new TenantResolvedContext { Context = context, TenantInfo = tenantInfo });
+                            await options.CurrentValue.Events.OnTenantResolved(new TenantResolvedContext { Context = context, TenantInfo = tenantInfo });
 
                             break;
                         }
@@ -73,14 +73,14 @@ namespace Finbuckle.MultiTenant
                     if (result != null)
                         break;
 
-                    await options.CurrentValue?.Events?.OnTenantNotResolved(new TenantNotResolvedContext { Context = context, Identifier = identifier });
+                    await options.CurrentValue.Events.OnTenantNotResolved(new TenantNotResolvedContext { Context = context, Identifier = identifier });
                 }
             }
 
             return result;
         }
 
-        async Task<object> ITenantResolver.ResolveAsync(object context)
+        async Task<object?> ITenantResolver.ResolveAsync(object context)
         {
             var multiTenantContext = await ResolveAsync(context);
             return multiTenantContext;

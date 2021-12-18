@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
             var identifier = await doStrategy(context);
             return await Task.FromResult(identifier);

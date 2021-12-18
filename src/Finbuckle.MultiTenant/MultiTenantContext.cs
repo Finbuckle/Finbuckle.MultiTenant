@@ -9,8 +9,8 @@ namespace Finbuckle.MultiTenant
     public class MultiTenantContext<T> : IMultiTenantContext<T>
         where T : class, ITenantInfo, new()
     {
-        public T TenantInfo { get; set; }
-        public StrategyInfo StrategyInfo { get; set; }
-        public StoreInfo<T> StoreInfo { get; set; }
+        public T? TenantInfo { get; set; }
+        public StrategyInfo? StrategyInfo { get; set; }
+        public StoreInfo<T>? StoreInfo { get; set; }
     }
 }

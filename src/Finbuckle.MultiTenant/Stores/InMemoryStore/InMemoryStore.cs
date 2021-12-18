@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.Stores
             var stringComparer = StringComparer.OrdinalIgnoreCase;
             if(this.options.IsCaseSensitive)
                 stringComparer = StringComparer.Ordinal;
-            
+
             tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
             foreach(var tenant in this.options.Tenants)
             {
@@ -38,17 +38,17 @@ namespace Finbuckle.MultiTenant.Stores
             }
         }
 
-        public virtual async Task<TTenantInfo> TryGetAsync(string id)
+        public virtual async Task<TTenantInfo?> TryGetAsync(string id)
         {
             var result = tenantMap.Values.Where(ti => ti.Id == id).SingleOrDefault();
-            
+
             return await Task.FromResult(result);
         }
 
-        public virtual async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             tenantMap.TryGetValue(identifier, out var result);
-            
+
             return await Task.FromResult(result);
         }
 
@@ -59,23 +59,23 @@ namespace Finbuckle.MultiTenant.Stores
 
         public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
-            var result = tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
+            var result = tenantInfo.Identifier != null && tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
             return await Task.FromResult(result);
         }
 
         public async Task<bool> TryRemoveAsync(string identifier)
         {
-            var result = tenantMap.TryRemove(identifier, out var dummy);
+            var result = tenantMap.TryRemove(identifier, out var _);
 
             return await Task.FromResult(result);
         }
 
         public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
-            var existingTenantInfo = await TryGetAsync(tenantInfo.Id);
+            var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id) : null;
 
-            if(existingTenantInfo != null)
+            if (existingTenantInfo?.Identifier != null)
             {
                 var result =  tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
                 return await Task.FromResult(result);

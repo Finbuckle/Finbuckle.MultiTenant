@@ -31,11 +31,11 @@ namespace Finbuckle.MultiTenant.Test.Strategies
 
             Assert.Equal(identifier, result);
         }
-    
+
         [Fact]
         public void ThrowIfNullDelegate()
         {
-            Assert.Throws<ArgumentNullException>(() => new DelegateStrategy(null));
+            Assert.Throws<ArgumentNullException>(() => new DelegateStrategy(null!));
         }
     }
 }

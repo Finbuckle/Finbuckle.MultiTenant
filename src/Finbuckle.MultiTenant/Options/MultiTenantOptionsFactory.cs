@@ -5,7 +5,6 @@
 //    https://github.com/dotnet/runtime/blob/5aad989cebe00f0987fcb842ea5b7cbe986c67df/src/libraries/Microsoft.Extensions.Options/src/OptionsFactory.cs
 
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options
@@ -34,7 +33,7 @@ namespace Finbuckle.MultiTenant.Options
             // by checking for an array and enumerate over that, so we don't need to allocate an enumerator.
             // When it isn't already an array, convert it to one, but don't use System.Linq to avoid pulling Linq in to
             // small trimmed applications.
-            
+
             _configureOptions = configureOptions as IConfigureOptions<TOptions>[] ?? new List<IConfigureOptions<TOptions>>(configureOptions).ToArray();
             _postConfigureOptions = postConfigureOptions as IPostConfigureOptions<TOptions>[] ?? new List<IPostConfigureOptions<TOptions>>(postConfigureOptions).ToArray();
             _validations = validations as IValidateOptions<TOptions>[] ?? new List<IValidateOptions<TOptions>>(validations).ToArray();
@@ -68,7 +67,7 @@ namespace Finbuckle.MultiTenant.Options
             {
                 post.PostConfigure(name, options);
             }
-            
+
             if (_validations.Length > 0)
             {
                 var failures = new List<string>();
@@ -85,7 +84,7 @@ namespace Finbuckle.MultiTenant.Options
                     throw new OptionsValidationException(name, typeof(TOptions), failures);
                 }
             }
-            
+
             return options;
         }
     }

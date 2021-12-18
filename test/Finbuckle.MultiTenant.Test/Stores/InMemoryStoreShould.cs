@@ -40,14 +40,14 @@ namespace Finbuckle.MultiTenant.Test.Stores
         public void GetTenantInfoFromStoreCaseInsensitiveByDefault()
         {
             var store = CreateTestStore();
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("iNitEch").Result.Identifier);
+            Assert.Equal("initech", store.TryGetByIdentifierAsync("iNitEch").Result!.Identifier);
         }
 
         [Fact]
         public void GetTenantInfoFromStoreCaseSensitive()
         {
             var store = CreateCaseSensitiveTestStore();
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
+            Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result!.Identifier);
             Assert.Null(store.TryGetByIdentifierAsync("iNitEch").Result);
         }
 
@@ -69,6 +69,19 @@ namespace Finbuckle.MultiTenant.Test.Stores
             };
             Assert.False(store.TryAddAsync(ti1).Result);
             Assert.True(store.TryAddAsync(ti2).Result);
+        }
+
+        [Fact]
+        public void FailIfAddingWithoutTenantIdentifier()
+        {
+            var store = CreateCaseSensitiveTestStore();
+            var ti = new TenantInfo
+            {
+                Id = "NullTenant",
+                Name = "NullTenant"
+            };
+
+            Assert.False(store.TryAddAsync(ti).Result);
         }
 
         [Fact]
@@ -109,7 +122,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
-            var store = new InMemoryStore<TenantInfo>(null);
+            var store = new InMemoryStore<TenantInfo>(null!);
 
             return PopulateTestStore(store);
         }

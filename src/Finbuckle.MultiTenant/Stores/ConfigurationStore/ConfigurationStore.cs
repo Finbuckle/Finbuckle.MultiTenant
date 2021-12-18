@@ -13,9 +13,9 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
     {
-        private static readonly string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
+        private const string defaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
         private readonly IConfigurationSection section;
-        private ConcurrentDictionary<string, TTenantInfo> tenantMap;
+        private ConcurrentDictionary<string, TTenantInfo>? tenantMap;
 
         public ConfigurationStore(IConfiguration configuration) : this(configuration, defaultSectionName)
         {
@@ -50,12 +50,13 @@ namespace Finbuckle.MultiTenant.Stores
 
             foreach(var tenantSection in tenants)
             {
-                var newTenant = section.GetSection("Defaults").Get<TTenantInfo>((options => options.BindNonPublicProperties = true)) ?? new TTenantInfo();
+                var newTenant = section.GetSection("Defaults").Get<TTenantInfo>(options => options.BindNonPublicProperties = true) ?? new TTenantInfo();
                 tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-                newMap.TryAdd(newTenant.Identifier, newTenant);
+
+                // Throws an ArgumentNullException if the identifier is null.
+                newMap.TryAdd(newTenant.Identifier!, newTenant);
             }
 
-            var oldMap = tenantMap;
             tenantMap = newMap;
         }
 
@@ -64,32 +65,37 @@ namespace Finbuckle.MultiTenant.Stores
             throw new NotImplementedException();
         }
 
-        public async Task<TTenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo?> TryGetAsync(string id)
         {
             if (id is null)
             {
                 throw new ArgumentNullException(nameof(id));
             }
 
-            return await Task.FromResult(tenantMap.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
+            return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
         }
 
         public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
-            return await Task.FromResult(tenantMap.Select(x => x.Value).ToList());
+            return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>());
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             if (identifier is null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
+            if (tenantMap is null)
+            {
+                return null;
+            }
+
             return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
         }
 
-        public Task<bool> TryRemoveAsync(string id)
+        public Task<bool> TryRemoveAsync(string identifier)
         {
             throw new NotImplementedException();
         }

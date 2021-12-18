@@ -36,6 +36,16 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         [Fact]
+        public void RemoveReturnsFalseWhenNoMatchingIdentifierFound()
+        {
+            var store = CreateTestStore();
+
+            var r = store.TryRemoveAsync("DOESNOTEXIST").Result;
+
+            Assert.False(r);
+        }
+
+        [Fact]
         public void AddDualEntriesOnAddOrUpdate()
         {
             var store = CreateTestStore();
@@ -45,8 +55,8 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
             Assert.NotNull(t1);
             Assert.NotNull(t2);
-            Assert.Equal("lol-id", t1.Id);
-            Assert.Equal("lol-id", t2.Id);
+            Assert.Equal("lol-id", t1!.Id);
+            Assert.Equal("lol-id", t2!.Id);
             Assert.Equal("lol", t1.Identifier);
             Assert.Equal("lol", t2.Identifier);
         }
@@ -62,8 +72,8 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
             Assert.NotNull(t1);
             Assert.NotNull(t2);
-            Assert.Equal("lol-id", t1.Id);
-            Assert.Equal("lol-id", t2.Id);
+            Assert.Equal("lol-id", t1!.Id);
+            Assert.Equal("lol-id", t2!.Id);
             Assert.Equal("lol", t1.Identifier);
             Assert.Equal("lol", t2.Identifier);
         }
@@ -81,7 +91,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs
-    
+
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
             var services = new ServiceCollection();
@@ -89,7 +99,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             var sp = services.BuildServiceProvider();
 
             var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromSeconds(3));
-    
+
             return PopulateTestStore(store);
         }
 
@@ -128,7 +138,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             base.RemoveTenantInfoFromStore();
         }
-    
+
         [Fact]
         public override void UpdateTenantInfoInStore()
         {

@@ -25,7 +25,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            Assert.Equal("initech", store.TryGetAsync("initech-id").Result.Identifier);
+            Assert.Equal("initech", store.TryGetAsync("initech-id").Result!.Identifier);
         }
 
         //[Fact]
@@ -41,7 +41,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result.Identifier);
+            Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result!.Identifier);
         }
 
         //[Fact]

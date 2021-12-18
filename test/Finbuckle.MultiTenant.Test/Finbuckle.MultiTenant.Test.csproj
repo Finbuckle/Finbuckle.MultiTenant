@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,7 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
   </ItemGroup>
-    
+
   <ItemGroup>
     <None Include="*TestSettings*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

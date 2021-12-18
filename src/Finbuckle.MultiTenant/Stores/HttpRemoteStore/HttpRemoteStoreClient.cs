@@ -17,9 +17,9 @@ namespace Finbuckle.MultiTenant.Stores
             this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
         {
-            var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName);
+            var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
             var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.defaultEndpointTemplateIdentifierToken, identifier);
             var response = await client.GetAsync(uri);
 

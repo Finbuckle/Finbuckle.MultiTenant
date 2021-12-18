@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             {
                 var result = new HttpResponseMessage();
 
-                var numSegments = request.RequestUri.Segments.Length;
+                var numSegments = request.RequestUri!.Segments.Length;
                 if (string.Equals(request.RequestUri.Segments[numSegments - 1], "initech", StringComparison.OrdinalIgnoreCase))
                 {
 
@@ -41,7 +41,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         [Fact]
         public void ThrowIfTypedClientParamIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore<TenantInfo>(null, "http://example.com"));
+            Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore<TenantInfo>(null!, "http://example.com"));
         }
 
         [Theory]
@@ -77,7 +77,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             var store = new HttpRemoteStore<TenantInfo>(client, "http://example.com");
 
             var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
-            var endpointTemplate = field.GetValue(store);
+            var endpointTemplate = field?.GetValue(store);
 
             Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.defaultEndpointTemplateIdentifierToken}", endpointTemplate);
         }

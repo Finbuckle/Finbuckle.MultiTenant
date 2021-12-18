@@ -7,13 +7,13 @@ namespace Finbuckle.MultiTenant
 {
     public class TenantInfo : ITenantInfo
     {
-        private string id;
+        private string? id;
 
         public TenantInfo()
         {
         }
 
-        public string Id
+        public string? Id
         {
             get
             {
@@ -32,8 +32,8 @@ namespace Finbuckle.MultiTenant
             }
         }
 
-        public string Identifier { get; set; }
-        public string Name { get; set; }
-        public string ConnectionString { get; set; }
+        public string? Identifier { get; set; }
+        public string? Name { get; set; }
+        public string? ConnectionString { get; set; }
     }
 }

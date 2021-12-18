@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
-            var store = new MultiTenantStoreWrapper<TenantInfo>(new InMemoryStore<TenantInfo>(null), NullLogger.Instance);
+            var store = new MultiTenantStoreWrapper<TenantInfo>(new InMemoryStore<TenantInfo>(null!), NullLogger.Instance);
 
             return PopulateTestStore(store);
         }
@@ -36,7 +36,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var e = Assert.Throws<AggregateException>(() => store.TryGetAsync(null).Result);
+            var e = Assert.Throws<AggregateException>(() => store.TryGetAsync(null!).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -57,7 +57,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var e = Assert.Throws<AggregateException>(() => store.TryGetByIdentifierAsync(null).Result);
+            var e = Assert.Throws<AggregateException>(() => store.TryGetByIdentifierAsync(null!).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -71,7 +71,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         public void ThrowWhenAddingIfTenantInfoIsNull()
         {
             var store = CreateTestStore();
-            var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(null).Result);
+            var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(null!).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -80,6 +80,14 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
             var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo()).Result);
+            Assert.IsType<ArgumentNullException>(e.InnerException);
+        }
+
+        [Fact]
+        public void ThrowWhenAddingIfTenantInfoIdentifierIsNull()
+        {
+            var store = CreateTestStore();
+            var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo() { Id = "inittech-id" }).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -104,7 +112,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(null).Result);
+            var e = Assert.Throws<AggregateException>(() => store.TryUpdateAsync(null!).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -136,7 +144,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         public void ThrowWhenRemovingIfTenantIdentifierIsNull()
         {
             var store = CreateTestStore();
-            var e = Assert.Throws<AggregateException>(() => store.TryRemoveAsync(null).Result);
+            var e = Assert.Throws<AggregateException>(() => store.TryRemoveAsync(null!).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 

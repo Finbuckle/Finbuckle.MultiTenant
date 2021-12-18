@@ -32,7 +32,7 @@ namespace Finbuckle.MultiTenant.Stores
             return true;
         }
 
-        public async Task<TTenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo?> TryGetAsync(string id)
         {
             var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}");
             if (bytes == null)
@@ -51,7 +51,7 @@ namespace Finbuckle.MultiTenant.Stores
             throw new NotImplementedException();
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}");
             if (bytes == null)

@@ -83,7 +83,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
                     store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
                     Assert.NotSame(store, store2);
                     break;
-                
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
@@ -128,7 +128,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            Assert.Throws<ArgumentNullException>(() => builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null));
+            Assert.Throws<ArgumentNullException>(() => builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>)null);
+            accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>?)null);
             services.AddSingleton(accessor.Object);
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
             // Note: using MultiTenantBuilderShould as our test options class.
@@ -151,7 +151,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>(null));
+            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>(null!));
         }
 
         [Theory]
@@ -261,7 +261,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            Assert.Throws<ArgumentNullException>(() => builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null));
+            Assert.Throws<ArgumentNullException>(() => builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null!));
         }
 
         private class TestStore<TTenant> : IMultiTenantStore<TTenant>
@@ -286,7 +286,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
                 throw new NotImplementedException();
             }
 
-            public Task<TTenant> TryGetAsync(string id)
+            public Task<TTenant?> TryGetAsync(string id)
             {
                 throw new NotImplementedException();
             }
@@ -296,12 +296,12 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
                 throw new NotImplementedException();
             }
 
-            public Task<TTenant> TryGetByIdentifierAsync(string identifier)
+            public Task<TTenant?> TryGetByIdentifierAsync(string identifier)
             {
                 throw new NotImplementedException();
             }
 
-            public Task<bool> TryRemoveAsync(string id)
+            public Task<bool> TryRemoveAsync(string identifier)
             {
                 throw new NotImplementedException();
             }

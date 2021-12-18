@@ -8,10 +8,10 @@ namespace Finbuckle.MultiTenant.Core
     public class MultiTenantContextAccessor<T> : IMultiTenantContextAccessor<T>, IMultiTenantContextAccessor
         where T : class, ITenantInfo, new()
     {
-        internal static AsyncLocal<IMultiTenantContext<T>> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<T>>();
+        internal static AsyncLocal<IMultiTenantContext<T>?> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<T>?>();
 
-        public IMultiTenantContext<T> MultiTenantContext
-        { 
+        public IMultiTenantContext<T>? MultiTenantContext
+        {
             get
             {
                 return _asyncLocalContext.Value;
@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.Core
             }
         }
 
-        object IMultiTenantContextAccessor.MultiTenantContext
+        object? IMultiTenantContextAccessor.MultiTenantContext
         {
             get => MultiTenantContext;
             set => MultiTenantContext = value as IMultiTenantContext<T> ?? MultiTenantContext;

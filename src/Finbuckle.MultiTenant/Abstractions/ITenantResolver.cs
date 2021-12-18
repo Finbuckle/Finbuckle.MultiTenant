@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant
 {
     public interface ITenantResolver
     {
-        Task<object> ResolveAsync(object context);
+        Task<object?> ResolveAsync(object context);
     }
 
     public interface ITenantResolver<T>
@@ -16,7 +16,7 @@ namespace Finbuckle.MultiTenant
     {
         IEnumerable<IMultiTenantStrategy> Strategies { get; }
         IEnumerable<IMultiTenantStore<T>> Stores { get; }
-        
-        Task<IMultiTenantContext<T>> ResolveAsync(object context);
+
+        Task<IMultiTenantContext<T>?> ResolveAsync(object context);
     }
 }

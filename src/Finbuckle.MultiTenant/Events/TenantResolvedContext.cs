@@ -5,7 +5,7 @@ namespace Finbuckle.MultiTenant
 {
     public class TenantResolvedContext
     {
-        public object Context { get; set; }
-        public ITenantInfo TenantInfo { get; set; }
+        public object? Context { get; set; }
+        public ITenantInfo? TenantInfo { get; set; }
     }
 }

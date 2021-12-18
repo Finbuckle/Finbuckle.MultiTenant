@@ -8,6 +8,6 @@ namespace Finbuckle.MultiTenant.Test.Options
     internal class TestOptions
     {
         [Required]
-        public string DefaultConnectionString { get; set; }
+        public string? DefaultConnectionString { get; set; }
     }
 }
