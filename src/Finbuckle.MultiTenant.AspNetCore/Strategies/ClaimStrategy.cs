@@ -51,7 +51,9 @@ namespace Finbuckle.MultiTenant.Strategies
 			}
 
 			if (authScheme is null)
-				throw new NullReferenceException("No authentication scheme found.");
+			{
+				return null;
+			}
 
 			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
 			await handler.InitializeAsync(authScheme, httpContext);

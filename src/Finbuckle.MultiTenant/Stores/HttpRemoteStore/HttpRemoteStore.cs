@@ -36,7 +36,7 @@ namespace Finbuckle.MultiTenant.Stores
             this.endpointTemplate = endpointTemplate;
         }
 
-        public Task<bool> TryAddAsync(TTenantInfo TtenantInfo)
+        public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             throw new System.NotImplementedException();
         }

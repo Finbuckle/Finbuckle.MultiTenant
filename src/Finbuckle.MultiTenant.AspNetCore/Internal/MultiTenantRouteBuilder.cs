@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
@@ -11,21 +12,16 @@ namespace Finbuckle.MultiTenant.AspNetCore
     internal class MultiTenantRouteBuilder : IRouteBuilder
     {
         private readonly IServiceProvider serviceProvider;
-        private IRouter defaultHandler = new RouteHandler(context => null);
+        private IRouter defaultHandler = new RouteHandler(_ => Task.CompletedTask);
 
-        public MultiTenantRouteBuilder(IServiceProvider ServiceProvider)
+        public MultiTenantRouteBuilder(IServiceProvider serviceProvider)
         {
-            if (ServiceProvider == null)
-            {
-                throw new ArgumentNullException(nameof(ServiceProvider));
-            }
-
-            serviceProvider = ServiceProvider;
+            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
         public IApplicationBuilder ApplicationBuilder => throw new NotImplementedException();
 
-        public IRouter DefaultHandler { get => defaultHandler; set => throw new NotImplementedException(); }
+        public IRouter? DefaultHandler { get => defaultHandler; set => throw new NotImplementedException(); }
 
         public IServiceProvider ServiceProvider => serviceProvider;
 

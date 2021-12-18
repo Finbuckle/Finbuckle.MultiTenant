@@ -40,9 +40,20 @@ namespace Finbuckle.MultiTenant.Strategies
                 // Unfortnately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
                 // Instead we'll get the paths to check from the options.
                 var optionsType = scheme.HandlerType.GetProperty("Options")?.PropertyType;
+
+                if (optionsType is null)
+                {
+                    continue;
+                }
+
                 var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionsType);
                 var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
-                var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+                var options = optionsMonitorType?.GetMethod("Get")?.Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+
+                if (options is null)
+                {
+                    continue;
+                }
 
                 var callbackPath = (PathString)(optionsType.GetProperty("CallbackPath")?.GetValue(options) ?? PathString.Empty);
                 var signedOutCallbackPath = (PathString)(optionsType.GetProperty("SignedOutCallbackPath")?.GetValue(options) ?? PathString.Empty);
@@ -52,7 +63,7 @@ namespace Finbuckle.MultiTenant.Strategies
                 {
                     try
                     {
-                        string state = null;
+                        string? state = null;
 
                         if (string.Equals(httpContext.Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
                         {
