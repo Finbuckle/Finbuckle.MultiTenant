@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                     services.AddAuthentication()
                         .AddCookie("tenant1Scheme")
                         .AddCookie("tenant2Scheme");
-                            
+
                     services.AddMultiTenant<TenantInfo>()
                         .WithBasePathStrategy()
                         .WithPerTenantAuthentication()
@@ -39,10 +39,10 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                     app.UseMultiTenant();
                     app.Run(async context =>
                     {
-                        if (context.GetMultiTenantContext<TenantInfo>().TenantInfo != null)
+                        if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                         {
                             var schemeProvider = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-                            await context.Response.WriteAsync((await schemeProvider.GetDefaultChallengeSchemeAsync()).Name);
+                            await context.Response.WriteAsync((await schemeProvider.GetDefaultChallengeSchemeAsync())!.Name);
                         }
                     });
 

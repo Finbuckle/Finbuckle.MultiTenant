@@ -20,13 +20,13 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetService<IMultiTenantStore<TenantInfo>>();
-            store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" }).Wait();
+            store!.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" }).Wait();
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
 
             var mw = new MultiTenantMiddleware(_ => {
-                Assert.Equal("initech", context.Object.RequestServices.GetService<ITenantInfo>().Id);
+                Assert.Equal("initech", context.Object.RequestServices.GetService<ITenantInfo>()!.Id);
                 return Task.CompletedTask;
             });
 
@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetService<IMultiTenantStore<TenantInfo>>();
-            store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" }).Wait();
+            store!.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" }).Wait();
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -53,7 +53,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                 return Task.CompletedTask;
             });
 
-            await mw.Invoke(context.Object);        
+            await mw.Invoke(context.Object);
         }
     }
 }

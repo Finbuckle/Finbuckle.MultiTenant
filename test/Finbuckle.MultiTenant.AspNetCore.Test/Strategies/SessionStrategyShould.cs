@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
                         context.Session.SetString(sessionKey, identifier);
                         if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                         {
-                            await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()?.TenantInfo.Id);
+                            await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!.TenantInfo!.Id!);
                         }
                     });
 
