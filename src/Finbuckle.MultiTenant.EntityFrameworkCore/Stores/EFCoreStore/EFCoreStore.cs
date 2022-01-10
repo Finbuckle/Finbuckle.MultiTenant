@@ -20,7 +20,7 @@ namespace Finbuckle.MultiTenant.Stores
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<TTenantInfo> TryGetAsync(string id)
+        public async Task<TTenantInfo?> TryGetAsync(string id)
         {
             return await dbContext.TenantInfo
                             .Where(ti => ti.Id == id)
@@ -32,7 +32,7 @@ namespace Finbuckle.MultiTenant.Stores
             return await dbContext.TenantInfo.ToListAsync();
         }
 
-        public async Task<TTenantInfo> TryGetByIdentifierAsync(string identifier)
+        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             return await dbContext.TenantInfo
                             .Where(ti => ti.Identifier == identifier)
@@ -51,6 +51,12 @@ namespace Finbuckle.MultiTenant.Stores
             var existing = await dbContext.TenantInfo
                 .Where(ti => ti.Identifier == identifier)
                 .SingleOrDefaultAsync();
+
+            if (existing is null)
+            {
+                return false;
+            }
+
             dbContext.TenantInfo.Remove(existing);
             return await dbContext.SaveChangesAsync() > 0;
         }

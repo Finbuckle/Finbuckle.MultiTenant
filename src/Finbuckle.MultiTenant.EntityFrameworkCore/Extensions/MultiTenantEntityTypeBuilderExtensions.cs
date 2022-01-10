@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return builder;
         }
-        
+
         /// <summary>
         /// Adds TenantId to all indexes.
         /// </summary>
