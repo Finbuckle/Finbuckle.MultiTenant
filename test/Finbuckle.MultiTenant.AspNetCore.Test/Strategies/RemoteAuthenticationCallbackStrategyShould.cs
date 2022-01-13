@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
         [Fact]
         public void HavePriorityNeg900()
         {
-            var strategy = new RemoteAuthenticationCallbackStrategy(null);
+            var strategy = new RemoteAuthenticationCallbackStrategy(null!);
             Assert.Equal(-900, strategy.Priority);
         }
     }

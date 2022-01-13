@@ -61,18 +61,18 @@ namespace Finbuckle.MultiTenant.Strategies
             this.regex = $"^{template}$";
         }
 
-        public async Task<string> GetIdentifierAsync(object context)
+        public async Task<string?> GetIdentifierAsync(object context)
         {
-            if (!(context is HttpContext))
+            if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
-            var host = (context as HttpContext).Request.Host;
+            var host = httpContext.Request.Host;
 
             if (host.HasValue == false)
                 return null;
 
-            string identifier = null;
+            string? identifier = null;
 
             var match = Regex.Match(host.Host, regex,
                 RegexOptions.ExplicitCapture,

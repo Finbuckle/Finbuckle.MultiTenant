@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var res = context.TrySetTenantInfo(ti2, false);
             var mtc = context.GetMultiTenantContext<TenantInfo>();
             Assert.True(res);
-            Assert.Same(ti2, mtc.TenantInfo);
+            Assert.Same(ti2, mtc!.TenantInfo);
         }
 
         [Fact]
@@ -98,8 +98,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             context.TrySetTenantInfo(ti2, false);
             var mtc = context.GetMultiTenantContext<TenantInfo>();
 
-            Assert.Null(mtc.StoreInfo);
-            Assert.Null(mtc.StrategyInfo);
+            Assert.Null(mtc?.StoreInfo);
+            Assert.Null(mtc?.StrategyInfo);
         }
 
         [Fact]
@@ -119,8 +119,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             httpContextMock.Object.TrySetTenantInfo(ti2, true);
 
             Assert.NotSame(sp, httpContextMock.Object.RequestServices);
-            Assert.NotStrictEqual((DateTime)sp.GetService<object>(),
-                (DateTime)httpContextMock.Object.RequestServices.GetService<object>());
+            Assert.NotStrictEqual((DateTime?)sp.GetService<object>(),
+                (DateTime?)httpContextMock.Object.RequestServices.GetService<object>());
         }
 
         [Fact]
@@ -140,8 +140,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             httpContextMock.Object.TrySetTenantInfo(ti2, false);
 
             Assert.Same(sp, httpContextMock.Object.RequestServices);
-            Assert.StrictEqual((DateTime)sp.GetService<object>(),
-                (DateTime)httpContextMock.Object.RequestServices.GetService<object>());
+            Assert.StrictEqual((DateTime?)sp.GetService<object>(),
+                (DateTime?)httpContextMock.Object.RequestServices.GetService<object>());
         }
     }
 }

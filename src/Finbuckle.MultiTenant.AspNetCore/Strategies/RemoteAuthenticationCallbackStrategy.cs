@@ -17,7 +17,7 @@ namespace Finbuckle.MultiTenant.Strategies
     public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
     {
         private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
-        
+
         public int Priority { get => -900; }
 
         public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
@@ -25,13 +25,11 @@ namespace Finbuckle.MultiTenant.Strategies
             this.logger = logger;
         }
 
-        public async virtual Task<string> GetIdentifierAsync(object context)
+        public async virtual Task<string?> GetIdentifierAsync(object context)
         {
-            if(!(context is HttpContext))
+            if(!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
-
-            var httpContext = context as HttpContext;
 
             var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
@@ -41,10 +39,21 @@ namespace Finbuckle.MultiTenant.Strategies
             {
                 // Unfortnately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
                 // Instead we'll get the paths to check from the options.
-                var optionsType = scheme.HandlerType.GetProperty("Options").PropertyType;
+                var optionsType = scheme.HandlerType.GetProperty("Options")?.PropertyType;
+
+                if (optionsType is null)
+                {
+                    continue;
+                }
+
                 var optionsMonitorType = typeof(IOptionsMonitor<>).MakeGenericType(optionsType);
                 var optionsMonitor = httpContext.RequestServices.GetRequiredService(optionsMonitorType);
-                var options = optionsMonitorType.GetMethod("Get").Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+                var options = optionsMonitorType?.GetMethod("Get")?.Invoke(optionsMonitor, new[] { scheme.Name }) as RemoteAuthenticationOptions;
+
+                if (options is null)
+                {
+                    continue;
+                }
 
                 var callbackPath = (PathString)(optionsType.GetProperty("CallbackPath")?.GetValue(options) ?? PathString.Empty);
                 var signedOutCallbackPath = (PathString)(optionsType.GetProperty("SignedOutCallbackPath")?.GetValue(options) ?? PathString.Empty);
@@ -54,7 +63,7 @@ namespace Finbuckle.MultiTenant.Strategies
                 {
                     try
                     {
-                        string state = null;
+                        string? state = null;
 
                         if (string.Equals(httpContext.Request.Method, "GET", StringComparison.OrdinalIgnoreCase))
                         {
@@ -66,7 +75,7 @@ namespace Finbuckle.MultiTenant.Strategies
                             && httpContext.Request.Body.CanRead)
                         {
                             var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
-                            
+
                             var form = await httpContext.Request.ReadFormAsync(formOptions);
                             state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
                         }

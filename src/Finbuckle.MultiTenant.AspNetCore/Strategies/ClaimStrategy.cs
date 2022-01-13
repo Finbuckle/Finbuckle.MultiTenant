@@ -16,13 +16,13 @@ namespace Finbuckle.MultiTenant.Strategies
 	public class ClaimStrategy : IMultiTenantStrategy
 	{
 		private readonly string _tenantKey;
-		private readonly string _authenticationScheme;
+		private readonly string? _authenticationScheme;
 
 		public ClaimStrategy(string template) : this(template, null)
 		{
 		}
-		
-		public ClaimStrategy(string template, string authenticationScheme)
+
+		public ClaimStrategy(string template, string? authenticationScheme)
 		{
 			if (string.IsNullOrWhiteSpace(template))
 				throw new ArgumentException(nameof(template));
@@ -31,15 +31,15 @@ namespace Finbuckle.MultiTenant.Strategies
 			_authenticationScheme = authenticationScheme;
 		}
 
-		public async Task<string> GetIdentifierAsync(object context)
+		public async Task<string?> GetIdentifierAsync(object context)
 		{
 			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
 			if (httpContext.User.Identity is { IsAuthenticated: true })
 				return httpContext.User.FindFirst(_tenantKey)?.Value;
-			
-			AuthenticationScheme authScheme;
+
+			AuthenticationScheme? authScheme;
 			var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 			if (_authenticationScheme is null)
 			{
@@ -51,8 +51,10 @@ namespace Finbuckle.MultiTenant.Strategies
 			}
 
 			if (authScheme is null)
-				throw new NullReferenceException("No authentication scheme found.");
-			
+			{
+				return null;
+			}
+
 			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
 			await handler.InitializeAsync(authScheme, httpContext);
 			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
