@@ -3,12 +3,9 @@
 
 using System;
 using System.Net.Http;
-using System.Threading.Tasks;
-#if NET5_0_OR_GREATER
 using System.Text.Json;
-#else
-using Newtonsoft.Json;
-#endif
+using System.Threading.Tasks;
+
 namespace Finbuckle.MultiTenant.Stores
 {
     public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
@@ -30,11 +27,7 @@ namespace Finbuckle.MultiTenant.Stores
                 return null;
 
             var json = await response.Content.ReadAsStringAsync();
-#if NET5_0_OR_GREATER
             var result = JsonSerializer.Deserialize<TTenantInfo>(json);
-#else
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(json);
-#endif
 
             return result;
         }

@@ -1,16 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more inforation.
 
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
-
-#if NET5_0_OR_GREATER
 using System.Text.Json;
-#else
-using Newtonsoft.Json;
-#endif
+using System.Threading.Tasks;
 
 namespace Finbuckle.MultiTenant.Stores
 {
@@ -30,11 +25,8 @@ namespace Finbuckle.MultiTenant.Stores
         public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
-#if NET5_0_OR_GREATER
             var bytes = JsonSerializer.Serialize(tenantInfo);
-#else
-            var bytes = JsonConvert.SerializeObject(tenantInfo);
-#endif
+
             await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options);
             await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options);
 
@@ -47,11 +39,8 @@ namespace Finbuckle.MultiTenant.Stores
             if (bytes == null)
                 return null;
 
-#if NET5_0_OR_GREATER
             var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
-#else
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(bytes);
-#endif
+
             // Refresh the identifier version to keep things synced
             await cache.RefreshAsync($"{keyPrefix}identifier__{result.Identifier}");
 
@@ -69,11 +58,8 @@ namespace Finbuckle.MultiTenant.Stores
             if (bytes == null)
                 return null;
 
-#if NET5_0_OR_GREATER
             var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
-#else
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(bytes);
-#endif
+
             // Refresh the identifier version to keep things synced
             await cache.RefreshAsync($"{keyPrefix}id__{result.Id}");
 
