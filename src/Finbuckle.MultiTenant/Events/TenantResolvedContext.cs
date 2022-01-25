@@ -9,8 +9,8 @@ namespace Finbuckle.MultiTenant
     {
         public object? Context { get; set; }
         public ITenantInfo? TenantInfo { get; set; }
-        public Type StrategyType { get; set; }
-        public Type StoreType { get; set; }
+        public Type? StrategyType { get; set; }
+        public Type? StoreType { get; set; }
         // TODO consider refactoring to just MultiTenantContext<T>
     }
 }
