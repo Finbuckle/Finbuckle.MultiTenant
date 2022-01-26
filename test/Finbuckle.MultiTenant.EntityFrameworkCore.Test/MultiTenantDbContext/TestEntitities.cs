@@ -8,8 +8,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
 {
     public class TestBlogDbContext : MultiTenant.MultiTenantDbContext
     {
-        public DbSet<Blog> Blogs { get; set; }
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<Blog>? Blogs { get; set; }
+        public DbSet<Post>? Posts { get; set; }
 
         public TestBlogDbContext(TenantInfo tenantInfo,
             DbContextOptions options) :
@@ -27,8 +27,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
     public class Blog
     {
         public int BlogId { get; set; }
-        public string Title { get; set; }
-        public List<Post> Posts { get; set; }
+        public string? Title { get; set; }
+        public List<Post>? Posts { get; set; }
     }
 
     [MultiTenant]
@@ -36,9 +36,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
     public class Post
     {
         public int PostId { get; set; }
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public Blog? Blog { get; set; }
     }
 }
