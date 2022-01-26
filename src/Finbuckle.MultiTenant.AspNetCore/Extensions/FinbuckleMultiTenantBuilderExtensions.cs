@@ -240,8 +240,20 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.></returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
             this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+            where TTenantInfo : class, ITenantInfo, new() => WithBasePathStrategy(builder, configureOptions =>
+        {
+            configureOptions.RebaseAspNetCorePathBase = false;
+        });
+
+        /// <summary>
+        /// Adds and configures a BasePathStrategy to the application.
+        /// </summary>
+        /// <returns>The same MultiTenantBuilder passed into the method.></returns>
+        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, Action<BasePathStrategyOptions> configureOptions)
             where TTenantInfo : class, ITenantInfo, new()
         {
+            builder.Services.Configure(configureOptions);
             builder.Services.Configure<MultiTenantOptions>(options =>
             {
                 var origOnTenantResolved = options.Events.OnTenantResolved;
