@@ -519,7 +519,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            builder.WithBasePathStrategy(configureOptions => configureOptions.RebaseAspNetCorePathBase = true);
+            builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
             var sp = services.BuildServiceProvider();
 
             var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
