@@ -12,9 +12,9 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class TenantIdGenerator : ValueGenerator<string>
+    public class TenantIdGenerator : ValueGenerator<string?>
     {
-        public override string Next(EntityEntry entry)
+        public override string? Next(EntityEntry entry)
         {
             return ((IMultiTenantDbContext)entry.Context).TenantInfo.Id;
         }
