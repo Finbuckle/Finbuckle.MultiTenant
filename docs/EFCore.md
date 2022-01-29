@@ -254,7 +254,7 @@ And that's it. Whenever this db context is used it will only set and query recor
 for the current tenant.
 
 ## Hybrid Per-tenant and Shared Databases
-When using a shared database database context based on `IMultiTenantDbContext` it is
+When using a shared database context based on `IMultiTenantDbContext` it is
 simple extend into a hybrid approach simply by assigning some tenants to a separate
 shared database (or its own completely isolated database) via the tenant info
 connection string property.
