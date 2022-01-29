@@ -1,11 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more inforation.
 
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
 
 namespace Finbuckle.MultiTenant.Stores
 {
@@ -25,7 +25,8 @@ namespace Finbuckle.MultiTenant.Stores
         public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
-            var bytes = JsonConvert.SerializeObject(tenantInfo);
+            var bytes = JsonSerializer.Serialize(tenantInfo);
+
             await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options);
             await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options);
 
@@ -38,7 +39,7 @@ namespace Finbuckle.MultiTenant.Stores
             if (bytes == null)
                 return null;
 
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(bytes);
+            var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
             // Refresh the identifier version to keep things synced
             await cache.RefreshAsync($"{keyPrefix}identifier__{result.Identifier}");
@@ -57,7 +58,7 @@ namespace Finbuckle.MultiTenant.Stores
             if (bytes == null)
                 return null;
 
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(bytes);
+            var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
             // Refresh the identifier version to keep things synced
             await cache.RefreshAsync($"{keyPrefix}id__{result.Id}");
