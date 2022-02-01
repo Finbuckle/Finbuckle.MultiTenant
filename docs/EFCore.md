@@ -44,7 +44,7 @@ Finbuckle.MultiTenant provides two different ways to utilize this behavior in a 
 [described below](#adding-multitenant-functionality-to-an-existing-dbcontext), or
 2. Derive from `MultiTenantDbContext` which handles the details for you.
 
-The first option is more complex, but provides enhanced flexibility and allows existing database context classes (which may derive from a base class) to utilize per-tenant data isolation. The second option option is easier, but provides less flexibility. These approaches are both explained further below.
+The first option is more complex, but provides enhanced flexibility and allows existing database context classes (which may derive from a base class) to utilize per-tenant data isolation. The second option is easier, but provides less flexibility. These approaches are both explained further below.
 
 Regardless of how the db context is configured, the context will need to know which entity types should be treated as multitenant
 (i.e. which entity types are to be isolated per tenant) When the db context is initialized, a shadow property named `TenantId` is added to the data model for designated entity types. This property is used internally to filter all requests and commands. If there already is a defined string property named "TenantId" then it will be used.
@@ -254,7 +254,7 @@ And that's it. Whenever this db context is used it will only set and query recor
 for the current tenant.
 
 ## Hybrid Per-tenant and Shared Databases
-When using a shared database database context based on `IMultiTenantDbContext` it is
+When using a shared database context based on `IMultiTenantDbContext` it is
 simple extend into a hybrid approach simply by assigning some tenants to a separate
 shared database (or its own completely isolated database) via the tenant info
 connection string property.

@@ -64,7 +64,8 @@ namespace Finbuckle.MultiTenant
                             result.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
                             result.TenantInfo = tenantInfo;
 
-                            await options.CurrentValue.Events.OnTenantResolved(new TenantResolvedContext { Context = context, TenantInfo = tenantInfo });
+                            await options.CurrentValue.Events.OnTenantResolved(new TenantResolvedContext { Context = 
+                            context, TenantInfo = tenantInfo, StrategyType = strategy.GetType(), StoreType = store.GetType()});
 
                             break;
                         }

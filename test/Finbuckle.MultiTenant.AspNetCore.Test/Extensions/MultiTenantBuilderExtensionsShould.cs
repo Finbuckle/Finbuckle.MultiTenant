@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -496,6 +497,36 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
 
             var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
             Assert.IsType<BasePathStrategy>(strategy);
+        }
+        
+        [Fact]
+        public void AddBasePathStrategyDefaultRebaseFalse()
+        {
+            var services = new ServiceCollection();
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            builder.WithBasePathStrategy();
+            var sp = services.BuildServiceProvider();
+
+            var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+            Assert.IsType<BasePathStrategy>(strategy);
+
+            var options = sp.GetRequiredService<IOptions<BasePathStrategyOptions>>();
+            Assert.False(options.Value.RebaseAspNetCorePathBase);
+        }
+        
+        [Fact]
+        public void AddBasePathStrategyWithOptions()
+        {
+            var services = new ServiceCollection();
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
+            var sp = services.BuildServiceProvider();
+
+            var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+            Assert.IsType<BasePathStrategy>(strategy);
+
+            var options = sp.GetRequiredService<IOptions<BasePathStrategyOptions>>();
+            Assert.True(options.Value.RebaseAspNetCorePathBase);
         }
 
         [Fact]

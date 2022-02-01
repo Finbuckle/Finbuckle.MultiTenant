@@ -18,7 +18,9 @@ namespace Finbuckle.MultiTenant
         public static IMultiTenantContext<T>? GetMultiTenantContext<T>(this HttpContext httpContext)
         where T : class, ITenantInfo, new()
         {
-            return httpContext.RequestServices.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext;
+            var services = httpContext.RequestServices;
+            var context = services.GetRequiredService<IMultiTenantContextAccessor<T>>();
+            return context?.MultiTenantContext;
         }
 
         /// <summary>

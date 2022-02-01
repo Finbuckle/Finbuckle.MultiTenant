@@ -3,8 +3,8 @@
 
 using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Finbuckle.MultiTenant.Stores
 {
@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.Stores
                 return null;
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<TTenantInfo>(json);
+            var result = JsonSerializer.Deserialize<TTenantInfo>(json);
 
             return result;
         }
