@@ -37,7 +37,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for added entities
             var mismatchedAdded = addedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue! != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedAdded.Any())
             {
@@ -75,7 +75,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for modified entities
             var mismatchedModified = modifiedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue! != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedModified.Any())
             {
@@ -124,7 +124,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             // handle Tenant Id mismatches for deleted entities
             var mismatchedDeleted = deletedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue! != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedDeleted.Any())
             {
