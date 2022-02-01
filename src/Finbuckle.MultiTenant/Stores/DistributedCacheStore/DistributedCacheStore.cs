@@ -42,7 +42,7 @@ namespace Finbuckle.MultiTenant.Stores
             var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
             // Refresh the identifier version to keep things synced
-            await cache.RefreshAsync($"{keyPrefix}identifier__{result.Identifier}");
+            await cache.RefreshAsync($"{keyPrefix}identifier__{result?.Identifier}");
 
             return result;
         }
@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.Stores
             var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
             // Refresh the identifier version to keep things synced
-            await cache.RefreshAsync($"{keyPrefix}id__{result.Id}");
+            await cache.RefreshAsync($"{keyPrefix}id__{result?.Id}");
 
             return result;
         }

@@ -266,7 +266,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                             .RebaseAspNetCorePathBase)
                     {
-                        httpContext.Request.Path.StartsWithSegments($"/{tenantResolvedContext.TenantInfo.Identifier}",
+                        httpContext.Request.Path.StartsWithSegments($"/{tenantResolvedContext.TenantInfo?.Identifier}",
                             out var matched, out var
                                 newPath);
                         httpContext.Request.PathBase = Path.Combine(httpContext.Request.PathBase, matched);
