@@ -3,7 +3,7 @@ name: Linux (.NET 6.0)
 on:
   push:
     branches: [main]
-  pull_request:
+  pull_request_target:
 
 jobs:
   os-tests:
