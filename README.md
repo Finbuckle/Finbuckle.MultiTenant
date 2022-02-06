@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version"></span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.5.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -8,7 +8,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 Tablef of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version"></span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.5.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -20,9 +20,12 @@ Tablef of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version"></span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.5.1</span>
 
 <!--_release-notes-->
+### Bug Fixes
+
+* ClaimStrategy validation bypass type principle changed to principal ([#493](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/493)) ([fbfd022](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fbfd0228c8b30a5f663fd2dfade0ae1b5bda09da))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
