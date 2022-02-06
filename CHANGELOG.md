@@ -1,32 +1,32 @@
-## [6.5.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.0...v6.5.1) (2021-11-17)
+### [6.5.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.0...v6.5.1) (2021-11-17)
 
 
 ### Bug Fixes
 
 * ClaimStrategy validation bypass type principle changed to principal ([#493](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/493)) ([fbfd022](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fbfd0228c8b30a5f663fd2dfade0ae1b5bda09da))
 
-# [6.5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.2...v6.5.0) (2021-11-08)
+## [6.5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.2...v6.5.0) (2021-11-08)
 
 
 ### Features
 
 * add .NET 6 support ([#489](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/489)) ([a2d0416](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a2d041670bf7efb198b06a864bad0a4cfc490a0c))
 
-## [6.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.1...v6.4.2) (2021-10-25)
+### [6.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.1...v6.4.2) (2021-10-25)
 
 
 ### Bug Fixes
 
 * change Options types from internal to public ([#483](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/483)) ([af9521d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/af9521d993ce1c0369662c8db26d790c06c521f3))
 
-## [6.4.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.0...v6.4.1) (2021-10-11)
+### [6.4.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.4.0...v6.4.1) (2021-10-11)
 
 
 ### Bug Fixes
 
 * options not validating ([d4c6f30](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d4c6f30d8d78b9e1c42a627f426a8ca867bc860f))
 
-# [6.4.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.1...v6.4.0) (2021-10-07)
+## [6.4.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.1...v6.4.0) (2021-10-07)
 
 
 ### Bug Fixes
@@ -38,7 +38,7 @@
 
 * add optional parameter to specify the ClaimStrategy authentication scheme. ([#398](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/398)) thanks @Valks! ([d74ae41](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d74ae41a71b9df6a95a711ef3bad6d4ebc9f73f7))
 
-## [6.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.3.1) (2021-09-30)
+### [6.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.3.1) (2021-09-30)
 
 
 ### Bug Fixes
