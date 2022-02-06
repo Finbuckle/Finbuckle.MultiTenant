@@ -1,5 +1,9 @@
 [Introduction](Introduction)
 
+[What's New in Finbuckle.MultiTenant <span class="_version">6.5.1</span>](WhatsNew)
+
+[Version History](History)
+
 [Getting Started](GettingStarted)
 
 [Core Concepts](CoreConcepts)

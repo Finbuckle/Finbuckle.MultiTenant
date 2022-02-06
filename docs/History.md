@@ -1,3 +1,6 @@
+# Version History
+
+<!--_history-->
 ### [6.5.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.0...v6.5.1) (2021-11-17)
 
 
@@ -211,3 +214,4 @@
 
 **1.0.0**
 * Initial release
+<!--_history-->

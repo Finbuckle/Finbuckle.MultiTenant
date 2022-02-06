@@ -23,6 +23,7 @@ jobs:
           npm install -D @semantic-release/git
           npm install -D @semantic-release/changelog
           npm install -D @semantic-release/exec
+          npm install -D conventional-changelog-conventionalcommits
       - name: run semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
