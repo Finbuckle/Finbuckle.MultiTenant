@@ -7,8 +7,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelBuilder
 {
     public class TestDbContext : DbContext
     {
-        public DbSet<MyMultiTenantThing> MyMultiTenantThings { get; set; }
-        public DbSet<MyThing> MyThings { get; set; }
+        public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
+        public DbSet<MyThing>? MyThings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -16,12 +16,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelBuilder
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.ConfigureMultiTenant();
+            modelBuilder.ConfigureMultiTenant();
         }
     }
-    
+
     [MultiTenant]
     public class MyMultiTenantThing
     {

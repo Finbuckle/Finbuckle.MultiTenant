@@ -29,14 +29,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
             _connection.Dispose();
         }
 
-        private IProperty GetModelProperty(string propName)
+        private IProperty? GetModelProperty(string propName)
         {
             _connection.Open();
             var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
             var dbContext = new TestEfCoreStoreDbContext(options);
 
             var model = dbContext.Model.FindEntityType(typeof(TenantInfo));
-            var prop = model.GetProperties().SingleOrDefault(p => p.Name == propName);
+            var prop = model?.GetProperties().SingleOrDefault(p => p.Name == propName);
             return prop;
         }
 
@@ -61,21 +61,21 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
         public void AddTenantIdLengthConstraint()
         {
             var prop = GetModelProperty("Id");
-            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
+            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
         }
 
         [Fact]
         public void AddTenantIdAsKey()
         {
             var prop = GetModelProperty("Id");
-            Assert.True(prop.IsPrimaryKey());
+            Assert.True(prop!.IsPrimaryKey());
         }
 
         [Fact]
         public void AddIdentifierUniqueConstraint()
         {
             var prop = GetModelProperty("Identifier");
-            Assert.True(prop.IsIndex());
+            Assert.True(prop!.IsIndex());
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs

@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// </summary>
         /// <param name="entityType">The entity type to test for MultiTenant configuration.</param>
         /// <returns><see cref="true"/> if the entity type has MultiTenant configuration, <see cref="false"/> if not.</returns>
-        public static bool IsMultiTenant(this IMutableEntityType entityType)
+        public static bool IsMultiTenant(this IMutableEntityType? entityType)
         {
             while (entityType != null)
             {
@@ -24,8 +24,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return false;
         }
-        
-        public static bool IsMultiTenant(this IEntityType entityType)
+
+        public static bool IsMultiTenant(this IEntityType? entityType)
         {
             while (entityType != null)
             {

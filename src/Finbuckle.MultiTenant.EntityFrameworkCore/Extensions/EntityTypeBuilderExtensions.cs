@@ -12,30 +12,30 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class TenantIdGenerator : ValueGenerator<string>
+    public class TenantIdGenerator : ValueGenerator<string?>
     {
-        public override string Next(EntityEntry entry)
+        public override string? Next(EntityEntry entry)
         {
             return ((IMultiTenantDbContext)entry.Context).TenantInfo.Id;
         }
 
         public override bool GeneratesTemporaryValues => false;
     }
-    
+
     public static class FinbuckleEntityTypeBuilderExtensions
     {
         private class ExpressionVariableScope
         {
-            public IMultiTenantDbContext Context { get; }
+            public IMultiTenantDbContext? Context { get; }
         }
 
-        private static LambdaExpression GetQueryFilter(this EntityTypeBuilder builder)
+        private static LambdaExpression? GetQueryFilter(this EntityTypeBuilder builder)
         {
             return builder.Metadata.GetQueryFilter();
         }
 
         /// <summary>
-        /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after 
+        /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after
         /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
         /// </summary>
         /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
@@ -102,7 +102,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // set the filter
             builder.HasQueryFilter(lambdaExp);
-            
+
             // TODO: Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
             if (clrType != null)
@@ -116,7 +116,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
                 {
                     UpdateIdentityRoleIndex(builder);
                 }
-                
+
                 // This is a special case that should still occur.
                 // Note the index below is not unique;
                 if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUserLogin<>)))
@@ -128,7 +128,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return new MultiTenantEntityTypeBuilder(builder);
         }
-        
+
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
@@ -152,7 +152,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserLoginPrimaryKey(this EntityTypeBuilder builder)
         {
             var pk = builder.Metadata.FindPrimaryKey();
-            builder.Metadata.RemoveKey(pk.Properties);
+
+            // Remove the key if it exists.
+            if (pk != null)
+            {
+                builder.Metadata.RemoveKey(pk.Properties);
+            }
 
             // Create a new ID and a unique index to replace the old pk.
             builder.Property<string>("Id").ValueGeneratedOnAdd();
@@ -166,8 +171,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void RemoveIndex(this EntityTypeBuilder builder, string propName)
         {
             var prop = builder.Metadata.FindProperty(propName);
-            var index = builder.Metadata.FindIndex(prop);
-            builder.Metadata.RemoveIndex(index);
+            var index = prop is null ? null : builder.Metadata.FindIndex(prop);
+
+            // Remove the index if one is found.
+            if (index != null)
+            {
+                builder.Metadata.RemoveIndex(index);
+            }
         }
     }
 }

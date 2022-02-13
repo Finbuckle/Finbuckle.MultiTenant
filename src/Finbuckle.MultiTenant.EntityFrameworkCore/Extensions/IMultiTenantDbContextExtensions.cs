@@ -36,8 +36,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id mismatches for added entities
             var mismatchedAdded = addedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedAdded.Any())
             {
@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // for added entities TenantNotSetMode is always Overwrite
             var notSetAdded = addedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue == null);
+                Where(e => (string?)e.Property("TenantId").CurrentValue == null);
 
             foreach (var e in notSetAdded)
             {
@@ -74,8 +74,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id mismatches for modified entities
             var mismatchedModified = modifiedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedModified.Any())
             {
@@ -99,7 +99,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id not set for modified entities
             var notSetModified = modifiedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue == null);
+                Where(e => (string?)e.Property("TenantId").CurrentValue == null);
 
             if (notSetModified.Any())
             {
@@ -123,8 +123,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id mismatches for deleted entities
             var mismatchedDeleted = deletedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue != null &&
-                (string)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
 
             if (mismatchedDeleted.Any())
             {
@@ -145,7 +145,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id not set for deleted entities
             var notSetDeleted = deletedMultiTenantEntities.
-                Where(e => (string)e.Property("TenantId").CurrentValue == null);
+                Where(e => (string?)e.Property("TenantId").CurrentValue == null);
 
             if (notSetDeleted.Any())
             {

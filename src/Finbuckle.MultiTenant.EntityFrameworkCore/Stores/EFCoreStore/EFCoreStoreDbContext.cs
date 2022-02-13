@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.Stores
         {
         }
 
-        public DbSet<TTenantInfo> TenantInfo { get; set; }
+        public DbSet<TTenantInfo> TenantInfo => Set<TTenantInfo>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

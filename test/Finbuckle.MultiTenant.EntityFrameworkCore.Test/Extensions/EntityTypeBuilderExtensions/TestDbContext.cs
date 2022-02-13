@@ -11,34 +11,34 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     public class TestDbContext : MultiTenant.MultiTenantDbContext
     {
-        private readonly Action<ModelBuilder> _config;
+        private readonly Action<ModelBuilder>? _config;
 
-        public TestDbContext(Action<ModelBuilder> config, ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+        public TestDbContext(Action<ModelBuilder>? config, ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
         {
             this._config = config;
         }
 
-        public DbSet<MyMultiTenantThing> MyMultiTenantThings { get; set; }
-        public DbSet<MyThingWithTenantId> MyThingsWithTenantIds { get; set; }
-        public DbSet<MyThingWithIntTenantId> MyThingsWithIntTenantId { get; set; }
-        public DbSet<MyMultiTenantThingWithAttribute> MyMultiTenantThingsWithAttribute { get; set; }
-        
-        protected override void OnModelCreating(ModelBuilder builder)
+        public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
+        public DbSet<MyThingWithTenantId>? MyThingsWithTenantIds { get; set; }
+        public DbSet<MyThingWithIntTenantId>? MyThingsWithIntTenantId { get; set; }
+        public DbSet<MyMultiTenantThingWithAttribute>? MyMultiTenantThingsWithAttribute { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // If the test passed in a custom builder use it
             if (_config != null)
-                _config(builder);
+                _config(modelBuilder);
             // Of use the standard builder configuration
             else
             {
-                builder.Entity<MyMultiTenantThing>().IsMultiTenant();
-                builder.Entity<MyThingWithTenantId>().IsMultiTenant();
+                modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+                modelBuilder.Entity<MyThingWithTenantId>().IsMultiTenant();
             }
-            
-            base.OnModelCreating(builder);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
-    
+
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
     {
@@ -48,7 +48,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
             return new object();
         }
     }
-    
+
     public class MyMultiTenantThing
     {
         public int Id { get; set; }
@@ -66,7 +66,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
     public class MyThingWithTenantId
     {
         public int Id { get; set; }
-        public string TenantId { get; set; }
+        public string? TenantId { get; set; }
     }
 
     // ReSharper disable once MemberCanBePrivate.Global

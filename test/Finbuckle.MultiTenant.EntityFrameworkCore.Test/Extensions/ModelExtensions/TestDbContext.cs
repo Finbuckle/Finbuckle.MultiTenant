@@ -9,8 +9,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelExtensi
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     public class TestDbContext : DbContext
     {
-        DbSet<MyMultiTenantThing> MyMultiTenantThings { get; set; }
-        DbSet<MyThing> MyThings { get; set; }
+        DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
+        DbSet<MyThing>? MyThings { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -18,12 +18,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelExtensi
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<MyMultiTenantThing>().IsMultiTenant();
+            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
         }
     }
-    
+
     public class MyMultiTenantThing
     {
         public int Id { get; set; }

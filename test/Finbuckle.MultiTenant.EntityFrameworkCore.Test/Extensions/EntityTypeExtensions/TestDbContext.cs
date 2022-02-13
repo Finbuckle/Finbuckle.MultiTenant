@@ -9,10 +9,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeEx
     {
         // ReSharper disable once MemberHidesStaticFromOuterClass
         // ReSharper disable once UnusedMember.Local
-        DbSet<MyMultiTenantThing> MyMultiTenantThing { get; set; }
+        DbSet<MyMultiTenantThing>? MyMultiTenantThing { get; set; }
         // ReSharper disable once MemberHidesStaticFromOuterClass
         // ReSharper disable once UnusedMember.Local
-        DbSet<MyThing> MyThing { get; set; }
+        DbSet<MyThing>? MyThing { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -20,13 +20,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeEx
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<MyMultiTenantThing>().IsMultiTenant();
-            builder.Entity<MyMultiTenantChildThing>();
+            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+            modelBuilder.Entity<MyMultiTenantChildThing>();
         }
     }
-    
+
     public class MyThing
     {
         public int Id { get; set; }
@@ -36,9 +36,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeEx
     {
         public int Id { get; set; }
     }
-    
+
     public class MyMultiTenantChildThing : MyMultiTenantThing
     {
-        
+
     }
 }

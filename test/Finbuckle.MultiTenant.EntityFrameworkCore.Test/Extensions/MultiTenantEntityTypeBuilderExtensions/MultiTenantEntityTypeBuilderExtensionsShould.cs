@@ -40,9 +40,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
 #endif
                 builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
             });
-            var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
+            var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
-            foreach (var index in indexes.Where(i => i.IsUnique))
+            foreach (var index in indexes!.Where(i => i.IsUnique))
             {
                 Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
             }
@@ -67,9 +67,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
 #endif
                 builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
             });
-            var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
+            var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
-            foreach (var index in indexes.Where(i => !i.IsUnique))
+            foreach (var index in indexes!.Where(i => !i.IsUnique))
             {
                 Assert.DoesNotContain("TenantId", index.Properties.Select(p => p.Name));
             }
@@ -94,9 +94,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
 #endif
                 builder.Entity<Blog>().IsMultiTenant().AdjustIndexes();
             });
-            var indexes = db.Model.FindEntityType(typeof(Blog)).GetIndexes().Where(i => i.IsUnique);
+            var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
-            foreach (var index in indexes)
+            foreach (var index in indexes!)
             {
                 Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
             }

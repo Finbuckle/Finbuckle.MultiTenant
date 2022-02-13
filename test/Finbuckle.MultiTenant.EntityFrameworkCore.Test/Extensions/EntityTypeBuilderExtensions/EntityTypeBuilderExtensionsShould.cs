@@ -28,43 +28,43 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
             _connection?.Dispose();
         }
 
-        private TestDbContext GetDbContext(Action<ModelBuilder> config = null, ITenantInfo tenant = null)
+        private TestDbContext GetDbContext(Action<ModelBuilder>? config = null, ITenantInfo? tenant = null)
         {
             var options = new DbContextOptionsBuilder()
                           .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
                           .UseSqlite(_connection)
                           .Options;
-            return new TestDbContext(config, tenant, options);
+            return new TestDbContext(config, tenant ?? new TenantInfo(), options);
         }
 
         [Fact]
         public void SetMultiTenantAnnotation()
         {
             using var db = GetDbContext();
-            var annotation = db.Model.FindEntityType(typeof(MyMultiTenantThing))
+            var annotation = db.Model.FindEntityType(typeof(MyMultiTenantThing))?
                                .FindAnnotation(Constants.MultiTenantAnnotationName);
 
-            Assert.True((bool)annotation.Value);
+            Assert.True((bool)annotation!.Value!);
         }
 
         [Fact]
         public void AddTenantIdStringShadowProperty()
         {
             using var db = GetDbContext();
-            var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing)).FindProperty("TenantId");
+            var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing))?.FindProperty("TenantId");
 
-            Assert.Equal(typeof(string), prop.ClrType);
-            Assert.True(prop.IsShadowProperty());
-            Assert.Null(prop.FieldInfo);
+            Assert.Equal(typeof(string), prop?.ClrType);
+            Assert.True(prop?.IsShadowProperty());
+            Assert.Null(prop?.FieldInfo);
         }
 
         [Fact]
         public void RespectExistingTenantIdStringProperty()
         {
             using var db = GetDbContext();
-            var prop = db.Model.FindEntityType(typeof(MyThingWithTenantId)).FindProperty("TenantId");
+            var prop = db.Model.FindEntityType(typeof(MyThingWithTenantId))?.FindProperty("TenantId");
 
-            Assert.Equal(typeof(string), prop.ClrType);
+            Assert.Equal(typeof(string), prop!.ClrType);
             Assert.False(prop.IsShadowProperty());
             Assert.NotNull(prop.FieldInfo);
         }
@@ -80,9 +80,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
         public void SetsTenantIdStringMaxLength()
         {
             using var db = GetDbContext();
-            var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing)).FindProperty("TenantId");
+            var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing))?.FindProperty("TenantId");
 
-            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop.GetMaxLength());
+            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
             {
                 Id = "abc"
             };
-            
+
             var tenant2 = new TenantInfo
             {
                 Id = "123"
@@ -101,12 +101,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
 
             using var db = GetDbContext(null, tenant1);
             db.Database.EnsureCreated();
-            db.MyMultiTenantThings.Add(new MyMultiTenantThing() { Id = 1 });
+            db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 1 });
             db.SaveChanges();
-            
-            Assert.Equal(1, db.MyMultiTenantThings.Count());
+
+            Assert.Equal(1, db.MyMultiTenantThings!.Count());
             db.TenantInfo = tenant2;
-            Assert.Equal(0, db.MyMultiTenantThings.Count());
+            Assert.Equal(0, db.MyMultiTenantThings!.Count());
         }
 
         [Fact]
@@ -124,11 +124,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
                 config.Entity<MyMultiTenantThing>().IsMultiTenant();
             }, tenant1);
             db.Database.EnsureCreated();
-            db.MyMultiTenantThings.Add(new MyMultiTenantThing() { Id = 1 });
-            db.MyMultiTenantThings.Add(new MyMultiTenantThing() { Id = 2 });
+            db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 1 });
+            db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 2 });
             db.SaveChanges();
-            
-            Assert.Equal(1, db.MyMultiTenantThings.Count());
+
+            Assert.Equal(1, db.MyMultiTenantThings!.Count());
         }
 
         // The tests below are Identity specific
@@ -146,13 +146,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
 
             var props = new List<IProperty>
             {
-                c.Model.FindEntityType(typeof(IdentityRole)).FindProperty("NormalizedName"),
-                c.Model.FindEntityType(typeof(IdentityRole)).FindProperty("TenantId")
+                c.Model.FindEntityType(typeof(IdentityRole))?.FindProperty("NormalizedName")!,
+                c.Model.FindEntityType(typeof(IdentityRole))?.FindProperty("TenantId")!
             };
 
-            var index = c.Model.FindEntityType(typeof(IdentityRole)).FindIndex(props);
+            var index = c.Model.FindEntityType(typeof(IdentityRole))?.FindIndex(props);
             Assert.NotNull(index);
-            Assert.True(index.IsUnique);
+            Assert.True(index!.IsUnique);
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
                 ConnectionString = "DataSource=testDb.db"
             };
             using var c = new TestIdentityDbContext(tenant1);
-            Assert.True(c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("Id")
+            Assert.True(c.Model.FindEntityType(typeof(IdentityUserLogin<string>))?.FindProperty("Id")?
                          .IsPrimaryKey());
         }
 
@@ -184,14 +184,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
 
             var props = new List<IProperty>
             {
-                c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("LoginProvider"),
-                c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("ProviderKey"),
-                c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindProperty("TenantId")
+                c.Model.FindEntityType(typeof(IdentityUserLogin<string>))?.FindProperty("LoginProvider")!,
+                c.Model.FindEntityType(typeof(IdentityUserLogin<string>))?.FindProperty("ProviderKey")!,
+                c.Model.FindEntityType(typeof(IdentityUserLogin<string>))?.FindProperty("TenantId")!
             };
 
-            var index = c.Model.FindEntityType(typeof(IdentityUserLogin<string>)).FindIndex(props);
+            var index = c.Model.FindEntityType(typeof(IdentityUserLogin<string>))?.FindIndex(props);
             Assert.NotNull(index);
-            Assert.True(index.IsUnique);
+            Assert.True(index!.IsUnique);
         }
 
         [Fact]
@@ -208,13 +208,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
 
             var props = new List<IProperty>
             {
-                c.Model.FindEntityType(typeof(IdentityUser)).FindProperty("NormalizedUserName"),
-                c.Model.FindEntityType(typeof(IdentityUser)).FindProperty("TenantId")
+                c.Model.FindEntityType(typeof(IdentityUser))?.FindProperty("NormalizedUserName")!,
+                c.Model.FindEntityType(typeof(IdentityUser))?.FindProperty("TenantId")!
             };
 
-            var index = c.Model.FindEntityType(typeof(IdentityUser)).FindIndex(props);
+            var index = c.Model.FindEntityType(typeof(IdentityUser))?.FindIndex(props);
             Assert.NotNull(index);
-            Assert.True(index.IsUnique);
+            Assert.True(index!.IsUnique);
         }
     }
 }
