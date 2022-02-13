@@ -1,6 +1,21 @@
 # Version History
 
 <!--_history-->
+## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)
+
+
+### Features
+
+* add BasePathStrategy option to rebase the AspNetCore Request.PathBase ([#510](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/510)) ([dccf414](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/dccf414c1fbb65d8a02b709460679e86c317451a))
+* add nullable reference types to all projects ([#514](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/514)) ([e6141fe](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e6141fec807025f8be51e86a82f91b4650a08aa4))
+* add strategy type and store type to TenantResolvedContext ([#508](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/508)) ([ef52fc2](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ef52fc21d05508bf4150bcfb7993aac953cd2202))
+
+
+### Bug Fixes
+
+* actually set the strategy and store types on OnTenantResolvedContext ([#509](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/509)) ([fd9029e](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd9029e112b1be7b2e029e56a65b88ab7ae618d6))
+* remove dependency on NewtonSoft.Json ([#505](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/505)) ([f83f0b1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f83f0b1bf0278e91f9f4455f080fd00a2e644167))
+
 ### [6.5.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.0...v6.5.1) (2021-11-17)
 
 
@@ -39,7 +54,7 @@
 
 ### Features
 
-* add optional parameter to specify the ClaimStrategy authentication scheme. ([#398](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/398)) thanks @Valks! ([d74ae41](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d74ae41a71b9df6a95a711ef3bad6d4ebc9f73f7))
+* add optional parameter to specify the ClaimStrategy authentication scheme. ([#398](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/398)) thanks ! ([d74ae41](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d74ae41a71b9df6a95a711ef3bad6d4ebc9f73f7))
 
 ### [6.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.3.1) (2021-09-30)
 
@@ -53,10 +68,10 @@
 * Retargeted specifically to .netcoreapp3.1 and .net5.0 across all packages.
 * Added `AdjustKey`, `AdjustIndex`, `AdjustAlIndexes`, `AdjustUniqueIndexes` methods to be chained off `IsMultiTenant` in EFCore functionality. They add the implicit `TenantId` to the respective key/indexes.
 * Reverted generic version of `IsMultiTenant` back to non-generic version for more flexibility.
-* Improved tenant resolution logging functionality and performance. Thanks to **@lahma**!
-* Fixed a bug with `InMemoryStore` implementation of `TryUpdate`. Thanks to **@mphill**!
+* Improved tenant resolution logging functionality and performance. Thanks to ****!
+* Fixed a bug with `InMemoryStore` implementation of `TryUpdate`. Thanks to ****!
 * Fixed a bug where `ConfigurationStore` would throw an exception if there was no default section in the config.
-* Fixed a bug where ASP.NET Core Identity security stamp validation would force user logout and raise exceptions. Thanks to **@Nivalux** for finding the root cause of this bug.
+* Fixed a bug where ASP.NET Core Identity security stamp validation would force user logout and raise exceptions. Thanks to **** for finding the root cause of this bug.
 * Fixed a bug where `MultiTenantOptionsManager<TOptions>` was internal instead of public.
 * Fixed problematic references in sample projects.
 * Updated and improved documentation.
@@ -64,7 +79,7 @@
 * Added various project files for .NET Foundation on-boarding.
 
 **6.2.0**
-* Added a new events system. See PR #359 Thanks to **@natelaff**!
+* Added a new events system. See PR #359 Thanks to ****!
 * Some internal refactoring.
 * Various documentation fixes.
 * Added sourcelink to allow debugging into remote source code.
@@ -73,8 +88,8 @@
 **6.1.0**
 * .NET 5.0 support.
 * New `DistributedCacheStore` uses the ASP.NET Core distributed cache for tenant resolution.
-* New `HeaderStrategy` uses HTTP headers for tenant resolution. Thanks to **@natelaff**!
-* Support for inheritance in multitenant Entity Framework Core entity. Thanks to **@rchamorro**!
+* New `HeaderStrategy` uses HTTP headers for tenant resolution. Thanks to ****!
+* Support for inheritance in multitenant Entity Framework Core entity. Thanks to ****!
 * Fixed a conflict between ClaimStrategy and per-tenant authentication.
 * Updated docs, samples, and unit tests.
 
@@ -112,12 +127,12 @@
 
 **5.0.0**
 * Added support for ASP.NET Core 3.1.
-* Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks **@GordonBlahut**!
+* Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
 * Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
 * Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
 * Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
 * Deprecated `InMemoryStore` functionality that reads from configuration.
-* Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to **@colindekker**!
+* Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to ****!
 * Fixed an exception with OpenIdConnect remote authentication if "state" is not returned from the identity provider. The new behavior will result in no tenant found for the request.
 * Updated samples.
 * Updated documentation.
@@ -126,7 +141,7 @@
 **4.0.0**
 * Added support for ASP.NET Core 3! Valid project targets are `netcoreapp3.0`, `netcoreapp2.0`, and `netcoreapp2.1`.
 * Added a sample app for ASP.NET 3 highlighting the route strategy improvements due to the endpoint routing mechanism.
-* Fixed a bug where route strategy could throw an exception when used with Razor Pages. Thanks @stardocs-services!
+* Fixed a bug where route strategy could throw an exception when used with Razor Pages. Thanks -services!
 * Support for configuring multiple multitenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
 * Refactored component assemblies for better dependency control. EFCore can be excluded by referencing `Finbuckle.MultiTenant.AspNetCore` instead of `Finbuckle.MultiTenant`.
 * Updated documentation.
@@ -134,11 +149,11 @@
 * Symbols package included for debugging.
 
 **3.2.0**
-* Added support for any preexisting global query filters in `MultiTenantDbContext` and `MultiTenantIdentityDbContext`. Thanks @nbarbettini!
-* Exposed the inner stores and strategies as a property on the respective `StoreInfo` and `StrategyInfo` properties of `MultiTenantContext`. Previously you could only access the wrapper object for each. Thanks @WalternativE!
-* Fixed certain methods on `MultiTenantOptionsCache` to be external as originally intended. Thanks @chernihiv!
-* Fix a bug with `TryUpdateAsync` in the wrapper store. Thanks @steebwba!
-* Updated documentation and fixed typos. Thanks @MesfinMo!
+* Added support for any preexisting global query filters in `MultiTenantDbContext` and `MultiTenantIdentityDbContext`. Thanks !
+* Exposed the inner stores and strategies as a property on the respective `StoreInfo` and `StrategyInfo` properties of `MultiTenantContext`. Previously you could only access the wrapper object for each. Thanks !
+* Fixed certain methods on `MultiTenantOptionsCache` to be external as originally intended. Thanks !
+* Fix a bug with `TryUpdateAsync` in the wrapper store. Thanks !
+* Updated documentation and fixed typos. Thanks !
 
 **3.1.0**
 * Added a strategy wrapper that handles validation and logging for the active strategy. When implementing `IMultiTenantStrategy` basic validation and logging are automatically provided.
@@ -147,10 +162,10 @@
 * Added `TrySetTenantInfo` as an extension method to `HttpContext`. This will set the `TenantInfo` provided as the current tenant for the request and can optionally reset the service providers so that scoped services are regenerated under the new tenant.
 * Updated and improved documentation and sample projects.
 * Miscellaneous bug fixes, code improvement, and unit tests.
-* Thanks to @nbarbettini for contributing to this release.
+* Thanks to  for contributing to this release.
 
 **3.0.1**
-* Refactored  the global query filter used in `MultiTenantDbContext` and `MultiTenantIdentityDbContext` (Thanks @GordonBlahut!) for better performance and code quality.
+* Refactored  the global query filter used in `MultiTenantDbContext` and `MultiTenantIdentityDbContext` (Thanks !) for better performance and code quality.
 * Removed custom `IModelCacheKeyFactory` as it is no longer needed due to the global query filter changes.
 * Updated documentation and samples.
 
@@ -192,7 +207,7 @@
 * Moved route configuration for RouteStrategy from `UseMultiTenant` to `WithRouteStrategy`.
 
 **1.2.0**
-* Added variants of `MultiTenantIdentityDbContext` which allows more flexible integration with Identity (Thanks @Cpcrook!)
+* Added variants of `MultiTenantIdentityDbContext` which allows more flexible integration with Identity (Thanks !)
 * Added sample project for data isolation with Identity
 * Minor refactoring and more unit tests
 * Various bug fixes
