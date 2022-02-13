@@ -1,4 +1,4 @@
-# What's New in Finbuckle.MultiTenant <span class="_version>6.5.1</span>
+# What's New in Finbuckle.MultiTenant <span class="_version">6.6.0</span>
 
 <!--_release-notes-->
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)
