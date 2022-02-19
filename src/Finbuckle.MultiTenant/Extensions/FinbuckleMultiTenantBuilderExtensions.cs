@@ -30,7 +30,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a DistributedCacheStore to the application.
         /// </summary>
-        /// <param name="slidingExiration">The timespan for a cache entry's sliding expiration.</param>
+        /// <param name="builder">The builder instance.</param>
+        /// <param name="slidingExpiration">The timespan for a cache entry's sliding expiration.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
             where TTenantInfo : class, ITenantInfo, new()
         {
@@ -42,8 +43,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a HttpRemoteStore to the application.
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         /// <param name="endpointTemplate">The endpoint URI template.</param>
-        /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string endpointTemplate)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithHttpRemoteStore(endpointTemplate, null);
@@ -51,6 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a HttpRemoteStore to the application.
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         /// <param name="endpointTemplate">The endpoint URI template.</param>
         /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
@@ -58,8 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                                                                                 Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : class, ITenantInfo, new()
         {
             var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
-            if (clientConfig != null && httpClientBuilder != null)
-                clientConfig(httpClientBuilder);
+            clientConfig?.Invoke(httpClientBuilder);
 
             builder.Services.TryAddSingleton<HttpRemoteStoreClient<TTenantInfo>>();
 
@@ -69,6 +70,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a ConfigurationStore to the application. Uses the default IConfiguration and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
             => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton);
@@ -76,6 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a ConfigurationStore to the application.
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         /// <param name="configuration">The IConfiguration to load the section from.</param>
         /// <param name="sectionName">The configuration section to load.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
@@ -87,16 +90,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds an empty InMemoryStore to the application.
         /// </summary>
-        /// <param name="ignoreCase">Whether the store should ignore case.</param>
+        /// <param name="builder">The builder instance.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
             where TTenantInfo : class, ITenantInfo, new()
+        // ReSharper disable once RedundantTypeArgumentsOfMethod
             => builder.WithInMemoryStore<TTenantInfo>(_ => {});
 
         /// <summary>
         /// Adds and configures InMemoryStore to the application using the provided action.
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         /// <param name="config">A action for configuring the store.</param>
-        /// <param name="ignoreCase">Whether the store should ignore case.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                                               Action<InMemoryStoreOptions<TTenantInfo>> config)
             where TTenantInfo : class, ITenantInfo, new()
@@ -106,6 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(config));
             }
 
+            // ReSharper disable once RedundantTypeArgumentsOfMethod
             builder.Services.Configure<InMemoryStoreOptions<TTenantInfo>>(config);
 
             return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
@@ -114,6 +119,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a StaticStrategy to the application.
         /// </summary>
+        /// <param name="builder">The builder instance.</param>
         /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
                                                                                                string identifier)
@@ -130,9 +136,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds and configures a DelegateStrategy to the application.
         /// </summary>
-        /// <param name="doStrategy">The delegate implementing the strategy.</returns>
+        /// <param name="builder">The builder instance.</param>
+        /// <param name="doStrategy">The delegate implementing the strategy.</param>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
-                                                                                                 Func<object, Task<string>> doStrategy)
+                                                                                                 Func<object, Task<string?>> doStrategy)
             where TTenantInfo : class, ITenantInfo, new()
         {
             if (doStrategy == null)

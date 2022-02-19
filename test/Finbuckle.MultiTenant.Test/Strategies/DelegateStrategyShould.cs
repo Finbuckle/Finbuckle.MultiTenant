@@ -31,6 +31,15 @@ namespace Finbuckle.MultiTenant.Test.Strategies
 
             Assert.Equal(identifier, result);
         }
+        
+        [Fact]
+        public async Task BeAbleToReturnNull()
+        {
+            var strategy = new DelegateStrategy(async _ => await Task.FromResult<string?>(null));
+            var result = await strategy.GetIdentifierAsync(new object());
+
+            Assert.Null(result);
+        }
 
         [Fact]
         public void ThrowIfNullDelegate()
