@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
-    public class TenantIdGenerator : ValueGenerator<string?>
-    {
-        public override string? Next(EntityEntry entry)
-        {
-            return ((IMultiTenantDbContext)entry.Context).TenantInfo.Id;
-        }
-
-        public override bool GeneratesTemporaryValues => false;
-    }
+    // public class TenantIdGenerator : ValueGenerator<string?>
+    // {
+    //     public override string? Next(EntityEntry entry)
+    //     {
+    //         return ((IMultiTenantDbContext)entry.Context).TenantInfo.Id;
+    //     }
+    //
+    //     public override bool GeneratesTemporaryValues => false;
+    // }
 
     public static class FinbuckleEntityTypeBuilderExtensions
     {
@@ -52,8 +52,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             {
                 builder.Property<string>("TenantId")
                        .IsRequired()
-                       .HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength)
-                       .HasValueGenerator<TenantIdGenerator>();
+                       .HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
+//                       .HasValueGenerator<TenantIdGenerator>();
             }
             catch (Exception ex)
             {
