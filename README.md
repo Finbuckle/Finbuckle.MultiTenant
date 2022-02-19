@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.6.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.6.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.6.0</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.6.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -23,22 +23,15 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.6.0</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.6.1</span>
 
 <!--_release-notes-->
 
 
-### Features
-
-* add BasePathStrategy option to rebase the AspNetCore Request.PathBase ([#510](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/510)) ([dccf414](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/dccf414c1fbb65d8a02b709460679e86c317451a))
-* add nullable reference types to all projects ([#514](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/514)) ([e6141fe](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e6141fec807025f8be51e86a82f91b4650a08aa4))
-* add strategy type and store type to TenantResolvedContext ([#508](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/508)) ([ef52fc2](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ef52fc21d05508bf4150bcfb7993aac953cd2202))
-
-
 ### Bug Fixes
 
-* actually set the strategy and store types on OnTenantResolvedContext ([#509](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/509)) ([fd9029e](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd9029e112b1be7b2e029e56a65b88ab7ae618d6))
-* remove dependency on NewtonSoft.Json ([#505](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/505)) ([f83f0b1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f83f0b1bf0278e91f9f4455f080fd00a2e644167))
+* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
