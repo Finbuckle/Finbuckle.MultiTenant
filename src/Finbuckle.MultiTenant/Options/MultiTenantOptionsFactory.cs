@@ -22,12 +22,13 @@ namespace Finbuckle.MultiTenant.Options
         private readonly IValidateOptions<TOptions>[] _validations;
 
         private readonly ITenantConfigureOptions<TOptions, TTenantInfo>[] _tenantConfigureOptions;
+        private readonly ITenantConfigureNamedOptions<TOptions, TTenantInfo>[] _tenantConfigureNamedOptions;
         private readonly IMultiTenantContextAccessor<TTenantInfo> _multiTenantContextAccessor;
 
         /// <summary>
         /// Initializes a new instance with the specified options configurations.
         /// </summary>
-        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions, IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions, IEnumerable<IValidateOptions<TOptions>> validations, IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions,  IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
+        public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions, IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions, IEnumerable<IValidateOptions<TOptions>> validations, IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions, IEnumerable<ITenantConfigureNamedOptions<TOptions, TTenantInfo>> tenantConfigureNamedOptions, IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
         {
             // The default DI container uses arrays under the covers. Take advantage of this knowledge
             // by checking for an array and enumerate over that, so we don't need to allocate an enumerator.
@@ -38,6 +39,7 @@ namespace Finbuckle.MultiTenant.Options
             _postConfigureOptions = postConfigureOptions as IPostConfigureOptions<TOptions>[] ?? new List<IPostConfigureOptions<TOptions>>(postConfigureOptions).ToArray();
             _validations = validations as IValidateOptions<TOptions>[] ?? new List<IValidateOptions<TOptions>>(validations).ToArray();
             _tenantConfigureOptions = tenantConfigureOptions as ITenantConfigureOptions<TOptions, TTenantInfo>[] ?? new List<ITenantConfigureOptions<TOptions, TTenantInfo>>(tenantConfigureOptions).ToArray();
+            _tenantConfigureNamedOptions = tenantConfigureNamedOptions as ITenantConfigureNamedOptions<TOptions, TTenantInfo>[] ?? new List<ITenantConfigureNamedOptions<TOptions, TTenantInfo>>(tenantConfigureNamedOptions).ToArray();
             _multiTenantContextAccessor = multiTenantContextAccessor;
         }
 
@@ -57,10 +59,17 @@ namespace Finbuckle.MultiTenant.Options
             }
 
             // Configure tenant options.
-            if(_multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
+            if (_multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
             {
-                foreach(var tenantConfigureOption in _tenantConfigureOptions)
+                foreach (var tenantConfigureOption in _tenantConfigureOptions)
                     tenantConfigureOption.Configure(options, _multiTenantContextAccessor.MultiTenantContext.TenantInfo);
+            }
+
+            // Configure tenant named options.
+            if (_multiTenantContextAccessor?.MultiTenantContext?.TenantInfo != null)
+            {
+                foreach (var tenantConfigureNamedOption in _tenantConfigureNamedOptions)
+                    tenantConfigureNamedOption.Configure(name, options, _multiTenantContextAccessor.MultiTenantContext.TenantInfo);
             }
 
             foreach (var post in _postConfigureOptions)

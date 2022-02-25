@@ -17,7 +17,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         // Used in some tests.
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         private int TestProperty { get; set; }
-
+      
         [Theory]
         [InlineData(ServiceLifetime.Singleton)]
         [InlineData(ServiceLifetime.Scoped)]
@@ -141,6 +141,25 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
             // Note: using MultiTenantBuilderShould as our test options class.
             builder.WithPerTenantOptions<MultiTenantBuilderShould>((o, _) => o.TestProperty = 1);
+            var sp = services.BuildServiceProvider();
+
+            sp.GetRequiredService<IOptionsMonitorCache<MultiTenantBuilderShould>>();
+        }
+        [Fact]
+        public void AddPerTenantNamedOptions()
+        {
+            var services = new ServiceCollection();
+            var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
+            accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>?)null);
+            services.AddSingleton(accessor.Object);
+
+            services.Configure<MultiTenantBuilderShould>("options1", c => { });
+            services.Configure<MultiTenantBuilderShould>("options2", c => { });
+
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+
+            // Note: using MultiTenantBuilderShould as our test options class.
+            builder.WithPerTenantNamedOptions<MultiTenantBuilderShould>((name, o, _) => o.TestProperty = 1);
             var sp = services.BuildServiceProvider();
 
             sp.GetRequiredService<IOptionsMonitorCache<MultiTenantBuilderShould>>();

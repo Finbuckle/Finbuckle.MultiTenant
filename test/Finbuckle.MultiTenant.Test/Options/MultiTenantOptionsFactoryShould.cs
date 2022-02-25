@@ -32,7 +32,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         [InlineData("")]
         [InlineData(null)]
         [InlineData("name")]
-        public void CreateMultipelOptionsWithTenantAction(string name)
+        public void CreateMultipleOptionsWithTenantAction(string name)
         {
             var services = new ServiceCollection();
             services.AddOptions();
@@ -47,6 +47,38 @@ namespace Finbuckle.MultiTenant.Test.Options
 
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Get(name);
             Assert.Equal($"{name}_begin_{accessor.MultiTenantContext.TenantInfo!.Id}_{accessor.MultiTenantContext.TenantInfo.Identifier}_end", options.DefaultConnectionString);
+        }
+
+        [Theory]
+        [InlineData("", "name2")]
+        [InlineData(null, "name2")]
+        [InlineData("name1", "name2")]
+        [InlineData("name1", "")]
+        public void CreateMultipleNamedOptionsWithTenantAction(string name1, string name2)
+        {
+            var services = new ServiceCollection();
+            services.AddOptions();
+            services.Configure<TestOptions>(name1, o => o.DefaultConnectionString = $"{name1}_begin");
+            services.Configure<TestOptions>(name2, o => o.DefaultConnectionString = $"{name2}_begin");
+            services.PostConfigure<TestOptions>(name1, o => o.DefaultConnectionString += "end");
+            services.PostConfigure<TestOptions>(name2, o => o.DefaultConnectionString += "end");
+            services.AddMultiTenant<TenantInfo>()
+                //configure non-named options
+                .WithPerTenantOptions<TestOptions>(( o, ti) => o.DefaultConnectionString += "_noname")
+                //configure named options
+                .WithPerTenantNamedOptions<TestOptions>((n, o, ti) => o.DefaultConnectionString += $"_{n}_{ti.Id}")
+                .WithPerTenantNamedOptions<TestOptions>((n, o, ti) => o.DefaultConnectionString += $"_{ti.Identifier}_");
+            var sp = services.BuildServiceProvider();
+            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
+            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "id", Identifier = "identifier" } };
+
+            var options1 = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Get(name1);
+            var expectedName1 = !string.IsNullOrEmpty(name1)? name1 :Microsoft.Extensions.Options.Options.DefaultName;
+            Assert.Equal($"{name1}_begin_noname_{expectedName1}_{accessor.MultiTenantContext.TenantInfo!.Id}_{accessor.MultiTenantContext.TenantInfo.Identifier}_end", options1.DefaultConnectionString);
+            
+            var options2 = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Get(name2);
+            var expectedName2 = !string.IsNullOrEmpty(name2)? name2 :Microsoft.Extensions.Options.Options.DefaultName;
+            Assert.Equal($"{name2}_begin_noname_{expectedName2}_{accessor.MultiTenantContext.TenantInfo!.Id}_{accessor.MultiTenantContext.TenantInfo.Identifier}_end", options2.DefaultConnectionString);
         }
 
         [Fact]
@@ -88,6 +120,22 @@ namespace Finbuckle.MultiTenant.Test.Options
                 .ValidateDataAnnotations();
             services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
             services.AddMultiTenant<TenantInfo>().WithPerTenantOptions<TestOptions>((o, ti) => o.DefaultConnectionString = null);
+            var sp = services.BuildServiceProvider();
+            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
+            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "id", Identifier = "identifier" } };
+
+            Assert.Throws<OptionsValidationException>(() => sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value);
+        }
+
+        [Fact]
+        public void ValidateNamedOptions()
+        {
+            var services = new ServiceCollection();
+            services.AddOptions<TestOptions>()
+                .Configure(o => o.DefaultConnectionString = "begin")
+                .ValidateDataAnnotations();
+            services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
+            services.AddMultiTenant<TenantInfo>().WithPerTenantNamedOptions<TestOptions>((n, o, ti) => o.DefaultConnectionString = null);
             var sp = services.BuildServiceProvider();
             var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
             accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = new TenantInfo { Id = "id", Identifier = "identifier" } };

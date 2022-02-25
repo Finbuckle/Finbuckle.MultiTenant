@@ -41,7 +41,29 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return this;
         }
+        /// <summary>
+        /// Adds per-tenant configuration for an named options class.
+        /// </summary>
+        /// <param name="tenantConfigureNamedOptions">The configuration action to be run for each tenant.</param>
+        /// <returns>The same MultiTenantBuilder passed into the method.</returns>
+        public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantNamedOptions<TOptions>(Action<string, TOptions, TTenantInfo> tenantConfigureNamedOptions) where TOptions : class, new()
+        {
+            if (tenantConfigureNamedOptions == null)
+            {
+                throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
+            }
 
+            // Handles multiplexing cached options.
+            Services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions, TTenantInfo>>();
+
+            // Necessary to apply tenant named options in between configuration and postconfiguration
+            Services.AddSingleton<ITenantConfigureNamedOptions<TOptions, TTenantInfo>, TenantConfigureNamedOptions<TOptions, TTenantInfo>>(sp => new TenantConfigureNamedOptions<TOptions, TTenantInfo>(tenantConfigureNamedOptions));
+            Services.TryAddTransient<IOptionsFactory<TOptions>, MultiTenantOptionsFactory<TOptions, TTenantInfo>>();
+            Services.TryAddScoped<IOptionsSnapshot<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
+            Services.TryAddSingleton<IOptions<TOptions>>(sp => BuildOptionsManager<TOptions>(sp));
+
+            return this;
+        }
 
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp) where TOptions : class, new()
         {
