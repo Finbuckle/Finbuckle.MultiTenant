@@ -167,7 +167,7 @@ namespace Finbuckle.MultiTenant.Test.Extensions
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            builder.WithDelegateStrategy(_ => Task.FromResult("Hi"));
+            builder.WithDelegateStrategy(_ => Task.FromResult<string?>("Hi"));
             var sp = services.BuildServiceProvider();
 
             var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
