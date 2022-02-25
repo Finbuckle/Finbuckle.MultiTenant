@@ -63,6 +63,8 @@ The type parameter `TOptions` is the options type being customized per-tenant. T
 `WithPerTenantOptions<TOptions>` can be called multiple times on the same `TOptions`
 type and the configuration will run in the respective order.
 
+The same delegate passed to `WithPerTenantOptions<TOptions>` is applied to all options generated of type `TOptions` regardless of the option name.
+
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
 ```cs
@@ -79,7 +81,30 @@ public MyController : Controller
 ```
 
 ## Named Options
-Both named and unnamed options are modified per-tenant. The same delegate passed to `WithPerTenantOptions<TOptions>` is applied to all options generated of type `TOptions` regardless of the option name.
+You can configure options by name using the `WithPerTenantNamedOptions<TOptions>` method.
+
+Call `WithPerTenantNamedOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
+
+```cs
+services.AddMultiTenant<TenantInfo>()...
+        .WithPerTenantNamedOptions<MyOptions>((name, options, tenantInfo) =>
+        {
+            if (name == "someOptionsName") {
+                options.MyOption1 = (int)tenantInfo.Items["someValue"];
+                options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
+            }
+        });
+```
+
+The `string` parameter is the name of the options.  The type parameter `TOptions` is the options type being customized per-tenant. The method parameter is an `Action<string, TOptions, TenantInfo>`. This action will modify the options instance *after* the options normal configuration and *before* its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions).
+
+`WithPerTenantNameOptions<TOptions>` can be called multiple times on the same `TOptions`
+type and the configuration will run in the respective order.
+
+The same delegate passed to `WithPerTenantNameOptions<TOptions>` is applied to all options generated of type `TOptions` regardless of the option name.  You can use the `name` argument in the callback to help you set the correct options by name.
+
+`WithPerTenantOptions<TOptions>` can be used in combination with `WithPerTenantNameOptions<TOptions>` for the same type `TOptions`.  The `WithPerTenantOptions<TOptions>` callbacks will be invoked first, followed by the `WithPerTenantNameOptions<TOptions>` callbacks.
+
 
 ## Options Caching
 Internally ASP.NET Core caches options, and Finbuckle.MultiTenant extends this to cache options per tenant. Caching occurs when a `TOptions` instance is retrieved via `Value` or `Get` on the injected `IOptions<TOptions>` (or derived) instance for the first time for a tenant.
