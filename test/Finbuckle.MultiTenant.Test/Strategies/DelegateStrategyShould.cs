@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.Test.Strategies
         public void CallDelegate()
         {
             int i = 0;
-            var strategy = new DelegateStrategy(_ => Task.FromResult((i++).ToString()));
+            var strategy = new DelegateStrategy(_ => Task.FromResult<string?>((i++).ToString()));
             strategy.GetIdentifierAsync(new object()).Wait();
 
             Assert.Equal(1, i);

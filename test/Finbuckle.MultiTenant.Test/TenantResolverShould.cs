@@ -15,14 +15,14 @@ namespace Finbuckle.MultiTenant.Test
     public class TenantResolverShould
     {
         [Fact]
-        void InitializeSortedStrategiesFromDi()
+        public void InitializeSortedStrategiesFromDi()
         {
             var services = new ServiceCollection();
             services.
                 AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult("strategy1")).
+                WithDelegateStrategy(_ => Task.FromResult<string?>("strategy1")).
                 WithStaticStrategy("strategy2").
-                WithDelegateStrategy(_ => Task.FromResult("strategy3")).
+                WithDelegateStrategy(_ => Task.FromResult<string?>("strategy3")).
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
 
@@ -36,7 +36,7 @@ namespace Finbuckle.MultiTenant.Test
         }
 
         [Fact]
-        void InitializeStoresFromDi()
+        public void InitializeStoresFromDi()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.Test
         }
 
         [Fact]
-        void ReturnMultiTenantContext()
+        public void ReturnMultiTenantContext()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -72,7 +72,7 @@ namespace Finbuckle.MultiTenant.Test
 
             services.
                 AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult("not-found")).
+                WithDelegateStrategy(_ => Task.FromResult<string?>("not-found")).
                 WithStaticStrategy("initech").
                 WithInMemoryStore().
                 WithConfigurationStore();
@@ -83,13 +83,13 @@ namespace Finbuckle.MultiTenant.Test
             var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
             var result = resolver.ResolveAsync(new object()).Result;
 
-            Assert.Equal("initech", result!.TenantInfo!.Identifier);
-            Assert.IsType<StaticStrategy>(result!.StrategyInfo!.Strategy);
-            Assert.IsType<ConfigurationStore<TenantInfo>>(result!.StoreInfo!.Store);
+            Assert.Equal("initech", result?.TenantInfo!.Identifier);
+            Assert.IsType<StaticStrategy>(result?.StrategyInfo!.Strategy);
+            Assert.IsType<ConfigurationStore<TenantInfo>>(result?.StoreInfo!.Store);
         }
 
         [Fact]
-        void ReturnNullMultiTenantContextGivenNoStrategies()
+        public void ReturnNullMultiTenantContextGivenNoStrategies()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -111,35 +111,31 @@ namespace Finbuckle.MultiTenant.Test
         }
 
         [Fact]
-        void ThrowGivenStaticStrategyWithNullIdentifierArgument()
+        public void ThrowGivenStaticStrategyWithNullIdentifierArgument()
         {
             var services = new ServiceCollection();
 
-            Action action = () => services.
+            Assert.Throws<ArgumentNullException>(() => services.
                 AddMultiTenant<TenantInfo>().
                 WithStaticStrategy(null!).
                 WithInMemoryStore().
-                WithConfigurationStore();
-
-            Assert.Throws<ArgumentNullException>(action);
+                WithConfigurationStore());
         }
 
         [Fact]
-        void ThrowGivenDelegateStrategyWithNullArgument()
+        public void ThrowGivenDelegateStrategyWithNullArgument()
         {
             var services = new ServiceCollection();
 
-            Action action = () => services.
+            Assert.Throws<ArgumentNullException>(() => services.
                 AddMultiTenant<TenantInfo>().
                 WithDelegateStrategy(null!).
                 WithInMemoryStore().
-                WithConfigurationStore();
-
-            Assert.Throws<ArgumentNullException>(action);
+                WithConfigurationStore());
         }
 
         [Fact]
-        void IgnoreSomeIdentifiersFromOptions()
+        public void IgnoreSomeIdentifiersFromOptions()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -150,7 +146,7 @@ namespace Finbuckle.MultiTenant.Test
 
             services.
                 AddMultiTenant<TenantInfo>(options => options.IgnoredIdentifiers.Add("lol")).
-                WithDelegateStrategy(_ => Task.FromResult("lol")). // should be ignored
+                WithDelegateStrategy(_ => Task.FromResult<string?>("lol")). // should be ignored
                 WithStaticStrategy("initech").
                 WithInMemoryStore().
                 WithConfigurationStore();
@@ -161,13 +157,13 @@ namespace Finbuckle.MultiTenant.Test
             var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
             var result = resolver.ResolveAsync(new object()).Result;
 
-            Assert.Equal("initech", result!.TenantInfo!.Identifier);
-            Assert.IsType<StaticStrategy>(result!.StrategyInfo!.Strategy);
+            Assert.Equal("initech", result?.TenantInfo!.Identifier);
+            Assert.IsType<StaticStrategy>(result?.StrategyInfo!.Strategy);
             Assert.IsType<ConfigurationStore<TenantInfo>>(result!.StoreInfo!.Store);
         }
 
         [Fact]
-        void ReturnNullIfNoStrategySuccess()
+        public void ReturnNullIfNoStrategySuccess()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -178,7 +174,7 @@ namespace Finbuckle.MultiTenant.Test
 
             services.
                 AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult<string>(null!)).
+                WithDelegateStrategy(_ => Task.FromResult<string?>(null!)).
                 WithInMemoryStore().
                 WithConfigurationStore();
             var sp = services.BuildServiceProvider();
@@ -192,7 +188,7 @@ namespace Finbuckle.MultiTenant.Test
         }
 
         [Fact]
-        void ReturnNullIfNoStoreSuccess()
+        public void ReturnNullIfNoStoreSuccess()
         {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -200,10 +196,10 @@ namespace Finbuckle.MultiTenant.Test
 
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
-
+            
             services.AddLogging().
                 AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult("not-found")).
+                WithDelegateStrategy(_ => Task.FromResult<string?>("not-found")).
                 WithStaticStrategy("also-not-found").
                 WithInMemoryStore().
                 WithConfigurationStore();
