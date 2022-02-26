@@ -1,0 +1,78 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1 class="display-4">Welcome</h1>
+
+<p>
+    This project demonstrates using BasePathStrategy for tenant resolution. See the <a href="https://www.finbuckle.com/MultiTenant/Docs/Strategies#base-path-strategy">documentation</a> for more
+    details.
+</p>
+
+<p>Select a tenant:</p>
+<ul>
+    <li>
+        <a href="/">None</a>
+    </li>
+    @foreach (var tenant in Model.Tenants)
+    {
+        <li>
+            <a href=@($"/{tenant.Identifier}")>@tenant.Name</a>
+        </li>
+    }
+</ul>
+
+@if (Model.TenantInfo is null)
+{
+    <p>There is no tenant selected.</p>
+    <p>
+        Note the setup in <code>Program.cs</code>. The <code>RebaseAspNetCorePathBase</code> option is set to <code>true</code>. This will automatically adjust any relative links generated after the middleware to include the tenant base path segment (such as the privacy menu link above). Be aware that relative links to static files will also be impacted. In this sample the css and javascript resource urls are all absolute urls for this reason. Also note that the MultiTenant middlware is registered just prior to the routing middleware.
+    </p>
+    <pre><code>
+// Add MultiTenant
+builder.Services.AddMultiTenant&lt;TenantInfo&gt;()
+                .WithBasePathStrategy(options =&gt; options.RebaseAspNetCorePathBase = true)
+                .WithConfigurationStore();
+
+// ...
+
+app.UseMultiTenant();
+
+app.UseRouting();
+
+// ...
+    </code></pre>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th class="w-25">Property</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td>@nameof(Model.TenantInfo.Id)</td>
+            <td>@Model.TenantInfo.Id</td>
+        </tr>
+        <tr>
+            <td>@nameof(Model.TenantInfo.Identifier)</td>
+            <td>@Model.TenantInfo.Identifier</td>
+        </tr>
+        <tr>
+            <td>@nameof(Model.TenantInfo.Name)</td>
+            <td>@Model.TenantInfo.Name</td>
+        </tr>
+        <tr>
+            <td>@nameof(Model.TenantInfo.ConnectionString)</td>
+            <td>@Model.TenantInfo.ConnectionString</td>
+        </tr>
+        </tbody>
+
+    </table>
+}

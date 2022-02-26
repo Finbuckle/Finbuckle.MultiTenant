@@ -119,9 +119,9 @@ services.AddMultiTenant<TenantInfo>()
 ```
 
 This strategy can also adjust the ASP.NET Core `Request.PathBase` and `Request.Path` variables so that subsequent
-middleware checking `Request.Path` do not see the tenant identifier segment but generated URLs are still valid. This can
-be useful in some scenarios where an application makes certain assumptions about paths that you otherwise cannot work
-around.
+middleware checking `Request.Path` do not see the tenant identifier segment and generated relative urls include the
+tenant base path automatically. This can be useful in some scenarios where an application makes certain assumptions
+about paths that you otherwise cannot work around.
 
 For example, a request to `https://mydomain.com/mytenant/mypath` by default has a `Request.PathBase` of `/` and
 a `Request.Path` of `/mytenant/mypath`. Setting this option will adjust these values to `/mytenant` and `/mypath`
@@ -135,6 +135,10 @@ services.AddMultiTenant<TenantInfo>()
           options.RebaseAspNetCorePathBase = true;
         })...
 ```
+
+Be aware that relative links to static files will be impacted so css files and other static resources may need to
+be referenced using absolute urls. Alternatively, you can place the `UseStaticFiles()` middleware after
+the `UseMultiTenant()` middware in the app pipeline configuration.
 
 ## Claim Strategy
 
