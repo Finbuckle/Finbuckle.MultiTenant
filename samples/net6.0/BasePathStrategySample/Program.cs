@@ -6,12 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 // Add MultiTenant
-builder.Services.AddMultiTenant<TenantInfo>(options =>
-    {
-        //options.IgnoredIdentifiers.Add("css");
-        //options.IgnoredIdentifiers.Add("js");
-        //options.IgnoredIdentifiers.Add("lib");
-    })
+builder.Services.AddMultiTenant<TenantInfo>()
     .WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true)
     .WithConfigurationStore();
 
