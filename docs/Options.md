@@ -88,8 +88,9 @@ Call `WithPerTenantNamedOptions<TOptions>` after `AddMultiTenant<T>` in the `Con
 ```cs
 services.AddMultiTenant<TenantInfo>()...
         .WithPerTenantNamedOptions<MyOptions>((name, options, tenantInfo) =>
-        {
+        {            
             if (name == "someOptionsName") {
+                //only update options named "someOptionsName"
                 options.MyOption1 = (int)tenantInfo.Items["someValue"];
                 options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
             }
