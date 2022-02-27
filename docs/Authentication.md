@@ -29,6 +29,8 @@ The following happens when `WithPerTenantAuthentication()` is called:
 - Cookie validation events are modified to validate that a tenant claim exists
   which matches the current requests tenant. Existing validation events are
   preserved.
+
+The following also happens if the `ItenantInfo` implementation has the appropriate property:
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `ITenantInfo` implementation.
 - 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property

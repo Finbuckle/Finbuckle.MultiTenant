@@ -26,7 +26,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseMultiTenant();
-
 app.UseRouting();
 
 app.UseAuthorization();
