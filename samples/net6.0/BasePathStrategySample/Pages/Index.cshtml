@@ -11,35 +11,21 @@
     details.
 </p>
 
-<p>Select a tenant:</p>
-<ul>
-    <li>
-        <a href="/">None</a>
-    </li>
-    @foreach (var tenant in Model.Tenants)
-    {
-        <li>
-            <a href=@($"/{tenant.Identifier}")>@tenant.Name</a>
-        </li>
-    }
-</ul>
-
 @if (Model.TenantInfo is null)
 {
-    <p>There is no tenant selected.</p>
+    <h2>There is no tenant selected. Use the menu bar to select a tenant.</h2>
     <p>
         Note the setup in <code>Program.cs</code>. The <code>RebaseAspNetCorePathBase</code> option is set to <code>true</code>. This will automatically adjust any relative links generated after the middleware to include the tenant base path segment (such as the privacy menu link above). Be aware that relative links to static files will also be impacted. In this sample the css and javascript resource urls are all absolute urls for this reason. Also note that the MultiTenant middlware is registered just prior to the routing middleware.
     </p>
     <pre><code>
 // Add MultiTenant
 builder.Services.AddMultiTenant&lt;TenantInfo&gt;()
-                .WithBasePathStrategy(options =&gt; options.RebaseAspNetCorePathBase = true)
-                .WithConfigurationStore();
+    .WithBasePathStrategy(options =&gt; options.RebaseAspNetCorePathBase = true)
+    .WithConfigurationStore();
 
 // ...
 
 app.UseMultiTenant();
-
 app.UseRouting();
 
 // ...
@@ -47,6 +33,7 @@ app.UseRouting();
 }
 else
 {
+    <h2>@Model.TenantInfo.Name</h2>
     <table class="table">
         <thead>
         <tr>
