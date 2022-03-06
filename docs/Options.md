@@ -62,11 +62,11 @@ details.
 Call `WithPerTenantOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
 
 ```cs
-services.AddMultiTenant<TenantInfo>()...
+services.AddMultiTenant<MyTenantInfo>()...
         .WithPerTenantOptions<MyOptions>((options, tenantInfo) =>
         {
-            options.MyOption1 = (int)tenantInfo.Items["someValue"];
-            options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
         });
 ```
 
@@ -103,12 +103,12 @@ You can configure options by name using the `WithPerTenantNamedOptions<TOptions>
 Call `WithPerTenantNamedOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
 
 ```cs
-services.AddMultiTenant<TenantInfo>()...
-    .WithPerTenantNamedOptions<MyOptions>(name, (options, tenantInfo) =>
+services.AddMultiTenant<MyTenantInfo>()...
+    .WithPerTenantNamedOptions<MyOptions>(someOptionsName, (options, tenantInfo) =>
     {
         // only update options named "someOptionsName"
-        options.MyOption1 = (int)tenantInfo.Items["someValue"];
-        options.MyOption2 = (int)tenantInfo.Items["anotherValue"];
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
     });
 ```
 
