@@ -9,16 +9,22 @@ namespace Finbuckle.MultiTenant.Options
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()
     {
-        private readonly Action<string, TOptions, TTenantInfo> configureOptions;
+        public string? Name { get; }
+        private readonly Action<TOptions, TTenantInfo> configureOptions;
 
-        public TenantConfigureNamedOptions(Action<string, TOptions, TTenantInfo> configureOptions)
+        public TenantConfigureNamedOptions(string? name, Action<TOptions, TTenantInfo> configureOptions)
         {
+            Name = name;
             this.configureOptions = configureOptions;
         }
 
         public void Configure(string name, TOptions options, TTenantInfo tenantInfo)
         {
-            configureOptions(name, options, tenantInfo);
+            // Null name is used to configure all named options.
+            if (Name == null || name == Name)
+            {
+                configureOptions(options, tenantInfo);
+            }
         }
     }
 }
