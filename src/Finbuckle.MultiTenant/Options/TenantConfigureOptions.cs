@@ -5,6 +5,7 @@ using System;
 
 namespace Finbuckle.MultiTenant.Options
 {
+    [Obsolete]
     public class TenantConfigureOptions<TOptions, TTenantInfo> : ITenantConfigureOptions<TOptions, TTenantInfo>
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()
