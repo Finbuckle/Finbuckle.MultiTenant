@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.6.1</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.7.0</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.6.1</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.7.0</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -23,15 +23,14 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.6.1</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.7.0</span>
 
 <!--_release-notes-->
 
 
-### Bug Fixes
+### Features
 
-* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
-* remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
+* Added support for named options ([#478](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/478)) ([#534](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/534)) ([6f9528d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6f9528d737f2803cf60f4d66112e53b5b1cb81c6))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
