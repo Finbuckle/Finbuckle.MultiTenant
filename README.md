@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.7.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.7.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.7.0</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.7.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -23,14 +23,14 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.7.0</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.7.1</span>
 
 <!--_release-notes-->
 
 
-### Features
+### Bug Fixes
 
-* Added support for named options ([#478](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/478)) ([#534](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/534)) ([6f9528d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6f9528d737f2803cf60f4d66112e53b5b1cb81c6))
+* use web System.Text.Json setttings and update samples ([#544](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/544)) ([266e806](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/266e806964af9b70daa7d1ed93b6b5a96c50ae5d))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
