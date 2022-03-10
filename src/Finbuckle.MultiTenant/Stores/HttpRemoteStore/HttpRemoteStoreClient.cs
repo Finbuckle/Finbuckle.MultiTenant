@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.Stores
                 return null;
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<TTenantInfo>(json);
+            var result = JsonSerializer.Deserialize<TTenantInfo>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
             return result;
         }
