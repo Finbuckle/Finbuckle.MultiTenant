@@ -23,7 +23,7 @@ namespace HttpRemoteStoreSample
             services.AddControllersWithViews();
             services.AddMultiTenant<TenantInfo>()
                     .WithRouteStrategy()
-                    .WithHttpRemoteStore("http://localhost:5004/tenants/"); // Use https in real apps!
+                    .WithHttpRemoteStore("http://localhost:44431/tenants/"); // Use https in real apps!
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
