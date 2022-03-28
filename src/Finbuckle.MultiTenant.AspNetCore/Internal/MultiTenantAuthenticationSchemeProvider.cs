@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         /// <summary>
         /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
-        /// using the specified <paramref name="options"/>,
+        /// using the specified <paramref name="options"/> and decorates the existing <paramref name="inner"/>.
         /// </summary>
         /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
@@ -34,7 +34,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         /// <summary>
         /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
-        /// using the specified <paramref name="options"/> and <paramref name="schemes"/>.
+        /// using the specified <paramref name="options"/> and <paramref name="schemes"/>. This instance decorates the existing <paramref name="inner"/>.
         /// </summary>
         /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
