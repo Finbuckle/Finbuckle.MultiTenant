@@ -19,24 +19,29 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// </summary>
     internal class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
+        private readonly IAuthenticationSchemeProvider _inner;
+
         /// <summary>
         /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
-        /// using the specified <paramref name="options"/>,
+        /// using the specified <paramref name="options"/> and decorates the existing <paramref name="inner"/>.
         /// </summary>
+        /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
-        public MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options)
-            : this(options, new Dictionary<string, AuthenticationScheme>(StringComparer.Ordinal))
+        public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options)
+            : this(inner, options, new Dictionary<string, AuthenticationScheme>(StringComparer.Ordinal))
         {
         }
 
         /// <summary>
         /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
-        /// using the specified <paramref name="options"/> and <paramref name="schemes"/>.
+        /// using the specified <paramref name="options"/> and <paramref name="schemes"/>. This instance decorates the existing <paramref name="inner"/>.
         /// </summary>
+        /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
         /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
         /// <param name="schemes">The dictionary used to store authentication schemes.</param>
-        public MultiTenantAuthenticationSchemeProvider(IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
+        public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
         {
+            _inner = inner;
             _optionsProvider = options;
 
             _schemes = schemes ?? throw new ArgumentNullException(nameof(schemes));
@@ -122,8 +127,22 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// </summary>
         /// <param name="name">The name of the authenticationScheme.</param>
         /// <returns>The scheme or null if not found.</returns>
-        public virtual Task<AuthenticationScheme?> GetSchemeAsync(string name)
-            => Task.FromResult(_schemes.ContainsKey(name) ? _schemes[name] : null);
+        public virtual async Task<AuthenticationScheme?> GetSchemeAsync(string name)
+        {
+            AuthenticationScheme? scheme = null;
+
+            if (_inner != null)
+            {
+                scheme = await _inner.GetSchemeAsync(name);
+            }
+
+            if (scheme == null)
+            {
+                scheme = _schemes.ContainsKey(name) ? _schemes[name] : null;
+            }
+
+            return scheme;
+        }
 
         /// <summary>
         /// Returns the scheme for this tenants in priority order for request handling.

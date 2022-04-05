@@ -194,10 +194,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     "WithPerTenantAuthenticationCore() must be called after AddAuthentication() in ConfigureServices.");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
 
-            // Replace IAuthenticationSchemeProvider so that the options aren't
-            // cached and can be used per-tenant.
-            builder.Services.Replace(ServiceDescriptor
-                .Singleton<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>());
+            // We need to "decorate" IAuthenticationScheme provider.
+            builder.Services.DecorateService<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>();
 
             return builder;
         }
