@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>6.7.1</Version>
+        <Version>6.7.2</Version>
         <Authors>Finbuckle LLC</Authors>
         <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
