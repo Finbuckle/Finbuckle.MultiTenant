@@ -21,14 +21,14 @@ namespace Finbuckle.MultiTenant.Strategies
             this.tenantKey = tenantKey;
         }
 
-        public async Task<string?> GetIdentifierAsync(object context)
+        public Task<string?> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var identifier = httpContext.Session.GetString(tenantKey);
-            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
+            return Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
         }
     }
 }

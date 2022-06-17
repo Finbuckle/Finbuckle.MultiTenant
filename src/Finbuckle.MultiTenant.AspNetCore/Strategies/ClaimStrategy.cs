@@ -62,7 +62,7 @@ namespace Finbuckle.MultiTenant.Strategies
 			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
 
 			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
-			return await Task.FromResult(identifier);
+			return identifier;
 		}
 	}
 }

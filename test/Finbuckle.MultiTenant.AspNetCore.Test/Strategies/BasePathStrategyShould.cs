@@ -97,12 +97,12 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
         }
 
         [Fact]
-        public void ThrowIfContextIsNotHttpContext()
+        public async void ThrowIfContextIsNotHttpContext()
         {
             var context = new Object();
             var strategy = new BasePathStrategy();
 
-            Assert.Throws<AggregateException>(() => strategy.GetIdentifierAsync(context).Result);
+            await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
         }
     }
 }

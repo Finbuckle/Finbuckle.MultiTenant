@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant.Strategies
 {
     public class BasePathStrategy : IMultiTenantStrategy
     {
-        public async Task<string?> GetIdentifierAsync(object context)
+        public Task<string?> GetIdentifierAsync(object context)
         {
             if(!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
@@ -21,11 +21,11 @@ namespace Finbuckle.MultiTenant.Strategies
                 path.Value?.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (pathSegments is null || pathSegments.Length == 0)
-                return null;
+                return Task.FromResult<string?>(null);
 
             string identifier = pathSegments[0];
 
-            return await Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
+            return Task.FromResult<string?>(identifier);
         }
     }
 }
