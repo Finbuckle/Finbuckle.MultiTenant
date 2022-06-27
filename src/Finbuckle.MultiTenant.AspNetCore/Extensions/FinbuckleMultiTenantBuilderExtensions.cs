@@ -103,61 +103,24 @@ namespace Microsoft.Extensions.DependencyInjection
             // Set per-tenant cookie options by convention.
             builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
             {
-                var d = (dynamic)tc;
-                try
+                var dynamicTenantInfo = (dynamic)tc;
+                if (dynamicTenantInfo != null)
                 {
-                    options.LoginPath = ((string)d.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    options.LogoutPath = ((string)d.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    options.AccessDeniedPath =
-                        ((string)d.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
+                    options.LoginPath = dynamicTenantInfo.LoginPath != null ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(TenantToken, tc.Identifier) : string.Empty;
+                    options.LogoutPath = dynamicTenantInfo.LogoutPath != null ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(TenantToken, tc.Identifier) : string.Empty;
+                    options.AccessDeniedPath = dynamicTenantInfo.AccessDeniedPath != null ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
             // Set per-tenant OpenIdConnect options by convention.
             builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
             {
-                var d = (dynamic)tc;
-                try
+                var dynamicTenantInfo = (dynamic)tc;
+                if (dynamicTenantInfo != null)
                 {
-                    options.Authority =
-                        ((string)d.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    options.ClientId = ((string)d.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    options.ClientSecret =
-                        ((string)d.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier);
-                }
-                catch
-                {
+                    options.Authority = dynamicTenantInfo.OpenIdConnectAuthority != null ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientId = dynamicTenantInfo.OpenIdConnectClientId != null ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientSecret = dynamicTenantInfo.OpenIdConnectClientSecret != null ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
