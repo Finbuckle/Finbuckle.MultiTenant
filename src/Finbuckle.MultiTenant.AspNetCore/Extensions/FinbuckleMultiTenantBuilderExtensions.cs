@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore;
@@ -106,9 +107,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.LoginPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LoginPath)) ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.LogoutPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LogoutPath)) ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.AccessDeniedPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.AccessDeniedPath)) != null ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.LoginPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieLoginPath)) ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.LogoutPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieLogoutPath)) ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.AccessDeniedPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieAccessDeniedPath)) ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
@@ -118,9 +119,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.Authority = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectAuthority)) ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientId = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectClientId)) ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientSecret = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectClientSecret)) ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.Authority = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectAuthority)) ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientId = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectClientId)) ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientSecret = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectClientSecret)) ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
@@ -133,6 +134,22 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return builder;
+
+            bool HasPropertyWithValidValue(dynamic entity, string propertyName)
+            {
+                var property = entity.GetType().GetProperty(propertyName);
+                if (property != null)
+                {
+                    if (string.IsNullOrWhiteSpace(property.GetValue(entity, null)))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
