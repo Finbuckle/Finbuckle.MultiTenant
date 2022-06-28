@@ -106,7 +106,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    ;
                     options.LoginPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LoginPath)) ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                     options.LogoutPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LogoutPath)) ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                     options.AccessDeniedPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.AccessDeniedPath)) != null ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
