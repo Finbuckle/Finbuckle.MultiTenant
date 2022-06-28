@@ -106,9 +106,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.LoginPath = dynamicTenantInfo.LoginPath != null ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.LogoutPath = dynamicTenantInfo.LogoutPath != null ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.AccessDeniedPath = dynamicTenantInfo.AccessDeniedPath != null ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    ;
+                    options.LoginPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LoginPath)) ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.LogoutPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.LogoutPath)) ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.AccessDeniedPath = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.AccessDeniedPath)) != null ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
@@ -118,9 +119,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.Authority = dynamicTenantInfo.OpenIdConnectAuthority != null ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientId = dynamicTenantInfo.OpenIdConnectClientId != null ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientSecret = dynamicTenantInfo.OpenIdConnectClientSecret != null ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.Authority = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectAuthority)) ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientId = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectClientId)) ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    options.ClientSecret = !string.IsNullOrEmpty(Convert.ToString(dynamicTenantInfo.OpenIdConnectClientSecret)) ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
                 }
             });
 
