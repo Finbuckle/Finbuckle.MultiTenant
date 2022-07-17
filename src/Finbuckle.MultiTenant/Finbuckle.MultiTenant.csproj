@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net5.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
         <Title>Finbuckle.MultiTenant</Title>
         <Description>Main library package for Finbuckle.MultiTenant.</Description>
         <Nullable>enable</Nullable>
@@ -22,17 +22,6 @@
                 <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
                 <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
             </ItemGroup>
-        </When>
-        <When Condition=" '$(TargetFramework)' == 'net5.0' ">
-            <ItemGroup>
-                <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
-          </ItemGroup>
         </When>
         <When Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
             <ItemGroup>
