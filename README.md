@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.7.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.7.3</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.7.2</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.7.3</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -23,14 +23,20 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.7.2</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.7.3</span>
 
 <!--_release-notes-->
 
 
 ### Bug Fixes
 
-* update scheme provider to support decorator pattern ([#551](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/551)) ([ead052a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ead052a45bdb414b26c0373262e9eff0b472e305))
+* drop .net 5.0 target ([#569](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/569)) ([38fa9e1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/38fa9e1cac660822f091c3e71b1746803394308f))
+* remove reliance on uncaught exceptions ([#563](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/563)) ([a675684](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a6756842b0558b19d620f9dcd049e30841841406))
+
+
+### Performance Improvements
+
+* corrected various async/await code ([#557](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/557)) ([fe7c01b](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fe7c01b66336e83ef5f1f108f9c3a92861135d54))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
