@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.regex = $"^{template}$";
         }
 
-        public async Task<string?> GetIdentifierAsync(object context)
+        public Task<string?> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
@@ -70,7 +70,7 @@ namespace Finbuckle.MultiTenant.Strategies
             var host = httpContext.Request.Host;
 
             if (host.HasValue == false)
-                return null;
+                return Task.FromResult<string?>(null);
 
             string? identifier = null;
 
@@ -83,7 +83,7 @@ namespace Finbuckle.MultiTenant.Strategies
                 identifier = match.Groups["identifier"].Value;
             }
 
-            return await Task.FromResult(identifier);
+            return Task.FromResult(identifier);
         }
     }
 }

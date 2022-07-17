@@ -21,7 +21,7 @@ namespace Finbuckle.MultiTenant.Strategies
             this.tenantParam = tenantParam;
         }
 
-        public async Task<string?> GetIdentifierAsync(object context)
+        public Task<string?> GetIdentifierAsync(object context)
         {
 
             if (!(context is HttpContext httpContext))
@@ -31,7 +31,7 @@ namespace Finbuckle.MultiTenant.Strategies
             object? identifier;
             httpContext.Request.RouteValues.TryGetValue(tenantParam, out identifier);
 
-            return await Task.FromResult(identifier as string);
+            return Task.FromResult(identifier as string);
         }
     }
 }

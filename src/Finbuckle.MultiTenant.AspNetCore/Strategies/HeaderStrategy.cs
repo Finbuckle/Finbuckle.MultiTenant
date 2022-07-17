@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -15,13 +16,13 @@ namespace Finbuckle.MultiTenant.Strategies
             _headerKey = headerKey;
         }
 
-        public async Task<string?> GetIdentifierAsync(object context)
+        public Task<string?> GetIdentifierAsync(object context)
         {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
-            return await Task.FromResult(httpContext?.Request.Headers[_headerKey]);
+            return Task.FromResult(httpContext?.Request.Headers[_headerKey].FirstOrDefault());
         }
     }
 }
