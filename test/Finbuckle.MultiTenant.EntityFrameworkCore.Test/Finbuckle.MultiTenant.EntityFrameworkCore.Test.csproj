@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -14,14 +14,8 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'net6.0' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.*-*" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.*-*" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net5.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.*" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.*" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.*" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
@@ -33,7 +27,6 @@
   </Choose>
 
   <ItemGroup>
-<!--    <ProjectReference Include="../Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj" />-->
     <ProjectReference Include="../../src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Finbuckle.MultiTenant.Test\Finbuckle.MultiTenant.Test.csproj" />
   </ItemGroup>
