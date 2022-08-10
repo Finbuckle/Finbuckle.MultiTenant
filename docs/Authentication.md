@@ -185,6 +185,6 @@ services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
         .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
         {
-            o.Cookie.Name = "SignInCookie - " + tenantInfo.Id;
+            o.Cookie.Name = "SignInCookie-" + tenantInfo.Id;
         });
 ```
