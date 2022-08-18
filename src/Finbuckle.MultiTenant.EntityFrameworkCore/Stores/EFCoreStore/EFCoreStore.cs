@@ -20,33 +20,33 @@ namespace Finbuckle.MultiTenant.Stores
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<TTenantInfo?> TryGetAsync(string id)
+        public virtual async Task<TTenantInfo?> TryGetAsync(string id)
         {
             return await dbContext.TenantInfo
                             .Where(ti => ti.Id == id)
                             .SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+        public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
             return await dbContext.TenantInfo.ToListAsync();
         }
 
-        public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+        public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
             return await dbContext.TenantInfo
                             .Where(ti => ti.Identifier == identifier)
                             .SingleOrDefaultAsync();
         }
 
-        public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+        public virtual async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             await dbContext.TenantInfo.AddAsync(tenantInfo);
 
             return await dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> TryRemoveAsync(string identifier)
+        public virtual async Task<bool> TryRemoveAsync(string identifier)
         {
             var existing = await dbContext.TenantInfo
                 .Where(ti => ti.Identifier == identifier)
@@ -61,7 +61,7 @@ namespace Finbuckle.MultiTenant.Stores
             return await dbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+        public virtual async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
             var existingLocal = dbContext.TenantInfo.Local.Where(ti => ti.Id == tenantInfo.Id).SingleOrDefault();
             if(existingLocal != null)
