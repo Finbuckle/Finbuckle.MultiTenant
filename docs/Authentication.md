@@ -11,7 +11,8 @@ Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
-See the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
+See
+the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
 for a demonstration of the features discussed in this topic.
 
 The sections below assume Finbuckle.MultiTenant is installed and configured. See
@@ -24,6 +25,7 @@ The `WithPerTenantAuthentication()` method can be called after
 options based on public properties of the `ITenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
+
 - Cookie sign-in events are modified to add a tenant claim during sign-in. Existing
   sign-in events are preserved.
 - Cookie validation events are modified to validate that a tenant claim exists
@@ -31,6 +33,7 @@ The following happens when `WithPerTenantAuthentication()` is called:
   preserved.
 
 The following also happens if the `ItenantInfo` implementation has the appropriate property:
+
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `ITenantInfo` implementation.
 - 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
@@ -64,8 +67,8 @@ By changing the default challenge per-tenant, the user can be redirected to a
 different scheme as needed. Combined with a per-tenant OpenID Connect authority,
 this can route to shared or tenant specific authentication infrastructure.
 
-The `CookieLoginPath`, `CookieLogoutPath`, and
-`CookieAccessDeniedPath` properties can use a template format where `__tenant__`
+The `CookieLoginPath`, `CookieLogoutPath`, `CookieAccessDeniedPath`, `OpenIdConnectAuthority`, `OpenIdConnectClientId`
+, `OpenIdConnectClientSecret` properties can use a template format where `__tenant__`
 will be replaced with the identifier for each specific tenant. For example, a
 `CookieLoginPath` of "/\_\_tenant\_\_/Identity/Account/Login" will result in
 "/initech/Identity/Account/Login" for the Initech tenant.
@@ -113,37 +116,37 @@ work.
 
 ```json
 "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
-    "Defaults": {
-        "ConnectionString": "",
-        "CookieLoginPath": "/__tenant__/home/login",
-        "CookieLogoutPath": "/__tenant__/home/logout"
-    },
-    "Tenants": [
-        {
-            "Id": "93f330717e5d4f039cd05da312d559cc",
-            "Identifier": "megacorp",
-            "Name": "MegaCorp",
-            "ChallengeScheme": "Cookies"
-        },
-        {
-            "Id": "505c5c97f4e2442394610c673ac91f61",
-            "Identifier": "acme",
-            "Name": "ACME",
-            "ChallengeScheme": "OpenIdConnect",
-            "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
-            "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
-            "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
-        },
-        {
-            "Id": "4ee609d6da0342e682012232566cff0e",
-            "Identifier": "initech",
-            "Name": "Initech",
-            "ChallengeScheme": "OpenIdConnect",
-            "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
-            "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
-            "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
-        }
-    ]
+"Defaults": {
+"ConnectionString": "",
+"CookieLoginPath": "/__tenant__/home/login",
+"CookieLogoutPath": "/__tenant__/home/logout"
+},
+"Tenants": [
+{
+"Id": "93f330717e5d4f039cd05da312d559cc",
+"Identifier": "megacorp",
+"Name": "MegaCorp",
+"ChallengeScheme": "Cookies"
+},
+{
+"Id": "505c5c97f4e2442394610c673ac91f61",
+"Identifier": "acme",
+"Name": "ACME",
+"ChallengeScheme": "OpenIdConnect",
+"OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
+"OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
+"OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+},
+{
+"Id": "4ee609d6da0342e682012232566cff0e",
+"Identifier": "initech",
+"Name": "Initech",
+"ChallengeScheme": "OpenIdConnect",
+"OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
+"OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
+"OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+}
+]
 }
 ```
 

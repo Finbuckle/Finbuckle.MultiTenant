@@ -28,7 +28,7 @@ namespace Finbuckle.MultiTenant.Strategies
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
             var identifier = httpContext.Session.GetString(tenantKey);
-            return Task.FromResult(identifier); // Prevent the compliler warning that no await exists.
+            return Task.FromResult<string?>(identifier); // Prevent the compiler warning that no await exists.
         }
     }
 }
