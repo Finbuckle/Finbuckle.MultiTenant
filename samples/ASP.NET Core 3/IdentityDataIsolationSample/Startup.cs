@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
 using Finbuckle.Utilities.AspNetCore;
 using System.Collections.Generic;
+using Microsoft.Extensions.Hosting;
 
 namespace IdentityDataIsolationSample
 {
