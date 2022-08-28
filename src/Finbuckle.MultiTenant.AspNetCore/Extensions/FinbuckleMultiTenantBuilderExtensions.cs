@@ -61,7 +61,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Configures conventional functionality for per-tenant authentication.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-        [SuppressMessage("ReSharper", "EmptyGeneralCatchClause")]
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
             this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
             Action<MultiTenantAuthenticationOptions>? config = null)
@@ -107,9 +106,16 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.LoginPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieLoginPath)) ? ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.LogoutPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieLogoutPath)) ? ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.AccessDeniedPath = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.CookieAccessDeniedPath)) ? ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    if (HasPropertyWithValidValue(dynamicTenantInfo, "CookieLoginPath"))
+                        options.LoginPath =
+                            ((string)dynamicTenantInfo.CookieLoginPath).Replace(Constants.TenantToken, tc.Identifier);
+                    if (HasPropertyWithValidValue(dynamicTenantInfo, "CookieLogoutPath"))
+                        options.LogoutPath =
+                            ((string)dynamicTenantInfo.CookieLogoutPath).Replace(Constants.TenantToken, tc.Identifier);
+                    if (HasPropertyWithValidValue(dynamicTenantInfo, "CookieAccessDeniedPath"))
+                        options.AccessDeniedPath = ((string)dynamicTenantInfo.CookieAccessDeniedPath).Replace(
+                            Constants.TenantToken,
+                            tc.Identifier);
                 }
             });
 
@@ -119,9 +125,21 @@ namespace Microsoft.Extensions.DependencyInjection
                 var dynamicTenantInfo = (dynamic)tc;
                 if (dynamicTenantInfo != null)
                 {
-                    options.Authority = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectAuthority)) ? ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientId = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectClientId)) ? ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
-                    options.ClientSecret = HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectClientSecret)) ? ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(Constants.TenantToken, tc.Identifier) : string.Empty;
+                    if (HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectAuthority)))
+                        options.Authority = ((string)dynamicTenantInfo.OpenIdConnectAuthority).Replace(
+                            Constants.TenantToken,
+                            tc.Identifier);
+
+                    if (HasPropertyWithValidValue(dynamicTenantInfo, nameof(dynamicTenantInfo.OpenIdConnectClientId)))
+                        options.ClientId = ((string)dynamicTenantInfo.OpenIdConnectClientId).Replace(
+                            Constants.TenantToken,
+                            tc.Identifier);
+
+                    if (HasPropertyWithValidValue(dynamicTenantInfo,
+                            nameof(dynamicTenantInfo.OpenIdConnectClientSecret)))
+                        options.ClientSecret = ((string)dynamicTenantInfo.OpenIdConnectClientSecret).Replace(
+                            Constants.TenantToken,
+                            tc.Identifier);
                 }
             });
 
@@ -218,10 +236,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.></returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
             this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
-            where TTenantInfo : class, ITenantInfo, new() => WithBasePathStrategy(builder, configureOptions =>
-        {
-            configureOptions.RebaseAspNetCorePathBase = false;
-        });
+            where TTenantInfo : class, ITenantInfo, new() => WithBasePathStrategy(builder,
+            configureOptions => { configureOptions.RebaseAspNetCorePathBase = false; });
 
         /// <summary>
         /// Adds and configures a BasePathStrategy to the application.
