@@ -192,7 +192,7 @@ The database context used with the EFCore store must derive from `EFCoreStoreDbC
 added:
 
 ```cs
-public class MultiTenantStoreDbContext : EFCoreStoreDbContext
+public class MultiTenantStoreDbContext : EFCoreStoreDbContext<TenantInfo>
 {
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
