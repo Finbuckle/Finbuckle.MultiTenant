@@ -215,7 +215,7 @@ method of the app's `Startup` class and provide types for the store's database c
 ```cs
 // Register to use the database context and TTenantInfo types show above.
 services.AddMultiTenant<TenantInfo>()
-        .WithEFCoreStore<MultiTenantStoreDbContext>()...
+        .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
 The contents of the store can be changed at runtime with the `TryAddAsync`,
