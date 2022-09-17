@@ -192,7 +192,7 @@ The database context used with the EFCore store must derive from `EFCoreStoreDbC
 added:
 
 ```cs
-public class MultiTenantStoreDbContext : EFCoreStoreDbContext
+public class MultiTenantStoreDbContext : EFCoreStoreDbContext<TenantInfo>
 {
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
@@ -209,13 +209,13 @@ This database context will have its own connection string (usually) separate fro
 Additionally, this database context can be entirely separate from any others an application might use if co-mingling the
 multitenant store and app entity models is not desired.
 
-Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext>` after `AddMultiTenant<T>` in the `ConfigureServices`
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext,ITenantInfo>` after `AddMultiTenant<T>` in the `ConfigureServices`
 method of the app's `Startup` class and provide types for the store's database context generic parameter:
 
 ```cs
 // Register to use the database context and TTenantInfo types show above.
 services.AddMultiTenant<TenantInfo>()
-        .WithEFCoreStore<MultiTenantStoreDbContext>()...
+        .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
 The contents of the store can be changed at runtime with the `TryAddAsync`,
