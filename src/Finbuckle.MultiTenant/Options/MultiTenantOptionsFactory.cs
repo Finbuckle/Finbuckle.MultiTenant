@@ -13,6 +13,7 @@ namespace Finbuckle.MultiTenant.Options
     /// Implementation of IOptionsFactory.
     /// </summary>
     /// <typeparam name="TOptions">The type of options being requested.</typeparam>
+    /// <typeparam name="TTenantInfo">The type of the tenant info.</typeparam>
     public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<TOptions>
         where TOptions : class, new()
         where TTenantInfo : class, ITenantInfo, new()

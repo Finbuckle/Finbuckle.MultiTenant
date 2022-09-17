@@ -14,23 +14,23 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Try to add the TTenantInfo to the store.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="tenantInfo"></param>
         /// <returns></returns>
         Task<bool> TryAddAsync(TTenantInfo tenantInfo);
 
         /// <summary>
         /// Try to update the TTenantInfo in the store.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="tenantInfo"></param>
         /// <returns></returns>
         Task<bool> TryUpdateAsync(TTenantInfo tenantInfo);
 
         /// <summary>
         /// Try to remove the TTenantInfo from the store.
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="tenantInfo"></param>
         /// <returns></returns>
-        Task<bool> TryRemoveAsync(string identifier);
+        Task<bool> TryRemoveAsync(string tenantInfo);
 
         /// <summary>
         /// Retrieve the TTenantInfo for a given identifier.

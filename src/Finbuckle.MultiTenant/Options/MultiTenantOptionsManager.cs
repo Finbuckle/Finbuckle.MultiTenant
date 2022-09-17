@@ -21,6 +21,7 @@ namespace Finbuckle.MultiTenant.Options
         /// Initializes a new instance with the specified options configurations.
         /// </summary>
         /// <param name="factory">The factory to use to create options.</param>
+        /// <param name="cache">The cache used for options.</param>
         public MultiTenantOptionsManager(IOptionsFactory<TOptions> factory, IOptionsMonitorCache<TOptions> cache)
         {
             _factory = factory;

@@ -112,7 +112,7 @@ namespace MultiTenantEntityTypeBuilderShould
             {
                 var key = db.Model.FindEntityType(typeof(Post))?.GetKeys().ToList();
 
-                Assert.Single(key);
+                Assert.Single(key!);
                 Assert.Equal(2, key![0].Properties.Count);
                 Assert.Contains("PostId", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
@@ -131,7 +131,7 @@ namespace MultiTenantEntityTypeBuilderShould
             {
                 var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
 
-                Assert.Single(key);
+                Assert.Single(key!);
                 Assert.Equal(2, key![0].Properties.Count);
                 Assert.Contains("BlogId", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
@@ -149,7 +149,7 @@ namespace MultiTenantEntityTypeBuilderShould
             {
                 var key = db.Model.FindEntityType(typeof(Blog))?.GetKeys().Where(k => !k.IsPrimaryKey()).ToList();
 
-                Assert.Single(key);
+                Assert.Single(key!);
                 Assert.Equal(2, key![0].Properties.Count);
                 Assert.Contains("Url", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
@@ -172,7 +172,7 @@ namespace MultiTenantEntityTypeBuilderShould
             {
                 var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
 
-                Assert.Single(key);
+                Assert.Single(key!);
                 Assert.Equal(2, key![0].Properties.Count);
                 Assert.Contains("Title", key[0].Properties.Select(p => p.Name));
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
