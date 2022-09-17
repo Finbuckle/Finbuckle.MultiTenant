@@ -12,6 +12,8 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

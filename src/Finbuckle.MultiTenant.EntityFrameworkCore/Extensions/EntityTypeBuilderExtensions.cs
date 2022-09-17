@@ -38,7 +38,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after
         /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
         /// </summary>
-        /// <typeparam name="T">The specific type of <see cref="EntityTypeBuilder"/></typeparam>
         /// <param name="builder">The typed EntityTypeBuilder instance.</param>
         /// <returns>A MultiTenantEntityTypeBuilder instance.</returns>
         public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)

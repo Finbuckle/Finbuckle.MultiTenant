@@ -14,8 +14,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.2" />
-        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.6.1" />
-        <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.6.1" />
+        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.*" />
+        <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.*" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
     </ItemGroup>
 
