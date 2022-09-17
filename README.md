@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.8.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.8.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.8.0</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.8.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#samples)
@@ -23,22 +23,14 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.8.0</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.8.1</span>
 
 <!--_release-notes-->
 
 
-### Features
-
-* opened efcorestore to allow overriding methods ([#577](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/577)) ([7dac251](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7dac251b39cbaf62a5329f71b920fac2288c1ec6)), closes [#574](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/574)
-
-
 ### Bug Fixes
 
-* add missing using statement to samples ([#581](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/581)) ([ec8e08e](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ec8e08e2bc99a85d28fc8be4aa34070f8eae4437))
-* adjust logic in per-tenant-authentication conventions ([e78a26f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e78a26fe1d3fa89b5ece8ecabcb2bce2f7a749ab))
-* environment configuration in samples ([#579](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/579)) ([6df8827](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6df882786c656108ffd4f0450c7c4fcb45cfe3fb))
-* update authentication.md ([#573](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/573)) ([df55b24](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/df55b24668642dfca235071abdbf7b369c2b3a85))
+* XML comment and generation fix ([#588](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/588)) ([c1de82d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c1de82dc9405830ae92ec331b81048a4b485e17b))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
