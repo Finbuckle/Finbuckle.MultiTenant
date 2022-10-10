@@ -230,7 +230,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         httpContext.Request.Path.StartsWithSegments($"/{tenantResolvedContext.TenantInfo?.Identifier}",
                             out var matched, out var
                                 newPath);
-                        httpContext.Request.PathBase = Path.Combine(httpContext.Request.PathBase, matched);
+                        httpContext.Request.PathBase = httpContext.Request.PathBase.Add(matched);
                         httpContext.Request.Path = newPath;
                     }
 
