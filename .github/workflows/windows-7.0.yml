@@ -1,4 +1,4 @@
-name: Windows (.NET 6.0)
+name: Windows (.NET 7.0)
 
 on:
   push:

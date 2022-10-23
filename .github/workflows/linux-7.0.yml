@@ -1,4 +1,4 @@
-name: Linux (.NET 6.0)
+name: Linux (.NET 7.0)
 
 on:
   push:

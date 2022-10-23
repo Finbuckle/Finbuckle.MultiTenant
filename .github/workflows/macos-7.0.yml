@@ -1,4 +1,4 @@
-name: MacOS (.NET 6.0)
+name: MacOS (.NET 7.0)
 
 on:
   push:
