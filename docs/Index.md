@@ -1,6 +1,6 @@
 [Introduction](Introduction)
 
-[What's New in Finbuckle.MultiTenant <span class="_version">6.8.1</span>](WhatsNew)
+[What's New in Finbuckle.MultiTenant <span class="_version">6.9.0</span>](WhatsNew)
 
 [Version History](History)
 
