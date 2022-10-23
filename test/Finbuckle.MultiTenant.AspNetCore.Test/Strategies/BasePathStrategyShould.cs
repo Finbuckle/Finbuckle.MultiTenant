@@ -13,11 +13,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
 {
     public class BasePathStrategyShould
     {
-        private HttpContext CreateHttpContextMock(string path)
+        private HttpContext CreateHttpContextMock(string path, string pathBase = "/")
         {
             var mock = new Mock<HttpContext>();
             mock.SetupProperty<PathString>(c => c.Request.Path, path);
-            mock.SetupProperty<PathString>(c => c.Request.PathBase, "/");
+            mock.SetupProperty<PathString>(c => c.Request.PathBase, pathBase);
             mock.SetupProperty(c => c.RequestServices);
             return mock.Object;
         }
@@ -103,6 +103,35 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
             var strategy = new BasePathStrategy();
 
             await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+        }
+
+        [Fact]
+        public async void AppendTenantToExistingBase()
+        {
+
+            var services = new ServiceCollection();
+            services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
+            {
+                options.Tenants.Add(new TenantInfo
+                {
+                    Id = "tenant",
+                    Identifier = "tenant",
+                    Name = "tenant"
+                });
+            });
+            services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
+            var serviceProvider = services.BuildServiceProvider();
+            var httpContext = CreateHttpContextMock("/tenant/path", "/base");
+            httpContext.RequestServices = serviceProvider;
+
+            Assert.Equal("/base", httpContext.Request.PathBase);
+            Assert.Equal("/tenant/path", httpContext.Request.Path);
+
+            // will trigger OnTenantFound event...
+            var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
+
+            Assert.Equal("/base/tenant", httpContext.Request.PathBase);
+            Assert.Equal("/path", httpContext.Request.Path);
         }
     }
 }
