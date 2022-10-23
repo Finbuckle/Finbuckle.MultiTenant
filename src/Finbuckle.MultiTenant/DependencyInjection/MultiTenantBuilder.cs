@@ -78,9 +78,9 @@ namespace Microsoft.Extensions.DependencyInjection
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp)
             where TOptions : class, new()
         {
-            var cache = ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions, TTenantInfo>));
+            var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsCache<TOptions, TTenantInfo>));
             return (MultiTenantOptionsManager<TOptions>)
-                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), new[] { cache });
+                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
         }
 
         /// <summary>

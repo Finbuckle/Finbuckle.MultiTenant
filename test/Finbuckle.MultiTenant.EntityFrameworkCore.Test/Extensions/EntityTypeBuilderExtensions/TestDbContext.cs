@@ -44,7 +44,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
     {
         public object Create(DbContext context)
         {
-            // Needed for tests that change the model.
+            return new object();
+        }
+        
+        public object Create(DbContext context, bool designTime)
+        {
             return new object();
         }
     }
