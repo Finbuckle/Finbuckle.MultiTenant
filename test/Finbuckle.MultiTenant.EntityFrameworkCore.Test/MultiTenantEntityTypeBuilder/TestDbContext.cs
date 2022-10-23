@@ -50,6 +50,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantEntityTypeBu
     {
         public object Create(DbContext context)
         {
+            return new object();
+        }
+        
+        public object Create(DbContext context, bool designTime)
+        {
             return new Object(); // Never cache!
         }
     }
