@@ -1,17 +1,12 @@
-# What's New in Finbuckle.MultiTenant <span class="_version">6.9.0</span>
+# What's New in Finbuckle.MultiTenant <span class="_version">6.9.1</span>
 
 <!--_release-notes-->
-## [6.9.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.8.1...v6.9.0) (2022-10-23)
-
-
-### Features
-
-* .net7.0 support ([#604](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/604)) ([4d7d54d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4d7d54d928ecc22b7cc7d7de50223400b00c9f10))
+## [6.9.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.9.0...v6.9.1) (2022-11-10)
 
 
 ### Bug Fixes
 
-* BasePathStrategy combine path bug ([0628b0f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0628b0f3d27d4a975cf862b8477cec73a29080b2))
+* update for final .NET 7 release ([#610](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/610)) ([ac32e7d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ac32e7dbb9b2bb7315e4787234677e1643ef0118))
 
 
 <!--_release-notes-->
