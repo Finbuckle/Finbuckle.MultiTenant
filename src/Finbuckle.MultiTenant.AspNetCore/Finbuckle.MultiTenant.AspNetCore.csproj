@@ -16,7 +16,7 @@
     <When Condition=" '$(TargetFramework)' == 'net7.0' ">
       <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.*-*" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.0" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'net6.0' ">

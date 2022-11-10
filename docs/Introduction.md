@@ -15,6 +15,10 @@ Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. I
 ![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-6.0.yml/badge.svg)  
 ![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-6.0.yml/badge.svg)
 
+![Build Status Linux 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-7.0.yml/badge.svg)  
+![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-7.0.yml/badge.svg)  
+![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-7.0.yml/badge.svg)
+
 ## License
 
 This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See the LICENSE file for license information.
