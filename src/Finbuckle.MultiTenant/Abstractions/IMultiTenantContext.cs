@@ -3,10 +3,15 @@
 
 namespace Finbuckle.MultiTenant
 {
-    public interface IMultiTenantContext<T>
+    public interface IMultiTenantContext
+    {
+        ITenantInfo? TenantInfo { get; }
+    }
+
+    public interface IMultiTenantContext<T> : IMultiTenantContext
         where T : class, ITenantInfo, new()
     {
-        T? TenantInfo { get; set; }
+        new T? TenantInfo { get; set; }
         StrategyInfo? StrategyInfo { get; set; }
         StoreInfo<T>? StoreInfo { get; set; }
     }

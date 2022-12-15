@@ -12,5 +12,7 @@ namespace Finbuckle.MultiTenant
         public T? TenantInfo { get; set; }
         public StrategyInfo? StrategyInfo { get; set; }
         public StoreInfo<T>? StoreInfo { get; set; }
+
+        ITenantInfo? IMultiTenantContext.TenantInfo => TenantInfo;
     }
 }

@@ -23,7 +23,7 @@ namespace Finbuckle.MultiTenant.Core
             }
         }
 
-        object? IMultiTenantContextAccessor.MultiTenantContext
+        IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext
         {
             get => MultiTenantContext;
             set => MultiTenantContext = value as IMultiTenantContext<T> ?? MultiTenantContext;
