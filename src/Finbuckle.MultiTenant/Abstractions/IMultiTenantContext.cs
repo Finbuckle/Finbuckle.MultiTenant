@@ -9,11 +9,11 @@ namespace Finbuckle.MultiTenant
         StrategyInfo? StrategyInfo { get; }
     }
 
-    public interface IMultiTenantContext<T> : IMultiTenantContext
+    public interface IMultiTenantContext<T>
         where T : class, ITenantInfo, new()
     {
-        new T? TenantInfo { get; set; }
-        new StrategyInfo? StrategyInfo { get; set; }
+        T? TenantInfo { get; set; }
+        StrategyInfo? StrategyInfo { get; set; }
         StoreInfo<T>? StoreInfo { get; set; }
     }
 }

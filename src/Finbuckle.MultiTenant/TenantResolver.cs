@@ -83,8 +83,7 @@ namespace Finbuckle.MultiTenant
 
         async Task<IMultiTenantContext?> ITenantResolver.ResolveAsync(object context)
         {
-            var multiTenantContext = await ResolveAsync(context);
-            return multiTenantContext;
+            return (await ResolveAsync(context)) as IMultiTenantContext;
         }
     }
 }
