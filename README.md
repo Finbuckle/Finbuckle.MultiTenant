@@ -7,7 +7,7 @@ per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
 Current publish feed release:  
-![Finbckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
+![Finbuckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
 
 Table of Contents
 
