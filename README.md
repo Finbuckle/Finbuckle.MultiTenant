@@ -7,14 +7,14 @@ per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
 Current publish feed release:  
-![Finbckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
+![Finbuckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
 
 Table of Contents
 
 1. [What's New in Finbuckle.MultiTenant <span class="_version">6.9.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
-4. [Sample Projects](#samples)
+4. [Sample Projects](#sample-projects)
 5. [Build and Test Status](#build-and-test-status)
 6. [License](#license)
 7. [.NET Foundation](#net-foundation)
@@ -140,17 +140,20 @@ more details:
 * [Entity Framework Core Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/EFCore)
 * [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/Identity)
 
-## Samples Projects
+## Sample Projects
 
 A variety of [sample projects](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) are available in the repository.
 
 ## Build and Test Status
 
-| Windows                                                                                                                     | Linux                                                                                                                   | macOS                                                                                                                     |
-|-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| ![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-6.0.yml/badge.svg) | ![Build Status Linux 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-6.0.yml/badge.svg) | ![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-6.0.yml/badge.svg)   |
-| ![Build Status Windows 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-5.0.yml/badge.svg) | ![Build Status Linux 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-5.0.yml/badge.svg) | ![Build Status MacOS 5.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-5.0.yml/badge.svg)   |
-| ![Build Status Windows 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-3.1.yml/badge.svg) | ![Build Status Linux 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-3.1.yml/badge.svg) | ![Build Status MacOS 3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-3.1.yml/badge.svg?)  |
+![Build Status Linux 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-6.0.yml/badge.svg)  
+![Build Status Linux 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/linux-7.0.yml/badge.svg)  
+
+![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-6.0.yml/badge.svg)  
+![Build Status MacOS 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/macos-7.0.yml/badge.svg)  
+
+![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-6.0.yml/badge.svg)  
+![Build Status Windows 6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/windows-7.0.yml/badge.svg)
 
 ## License
 

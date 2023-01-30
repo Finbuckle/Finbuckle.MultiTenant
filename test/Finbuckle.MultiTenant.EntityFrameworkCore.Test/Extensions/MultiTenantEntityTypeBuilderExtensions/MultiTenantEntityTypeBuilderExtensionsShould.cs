@@ -25,8 +25,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
         {
             using var db = GetDbContext(builder =>
             {
-#if NET
-                    builder.Entity<Blog>()
+                builder.Entity<Blog>()
                            .HasIndex(e => e.BlogId, nameof(Blog.BlogId))
                            .HasDatabaseName(nameof(Blog.BlogId) + "DbName")
                            .IsUnique();
@@ -34,11 +33,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
                            .HasIndex(e => e.Url, nameof(Blog.Url))
                            .HasDatabaseName(nameof(Blog.Url) + "DbName")
                            .IsUnique();
-#else
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
-                builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url)).IsUnique();
-#endif
-                builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
             });
             var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
@@ -53,19 +48,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
         {
             using var db = GetDbContext(builder =>
             {
-#if NET
-                    builder.Entity<Blog>()
+                builder.Entity<Blog>()
                            .HasIndex(e => e.BlogId, nameof(Blog.BlogId))
                            .HasDatabaseName(nameof(Blog.BlogId) + "DbName")
                            .IsUnique();
                     builder.Entity<Blog>()
                            .HasIndex(e => e.Url, nameof(Blog.Url))
                            .HasDatabaseName(nameof(Blog.Url) + "DbName");
-#else
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
-                builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url));
-#endif
-                builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
+                    builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
             });
             var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
@@ -80,18 +70,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
         {
             using var db = GetDbContext(builder =>
             {
-#if NET
-                    builder.Entity<Blog>()
+                builder.Entity<Blog>()
                            .HasIndex(e => e.BlogId, nameof(Blog.BlogId))
                            .HasDatabaseName(nameof(Blog.BlogId) + "DbName")
                            .IsUnique();
-                    builder.Entity<Blog>()
-                           .HasIndex(e => e.Url, nameof(Blog.Url))
-                           .HasDatabaseName(nameof(Blog.Url) + "DbName");
-#else
-                builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName(nameof(Blog.BlogId)).IsUnique();
-                builder.Entity<Blog>().HasIndex(e => e.Url).HasName(nameof(Blog.Url));
-#endif
+                builder.Entity<Blog>()
+                       .HasIndex(e => e.Url, nameof(Blog.Url))
+                       .HasDatabaseName(nameof(Blog.Url) + "DbName");
                 builder.Entity<Blog>().IsMultiTenant().AdjustIndexes();
             });
             var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);

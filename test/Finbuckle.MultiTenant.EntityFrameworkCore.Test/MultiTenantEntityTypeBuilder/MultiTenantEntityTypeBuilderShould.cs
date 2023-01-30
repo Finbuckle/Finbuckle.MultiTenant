@@ -55,26 +55,17 @@ namespace MultiTenantEntityTypeBuilderShould
 
             using (var db = GetDbContext(builder =>
                 {
-#if NET
                     builder.Entity<Blog>()
                            .HasIndex(e => e.BlogId, "CustomIndexName")
                            .HasDatabaseName("CustomIndexDbName");
-#else
-                    builder.Entity<Blog>().HasIndex(e => e.BlogId).HasName("CustomIndexName");
-#endif
+
                     origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
                     builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
                 }))
             {
                 var index = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().First();
-#if NET
                 Assert.Equal("CustomIndexName", index!.Name);
                 Assert.Equal("CustomIndexDbName", index.GetDatabaseName());
-#elif NETCOREAPP3_1
-                Assert.Equal("CustomIndexName", index.GetName());
-#elif NETCOREAPP2_1
-                Assert.Equal("CustomIndexName", index.Relational().Name);
-#endif
             }
         }
 

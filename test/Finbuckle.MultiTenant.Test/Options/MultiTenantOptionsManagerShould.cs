@@ -72,17 +72,17 @@ namespace Finbuckle.MultiTenant.Test.Options
                 throw new NotImplementedException();
             }
 
-            public virtual TOptions GetOrAdd(string name, Func<TOptions> createOptions)
+            public virtual TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
             {
                 throw new NotImplementedException();
             }
 
-            public virtual bool TryAdd(string name, TOptions options)
+            public virtual bool TryAdd(string? name, TOptions options)
             {
                 throw new NotImplementedException();
             }
 
-            public virtual bool TryRemove(string name)
+            public virtual bool TryRemove(string? name)
             {
                 throw new NotImplementedException();
             }

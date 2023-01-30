@@ -131,21 +131,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         private static void UpdateIdentityUserIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedUserName");
-#if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
-#elif NETSTANDARD2_1 // .NET Core 3.1
-            builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
-#endif
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedName");
-#if NET // Covers .NET 5.0 and later.
             builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
-#elif NETSTANDARD2_1 // .NET Core 3.1
-            builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
-#endif
         }
 
         private static void UpdateIdentityUserLoginPrimaryKey(this EntityTypeBuilder builder)

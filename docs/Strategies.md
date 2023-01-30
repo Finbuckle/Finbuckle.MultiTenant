@@ -188,7 +188,7 @@ services.AddMultiTenant<TenantInfo>()
 ```
 
 Note that an app will have
-to [configure session state](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-3.1#session-state)
+to [configure session state](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/app-state#session-state)
 accordingly and then actually set the session variable. A typical use case is to register the session strategy before a
 more expensive strategy. The expensive strategy can set the session value so that for subsequent requests resolve the
 tenant without invoking the expensive strategy.
@@ -219,7 +219,7 @@ public class Startup
         
         // Other services...
 
-        services.AddControllersWithViews(); // /AddMvc() for ASP.NET Core 3.1
+        services.AddControllersWithViews();
 
         // Other services...
     }

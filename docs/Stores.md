@@ -124,7 +124,7 @@ When possible prefer a case-insensitive in-memory store.
 > NuGet package: Finbuckle.MultiTenant
 
 Uses an
-app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1) as
+app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) as
 the underlying store. Most of the sample projects use this store for simplicity. This store is case insensitive when
 retrieving tenant information by tenant identifier.
 
@@ -296,7 +296,7 @@ services.AddMultiTenant<TenantInfo>()
 ```
 
 Use the same overload to configure delegating handlers
-and [customize the http request behavior](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-3.1#outgoing-request-middleware)
+and [customize the http request behavior](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests#outgoing-request-middleware)
 . For example, adding custom headers for authentication:
 
 ```cs
@@ -325,7 +325,7 @@ services.AddMultiTenant<TenantInfo>()
 > NuGet package: Finbuckle.MultiTenant
 
 Uses the ASP.NET
-Core [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed?view=aspnetcore-3.1)
+Core [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed)
 mechanism. The distributed cache can use Redis, SQl Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported.
 

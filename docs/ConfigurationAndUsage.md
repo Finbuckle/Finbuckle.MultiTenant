@@ -59,7 +59,7 @@ Configures the middleware handling tenant resolution via the multitenant strateg
 ```cs
 public void Configure(IApplicationBuilder app)
 {
-    app.UseRouting(); // In ASP.NET Core 3.1 this should be before UseMultiTenant!
+    app.UseRouting();
     ...
     app.UseMultiTenant(); // Before UseAuthentication and UseEndpoints
     ...
