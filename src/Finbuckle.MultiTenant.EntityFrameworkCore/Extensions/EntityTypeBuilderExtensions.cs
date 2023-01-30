@@ -132,14 +132,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             builder.RemoveIndex("NormalizedUserName");
             builder.HasIndex("NormalizedUserName", "TenantId").HasDatabaseName("UserNameIndex").IsUnique();
-            builder.HasIndex("NormalizedUserName", "TenantId").HasName("UserNameIndex").IsUnique();
         }
 
         private static void UpdateIdentityRoleIndex(this EntityTypeBuilder builder)
         {
             builder.RemoveIndex("NormalizedName");
             builder.HasIndex("NormalizedName", "TenantId").HasDatabaseName("RoleNameIndex").IsUnique();
-            builder.HasIndex("NormalizedName", "TenantId").HasName("RoleNameIndex").IsUnique();
         }
 
         private static void UpdateIdentityUserLoginPrimaryKey(this EntityTypeBuilder builder)

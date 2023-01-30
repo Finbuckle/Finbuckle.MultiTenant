@@ -65,7 +65,7 @@ namespace Finbuckle.MultiTenant.Options
         /// <param name="name">The options name.</param>
         /// <param name="createOptions">The factory function for creating the options instance.</param>
         /// <returns>The existing or new options instance.</returns>
-        public TOptions GetOrAdd(string name, Func<TOptions> createOptions)
+        public TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
         {
             if (createOptions == null)
             {
@@ -85,7 +85,7 @@ namespace Finbuckle.MultiTenant.Options
         /// <param name="name">The options name.</param>
         /// <param name="options">The options instance.</param>
         /// <returns>True if the options was added to the cache for the current tenant.</returns>
-        public bool TryAdd(string name, TOptions options)
+        public bool TryAdd(string? name, TOptions options)
         {
             name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
             var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
@@ -99,7 +99,7 @@ namespace Finbuckle.MultiTenant.Options
         /// </summary>
         /// <param name="name">The options name.</param>
         /// <returns>True if the options was removed from the cache for the current tenant.</returns>
-        public bool TryRemove(string name)
+        public bool TryRemove(string? name)
         {
             name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
             var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";

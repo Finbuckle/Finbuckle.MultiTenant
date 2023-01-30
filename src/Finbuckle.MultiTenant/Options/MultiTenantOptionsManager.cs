@@ -36,7 +36,7 @@ namespace Finbuckle.MultiTenant.Options
             }
         }
 
-        public virtual TOptions Get(string name)
+        public virtual TOptions Get(string? name)
         {
             name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
 
