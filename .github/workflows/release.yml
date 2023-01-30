@@ -6,13 +6,7 @@ jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '7.0.x'
-          include-prerelease: true
-        env:
-          DOTNET_INSTALL_DIR: /usr/share/dotnet
+      - uses: actions/checkout@v3
       - name: build and test
         run: |
           dotnet restore
@@ -28,4 +22,4 @@ jobs:
       - name: run semantic-release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx semantic-release
+        run: nvm install 'lts/*' && npx semantic-release
