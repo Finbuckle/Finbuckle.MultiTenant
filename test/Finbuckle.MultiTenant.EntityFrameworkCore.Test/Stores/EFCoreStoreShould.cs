@@ -77,6 +77,76 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
             var prop = GetModelProperty("Identifier");
             Assert.True(prop!.IsIndex());
         }
+        
+        [Fact]
+        public void NotTrackContextOnGet()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = store.TryGetAsync("initech-id").Result;
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
+        
+        [Fact]
+        public void NotTrackContextOnGetByIdentifier()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
+        
+        [Fact]
+        public void NotTrackContextOnGetAll()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = store.GetAllAsync().Result.First();
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
+        
+        [Fact]
+        public void NotTrackContextOnAdd()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = new TenantInfo
+            {
+                Id = "test-id",
+                Identifier = "test-identifier",
+                Name = "test"
+            };
+            store.TryAddAsync(tenant);
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
+        
+        [Fact]
+        public void NotTrackContextOnUpdate()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            tenant.Name = "new name";
+            store.TryUpdateAsync(tenant);
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
+        
+        [Fact]
+        public void NotTrackContextOnRemove()
+        {
+            var store = CreateTestStore() as EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>;
+            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            tenant.Name = "new name";
+            store.TryRemoveAsync(tenant.Id);
+            
+            var entity = store.dbContext.Entry(tenant);
+            Assert.Equal(EntityState.Detached, entity.State);
+        }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs
 
