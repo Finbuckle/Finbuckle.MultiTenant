@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant.Stores
 {
     public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
         where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
-        where TTenantInfo :class, ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
         internal readonly TEFCoreStoreDbContext dbContext;
 
@@ -22,28 +22,30 @@ namespace Finbuckle.MultiTenant.Stores
 
         public virtual async Task<TTenantInfo?> TryGetAsync(string id)
         {
-            return await dbContext.TenantInfo
-                            .Where(ti => ti.Id == id)
-                            .SingleOrDefaultAsync();
+            return await dbContext.TenantInfo.AsNoTracking()
+                .Where(ti => ti.Id == id)
+                .SingleOrDefaultAsync();
         }
 
         public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync()
         {
-            return await dbContext.TenantInfo.ToListAsync();
+            return await dbContext.TenantInfo.AsNoTracking().ToListAsync();
         }
 
         public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
         {
-            return await dbContext.TenantInfo
-                            .Where(ti => ti.Identifier == identifier)
-                            .SingleOrDefaultAsync();
+            return await dbContext.TenantInfo.AsNoTracking()
+                .Where(ti => ti.Identifier == identifier)
+                .SingleOrDefaultAsync();
         }
 
         public virtual async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
         {
             await dbContext.TenantInfo.AddAsync(tenantInfo);
-
-            return await dbContext.SaveChangesAsync() > 0;
+            var result = await dbContext.SaveChangesAsync() > 0;
+            dbContext.Entry(tenantInfo).State = EntityState.Detached;
+            
+            return result;
         }
 
         public virtual async Task<bool> TryRemoveAsync(string identifier)
@@ -63,14 +65,10 @@ namespace Finbuckle.MultiTenant.Stores
 
         public virtual async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
         {
-            var existingLocal = dbContext.TenantInfo.Local.Where(ti => ti.Id == tenantInfo.Id).SingleOrDefault();
-            if(existingLocal != null)
-            {
-                dbContext.Entry(existingLocal).State = EntityState.Detached;
-            }
-
             dbContext.TenantInfo.Update(tenantInfo);
-            return await dbContext.SaveChangesAsync() > 0;
+            var result = await dbContext.SaveChangesAsync() > 0;
+            dbContext.Entry(tenantInfo).State = EntityState.Detached;
+            return result;
         }
     }
 }
