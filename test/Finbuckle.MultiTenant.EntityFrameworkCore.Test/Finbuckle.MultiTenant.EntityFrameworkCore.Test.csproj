@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -14,20 +14,14 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'net7.0' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.*" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.*" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'net6.0' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.8" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.28" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.28" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.*" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.*" />
       </ItemGroup>
     </When>
   </Choose>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
     <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
     <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
     <Nullable>enable</Nullable>
@@ -25,14 +25,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="3.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.0" />
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       </ItemGroup>
     </When>
   </Choose>

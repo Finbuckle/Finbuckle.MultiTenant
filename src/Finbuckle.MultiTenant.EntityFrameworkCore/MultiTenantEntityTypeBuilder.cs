@@ -26,7 +26,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         {
             // Set the new unique index with TenantId preserving name and database name
             IndexBuilder indexBuilder;
-#if NET
             Builder.Metadata.RemoveIndex(index);
             if (index.Name != null)
                 indexBuilder = Builder
@@ -35,11 +34,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             else
                 indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
                                       .HasDatabaseName(index.GetDatabaseName());
-#elif NETSTANDARD2_1
-            Builder.Metadata.RemoveIndex(index.Properties);
-            indexBuilder = Builder.HasIndex(index.Properties.Select(p => p.Name).Append("TenantId").ToArray())
-                                  .HasName(index.GetName());
-#endif
 
             if (index.IsUnique)
                 indexBuilder.IsUnique();
@@ -59,7 +53,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             var fks = key.GetReferencingForeignKeys().ToList();
 
             if (key.IsPrimaryKey())
-                // 3.1/5.0 - key and fks replaced on entity
                 // 6.0 - key replaced on entity, fks changed in-place
                 Builder.HasKey(propertyNames);
             else
@@ -68,7 +61,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             foreach (var fk in fks)
             {
                 var fkEntityBuilder = modelBuilder.Entity(fk.DeclaringEntityType.ClrType);
-                // Note 3.1/5.0 will not have TenantId in Properties, so we add it and set the foreign key.
                 // Note 6.0+ will generate a shadow property with the wrong name in the Properties, we will replace.
                 var props = fk.Properties.Where(p => !p.Name.EndsWith("TenantId")).Select(p => p.Name).Append("TenantId").ToArray();
                 fkEntityBuilder.Property<string>("TenantId");
