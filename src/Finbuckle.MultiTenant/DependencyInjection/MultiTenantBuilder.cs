@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Handles multiplexing cached options.
             Services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions, TTenantInfo>>();
 
-            // Necessary to apply tenant named options in between configuration and postconfiguration
+            // Necessary to apply tenant named options in between configuration and post configuration
             Services.AddSingleton<ITenantConfigureNamedOptions<TOptions, TTenantInfo>,
                 TenantConfigureNamedOptions<TOptions, TTenantInfo>>(sp => new TenantConfigureNamedOptions<TOptions,
                 TTenantInfo>(name, tenantConfigureNamedOptions));
@@ -87,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds and configures a IMultiTenantStore to the application using default dependency injection.
         /// </summary>>
         /// <param name="lifetime">The service lifetime.</param>
-        /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
+        /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
             params object[] parameters)
@@ -117,10 +117,10 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a IMultiTenantStrategy to the applicationusing default dependency injection.
+        /// Adds and configures a IMultiTenantStrategy to the application using default dependency injection.
         /// </summary>
         /// <param name="lifetime">The service lifetime.</param>
-        /// <param name="parameters">a paramter list for any constructor paramaters not covered by dependency injection.</param>
+        /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
             params object[] parameters) where TStrategy : IMultiTenantStrategy

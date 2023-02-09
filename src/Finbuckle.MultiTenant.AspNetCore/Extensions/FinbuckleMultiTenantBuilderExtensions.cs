@@ -358,7 +358,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a HeaderStrategy with tenantKey "__tenant__" to the application.
+        /// Adds and configures a HeaderStrategy with using HTTP header key "__tenant__" to the application.
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
@@ -368,10 +368,10 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds and configures a Header to the application.
+        /// Adds and configures a HeaderStrategy to the application with a custom HTTP header key.
         /// </summary>
         /// <param name="builder">MultiTenantBuilder instance.</param>
-        /// <param name="tenantKey">The template for determining the tenant identifier in the host.</param>
+        /// <param name="tenantKey">The HTTP header key for determining the tenant identifier in the request.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
             this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
