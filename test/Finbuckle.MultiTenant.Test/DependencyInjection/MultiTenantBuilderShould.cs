@@ -162,11 +162,20 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         }
 
         [Fact]
-        public void ThrowIfNullParamAddingPerTenantOptions()
+        public void ThrowIfNullParamAddingPerTenantOptions2()
         {
             var services = new ServiceCollection();
             var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>(null!));
+            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>((Action<MultiTenantBuilderShould, TenantInfo>)null!));
+        }
+
+
+        [Fact]
+        public void ThrowIfNullParamAddingPerTenantOptions3()
+        {
+            var services = new ServiceCollection();
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>((Action<IServiceProvider, MultiTenantBuilderShould, TenantInfo>)null!));
         }
 
         [Theory]

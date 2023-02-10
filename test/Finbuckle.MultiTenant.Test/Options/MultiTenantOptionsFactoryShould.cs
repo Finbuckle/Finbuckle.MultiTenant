@@ -74,7 +74,9 @@ namespace Finbuckle.MultiTenant.Test.Options
                 .WithPerTenantNamedOptions<TestOptions>(name1,
                     (o, ti) => o.DefaultConnectionString += $"_{name1}_")
                 .WithPerTenantNamedOptions<TestOptions>(name2,
-                    (o, ti) => o.DefaultConnectionString += $"_{name2}_");
+                    (o, ti) => o.DefaultConnectionString += $"_{name2}_")
+                .WithPerTenantNamedOptions<TestOptions>(name1,
+                    (sp, o, ti) => Assert.NotNull(sp));
             var sp = services.BuildServiceProvider();
             var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
             accessor.MultiTenantContext = new MultiTenantContext<TenantInfo>

@@ -30,6 +30,10 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
                         .WithPerTenantOptions<AuthenticationOptions>((ao, ti) =>
                         {
                             ao.DefaultChallengeScheme = ti.Identifier + "Scheme";
+                        })
+                        .WithPerTenantOptions<AuthenticationOptions>((sp, ao, ti) =>
+                        {
+                            Assert.NotNull(sp);
                         });
 
                     services.AddMvc();
