@@ -22,7 +22,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -45,7 +45,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         [Fact]
         public void HandleNullMultiTenantContextOnAdd()
         {
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
             var options = new TestOptions();
@@ -58,7 +58,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         [Fact]
         public void HandleNullMultiTenantContextOnGetOrAdd()
         {
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
             var options = new TestOptions();
@@ -77,7 +77,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123"};
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -102,7 +102,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         public void ThrowsIfGetOrAddFactoryIsNull()
         {
             var tc = new MultiTenantContext<TenantInfo>();
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -113,7 +113,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         public void ThrowIfContructorParamIsNull()
         {
             var tc = new MultiTenantContext<TenantInfo>();
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
 
             Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions, TenantInfo>(null!));
@@ -128,7 +128,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -172,7 +172,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -213,7 +213,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 
@@ -252,7 +252,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
-            var tca = new MultiTenantContextAccessor<TenantInfo>();
+            var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
             var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
 

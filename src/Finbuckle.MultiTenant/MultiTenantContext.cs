@@ -10,6 +10,7 @@ namespace Finbuckle.MultiTenant
         where T : class, ITenantInfo, new()
     {
         public T? TenantInfo { get; set; }
+
         public StrategyInfo? StrategyInfo { get; set; }
         public StoreInfo<T>? StoreInfo { get; set; }
 

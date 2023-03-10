@@ -5,22 +5,16 @@ using System.Threading;
 
 namespace Finbuckle.MultiTenant.Core
 {
-    public class MultiTenantContextAccessor<T> : IMultiTenantContextAccessor<T>, IMultiTenantContextAccessor
+    public class AsyncLocalMultiTenantContextAccessor<T> : IMultiTenantContextAccessor<T>, IMultiTenantContextAccessor
         where T : class, ITenantInfo, new()
     {
-        internal static AsyncLocal<IMultiTenantContext<T>?> _asyncLocalContext = new AsyncLocal<IMultiTenantContext<T>?>();
+        private static readonly AsyncLocal<IMultiTenantContext<T>?> _asyncLocalContext = new();
 
         public IMultiTenantContext<T>? MultiTenantContext
         {
-            get
-            {
-                return _asyncLocalContext.Value;
-            }
+            get => _asyncLocalContext.Value;
 
-            set
-            {
-                _asyncLocalContext.Value = value;
-            }
+            set => _asyncLocalContext.Value = value;
         }
 
         IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext

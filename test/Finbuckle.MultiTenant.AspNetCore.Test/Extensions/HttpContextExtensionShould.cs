@@ -20,7 +20,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             tc.TenantInfo = ti;
 
             var services = new ServiceCollection();
-            services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new MultiTenantContextAccessor<TenantInfo>{ MultiTenantContext = tc });
+            services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new AsyncLocalMultiTenantContextAccessor<TenantInfo>{ MultiTenantContext = tc });
             var sp = services.BuildServiceProvider();
 
             var httpContextMock = new Mock<HttpContext>();
@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void ReturnNullIfNoMultiTenantContext()
         {
             var services = new ServiceCollection();
-            services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new MultiTenantContextAccessor<TenantInfo>());
+            services.AddScoped<IMultiTenantContextAccessor<TenantInfo>>(_ => new AsyncLocalMultiTenantContextAccessor<TenantInfo>());
             var sp = services.BuildServiceProvider();
 
             var httpContextMock = new Mock<HttpContext>();
