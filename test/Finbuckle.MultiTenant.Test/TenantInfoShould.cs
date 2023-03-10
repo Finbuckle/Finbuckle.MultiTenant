@@ -18,10 +18,14 @@ namespace Finbuckle.MultiTenant.Test
             // OK
             // ReSharper disable once ObjectCreationAsStatement
             new TenantInfo { Id = "".PadRight(Constants.TenantIdMaxLength, 'a') };
-        
-            Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength + 1, 'a') });
-            Assert.Throws<MultiTenantException>(() => new TenantInfo{ Id = "".PadRight(Constants.TenantIdMaxLength
-                + 999, 'a') });
+
+            Assert.Throws<MultiTenantException>(() => new TenantInfo
+                { Id = "".PadRight(Constants.TenantIdMaxLength + 1, 'a') });
+            Assert.Throws<MultiTenantException>(() => new TenantInfo
+            {
+                Id = "".PadRight(Constants.TenantIdMaxLength
+                                 + 999, 'a')
+            });
         }
     }
 }

@@ -6,6 +6,8 @@ namespace Finbuckle.MultiTenant
     public interface IMultiTenantContext
     {
         ITenantInfo? TenantInfo { get; }
+        bool HasResolvedTenant => TenantInfo != null;
+        
         StrategyInfo? StrategyInfo { get; }
     }
 
@@ -13,6 +15,8 @@ namespace Finbuckle.MultiTenant
         where T : class, ITenantInfo, new()
     {
         T? TenantInfo { get; set; }
+        bool HasResolvedTenant => TenantInfo != null;
+        
         StrategyInfo? StrategyInfo { get; set; }
         StoreInfo<T>? StoreInfo { get; set; }
     }

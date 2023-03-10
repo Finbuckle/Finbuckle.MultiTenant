@@ -75,6 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        // TODO consider per tenant AllOptions variation
+
         private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp)
             where TOptions : class, new()
         {
