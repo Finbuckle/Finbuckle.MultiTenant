@@ -3,22 +3,21 @@
 
 using System.Threading.Tasks;
 
-namespace Finbuckle.MultiTenant.Strategies
+namespace Finbuckle.MultiTenant.Strategies;
+
+public class StaticStrategy : IMultiTenantStrategy
 {
-    public class StaticStrategy : IMultiTenantStrategy
+    internal readonly string identifier;
+
+    public int Priority { get => -1000; }
+
+    public StaticStrategy(string identifier)
     {
-        internal readonly string identifier;
+        this.identifier = identifier;
+    }
 
-        public int Priority { get => -1000; }
-
-        public StaticStrategy(string identifier)
-        {
-            this.identifier = identifier;
-        }
-
-        public async Task<string?> GetIdentifierAsync(object context)
-        {
-            return await Task.FromResult(identifier);
-        }
+    public async Task<string?> GetIdentifierAsync(object context)
+    {
+        return await Task.FromResult(identifier);
     }
 }

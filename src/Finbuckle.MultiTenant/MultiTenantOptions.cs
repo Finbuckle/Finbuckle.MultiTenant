@@ -4,11 +4,10 @@
 using System.Collections.Generic;
 
 // TODO move to options folder/namespace on future major release
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant;
+
+public class MultiTenantOptions
 {
-    public class MultiTenantOptions
-    {
-        public IList<string> IgnoredIdentifiers = new List<string>();
-        public MultiTenantEvents Events { get; set; } = new MultiTenantEvents();
-    }
+    public IList<string> IgnoredIdentifiers = new List<string>();
+    public MultiTenantEvents Events { get; set; } = new MultiTenantEvents();
 }
