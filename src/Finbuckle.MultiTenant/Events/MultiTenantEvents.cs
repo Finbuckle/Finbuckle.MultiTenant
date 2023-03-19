@@ -4,11 +4,10 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant;
+
+public class MultiTenantEvents
 {
-    public class MultiTenantEvents
-    {
-        public Func<TenantResolvedContext, Task> OnTenantResolved { get; set; } = context => Task.CompletedTask;
-        public Func<TenantNotResolvedContext, Task> OnTenantNotResolved { get; set; } = context => Task.CompletedTask;
-    }
+    public Func<TenantResolvedContext, Task> OnTenantResolved { get; set; } = context => Task.CompletedTask;
+    public Func<TenantNotResolvedContext, Task> OnTenantNotResolved { get; set; } = context => Task.CompletedTask;
 }

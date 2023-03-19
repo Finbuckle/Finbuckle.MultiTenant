@@ -4,19 +4,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant;
+
+public interface ITenantResolver
 {
-    public interface ITenantResolver
-    {
-        Task<IMultiTenantContext?> ResolveAsync(object context);
-    }
+    Task<IMultiTenantContext?> ResolveAsync(object context);
+}
 
-    public interface ITenantResolver<T>
-        where T : class, ITenantInfo, new()
-    {
-        IEnumerable<IMultiTenantStrategy> Strategies { get; }
-        IEnumerable<IMultiTenantStore<T>> Stores { get; }
+public interface ITenantResolver<T>
+    where T : class, ITenantInfo, new()
+{
+    IEnumerable<IMultiTenantStrategy> Strategies { get; }
+    IEnumerable<IMultiTenantStore<T>> Stores { get; }
 
-        Task<IMultiTenantContext<T>?> ResolveAsync(object context);
-    }
+    Task<IMultiTenantContext<T>?> ResolveAsync(object context);
 }

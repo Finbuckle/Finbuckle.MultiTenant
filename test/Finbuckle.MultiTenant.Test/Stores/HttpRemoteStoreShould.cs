@@ -66,7 +66,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
             var endpointTemplate = field?.GetValue(store);
 
-            Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.defaultEndpointTemplateIdentifierToken}", endpointTemplate);
+            Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}", endpointTemplate);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
             var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
             var endpointTemplate = field?.GetValue(store);
 
-            Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.defaultEndpointTemplateIdentifierToken}", endpointTemplate);
+            Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}", endpointTemplate);
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs

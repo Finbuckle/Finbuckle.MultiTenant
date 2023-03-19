@@ -8,80 +8,96 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.Stores
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant.Stores;
+
+
+/// <summary>
+/// Basic store that keeps tenants in memory.
+/// </summary>
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
 {
-    public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-        where TTenantInfo : class, ITenantInfo, new()
+    private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+    private readonly InMemoryStoreOptions<TTenantInfo> _options;
+
+    /// <summary>
+    /// Constructor for InMemoryStore.
+    /// </summary>
+    /// <param name="options">InMemoryStoreOptions instance for desired behavior.</param>
+    /// <exception cref="MultiTenantException"></exception>
+    public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
     {
-        private readonly ConcurrentDictionary<string, TTenantInfo> tenantMap;
-        private readonly InMemoryStoreOptions<TTenantInfo> options;
+        _options = options.Value;
 
-        public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
+        var stringComparer = StringComparer.OrdinalIgnoreCase;
+        if(_options.IsCaseSensitive)
+            stringComparer = StringComparer.Ordinal;
+
+        _tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
+        foreach(var tenant in _options.Tenants)
         {
-            this.options = options?.Value ?? new InMemoryStoreOptions<TTenantInfo>();
+            if(String.IsNullOrWhiteSpace(tenant.Id))
+                throw new MultiTenantException("Missing tenant id in options.");
+            if(String.IsNullOrWhiteSpace(tenant.Identifier))
+                throw new MultiTenantException("Missing tenant identifier in options.");
+            if(_tenantMap.ContainsKey(tenant.Identifier))
+                throw new MultiTenantException("Duplicate tenant identifier in options.");
 
-            var stringComparer = StringComparer.OrdinalIgnoreCase;
-            if(this.options.IsCaseSensitive)
-                stringComparer = StringComparer.Ordinal;
-
-            tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
-            foreach(var tenant in this.options.Tenants)
-            {
-                if(String.IsNullOrWhiteSpace(tenant.Id))
-                    throw new MultiTenantException("Missing tenant id in options.");
-                if(String.IsNullOrWhiteSpace(tenant.Identifier))
-                    throw new MultiTenantException("Missing tenant identifier in options.");
-                if(tenantMap.ContainsKey(tenant.Identifier))
-                    throw new MultiTenantException("Duplicate tenant identifier in options.");
-
-                tenantMap.TryAdd(tenant.Identifier, tenant);
-            }
+            _tenantMap.TryAdd(tenant.Identifier, tenant);
         }
+    }
 
-        public virtual async Task<TTenantInfo?> TryGetAsync(string id)
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> TryGetAsync(string id)
+    {
+        var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
+        return await Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    {
+        _tenantMap.TryGetValue(identifier, out var result);
+
+        return await Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    {
+        return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList());
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    {
+        var result = tenantInfo.Identifier != null && _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
+
+        return await Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> TryRemoveAsync(string identifier)
+    {
+        var result = _tenantMap.TryRemove(identifier, out var _);
+
+        return await Task.FromResult(result);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    {
+        var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id) : null;
+
+        if (existingTenantInfo?.Identifier != null)
         {
-            var result = tenantMap.Values.Where(ti => ti.Id == id).SingleOrDefault();
-
+            var result =  _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
             return await Task.FromResult(result);
         }
 
-        public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
-        {
-            tenantMap.TryGetValue(identifier, out var result);
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
-        {
-            return await Task.FromResult(tenantMap.Select(x => x.Value).ToList());
-        }
-
-        public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
-        {
-            var result = tenantInfo.Identifier != null && tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<bool> TryRemoveAsync(string identifier)
-        {
-            var result = tenantMap.TryRemove(identifier, out var _);
-
-            return await Task.FromResult(result);
-        }
-
-        public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
-        {
-            var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id) : null;
-
-            if (existingTenantInfo?.Identifier != null)
-            {
-                var result =  tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
-                return await Task.FromResult(result);
-            }
-
-            return await Task.FromResult(false);
-        }
+        return await Task.FromResult(false);
     }
 }

@@ -2,19 +2,30 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
+using System.Collections.Generic;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores
 {
-    public class MultiTenantStoreWrappperShould : MultiTenantStoreTestBase
+    public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         // Basic store functionality tested in MultiTenantStoresShould.cs
 
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
-            var store = new MultiTenantStoreWrapper<TenantInfo>(new InMemoryStore<TenantInfo>(null!), NullLogger.Instance);
+            var optionsMock = new Mock<IOptions<InMemoryStoreOptions<TenantInfo>>>();
+            var options = new InMemoryStoreOptions<TenantInfo>
+            {
+                IsCaseSensitive = false,
+                Tenants = new List<TenantInfo>()
+            };
+            optionsMock.Setup(o => o.Value).Returns(options);
+            var store = new MultiTenantStoreWrapper<TenantInfo>(
+                new InMemoryStore<TenantInfo>(optionsMock.Object), NullLogger.Instance);
 
             return PopulateTestStore(store);
         }
@@ -87,7 +98,8 @@ namespace Finbuckle.MultiTenant.Test.Stores
         public void ThrowWhenAddingIfTenantInfoIdentifierIsNull()
         {
             var store = CreateTestStore();
-            var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo() { Id = "inittech-id" }).Result);
+            var e = Assert.Throws<AggregateException>(() =>
+                store.TryAddAsync(new TenantInfo() { Id = "initech-id" }).Result);
             Assert.IsType<ArgumentNullException>(e.InnerException);
         }
 
@@ -108,7 +120,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         [Fact]
-        public virtual void ThrowWhenUpdatingIfTenantInfoIsNull()
+        public void ThrowWhenUpdatingIfTenantInfoIsNull()
         {
             var store = CreateTestStore();
 
@@ -117,7 +129,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         [Fact]
-        public virtual void ThrowWhenUpdatingIfTenantInfoIdIsNull()
+        public void ThrowWhenUpdatingIfTenantInfoIdIsNull()
         {
             var store = CreateTestStore();
 
@@ -130,7 +142,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var result = store.TryUpdateAsync(new TenantInfo{Id = "not-found"}).Result;
+            var result = store.TryUpdateAsync(new TenantInfo { Id = "not-found" }).Result;
             Assert.False(result);
         }
 

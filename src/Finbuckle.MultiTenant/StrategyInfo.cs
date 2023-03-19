@@ -3,11 +3,10 @@
 
 using System;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant;
+
+public class StrategyInfo
 {
-    public class StrategyInfo
-    {
-        public Type? StrategyType { get; internal set; }
-        public IMultiTenantStrategy? Strategy { get; internal set; }
-    }
+    public Type? StrategyType { get; internal set; }
+    public IMultiTenantStrategy? Strategy { get; internal set; }
 }

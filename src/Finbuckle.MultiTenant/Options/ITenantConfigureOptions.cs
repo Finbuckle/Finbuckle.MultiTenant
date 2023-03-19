@@ -3,13 +3,12 @@
 
 using System;
 
-namespace Finbuckle.MultiTenant.Options
+namespace Finbuckle.MultiTenant.Options;
+
+[Obsolete]
+public interface ITenantConfigureOptions<TOptions, TTenantInfo>
+    where TOptions : class, new()
+    where TTenantInfo : class, ITenantInfo, new()
 {
-    [Obsolete]
-    public interface ITenantConfigureOptions<TOptions, TTenantInfo>
-        where TOptions : class, new()
-        where TTenantInfo : class, ITenantInfo, new()
-    {
-        void Configure(TOptions options, TTenantInfo tenantInfo);
-    }
+    void Configure(TOptions options, TTenantInfo tenantInfo);
 }

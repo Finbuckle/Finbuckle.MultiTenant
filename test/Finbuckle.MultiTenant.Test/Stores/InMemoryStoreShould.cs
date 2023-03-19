@@ -1,9 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more inforation.
 
+using System.Collections.Generic;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores
@@ -122,7 +124,14 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
         protected override IMultiTenantStore<TenantInfo> CreateTestStore()
         {
-            var store = new InMemoryStore<TenantInfo>(null!);
+            var optionsMock = new Mock<IOptions<InMemoryStoreOptions<TenantInfo>>>();
+            var options = new InMemoryStoreOptions<TenantInfo>
+            {
+                IsCaseSensitive = false,
+                Tenants = new List<TenantInfo>()
+            };
+            optionsMock.Setup(o => o.Value).Returns(options);
+            var store = new InMemoryStore<TenantInfo>(optionsMock.Object);
 
             return PopulateTestStore(store);
         }

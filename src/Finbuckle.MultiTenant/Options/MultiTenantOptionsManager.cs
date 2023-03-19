@@ -6,47 +6,46 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.Options
+namespace Finbuckle.MultiTenant.Options;
+
+/// <summary>
+/// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
+/// </summary>
+/// <typeparam name="TOptions"></typeparam>
+public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
 {
+    private readonly IOptionsFactory<TOptions> _factory;
+    private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache
+
     /// <summary>
-    /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
+    /// Initializes a new instance with the specified options configurations.
     /// </summary>
-    /// <typeparam name="TOptions"></typeparam>
-    public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
+    /// <param name="factory">The factory to use to create options.</param>
+    /// <param name="cache">The cache used for options.</param>
+    public MultiTenantOptionsManager(IOptionsFactory<TOptions> factory, IOptionsMonitorCache<TOptions> cache)
     {
-        private readonly IOptionsFactory<TOptions> _factory;
-        private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache
+        _factory = factory;
+        _cache = cache;
+    }
 
-        /// <summary>
-        /// Initializes a new instance with the specified options configurations.
-        /// </summary>
-        /// <param name="factory">The factory to use to create options.</param>
-        /// <param name="cache">The cache used for options.</param>
-        public MultiTenantOptionsManager(IOptionsFactory<TOptions> factory, IOptionsMonitorCache<TOptions> cache)
+    public TOptions Value
+    {
+        get
         {
-            _factory = factory;
-            _cache = cache;
+            return Get(Microsoft.Extensions.Options.Options.DefaultName);
         }
+    }
 
-        public TOptions Value
-        {
-            get
-            {
-                return Get(Microsoft.Extensions.Options.Options.DefaultName);
-            }
-        }
+    public virtual TOptions Get(string? name)
+    {
+        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
 
-        public virtual TOptions Get(string? name)
-        {
-            name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
+        // Store the options in our instance cache.
+        return _cache.GetOrAdd(name, () => _factory.Create(name));
+    }
 
-            // Store the options in our instance cache.
-            return _cache.GetOrAdd(name, () => _factory.Create(name));
-        }
-
-        public void Reset()
-        {
-            _cache.Clear();
-        }
+    public void Reset()
+    {
+        _cache.Clear();
     }
 }
