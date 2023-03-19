@@ -12,7 +12,7 @@ do
 done
 
 # Update the Version property in Directory.Build.props:
-sed -E -i 's|<Version>.*</Version>|<Version>'"${version}"'</Version>|g' Directory.Build.props
+sed -E -i 's|<Version>.*</Version>|<Version>'"${version}"'</Version>|g' src/Directory.Build.props
 
 # Update the version in readme and docs files with <span class="_version"> elements:
 sed -E -i 's|<span class="_version">.*</span>|<span class="_version">'"${version}"'</span>|g' README.md docs/*.md
