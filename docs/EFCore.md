@@ -335,7 +335,7 @@ When configuring a multitenant entity type it is often useful to include the imp
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
 * `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
-* `AdjustIndexes()` - Alters all existing indexes to include te implicit `TenantId`.
+* `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
 * `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
 
 ```cs
