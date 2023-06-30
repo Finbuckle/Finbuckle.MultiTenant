@@ -36,6 +36,7 @@ public interface IMultiTenantContext<T>
     /// Information about the tenant for this context.
     /// </summary>
     T? TenantInfo { get; set; }
+    
     /// <summary>
     /// Returns true if a non-null tenant has been resolved.
     /// </summary>

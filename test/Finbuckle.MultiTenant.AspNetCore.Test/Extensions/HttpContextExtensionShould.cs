@@ -2,7 +2,7 @@
 // Refer to the solution LICENSE file for more inforation.
 
 using System;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

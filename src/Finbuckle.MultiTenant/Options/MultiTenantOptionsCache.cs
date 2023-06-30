@@ -22,6 +22,11 @@ public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCac
 
     private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>>();
 
+    /// <summary>
+    /// Constructs a new instance of MultiTenantOptionsCache.
+    /// </summary>
+    /// <param name="multiTenantContextAccessor"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public MultiTenantOptionsCache(IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
     {
         this.multiTenantContextAccessor = multiTenantContextAccessor ?? throw new ArgumentNullException(nameof(multiTenantContextAccessor));
@@ -44,7 +49,6 @@ public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCac
     /// <param name="tenantId">The Id of the tenant which will have its options cleared.</param>
     public void Clear(string tenantId)
     {
-        tenantId = tenantId ?? "";
         var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
         cache.Clear();

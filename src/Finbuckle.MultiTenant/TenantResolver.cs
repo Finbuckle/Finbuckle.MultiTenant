@@ -81,6 +81,7 @@ public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
         return result;
     }
 
+    // TODO move this to the base interface?
     async Task<IMultiTenantContext?> ITenantResolver.ResolveAsync(object context)
     {
         return (await ResolveAsync(context)) as IMultiTenantContext;

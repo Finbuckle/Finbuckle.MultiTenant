@@ -3,20 +3,30 @@
 
 using System.Threading;
 
-namespace Finbuckle.MultiTenant.Core;
+namespace Finbuckle.MultiTenant.Internal;
 
+/// <summary>
+/// Provides access the current MultiTenantContext via an AsyncLocal variable.
+/// </summary>
+/// <typeparam name="T">The ITenantInfo implementation type.</typeparam>
+/// <remarks>
+/// This implementation may have performance impacts due to the use of AsyncLocal.
+/// </remarks>
 public class AsyncLocalMultiTenantContextAccessor<T> : IMultiTenantContextAccessor<T>, IMultiTenantContextAccessor
     where T : class, ITenantInfo, new()
 {
-    private static readonly AsyncLocal<IMultiTenantContext<T>?> _asyncLocalContext = new();
+    private static readonly AsyncLocal<IMultiTenantContext<T>?> AsyncLocalContext = new();
 
+    /// <inheritdoc />
     public IMultiTenantContext<T>? MultiTenantContext
     {
-        get => _asyncLocalContext.Value;
+        get => AsyncLocalContext.Value;
 
-        set => _asyncLocalContext.Value = value;
+        set => AsyncLocalContext.Value = value;
     }
 
+    /// <inheritdoc />
+    /// TODO move this to the interface?
     IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext
     {
         get => MultiTenantContext as IMultiTenantContext;

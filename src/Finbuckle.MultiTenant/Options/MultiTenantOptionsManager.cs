@@ -11,8 +11,8 @@ namespace Finbuckle.MultiTenant.Options;
 /// <summary>
 /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
 /// </summary>
-/// <typeparam name="TOptions"></typeparam>
-public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsSnapshot<TOptions> where TOptions : class, new()
+/// <typeparam name="TOptions">The type of options being configured.</typeparam>
+public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> where TOptions : class, new()
 {
     private readonly IOptionsFactory<TOptions> _factory;
     private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache
@@ -28,15 +28,11 @@ public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsS
         _cache = cache;
     }
 
-    public TOptions Value
-    {
-        get
-        {
-            return Get(Microsoft.Extensions.Options.Options.DefaultName);
-        }
-    }
+    /// <inheritdoc />
+    public TOptions Value => Get(Microsoft.Extensions.Options.Options.DefaultName);
 
-    public virtual TOptions Get(string? name)
+    /// <inheritdoc />
+    public TOptions Get(string? name)
     {
         name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
 
@@ -44,6 +40,9 @@ public class MultiTenantOptionsManager<TOptions> : IOptions<TOptions>, IOptionsS
         return _cache.GetOrAdd(name, () => _factory.Create(name));
     }
 
+    /// <summary>
+    /// Clears the options stored in the internal cache.
+    /// </summary>
     public void Reset()
     {
         _cache.Clear();

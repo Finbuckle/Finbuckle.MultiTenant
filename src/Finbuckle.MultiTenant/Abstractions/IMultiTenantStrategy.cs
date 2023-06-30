@@ -3,22 +3,23 @@
 
 using System.Threading.Tasks;
 
+// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
 /// <summary>
-/// The interface for determining the tenant idenfitider.
+/// Determines the tenant identifier.
 /// </summary>
 public interface IMultiTenantStrategy
 {
     /// <summary>
-    ///  Method for implemenations to control how the identifier is determined.
+    ///  Method for implementations to control how the identifier is determined.
     /// </summary>
     /// <param name="context"></param>
-    /// <returns></returns>
+    /// <returns>The found identifier or null.</returns>
     Task<string?> GetIdentifierAsync(object context);
-        
+
     /// <summary>
-    ///  Determines strategy execution order. Normally handled in the order registered.
+    /// Strategy execution order priority. Low values are executed first. Equal values are executed in order of registration.
     /// </summary>
     int Priority => 0;
 }
