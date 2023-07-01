@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Finbuckle.MultiTenant.Core;
+using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Xunit;

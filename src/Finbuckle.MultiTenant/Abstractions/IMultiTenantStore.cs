@@ -31,15 +31,15 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// <summary>
     /// Try to remove the TTenantInfo from the store.
     /// </summary>
-    /// <param name="identifier">Identifier for the tenant to remove. </param>
-    /// <returns>True if successfully removed</returns>
+    /// <param name="identifier">Identifier for the tenant to remove.</param>
+    /// <returns>True if successfully removed.</returns>
     Task<bool> TryRemoveAsync(string identifier);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given identifier.
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to retrieve.</param>
-    /// <returns>Returns TTenantInfo instance if found or null.</returns>
+    /// <returns>The found TTenantInfo instance or null if none found.</returns>
     ///  TODO make obsolete
     Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier);
 
@@ -47,7 +47,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// Retrieve the TTenantInfo for a given tenant Id.
     /// </summary>
     /// <param name="id">TenantId for the tenant to retrieve.</param>
-    /// <returns>Returns TTenantInfo instance if found or null.</returns>
+    /// <returns>The found TTenantInfo instance or null if none found.</returns>
     ///  TODO make obsolete
     Task<TTenantInfo?> TryGetAsync(string id);
 
@@ -55,6 +55,6 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// <summary>
     /// Retrieve all the TTenantInfo's from the store.
     /// </summary>
-    /// <returns>IEnumerable of all tenants in the store.</returns>
+    /// <returns>An IEnumerable of all tenants in the store.</returns>
     Task<IEnumerable<TTenantInfo>> GetAllAsync();
 }

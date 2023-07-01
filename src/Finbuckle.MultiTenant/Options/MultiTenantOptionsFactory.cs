@@ -56,6 +56,7 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
         _multiTenantContextAccessor = multiTenantContextAccessor;
     }
 
+    /// <inheritdoc />
     public TOptions Create(string name)
     {
         var options = new TOptions();
@@ -72,7 +73,7 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
         }
 
         // Configure tenant options.
-        if (_multiTenantContextAccessor?.MultiTenantContext?.HasResolvedTenant ?? false)
+        if (_multiTenantContextAccessor.MultiTenantContext?.HasResolvedTenant ?? false)
         {
             foreach (var tenantConfigureOption in _tenantConfigureOptions)
                 tenantConfigureOption.Configure(options, _multiTenantContextAccessor.MultiTenantContext.TenantInfo!);
