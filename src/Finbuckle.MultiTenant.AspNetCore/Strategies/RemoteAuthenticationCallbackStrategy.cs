@@ -1,5 +1,5 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System;
 using System.Linq;
@@ -37,7 +37,8 @@ namespace Finbuckle.MultiTenant.Strategies
                 Where(s => typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
             // Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
             {
-                // Unfortnately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
+                // TODO verify this comment
+                // Unfortunately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
                 // Instead we'll get the paths to check from the options.
                 var optionsType = scheme.HandlerType.GetProperty("Options")?.PropertyType;
 
@@ -85,7 +86,7 @@ namespace Finbuckle.MultiTenant.Strategies
                         if (properties == null)
                         {
                             if (logger != null)
-                                logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
+                                logger.LogWarning("A tenant could not be determined because no state parameter passed with the remote authentication callback.");
                             return null;
                         }
 

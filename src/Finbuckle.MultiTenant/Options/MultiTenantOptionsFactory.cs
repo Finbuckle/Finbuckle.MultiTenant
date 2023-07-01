@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/runtime/blob/5aad989cebe00f0987fcb842ea5b7cbe986c67df/src/libraries/Microsoft.Extensions.Options/src/OptionsFactory.cs

@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -98,7 +98,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         {
             var services = new ServiceCollection();
             services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
-            services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "end");
+            services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "End");
             services.AddMultiTenant<TenantInfo>()
                 .WithPerTenantOptions<TestOptions>((o, ti) => o.DefaultConnectionString += $"_{ti.Id}_");
             var sp = services.BuildServiceProvider();
@@ -106,7 +106,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             accessor.MultiTenantContext = new MultiTenantContext<TenantInfo>();
 
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value;
-            Assert.Equal($"beginend", options.DefaultConnectionString);
+            Assert.Equal($"beginEnd", options.DefaultConnectionString);
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         {
             var services = new ServiceCollection();
             services.Configure<TestOptions>(o => o.DefaultConnectionString = "begin");
-            services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "end");
+            services.PostConfigure<TestOptions>(o => o.DefaultConnectionString += "End");
             services.AddMultiTenant<TenantInfo>()
                 .WithPerTenantOptions<TestOptions>((o, ti) => o.DefaultConnectionString += $"_{ti.Id}_");
             var sp = services.BuildServiceProvider();
@@ -122,7 +122,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             accessor.MultiTenantContext = null;
 
             var options = sp.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value;
-            Assert.Equal($"beginend", options.DefaultConnectionString);
+            Assert.Equal($"beginEnd", options.DefaultConnectionString);
         }
 
         [Fact]

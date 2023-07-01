@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System.Data.Common;
 using System.Linq;
@@ -79,7 +79,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 // TenantMismatchMode.Throw
@@ -141,7 +141,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 // TenantNotSetMode.Throw
@@ -194,7 +194,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 // TenantMismatchMode.Throw
@@ -264,7 +264,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 // TenantNotSetMode.Throw
@@ -318,7 +318,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                     Id = "abc",
                     Identifier = "abc",
                     Name = "abc",
-                    ConnectionString = "DataSource=testdb.db"
+                    ConnectionString = "DataSource=testDb.db"
                 };
 
                 // TenantMismatchMode.Throw

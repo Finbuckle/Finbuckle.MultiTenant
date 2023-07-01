@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System;
 using Finbuckle.MultiTenant.AspNetCore.Options;
@@ -38,17 +38,17 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
             });
             services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
             var serviceProvider = services.BuildServiceProvider();
-            var httpContext = CreateHttpContextMock("/base/notbase");
+            var httpContext = CreateHttpContextMock("/base/notBase");
             httpContext.RequestServices = serviceProvider;
 
             Assert.Equal("/", httpContext.Request.PathBase);
-            Assert.Equal("/base/notbase", httpContext.Request.Path);
+            Assert.Equal("/base/notBase", httpContext.Request.Path);
             
             // will trigger OnTenantFound event...
             var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
 
             Assert.Equal("/base", httpContext.Request.PathBase);
-            Assert.Equal("/notbase", httpContext.Request.Path);
+            Assert.Equal("/notBase", httpContext.Request.Path);
         }
         
         [Fact]
@@ -67,17 +67,17 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
             });
             services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = false);
             var serviceProvider = services.BuildServiceProvider();
-            var httpContext = CreateHttpContextMock("/base/notbase");
+            var httpContext = CreateHttpContextMock("/base/notBase");
             httpContext.RequestServices = serviceProvider;
 
             Assert.Equal("/", httpContext.Request.PathBase);
-            Assert.Equal("/base/notbase", httpContext.Request.Path);
+            Assert.Equal("/base/notBase", httpContext.Request.Path);
             
             // will trigger OnTenantFound event...
             var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
 
             Assert.Equal("/", httpContext.Request.PathBase);
-            Assert.Equal("/base/notbase", httpContext.Request.Path);
+            Assert.Equal("/base/notBase", httpContext.Request.Path);
         }
 
         [Theory]

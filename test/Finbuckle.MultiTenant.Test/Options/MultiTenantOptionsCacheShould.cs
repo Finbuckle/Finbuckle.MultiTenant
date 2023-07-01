@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System;
 using System.Collections.Concurrent;
@@ -110,7 +110,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         }
 
         [Fact]
-        public void ThrowIfContructorParamIsNull()
+        public void ThrowIfConstructorParamIsNull()
         {
             var tc = new MultiTenantContext<TenantInfo>();
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
@@ -142,7 +142,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             ti.Id = "diff_id";
             result = cache.TryAdd(name, options);
             Assert.True(result);
-            result = cache.TryAdd("diffname", options);
+            result = cache.TryAdd("diffName", options);
             Assert.True(result);
 
             // Remove named options for current tenant.
@@ -157,7 +157,7 @@ namespace Finbuckle.MultiTenant.Test.Options
 
             // Assert named options removed and other options on tenant left as-is.
             Assert.False(tenantInternalCache!.Keys.Contains(name ?? ""));
-            Assert.True(tenantInternalCache.Keys.Contains("diffname"));
+            Assert.True(tenantInternalCache.Keys.Contains("diffName"));
 
             // Assert other tenant not affected.
             ti.Id = "test-id-123";

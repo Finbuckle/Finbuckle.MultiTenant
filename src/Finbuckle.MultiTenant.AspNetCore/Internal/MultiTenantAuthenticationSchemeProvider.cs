@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Core/src/AuthenticationSchemeProvider.cs
@@ -114,7 +114,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
         /// <summary>
         /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/>.
         /// This is typically specified via <see cref="AuthenticationOptions.DefaultSignOutScheme"/>.
-        /// Otherwise this will fallback to <see cref="GetDefaultSignInSchemeAsync"/> if that supoorts sign out.
+        /// Otherwise this will fallback to <see cref="GetDefaultSignInSchemeAsync"/> if that supports sign out.
         /// </summary>
         /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
         public virtual Task<AuthenticationScheme?> GetDefaultSignOutSchemeAsync()
