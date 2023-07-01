@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -67,7 +67,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var result = store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2", Name = "Initech2", ConnectionString = "connstring2" }).Result;
+            var result = store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2", Name = "Initech2", ConnectionString = "connString2" }).Result;
             Assert.True(result);
         }
 

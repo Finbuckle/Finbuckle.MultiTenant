@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using System;
 using System.Threading;
@@ -40,7 +40,7 @@ namespace Finbuckle.MultiTenant.Test.Stores
         {
             var store = CreateTestStore();
 
-            var r = store.TryRemoveAsync("DOESNOTEXIST").Result;
+            var r = store.TryRemoveAsync("DoesNotExist").Result;
 
             Assert.False(r);
         }

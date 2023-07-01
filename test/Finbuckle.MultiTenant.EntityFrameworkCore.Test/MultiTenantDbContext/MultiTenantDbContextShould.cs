@@ -1,5 +1,5 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
-// Refer to the solution LICENSE file for more inforation.
+// Refer to the solution LICENSE file for more information.
 
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -16,7 +16,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
             var c = new TestBlogDbContext(tenant1);
 
@@ -31,7 +31,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext
                 Id = "abc",
                 Identifier = "abc",
                 Name = "abc",
-                ConnectionString = "DataSource=testdb.db"
+                ConnectionString = "DataSource=testDb.db"
             };
             var c = new TestBlogDbContext(tenant1, new DbContextOptions<TestBlogDbContext>());
 
