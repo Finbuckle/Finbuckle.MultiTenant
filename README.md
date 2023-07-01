@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.10.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.11.0</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.10.0</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.11.0</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -23,20 +23,21 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.10.0</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.11.0</span>
 
 <!--_release-notes-->
 
 
 ### Features
 
-* add nongeneric IMultiTenantContext for flexibility ([b3a198f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3a198f46aba9370f3671b62c35ae06b829a7d73))
+* add HasResolvedTenant to IMultiTenantContext ([#650](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/650)) ([375add5](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/375add51e7317b03652556d4d1d0eb7ef20b8caf))
+* perf improvements in BasePathStrategy and  RemoteAuthenticationCallbackStrategy ([#654](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/654)) ([ac1c58a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ac1c58aed8ef0f053bfc26adb95078b481c26a58))
 
 
 ### Bug Fixes
 
-* fixes undesired context tracking across EFCoreStore methods ([#633](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/633)) ([3605a75](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3605a75482a4f585dc1115559a40a81eac437154))
-* remove netcore3.1 ([#632](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/632)) ([6c21fe9](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6c21fe999c9d15e50cd0e2fcf480b5d442f7f2f3))
+* internal refactoring and improved XML comments for intellisense ([c42c53d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c42c53d6c52bfab340327e40d44060f2bb550010))
+* xml docs corrections ([#639](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/639)) ([265d26d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/265d26d338b96813d061cb1b16ed1b575ef48469))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
