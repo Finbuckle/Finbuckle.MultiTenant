@@ -27,7 +27,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
         public async virtual Task<string?> GetIdentifierAsync(object context)
         {
-            if(!(context is HttpContext httpContext))
+            if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
 
@@ -35,7 +35,7 @@ namespace Finbuckle.MultiTenant.Strategies
 
             foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync()).
                 Where(s => typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
-                // Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
+            // Where(s => s.HandlerType.ImplementsOrInheritsUnboundGeneric(typeof(RemoteAuthenticationHandler<>))))
             {
                 // Unfortnately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
                 // Instead we'll get the paths to check from the options.
@@ -77,14 +77,14 @@ namespace Finbuckle.MultiTenant.Strategies
                             var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
 
                             var form = await httpContext.Request.ReadFormAsync(formOptions);
-                            state = form.Where(i => i.Key.ToLowerInvariant() == "state").Single().Value;
+                            state = form.Single(i => string.Equals(i.Key, "state", StringComparison.OrdinalIgnoreCase)).Value;
                         }
 
                         var properties = ((dynamic)options).StateDataFormat.Unprotect(state) as AuthenticationProperties;
 
                         if (properties == null)
                         {
-                            if(logger != null)
+                            if (logger != null)
                                 logger.LogWarning("A tenant could not be determined because no state paraameter passed with the remote authentication callback.");
                             return null;
                         }
