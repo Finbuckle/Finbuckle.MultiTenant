@@ -55,7 +55,7 @@ public static class FinbuckleServiceCollectionExtensions
         return services.AddMultiTenant<T>(_ => { });
     }
 
-    internal static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
+    public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
         var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
         if (existingService is null)
