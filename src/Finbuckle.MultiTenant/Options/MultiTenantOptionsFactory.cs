@@ -4,6 +4,7 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/runtime/blob/5aad989cebe00f0987fcb842ea5b7cbe986c67df/src/libraries/Microsoft.Extensions.Options/src/OptionsFactory.cs
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 
@@ -13,7 +14,93 @@ namespace Finbuckle.MultiTenant.Options;
 /// Implementation of IOptionsFactory.
 /// </summary>
 /// <typeparam name="TOptions">The type of options being requested.</typeparam>
+public class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions>
+    where TOptions : class, new()
+{
+    private readonly IConfigureOptions<TOptions>[] _configureOptions;
+    private readonly IPostConfigureOptions<TOptions>[] _postConfigureOptions;
+    private readonly IValidateOptions<TOptions>[] _validations;
+
+    /// <summary>
+    /// Initializes a new instance with the specified options configurations.
+    /// </summary>
+    public MultiTenantOptionsFactory(
+        IEnumerable<IConfigureOptions<TOptions>> configureOptions,
+        IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions,
+        IEnumerable<IValidateOptions<TOptions>> validations)
+    {
+        // The default DI container uses arrays under the covers. Take advantage of this knowledge
+        // by checking for an array and enumerate over that, so we don't need to allocate an enumerator.
+        // When it isn't already an array, convert it to one, but don't use System.Linq to avoid pulling Linq in to
+        // small trimmed applications.
+
+        _configureOptions = configureOptions as IConfigureOptions<TOptions>[] ??
+                            new List<IConfigureOptions<TOptions>>(configureOptions).ToArray();
+        _postConfigureOptions = postConfigureOptions as IPostConfigureOptions<TOptions>[] ??
+                                new List<IPostConfigureOptions<TOptions>>(postConfigureOptions).ToArray();
+        _validations = validations as IValidateOptions<TOptions>[] ??
+                       new List<IValidateOptions<TOptions>>(validations).ToArray();
+    }
+
+    /// <inheritdoc />
+    public TOptions Create(string name)
+    {
+        ITenantConfigureNamedOptionsWrapper<TOptions>? tenantConfigureNamedOptionsWrapper = null;
+        var options = new TOptions();
+        foreach (var setup in _configureOptions)
+        {
+            // consider directly injecting this to avoid a conditional.
+            if (setup is ITenantConfigureNamedOptionsWrapper<TOptions> wrapper)
+            {
+                tenantConfigureNamedOptionsWrapper = wrapper;
+            }
+            else if (setup is IConfigureNamedOptions<TOptions> namedSetup)
+            {
+                namedSetup.Configure(name, options);
+            }
+            else if (name == Microsoft.Extensions.Options.Options.DefaultName)
+            {
+                setup.Configure(options);
+            }
+        }
+
+        tenantConfigureNamedOptionsWrapper?.Configure(name, options);
+
+        foreach (var post in _postConfigureOptions)
+        {
+            post.PostConfigure(name, options);
+        }
+            
+        // TODO consider per tenant post configure
+
+        if (_validations.Length > 0)
+        {
+            var failures = new List<string>();
+            foreach (IValidateOptions<TOptions> validate in _validations)
+            {
+                ValidateOptionsResult result = validate.Validate(name, options);
+                if (result is { Failed: true })
+                {
+                    failures.AddRange(result.Failures);
+                }
+            }
+
+            if (failures.Count > 0)
+            {
+                throw new OptionsValidationException(name, typeof(TOptions), failures);
+            }
+        }
+
+        return options;
+    }
+}
+
+/// <summary>
+/// Implementation of IOptionsFactory.
+/// </summary>
+/// <typeparam name="TOptions">The type of options being requested.</typeparam>
 /// <typeparam name="TTenantInfo">The type of the tenant info.</typeparam>
+[Obsolete]
 public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<TOptions>
     where TOptions : class, new()
     where TTenantInfo : class, ITenantInfo, new()
@@ -22,7 +109,9 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
     private readonly IPostConfigureOptions<TOptions>[] _postConfigureOptions;
     private readonly IValidateOptions<TOptions>[] _validations;
 
+#pragma warning disable CS0612 // Type or member is obsolete
     private readonly ITenantConfigureOptions<TOptions, TTenantInfo>[] _tenantConfigureOptions;
+#pragma warning restore CS0612 // Type or member is obsolete
     private readonly ITenantConfigureNamedOptions<TOptions, TTenantInfo>[] _tenantConfigureNamedOptions;
     private readonly IMultiTenantContextAccessor<TTenantInfo> _multiTenantContextAccessor;
 
@@ -32,7 +121,9 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
     public MultiTenantOptionsFactory(IEnumerable<IConfigureOptions<TOptions>> configureOptions,
         IEnumerable<IPostConfigureOptions<TOptions>> postConfigureOptions,
         IEnumerable<IValidateOptions<TOptions>> validations,
+#pragma warning disable CS0612 // Type or member is obsolete
         IEnumerable<ITenantConfigureOptions<TOptions, TTenantInfo>> tenantConfigureOptions,
+#pragma warning restore CS0612 // Type or member is obsolete
         IEnumerable<ITenantConfigureNamedOptions<TOptions, TTenantInfo>> tenantConfigureNamedOptions,
         IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
     {
@@ -47,9 +138,11 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
                                 new List<IPostConfigureOptions<TOptions>>(postConfigureOptions).ToArray();
         _validations = validations as IValidateOptions<TOptions>[] ??
                        new List<IValidateOptions<TOptions>>(validations).ToArray();
+#pragma warning disable CS0612 // Type or member is obsolete
         _tenantConfigureOptions = tenantConfigureOptions as ITenantConfigureOptions<TOptions, TTenantInfo>[] ??
                                   new List<ITenantConfigureOptions<TOptions, TTenantInfo>>(tenantConfigureOptions)
                                       .ToArray();
+#pragma warning restore CS0612 // Type or member is obsolete
         _tenantConfigureNamedOptions =
             tenantConfigureNamedOptions as ITenantConfigureNamedOptions<TOptions, TTenantInfo>[] ??
             new List<ITenantConfigureNamedOptions<TOptions, TTenantInfo>>(tenantConfigureNamedOptions).ToArray();
@@ -88,7 +181,7 @@ public class MultiTenantOptionsFactory<TOptions, TTenantInfo> : IOptionsFactory<
         {
             post.PostConfigure(name, options);
         }
-            
+
         // TODO consider per tenant post configure
 
         if (_validations.Length > 0)
