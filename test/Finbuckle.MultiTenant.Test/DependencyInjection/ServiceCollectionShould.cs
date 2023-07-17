@@ -1,10 +1,8 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Co ntributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.IO.Compression;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.DependencyInjection
