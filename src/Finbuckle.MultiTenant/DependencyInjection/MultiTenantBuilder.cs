@@ -60,8 +60,7 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
 
         Services.AddPerTenantOptionsCore<TOptions>();
         Services.TryAddEnumerable(ServiceDescriptor.Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
-        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp =>
-            new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions, sp.GetRequiredService<IMultiTenantContextAccessor<T>>()));
+        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp => new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
 
         return this;
     }
