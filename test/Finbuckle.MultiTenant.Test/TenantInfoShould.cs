@@ -9,6 +9,12 @@ namespace Finbuckle.MultiTenant.Test
     public class TenantInfoShould
     {
         [Fact]
+        public void AlwaysFail()
+        {
+            Assert.True(false);
+        }
+        
+        [Fact]
         public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
         {
             // OK
