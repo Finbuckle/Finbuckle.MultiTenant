@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        dotnet: [6.0, 7.0]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+      - name: test Finbuckle.MultiTenant
+        run: dotnet test -f net${{ matrix.dotnet }}
+        working-directory: ./test/Finbuckle.MultiTenant.Test
+      - name: test Finbuckle.MultiTenant.AspNetCore
+        run: dotnet test -f net${{ matrix.dotnet }}
+        working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
+      - name: test Finbuckle.MultiTenant.EntityFrameworkCore
+        run: dotnet test -f net${{ matrix.dotnet }}
+        working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
+        
