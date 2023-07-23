@@ -1,4 +1,4 @@
-name: CI
+name: CI Workflow
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  tests:
+  build-and-test:
     strategy:
       matrix:
         dotnet: [6.0, 7.0]
