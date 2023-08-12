@@ -5,6 +5,9 @@ using System;
 using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Options;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -54,6 +57,29 @@ public static class FinbuckleServiceCollectionExtensions
     {
         return services.AddMultiTenant<T>(_ => { });
     }
+
+    /// <summary>
+    /// Gets an options builder that forwards Configure calls for the same named per-tenant <typeparamref name="TOptions"/> to the underlying service collection.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="name">The name of the options instance.</param>
+    /// <returns>The <see cref="OptionsBuilder{TOptions}"/> so that configure calls can be chained in it.</returns>
+    public static OptionsBuilder<TOptions> AddPerTenantOptions<TOptions>(this IServiceCollection services, string? name) where TOptions : class, new()
+    {
+
+        services.AddPerTenantOptionsCore<TOptions>();
+        return new OptionsBuilder<TOptions>(services, name);
+    }
+
+    /// <summary>
+    /// Gets an options builder that forwards Configure calls for the same per-tenant <typeparamref name="TOptions"/> to the underlying service collection.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <returns>The <see cref="OptionsBuilder{TOptions}"/> so that configure calls can be chained in it.</returns>
+    public static OptionsBuilder<TOptions> AddPerTenantOptions<TOptions>(this IServiceCollection services) where TOptions : class, new() =>
+        services.AddPerTenantOptions<TOptions>(Options.Options.DefaultName);
 
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
@@ -117,5 +143,28 @@ public static class FinbuckleServiceCollectionExtensions
         services.Add(newService);
 
         return true;
+    }
+
+    internal static void AddPerTenantOptionsCore<TOptions>(this IServiceCollection services) where TOptions : class, new()
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        // Handles multiplexing cached options.
+        services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
+        services.TryAddTransient<IOptionsFactory<TOptions>, MultiTenantOptionsFactory<TOptions>>();
+        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager<TOptions>);
+        services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager<TOptions>);
+    }
+
+    private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp)
+        where TOptions : class, new()
+    {
+        var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
+            typeof(MultiTenantOptionsCache<TOptions>));
+        return (MultiTenantOptionsManager<TOptions>)
+            ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
     }
 }

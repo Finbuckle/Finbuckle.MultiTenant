@@ -2,14 +2,10 @@
 // Refer to the solution LICENSE file for more information.
 
 using Microsoft.Extensions.Options;
-using System;
 
 namespace Finbuckle.MultiTenant.Options;
 
-[Obsolete]
-public interface ITenantConfigureOptions<TOptions, TTenantInfo>
+interface ITenantConfigureNamedOptionsWrapper<TOptions> : IConfigureNamedOptions<TOptions>
     where TOptions : class, new()
-    where TTenantInfo : class, ITenantInfo, new()
 {
-    void Configure(TOptions options, TTenantInfo tenantInfo);
 }

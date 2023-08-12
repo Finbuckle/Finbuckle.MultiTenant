@@ -40,7 +40,7 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
         Action<TOptions, T> tenantConfigureOptions) where TOptions : class, new()
     {
         // TODO maybe change this to string empty so null an be used for all options, note remarks.
-        return WithPerTenantNamedOptions(null, tenantConfigureOptions);
+        return WithPerTenantNamedOptions<TOptions>(null, tenantConfigureOptions);
     }
 
     /// <summary>
@@ -58,32 +58,16 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
             throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
         }
 
-        // Handles multiplexing cached options.
-        Services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions, T>>();
-
-        // Necessary to apply tenant named options in between configuration and post configuration
-        Services.AddSingleton<ITenantConfigureNamedOptions<TOptions, T>,
-            TenantConfigureNamedOptions<TOptions, T>>(_ => new TenantConfigureNamedOptions<TOptions,
-            T>(name, tenantConfigureNamedOptions));
-        Services.TryAddTransient<IOptionsFactory<TOptions>, MultiTenantOptionsFactory<TOptions, T>>();
-        Services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager<TOptions>);
-        Services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager<TOptions>);
+        Services.AddPerTenantOptionsCore<TOptions>();
+        Services.TryAddEnumerable(ServiceDescriptor.Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
+        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp => new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
 
         return this;
     }
 
     // TODO consider per tenant AllOptions variation
     // TODO consider per-tenant post options
-    // TODO consider OptionsBuilder api
-
-    private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp)
-        where TOptions : class, new()
-    {
-        var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
-            typeof(MultiTenantOptionsCache<TOptions, T>));
-        return (MultiTenantOptionsManager<TOptions>)
-            ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
-    }
+    
 
     /// <summary>
     /// Adds and configures an IMultiTenantStore to the application using default dependency injection.
