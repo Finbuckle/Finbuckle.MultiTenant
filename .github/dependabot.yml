@@ -5,15 +5,24 @@
 
 version: 2
 updates:
-  - package-ecosystem: "nuget" # See documentation for possible values
+  - package-ecosystem: "nuget"
     directory: "/src/Finbuckle.MultiTenant/" # Location of package manifests
     schedule:
-      interval: "weekly"
-  - package-ecosystem: "nuget" # See documentation for possible values
+      interval: "daily"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: "nuget"
     directory: "/src/Finbuckle.MultiTenant.AspNetCore/" # Location of package manifests
     schedule:
-      interval: "weekly"
-  - package-ecosystem: "nuget" # See documentation for possible values
+      interval: "daily"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+  - package-ecosystem: "nuget"
     directory: "/src/Finbuckle.MultiTenant.EntityFrameworkCore/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
