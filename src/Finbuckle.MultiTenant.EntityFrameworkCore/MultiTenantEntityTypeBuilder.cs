@@ -38,6 +38,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             if (index.IsUnique)
                 indexBuilder.IsUnique();
 
+            if (index.GetFilter() is string filter)
+            {
+                indexBuilder.HasFilter(filter);
+            }
+
             return this;
         }
 
