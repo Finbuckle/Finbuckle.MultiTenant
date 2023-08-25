@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -10,6 +10,12 @@
   </ItemGroup>
 
   <Choose>
+    <When Condition=" '$(TargetFramework)' == 'net8.0' ">
+      <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.*-*" />
+      </ItemGroup>
+    </When>
     <When Condition=" '$(TargetFramework)' == 'net7.0' ">
       <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
