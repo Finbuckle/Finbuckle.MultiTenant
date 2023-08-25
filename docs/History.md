@@ -359,7 +359,7 @@
 - Updated samples for ASP.NET Core 2.2.
 - Cleaned up library dependencies to target ASP.NET Core 2.1 or greater.
 
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) (2018-12-03)
+## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.2.0...v2.0.0) (2018-12-03)
 
 ### Changes
 
@@ -368,21 +368,11 @@
 - Additional and improved unit tests.
 - Updated sample project dependencies.
 - Various other internal improvements to code and bug fixes.
-
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) MultiTenant Store Enhancements (2018-12-03)
-
-### Changes
-
 - `TryUpdate` method added to `IMultiTenantStore` interface.
 - Added `EFCoreStore` which allows an Entity Framework Core database context as the tenant store.
 - Added sample project demonstrating use of `EFCoreStore`.
 - Custom can be configured with custom dependency injection lifetime (single, scoped, or transient) via `WithStore` method overloads.
 - Custom stores automatically receive logging and error support via internal use of `MultiTenantStoreWrapper`.
-
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) MultiTenant Strategy Enhancements (2018-12-03)
-
-### Changes
-
 - Use of async/await for strategy execution for improved performance.
 - Custom strategies can be configured with custom dependency injection lifetime (single, scoped, or transient) via `WithStrategy` method overloads.
 - Moved route configuration for RouteStrategy from `UseMultiTenant` to `WithRouteStrategy`.
