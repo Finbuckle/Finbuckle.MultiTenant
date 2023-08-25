@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.11.1</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.12.0</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.11.1</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.12.0</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -23,14 +23,15 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.11.1</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.12.0</span>
 
 <!--_release-notes-->
 
 
-### Bug Fixes
+### Features
 
-* make DecorateService public ([#671](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/671)) ([c9746d6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c9746d6655f2fa0130031885ebf9b4980a93c531)), closes [#668](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/668)
+* AdjustIndex preserves existing filter ([#711](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/711)) ([affb66f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/affb66f268a133916c17c7797138cd16dc67e728))
+* net8.0 ([#712](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/712)) ([a137dae](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a137dae907b2f9b465bee735e9e9eddec64bddf5))
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
