@@ -9,19 +9,11 @@ namespace Finbuckle.MultiTenant.Test
     public class TenantInfoShould
     {
         [Fact]
-        public void AlwaysFail()
-        {
-            Assert.True(false);
-        }
-        
-        [Fact]
         public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
         {
-            // OK
             // ReSharper disable once ObjectCreationAsStatement
             new TenantInfo { Id = "".PadRight(1, 'a') };
 
-            // OK
             // ReSharper disable once ObjectCreationAsStatement
             new TenantInfo { Id = "".PadRight(Constants.TenantIdMaxLength, 'a') };
 

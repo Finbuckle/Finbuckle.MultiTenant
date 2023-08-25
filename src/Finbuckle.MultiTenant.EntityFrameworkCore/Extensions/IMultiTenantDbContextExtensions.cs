@@ -21,7 +21,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             var changedMultiTenantEntities = changeTracker.Entries().
                 Where(e => e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted).
-                Where(e => e.Metadata.IsMultiTenant());
+                Where(e => e.Metadata.IsMultiTenant()).ToList();
 
             // ensure tenant context is valid
             if (changedMultiTenantEntities.Any())
@@ -32,19 +32,19 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // get list of all added entities with MultiTenant annotation
             var addedMultiTenantEntities = changedMultiTenantEntities.
-                Where(e => e.State == EntityState.Added);
+                Where(e => e.State == EntityState.Added).ToList();
 
             // handle Tenant Id mismatches for added entities
             var mismatchedAdded = addedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
             if (mismatchedAdded.Any())
             {
                 switch (tenantMismatchMode)
                 {
                     case TenantMismatchMode.Throw:
-                        throw new MultiTenantException($"{mismatchedAdded.Count()} added entities with Tenant Id mismatch."); ;
+                        throw new MultiTenantException($"{mismatchedAdded.Count} added entities with Tenant Id mismatch.");
 
                     case TenantMismatchMode.Ignore:
                         // no action needed
@@ -70,19 +70,19 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // get list of all modified entities with MultiTenant annotation
             var modifiedMultiTenantEntities = changedMultiTenantEntities.
-                Where(e => e.State == EntityState.Modified);
+                Where(e => e.State == EntityState.Modified).ToList();
 
             // handle Tenant Id mismatches for modified entities
             var mismatchedModified = modifiedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
             if (mismatchedModified.Any())
             {
                 switch (tenantMismatchMode)
                 {
                     case TenantMismatchMode.Throw:
-                        throw new MultiTenantException($"{mismatchedModified.Count()} modified entities with Tenant Id mismatch."); ;
+                        throw new MultiTenantException($"{mismatchedModified.Count} modified entities with Tenant Id mismatch.");
 
                     case TenantMismatchMode.Ignore:
                         // no action needed
@@ -99,14 +99,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id not set for modified entities
             var notSetModified = modifiedMultiTenantEntities.
-                Where(e => (string?)e.Property("TenantId").CurrentValue == null);
+                Where(e => (string?)e.Property("TenantId").CurrentValue == null).ToList();
 
             if (notSetModified.Any())
             {
                 switch (tenantNotSetMode)
                 {
                     case TenantNotSetMode.Throw:
-                        throw new MultiTenantException($"{notSetModified.Count()} modified entities with Tenant Id not set."); ;
+                        throw new MultiTenantException($"{notSetModified.Count} modified entities with Tenant Id not set.");
 
                     case TenantNotSetMode.Overwrite:
                         foreach (var e in notSetModified)
@@ -119,19 +119,19 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // get list of all deleted  entities with MultiTenant annotation
             var deletedMultiTenantEntities = changedMultiTenantEntities.
-                Where(e => e.State == EntityState.Deleted);
+                Where(e => e.State == EntityState.Deleted).ToList();
 
             // handle Tenant Id mismatches for deleted entities
             var mismatchedDeleted = deletedMultiTenantEntities.
                 Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
-                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id);
+                (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
             if (mismatchedDeleted.Any())
             {
                 switch (tenantMismatchMode)
                 {
                     case TenantMismatchMode.Throw:
-                        throw new MultiTenantException($"{mismatchedDeleted.Count()} deleted entities with Tenant Id mismatch."); ;
+                        throw new MultiTenantException($"{mismatchedDeleted.Count} deleted entities with Tenant Id mismatch.");
 
                     case TenantMismatchMode.Ignore:
                         // no action needed
@@ -145,14 +145,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             // handle Tenant Id not set for deleted entities
             var notSetDeleted = deletedMultiTenantEntities.
-                Where(e => (string?)e.Property("TenantId").CurrentValue == null);
+                Where(e => (string?)e.Property("TenantId").CurrentValue == null).ToList();
 
             if (notSetDeleted.Any())
             {
                 switch (tenantNotSetMode)
                 {
                     case TenantNotSetMode.Throw:
-                        throw new MultiTenantException($"{notSetDeleted.Count()} deleted entities with Tenant Id not set."); ;
+                        throw new MultiTenantException($"{notSetDeleted.Count} deleted entities with Tenant Id not set.");
 
                     case TenantNotSetMode.Overwrite:
                         // no action needed
