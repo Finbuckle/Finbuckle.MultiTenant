@@ -185,7 +185,7 @@
 
 * revert some platform targets to netstandard ([#469](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/469)) ([aceff1d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/aceff1d73540b22ef64c6cec0fd50e43eff5387b))
 
-## [6.3.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.3.0...v6.2.0) (2021-09-06)
+## [6.3.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.2.0...v6.3.0) (2021-09-06)
 
 ### Changes
 
@@ -203,7 +203,7 @@
 - Updated and improved tests.
 - Added various project files for .NET Foundation on-boarding.
 
-## [6.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.2.0...v6.1.0) (2021-02-16)
+## [6.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.1.0...v6.2.0) (2021-02-16)
 
 ### Changes
 
@@ -213,7 +213,7 @@
 - Added sourcelink to allow debugging into remote source code.
 - Added a security policy.
 
-## [6.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.1.0...v6.0.0) (2020-11-10)
+## [6.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.0.0...v6.1.0) (2020-11-10)
 
 ### Changes
 
@@ -224,7 +224,7 @@
 - Fixed a conflict between ClaimStrategy and per-tenant authentication.
 - Updated docs, samples, and unit tests.
 
-## [6.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.0.0...v5.0.4) (2020-09-08)
+## [6.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.4...v6.0.0) (2020-09-08)
 
 ### Changes
 
@@ -244,21 +244,21 @@
 - Updated and improved documentation.
 - Updated sample. Removed some older ASP.NET Core 2.1 samples.
 
-## [5.0.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.4...v5.0.3) (2020-02-12)
+## [5.0.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.3...v5.0.4) (2020-02-12)
 
 ### Changes
 
 - Fixed a conflicting assembly and NuGet versions.
 - Minor documentation fix.
 
-## [5.0.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.3...v5.0.1) (2020-01-21)
+## [5.0.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.1...v5.0.3) (2020-01-21)
 
 ### Changes
 
 - Fixed a bug where documented static methods were internal rather than public.
 - Minor documentation fix.
 
-## [5.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.1...v5.0.0) (2020-01-15)
+## [5.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.0...v5.0.1) (2020-01-15)
 
 ### Changes
 
@@ -268,7 +268,7 @@
 - *Finbuckle.MultiTenant.Core* targets `netstandard2.1` and `netstandard2.0`.
 - *Finbuckle.MultiTenant.EntityFrameworkCore* targets `netstandard2.1` and `netstandard2.0`.
 
-## [5.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v5.0.0...v4.0.0) (2020-01-12)
+## [5.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v4.0.0...v5.0.0) (2020-01-12)
 
 ### Changes
 
@@ -285,7 +285,7 @@
 - Updated unit tests to check against all valid project targets.
 - Symbols package included for debugging.
 
-## [4.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v4.0.0...v3.2.0) (2019-09-24)
+## [4.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.2.0...v4.0.0) (2019-09-24)
 
 ### Changes
 
@@ -298,7 +298,7 @@
 - Updated unit tests to check against all valid project targets.
 - Symbols package included for debugging.
 
-## [3.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.2.0...v3.1.0) (2019-09-08)
+## [3.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.1.0...v3.2.0) (2019-09-08)
 
 ### Changes
 
@@ -308,7 +308,7 @@
 - Fix a bug with `TryUpdateAsync` in the wrapper store. Thanks @steebwba!
 - Updated documentation and fixed typos. Thanks @MesfinMo!
 
-## [3.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.1.0...v3.0.1) (2019-06-09)
+## [3.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.0.1...v3.1.0) (2019-06-09)
 
 ### Changes
 
@@ -320,7 +320,7 @@
 - Miscellaneous bug fixes, code improvement, and unit tests.
 - Thanks to @nbarbettini for contributing to this release.
 
-## [3.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.0.1...v3.0.0) (2019-05-05)
+## [3.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.0.0...v3.0.1) (2019-05-05)
 
 ### Changes
 
@@ -328,7 +328,7 @@
 - Removed custom `IModelCacheKeyFactory` as it is no longer needed due to the global query filter changes.
 - Updated documentation and samples.
 
-## [3.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v3.0.0...v2.0.2) (2019-04-01)
+## [3.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.2...v3.0.0) (2019-04-01)
 
 ### Changes
 
@@ -339,7 +339,7 @@
 - Updated unit and integration tests.
 - Switch to Apache 2.0 license.
 
-## [2.0.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.2...v2.0.1) (2019-02-05)
+## [2.0.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.1...v2.0.2) (2019-02-05)
 
 ### Changes
 
@@ -347,7 +347,7 @@
 - Updated and Fixed the IdentityDataIsolation sample project.
 - General code and test cleanup.
 
-## [2.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.1...v2.0.0) (2019-01-07)
+## [2.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v2.0.1) (2019-01-07)
 
 ### Changes
 
@@ -356,7 +356,7 @@
 - Updated samples for ASP.NET Core 2.2.
 - Cleaned up library dependencies to target ASP.NET Core 2.1 or greater.
 
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) (2018-12-03)
+## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.2.0...v2.0.0) (2018-12-03)
 
 ### Changes
 
@@ -366,7 +366,7 @@
 - Updated sample project dependencies.
 - Various other internal improvements to code and bug fixes.
 
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) MultiTenant Store Enhancements (2018-12-03)
+## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.2.0...v2.0.0) MultiTenant Store Enhancements (2018-12-03)
 
 ### Changes
 
@@ -376,7 +376,7 @@
 - Custom can be configured with custom dependency injection lifetime (single, scoped, or transient) via `WithStore` method overloads.
 - Custom stores automatically receive logging and error support via internal use of `MultiTenantStoreWrapper`.
 
-## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v2.0.0...v1.2.0) MultiTenant Strategy Enhancements (2018-12-03)
+## [2.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.2.0...v2.0.0) MultiTenant Strategy Enhancements (2018-12-03)
 
 ### Changes
 
@@ -384,7 +384,7 @@
 - Custom strategies can be configured with custom dependency injection lifetime (single, scoped, or transient) via `WithStrategy` method overloads.
 - Moved route configuration for RouteStrategy from `UseMultiTenant` to `WithRouteStrategy`.
 
-## [1.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.2.0...v1.1.1) (2018-07-22)
+## [1.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.1.1...v1.2.0) (2018-07-22)
 
 ### Changes
 
@@ -393,7 +393,7 @@
 - Minor refactoring and more unit tests
 - Various bug fixes
 
-## [1.1.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.1.1...v1.1.0) (2018-05-22)
+## [1.1.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.1.0...v1.1.1) (2018-05-22)
 
 ### Changes
 
@@ -401,7 +401,7 @@
 - Added sample project for data isolation
 - Added new constructors for `MultiTenantDbContext` and `MultiTenantIdentityDbContext`
 
-## [1.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.1.0...v1.0.0) (2018-04-22)
+## [1.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.0.0...v1.1.0) (2018-04-22)
 
 ### Changes
 
@@ -414,7 +414,7 @@
 - Improved unit and integration tests
 - Switch to Apache 2.0 license
 
-## [1.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v1.0.0...v0.0.0) (2018-01-01)
+## [1.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v1.0.0) (2018-01-01)
 
 ### Changes
 
