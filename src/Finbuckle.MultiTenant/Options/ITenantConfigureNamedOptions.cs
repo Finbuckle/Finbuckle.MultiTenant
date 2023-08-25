@@ -7,7 +7,7 @@ namespace Finbuckle.MultiTenant.Options;
 /// Configures options per-tenant.
 /// </summary>
 /// <typeparam name="TOptions">Options type being configured.</typeparam>
-/// <typeparam name="T">A type implementing ITenantInfo.</typeparam>
+/// <typeparam name="TTenantInfo">A type implementing ITenantInfo.</typeparam>
 public interface ITenantConfigureNamedOptions<TOptions, TTenantInfo>
     where TOptions : class, new()
     where TTenantInfo : class, ITenantInfo, new()
@@ -17,6 +17,6 @@ public interface ITenantConfigureNamedOptions<TOptions, TTenantInfo>
     /// </summary>
     /// <param name="name">The name of the option to be configured.</param>
     /// <param name="options">The options class instance to be configured.</param>
-    /// <typeparam name="T">A type implementing ITenantInfo.</typeparam>
+    /// <param name="tenantInfo">The TTenantInfo instance for the options being configured.</param>
     void Configure(string name, TOptions options, TTenantInfo tenantInfo);
 }

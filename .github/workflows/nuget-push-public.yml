@@ -1,0 +1,18 @@
+name: NuGet Push Public
+
+on: [workflow_dispatch]
+
+jobs:
+  build-test-prep-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.100-preview.7.23376.3"
+      - name: Create the package
+        run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
+      - name: Publish the package to NuGet.org
+        env:
+          NUGET_KEY: ${{secrets.NUGET_KEY}}
+        run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
