@@ -16,53 +16,66 @@ namespace Finbuckle.MultiTenant.Strategies
 	public class ClaimStrategy : IMultiTenantStrategy
 	{
 		private readonly string _tenantKey;
-		private readonly string? _authenticationScheme;
+		private readonly string[]? _authenticationSchemes;
 
 		public ClaimStrategy(string template) : this(template, null)
 		{
 		}
 
-		public ClaimStrategy(string template, string? authenticationScheme)
+		public ClaimStrategy(string template, string[]? authenticationSchemes)
 		{
 			if (string.IsNullOrWhiteSpace(template))
 				throw new ArgumentException(nameof(template));
 
 			_tenantKey = template;
-			_authenticationScheme = authenticationScheme;
+			_authenticationSchemes = authenticationSchemes;
 		}
 
 		public async Task<string?> GetIdentifierAsync(object context)
 		{
-			if (!(context is HttpContext httpContext))
-				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
+            if (!(context is HttpContext httpContext))
+                throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
-			if (httpContext.User.Identity is { IsAuthenticated: true })
-				return httpContext.User.FindFirst(_tenantKey)?.Value;
+            if (httpContext.User.Identity is { IsAuthenticated: true })
+                return httpContext.User.FindFirst(_tenantKey)?.Value;
 
-			AuthenticationScheme? authScheme;
-			var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
-			if (_authenticationScheme is null)
-			{
-				authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
-			}
-			else
-			{
-				authScheme = (await schemeProvider.GetAllSchemesAsync()).FirstOrDefault(x => x.Name == _authenticationScheme);
-			}
+            var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
-			if (authScheme is null)
-			{
-				return null;
-			}
+            if (_authenticationSchemes != null && _authenticationSchemes.Length > 0)
+            {
+                foreach (var schemeName in _authenticationSchemes)
+                {
+                    var authScheme = (await schemeProvider.GetAllSchemesAsync()).FirstOrDefault(x => x.Name == schemeName);
+                    if (authScheme != null)
+                    {
+                        var identifier = await AuthenticateAndRetrieveIdentifier(httpContext, authScheme);
+                        if (identifier != null) return identifier;
+                    }
+                }
+            }
+            else
+            {
+                var authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
+                if (authScheme != null)
+                {
+                    var identifier = await AuthenticateAndRetrieveIdentifier(httpContext, authScheme);
+                    if (identifier != null) return identifier;
+                }
+            }
 
-			var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
-			await handler.InitializeAsync(authScheme, httpContext);
-			httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
-			var handlerResult = await handler.AuthenticateAsync();
-			httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
+            return null;
+        }
 
-			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
-			return identifier;
-		}
-	}
+        private async Task<string?> AuthenticateAndRetrieveIdentifier(HttpContext httpContext, AuthenticationScheme authScheme)
+        {
+            var handler = (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices, authScheme.HandlerType);
+            await handler.InitializeAsync(authScheme, httpContext);
+            httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
+            var handlerResult = await handler.AuthenticateAsync();
+            httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
+
+            var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
+            return identifier;
+        }
+    }
 }
