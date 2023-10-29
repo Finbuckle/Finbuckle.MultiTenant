@@ -314,7 +314,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         // ReSharper disable once MemberCanBePrivate.Global
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
-            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string[] tenantKey)
             where TTenantInfo : class, ITenantInfo, new()
         {
             BypassSessionPrincipalValidation(builder);
@@ -326,14 +326,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder">MultiTenantBuilder instance.</param>
         /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
-        /// <param name="authenticationScheme">The authentication scheme to check for claims.</param>
+        /// <param name="authenticationSchemes">The authentication schemes to check for claims.</param>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
-            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme)
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey, string[] authenticationSchemes)
             where TTenantInfo : class, ITenantInfo, new()
         {
             BypassSessionPrincipalValidation(builder);
-            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
+            return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationSchemes);
         }
 
         private static void BypassSessionPrincipalValidation<TTenantInfo>(
