@@ -314,7 +314,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         // ReSharper disable once MemberCanBePrivate.Global
         public static FinbuckleMultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
-            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string[] tenantKey)
+            this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string tenantKey)
             where TTenantInfo : class, ITenantInfo, new()
         {
             BypassSessionPrincipalValidation(builder);
