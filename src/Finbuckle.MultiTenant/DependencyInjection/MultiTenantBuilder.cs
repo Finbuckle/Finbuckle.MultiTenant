@@ -57,17 +57,19 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
         {
             throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
         }
-
-        Services.AddPerTenantOptionsCore<TOptions>();
-        Services.TryAddEnumerable(ServiceDescriptor.Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
-        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp => new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
+        
+        // Services.AddOptionsCore<TOptions>();
+        Services.TryAddEnumerable(ServiceDescriptor
+            .Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
+        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp =>
+            new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
 
         return this;
     }
 
     // TODO consider per tenant AllOptions variation
     // TODO consider per-tenant post options
-    
+
 
     /// <summary>
     /// Adds and configures an IMultiTenantStore to the application using default dependency injection.

@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.Options;
 
 [Obsolete]
 public interface ITenantConfigureOptions<TOptions, TTenantInfo>
-    where TOptions : class, new()
+    where TOptions : class
     where TTenantInfo : class, ITenantInfo, new()
 {
     void Configure(TOptions options, TTenantInfo tenantInfo);

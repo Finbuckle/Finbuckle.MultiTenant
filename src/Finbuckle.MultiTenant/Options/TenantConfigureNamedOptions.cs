@@ -7,7 +7,7 @@ namespace Finbuckle.MultiTenant.Options;
 
 /// <inheritdoc />
 public class TenantConfigureNamedOptions<TOptions, TTenantInfo> : ITenantConfigureNamedOptions<TOptions, TTenantInfo>
-    where TOptions : class, new()
+    where TOptions : class
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>

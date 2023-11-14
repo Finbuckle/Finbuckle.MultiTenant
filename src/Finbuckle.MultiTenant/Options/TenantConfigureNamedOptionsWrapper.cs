@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Finbuckle.MultiTenant.Options;
 
 class TenantConfigureNamedOptionsWrapper<TOptions, TTenantInfo> : ITenantConfigureNamedOptionsWrapper<TOptions>
-    where TOptions : class, new()
+    where TOptions : class
     where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;

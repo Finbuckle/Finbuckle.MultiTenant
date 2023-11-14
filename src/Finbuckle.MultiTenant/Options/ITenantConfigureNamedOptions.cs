@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant.Options;
 /// <typeparam name="TOptions">Options type being configured.</typeparam>
 /// <typeparam name="TTenantInfo">A type implementing ITenantInfo.</typeparam>
 public interface ITenantConfigureNamedOptions<TOptions, TTenantInfo>
-    where TOptions : class, new()
+    where TOptions : class
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>

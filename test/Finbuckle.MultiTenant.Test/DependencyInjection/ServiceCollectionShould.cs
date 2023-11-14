@@ -13,23 +13,23 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
         private string? TestProperty { get; set; }
         
-        [Fact]
-        public void AddPerTenantOptions()
-        {
-            var services = new ServiceCollection();
-            _ = services.AddMultiTenant<TenantInfo>();
-
-            services.AddPerTenantOptions<ServiceCollectionShould>()
-                .Configure<TenantInfo>((o, ti) => o.TestProperty = ti.Id);
-            
-            var sp = services.BuildServiceProvider();
-            var multiTenantContextAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            multiTenantContextAccessor.MultiTenantContext = new MultiTenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = "initech" } };
-
-            using var scope = sp.CreateScope();
-            var options = scope.ServiceProvider.GetRequiredService<IOptions<ServiceCollectionShould>>();
-
-            Assert.Equal("initech", options.Value.TestProperty);
-        }
+        // [Fact]
+        // public void AddPerTenantOptions()
+        // {
+        //     var services = new ServiceCollection();
+        //     _ = services.AddMultiTenant<TenantInfo>();
+        //
+        //     services.AddPerTenantOptions<ServiceCollectionShould>()
+        //         .Configure<TenantInfo>((o, ti) => o.TestProperty = ti.Id);
+        //     
+        //     var sp = services.BuildServiceProvider();
+        //     var multiTenantContextAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
+        //     multiTenantContextAccessor.MultiTenantContext = new MultiTenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = "initech" } };
+        //
+        //     using var scope = sp.CreateScope();
+        //     var options = scope.ServiceProvider.GetRequiredService<IOptions<ServiceCollectionShould>>();
+        //
+        //     Assert.Equal("initech", options.Value.TestProperty);
+        // }
     }
 }

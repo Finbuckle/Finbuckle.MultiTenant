@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.Options;
 /// </summary>
 /// <typeparam name="TOptions">The type of options being requested.</typeparam>
 public class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions>
-    where TOptions : class, new()
+    where TOptions : class
 {
     private readonly IConfigureOptions<TOptions>[] _configureOptions;
     private readonly IPostConfigureOptions<TOptions>[] _postConfigureOptions;
@@ -46,7 +46,7 @@ public class MultiTenantOptionsFactory<TOptions> : IOptionsFactory<TOptions>
     public TOptions Create(string name)
     {
         ITenantConfigureNamedOptionsWrapper<TOptions>? tenantConfigureNamedOptionsWrapper = null;
-        var options = new TOptions();
+        var options = Activator.CreateInstance<TOptions>();
         foreach (var setup in _configureOptions)
         {
             // consider directly injecting this to avoid a conditional.

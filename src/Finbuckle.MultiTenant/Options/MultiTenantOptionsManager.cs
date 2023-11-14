@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Options;
 /// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
 /// </summary>
 /// <typeparam name="TOptions">The type of options being configured.</typeparam>
-public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> where TOptions : class, new()
+public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> where TOptions : class
 {
     private readonly IOptionsFactory<TOptions> _factory;
     private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache
