@@ -15,9 +15,9 @@
   <Choose>
     <When Condition=" '$(TargetFramework)' == 'net8.0' ">
       <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0-*" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0-*" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0-*" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
       </ItemGroup>
     </When>
     <When Condition=" '$(TargetFramework)' == 'net7.0' ">
