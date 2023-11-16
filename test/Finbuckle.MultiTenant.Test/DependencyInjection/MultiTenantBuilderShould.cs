@@ -133,58 +133,6 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
                 builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
         }
 
-        [Fact]
-        public void AddPerTenantOptions()
-        {
-            var services = new ServiceCollection();
-            var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>?)null);
-            services.AddSingleton(accessor.Object);
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            // Note: using MultiTenantBuilderShould as our test options class.
-            builder.WithPerTenantOptions<MultiTenantBuilderShould>((o, _) => o.TestProperty = "1");
-            var sp = services.BuildServiceProvider();
-
-            sp.GetRequiredService<ITenantConfigureNamedOptions<MultiTenantBuilderShould, TenantInfo>>();
-        }
-
-        [Fact]
-        public void AddConfigurePerTenant()
-        {
-            var services = new ServiceCollection();
-            services.ConfigurePerTenant<MultiTenantBuilderShould, TenantInfo>("",
-                (options, tenant) => options.TestProperty = tenant?.Id);
-
-            Assert.Contains(services, service =>
-                service.ServiceType == typeof(IOptionsMonitorCache<MultiTenantBuilderShould>) &&
-                service.ImplementationType == typeof(MultiTenantOptionsCache<MultiTenantBuilderShould>) &&
-                service.Lifetime == ServiceLifetime.Singleton);
-
-            var sp = services.BuildServiceProvider();
-        }
-
-        [Fact]
-        public void AddPerTenantNamedOptions()
-        {
-            var services = new ServiceCollection();
-            var accessor = new Mock<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.Setup(a => a.MultiTenantContext).Returns((IMultiTenantContext<TenantInfo>?)null);
-            services.AddSingleton(accessor.Object);
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            // Note: using MultiTenantBuilderShould as our test options class.
-            builder.WithPerTenantNamedOptions<MultiTenantBuilderShould>("a name", (o, _) => o.TestProperty = "1");
-            var sp = services.BuildServiceProvider();
-            sp.GetRequiredService<ITenantConfigureNamedOptions<MultiTenantBuilderShould, TenantInfo>>();
-        }
-
-        [Fact]
-        public void ThrowIfNullParamAddingPerTenantOptions()
-        {
-            var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
-            Assert.Throws<ArgumentNullException>(() => builder.WithPerTenantOptions<MultiTenantBuilderShould>(null!));
-        }
-
         [Theory]
         [InlineData(ServiceLifetime.Singleton)]
         [InlineData(ServiceLifetime.Scoped)]
@@ -216,6 +164,8 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
                     strategy = scope.ServiceProvider.GetRequiredService<IMultiTenantStrategy>();
                     Assert.NotSame(strategy, strategy2);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
         }
 

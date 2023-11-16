@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-
 namespace Finbuckle.MultiTenant;
 
 public class StoreInfo<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()

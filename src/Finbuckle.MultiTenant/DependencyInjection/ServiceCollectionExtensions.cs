@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
@@ -123,6 +121,7 @@ public static class FinbuckleServiceCollectionExtensions
         return true;
     }
 
+    // TODO adjust summary
     /// <summary>
     /// Registers an action used to configure a particular type of options.
     /// Note: These are run before all <seealso cref="PostConfigure{TOptions}(IServiceCollection, Action{TOptions})"/>.
@@ -133,19 +132,47 @@ public static class FinbuckleServiceCollectionExtensions
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
     public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(this IServiceCollection services,
-        string name, Action<TOptions, TTenantInfo> config) where TOptions : class
+        string? name, Action<TOptions, TTenantInfo> action) where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
         // Required infrastructure.
+        services.AddOptions();
         services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
-        services.TryAddTransient<IOptionsFactory<TOptions>, MultiTenantOptionsFactory<TOptions>>();
         services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager<TOptions>);
         services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager<TOptions>);
-        services.ConfigureAll()
+        
         services.AddSingleton<IConfigureOptions<TOptions>>(sp =>
-            ActivatorUtilities.CreateInstance<TenantConfigureNamedOptionsWrapper<TOptions, TTenantInfo>>(sp));
+        {
+            var multiTenantContextAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>();
+
+            void ConfigureAction(TOptions options)
+            {
+                var multiTenantContext = multiTenantContextAccessor.MultiTenantContext;
+                if (multiTenantContext.HasResolvedTenant)
+                    action(options, multiTenantContext.TenantInfo);
+            }
+
+            return new ConfigureNamedOptions<TOptions>(name, ConfigureAction);
+        });
 
         return services;
+    }
+    
+    // TODO adjust summary
+    /// <summary>
+    /// Registers an action used to configure a particular type of options.
+    /// Note: These are run before all <seealso cref="PostConfigure{TOptions}(IServiceCollection, Action{TOptions})"/>.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="name">The name of the options instance.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(this IServiceCollection services,
+        Action<TOptions, TTenantInfo> action) where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        return services.ConfigurePerTenant(Options.Options.DefaultName, action);
     }
 
     private static void AddOptionsPerTenantCore<TOptions>(this IServiceCollection services) where TOptions : class

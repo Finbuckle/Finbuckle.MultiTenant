@@ -34,7 +34,7 @@ public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> wh
     /// <inheritdoc />
     public TOptions Get(string? name)
     {
-        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
+        name ??= Microsoft.Extensions.Options.Options.DefaultName;
 
         // Store the options in our instance cache.
         return _cache.GetOrAdd(name, () => _factory.Create(name));

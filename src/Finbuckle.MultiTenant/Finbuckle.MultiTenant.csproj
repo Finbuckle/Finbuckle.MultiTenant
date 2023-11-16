@@ -5,6 +5,7 @@
         <Title>Finbuckle.MultiTenant</Title>
         <Description>Main library package for Finbuckle.MultiTenant.</Description>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>

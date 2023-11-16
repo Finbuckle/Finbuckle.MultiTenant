@@ -1,15 +1,12 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
+// TODO refactor methods into extensions
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
@@ -39,6 +36,7 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
     public FinbuckleMultiTenantBuilder<T> WithPerTenantOptions<TOptions>(
         Action<TOptions, T> tenantConfigureOptions) where TOptions : class, new()
     {
+        // TODO remove this method
         // TODO maybe change this to string empty so null an be used for all options, note remarks.
         return WithPerTenantNamedOptions<TOptions>(null, tenantConfigureOptions);
     }
@@ -53,16 +51,17 @@ public class FinbuckleMultiTenantBuilder<T> where T : class, ITenantInfo, new()
     public FinbuckleMultiTenantBuilder<T> WithPerTenantNamedOptions<TOptions>(string? name,
         Action<TOptions, T> tenantConfigureNamedOptions) where TOptions : class, new()
     {
-        if (tenantConfigureNamedOptions == null)
-        {
-            throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
-        }
-        
-        // Services.AddOptionsCore<TOptions>();
-        Services.TryAddEnumerable(ServiceDescriptor
-            .Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
-        Services.AddScoped<ITenantConfigureNamedOptions<TOptions, T>>(sp =>
-            new TenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
+        // TODO remove this method
+        // if (tenantConfigureNamedOptions == null)
+        // {
+        //     throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
+        // }
+        //
+        // // Services.AddOptionsCore<TOptions>();
+        // Services.TryAddEnumerable(ServiceDescriptor
+        //     .Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
+        // Services.AddScoped<ITenantConfigureNamedOptionsOld<TOptions, T>>(sp =>
+        //     new MultiTenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
 
         return this;
     }

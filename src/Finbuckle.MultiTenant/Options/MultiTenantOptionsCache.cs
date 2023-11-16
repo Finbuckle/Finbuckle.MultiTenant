@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 
@@ -75,7 +74,7 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
             throw new ArgumentNullException(nameof(createOptions));
         }
 
-        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
+        name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
