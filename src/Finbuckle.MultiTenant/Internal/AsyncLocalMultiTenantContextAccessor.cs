@@ -24,7 +24,8 @@ public class AsyncLocalMultiTenantContextAccessor<T> : IMultiTenantContextAccess
     }
 
     /// <inheritdoc />
-    /// TODO move this to the interface?
+    // TODO move this to the interface?
+    // TODO should the set throw if "as" returns null?
     IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext
     {
         get => MultiTenantContext as IMultiTenantContext;
