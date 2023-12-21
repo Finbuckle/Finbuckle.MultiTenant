@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.12.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.13.0</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.12.0</span>](#whats-new)
+1. [What's New in Finbuckle.MultiTenant <span class="_version">6.13.0</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -23,15 +23,19 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.12.0</span>
+## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.13.0</span>
 
 <!--_release-notes-->
 
 
 ### Features
 
-* AdjustIndex preserves existing filter ([#711](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/711)) ([affb66f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/affb66f268a133916c17c7797138cd16dc67e728))
-* net8.0 ([#712](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/712)) ([a137dae](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a137dae907b2f9b465bee735e9e9eddec64bddf5))
+* .net8.0 LTS release support ([#770](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/770)) ([d7f08f9](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d7f08f94896b8efa8ca1877bcb0c4920b98ba049))
+
+
+### Bug Fixes
+
+* OnTenantNotResolved not called correctly ([#729](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/729)) ([a26081c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a26081c960786c3eb33f9b2173feed6c33427a74)), closes [#628](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/628)
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
