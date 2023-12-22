@@ -18,45 +18,49 @@ public static class FinbuckleServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+    /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public static FinbuckleMultiTenantBuilder<T> AddMultiTenant<T>(this IServiceCollection services,
+    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions> config)
-        where T : class, ITenantInfo, new()
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        services.AddScoped<ITenantResolver<T>, TenantResolver<T>>();
-        services.AddScoped<ITenantResolver>(sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<T>>());
+        services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
+        services.AddScoped<ITenantResolver>(
+            sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
-        services.AddScoped<IMultiTenantContext<T>>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext!);
+        services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp =>
+            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext!);
 
-        services.AddScoped<T>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<T>>().MultiTenantContext?.TenantInfo!);
-        services.AddScoped<ITenantInfo>(sp => sp.GetService<T>()!);
+        services.AddScoped<TTenantInfo>(sp =>
+            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo!);
+        services.AddScoped<ITenantInfo>(sp => sp.GetService<TTenantInfo>()!);
 
-        // TODO this might require instance
-        services.AddSingleton<IMultiTenantContextAccessor<T>, AsyncLocalMultiTenantContextAccessor<T>>();
+        // TODO this might require instance to ensure it already exists when needed
+        services
+            .AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
+                AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<T>>());
+            (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
 
         services.Configure(config);
 
-        return new FinbuckleMultiTenantBuilder<T>(services);
+        return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
     }
 
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <param name="services">The IServiceCollection<c/> instance the extension method applies to.</param>
+    /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
     /// <returns>An new instance of MultiTenantBuilder.</returns>
-    public static FinbuckleMultiTenantBuilder<T> AddMultiTenant<T>(this IServiceCollection services)
-        where T : class, ITenantInfo, new()
+    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.AddMultiTenant<T>(_ => { });
+        return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
 
+    // TODO: better document and extract
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
         var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
@@ -121,76 +125,154 @@ public static class FinbuckleServiceCollectionExtensions
         return true;
     }
 
-    // TODO adjust summary
     /// <summary>
-    /// Registers an action used to configure a particular type of options.
-    /// Note: These are run before all <seealso cref="PostConfigure{TOptions}(IServiceCollection, Action{TOptions})"/>.
+    /// Registers an action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-    public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(this IServiceCollection services,
-        string? name, Action<TOptions, TTenantInfo> action) where TOptions : class
+    public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        string? name, Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        // Required infrastructure.
-        services.AddOptions();
-        services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
-        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager<TOptions>);
-        services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager<TOptions>);
-        
-        services.AddSingleton<IConfigureOptions<TOptions>>(sp =>
-        {
-            var multiTenantContextAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>();
+        ConfigurePerTenantReqs<TOptions>(services);
 
-            void ConfigureAction(TOptions options)
-            {
-                var multiTenantContext = multiTenantContextAccessor.MultiTenantContext;
-                if (multiTenantContext.HasResolvedTenant)
-                    action(options, multiTenantContext.TenantInfo);
-            }
-
-            return new ConfigureNamedOptions<TOptions>(name, ConfigureAction);
-        });
+        services.AddTransient<IConfigureOptions<TOptions>>(sp =>
+            new ConfigureNamedOptions<TOptions, TTenantInfo?>(
+                name,
+                sp.GetService<TTenantInfo>(),
+                (options, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, tenantInfo);
+                }));
 
         return services;
     }
-    
-    // TODO adjust summary
+
     /// <summary>
     /// Registers an action used to configure a particular type of options.
-    /// Note: These are run before all <seealso cref="PostConfigure{TOptions}(IServiceCollection, Action{TOptions})"/>.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        return services.ConfigurePerTenant(Options.Options.DefaultName, configureOptions);
+    }
+
+    /// <summary>
+    /// Registers an action used to configure all instances of a particular type of options per tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection ConfigureAllPerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        return services.ConfigurePerTenant(null, configureOptions);
+    }
+
+    /// <summary>
+    /// Registers a post configure action used to configure a particular type of options per tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-    public static IServiceCollection ConfigurePerTenant<TOptions, TTenantInfo>(this IServiceCollection services,
-        Action<TOptions, TTenantInfo> action) where TOptions : class
+    public static IServiceCollection PostConfigurePerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        string? name, Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.ConfigurePerTenant(Options.Options.DefaultName, action);
+        ConfigurePerTenantReqs<TOptions>(services);
+
+        services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TTenantInfo?>(
+                name,
+                sp.GetService<TTenantInfo>(),
+                (options, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, tenantInfo);
+                }));
+
+        return services;
     }
 
-    private static void AddOptionsPerTenantCore<TOptions>(this IServiceCollection services) where TOptions : class
+    /// <summary>
+    /// Registers a post configure action used to configure a particular type of options per tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection PostConfigurePerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        if (services == null)
-        {
-            throw new ArgumentNullException(nameof(services));
-        }
-
-        
+        return services.PostConfigurePerTenant(Options.Options.DefaultName, configureOptions);
     }
 
-    private static MultiTenantOptionsManager<TOptions> BuildOptionsManager<TOptions>(IServiceProvider sp)
+    /// <summary>
+    /// Registers a post configure action used to configure all instances of a particular type of options per tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection PostConfigureAllPerTenant<TOptions, TTenantInfo>(
+        this IServiceCollection services,
+        Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        return services.PostConfigurePerTenant(null, configureOptions);
+    }
+
+    internal static void ConfigurePerTenantReqs<TOptions>(IServiceCollection services)
         where TOptions : class
     {
-        var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
-            typeof(MultiTenantOptionsCache<TOptions>));
-        return (MultiTenantOptionsManager<TOptions>)
-            ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
+        if (services == null) throw new ArgumentNullException(nameof(services));
+
+        // Required infrastructure.
+        services.AddOptions();
+
+        // TODO: Add check for success
+        services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
+        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager);
+        services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager);
+        return;
+
+        MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
+        {
+            var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
+                typeof(MultiTenantOptionsCache<TOptions>));
+            return (MultiTenantOptionsManager<TOptions>)
+                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
+        }
     }
 }
