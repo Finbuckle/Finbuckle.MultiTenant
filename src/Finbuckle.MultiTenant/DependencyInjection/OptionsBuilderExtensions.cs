@@ -18,6 +18,8 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -39,6 +41,8 @@ public static class OptionsBuilderExtensions
         where TDep : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -62,6 +66,8 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -88,6 +94,8 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -116,6 +124,8 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -146,6 +156,8 @@ public static class OptionsBuilderExtensions
         where TDep5 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -173,6 +185,8 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -194,6 +208,8 @@ public static class OptionsBuilderExtensions
         where TDep : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -217,6 +233,8 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -243,6 +261,8 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -271,6 +291,8 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -301,6 +323,8 @@ public static class OptionsBuilderExtensions
         where TDep5 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
