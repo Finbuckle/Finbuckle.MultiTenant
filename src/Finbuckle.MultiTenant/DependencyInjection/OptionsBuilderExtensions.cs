@@ -167,6 +167,161 @@ public static class OptionsBuilderExtensions
 
         return optionsBuilder;
     }
+    
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TTenantInfo?>(
+                optionsBuilder.Name,
+                sp.GetService<TTenantInfo>(),
+                (options, dep) =>
+                {
+                    if (dep is not null)
+                        configureOptions(options, dep);
+                }));
+        
+        return optionsBuilder;
+    }
+
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TDep : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TDep, TTenantInfo?>(
+                optionsBuilder.Name,
+                sp.GetRequiredService<TDep>(),
+                sp.GetService<TTenantInfo>(),
+                (options, dep, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, dep, tenantInfo);
+                }));
+
+        return optionsBuilder;
+    }
+
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep1, TDep2, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TDep1 : class
+        where TDep2 : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TDep1, TDep2, TTenantInfo?>(
+                optionsBuilder.Name,
+                sp.GetRequiredService<TDep1>(),
+                sp.GetRequiredService<TDep2>(),
+                sp.GetService<TTenantInfo>(),
+                (options, dep1, dep2, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, dep1, dep2, tenantInfo);
+                }));
+
+        return optionsBuilder;
+    }
+
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder,
+        Action<TOptions, TDep1, TDep2, TDep3, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TDep1 : class
+        where TDep2 : class
+        where TDep3 : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, TTenantInfo?>(
+                optionsBuilder.Name,
+                sp.GetRequiredService<TDep1>(),
+                sp.GetRequiredService<TDep2>(),
+                sp.GetRequiredService<TDep3>(),
+                sp.GetService<TTenantInfo>(),
+                (options, dep1, dep2, dep3, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, dep1, dep2, dep3, tenantInfo);
+                }));
+
+        return optionsBuilder;
+    }
+
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder,
+        Action<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TDep1 : class
+        where TDep2 : class
+        where TDep3 : class
+        where TDep4 : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+            new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo?>(
+                optionsBuilder.Name,
+                sp.GetRequiredService<TDep1>(),
+                sp.GetRequiredService<TDep2>(),
+                sp.GetRequiredService<TDep3>(),
+                sp.GetRequiredService<TDep4>(),
+                sp.GetService<TTenantInfo>(),
+                (options, dep1, dep2, dep3, dep4, tenantInfo) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, dep1, dep2, dep3, dep4, tenantInfo);
+                }));
+
+        return optionsBuilder;
+    }
+
+    public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5, TTenantInfo>(
+        this OptionsBuilder<TOptions> optionsBuilder,
+        Action<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5, TTenantInfo> configureOptions)
+        where TOptions : class
+        where TDep1 : class
+        where TDep2 : class
+        where TDep3 : class
+        where TDep4 : class
+        where TDep5 : class
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+
+        optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
+        {
+            var tenantInfo = sp.GetService<TTenantInfo>();
+            return new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5>(
+                optionsBuilder.Name,
+                sp.GetRequiredService<TDep1>(),
+                sp.GetRequiredService<TDep2>(),
+                sp.GetRequiredService<TDep3>(),
+                sp.GetRequiredService<TDep4>(),
+                sp.GetRequiredService<TDep5>(),
+                (options, dep1, dep2, dep3, dep4, dep5) =>
+                {
+                    if (tenantInfo is not null)
+                        configureOptions(options, dep1, dep2, dep3, dep4, dep5, tenantInfo);
+                });
+        });
+
+        return optionsBuilder;
+    }
 }
 //
 // /// <summary>
