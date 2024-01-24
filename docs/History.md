@@ -1,6 +1,13 @@
 # Version History
 
 <!--_history-->
+## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
+
+
+### Bug Fixes
+
+* update dependency to protect against CVE-2024-21319 ([#781](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/781)) ([c5e0c8a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c5e0c8a8e3f60033f97993b7feaf4ff87150a0f8))
+
 ## [6.13.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.12.0...v6.13.0) (2023-12-21)
 
 
