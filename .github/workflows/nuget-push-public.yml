@@ -7,9 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "8.0.x"
       - name: Create the package
         run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
       - name: Publish the package to NuGet.org

@@ -7,12 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "8.0.x"
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
       - name: build and test
         run: |
           dotnet restore
