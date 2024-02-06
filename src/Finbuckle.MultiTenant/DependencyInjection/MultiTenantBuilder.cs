@@ -6,7 +6,6 @@ using Finbuckle.MultiTenant;
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
-// TODO refactor methods into extensions
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>

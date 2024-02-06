@@ -101,21 +101,6 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         }
 
         [Fact]
-        public void PreInitMultiTenantContextAccessorInDi()
-        {
-            var services = new ServiceCollection();
-            services.AddMultiTenant<TenantInfo>();
-
-            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                                        s.ServiceType ==
-                                                        typeof(IMultiTenantContextAccessor<TenantInfo>) &&
-                                                        s.ImplementationInstance is not null);
-
-            Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Singleton, service!.Lifetime);
-        }
-
-        [Fact]
         public void RegisterMultiTenantOptionsInDi()
         {
             var services = new ServiceCollection();
@@ -143,10 +128,10 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             var sp = services.BuildServiceProvider();
 
             var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
-            var config = configs.Where(config => config is ConfigureNamedOptions<TestOptions> options).ToList();
+            var config = configs.Where(config => config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
 
             Assert.Single(config);
-            Assert.Equal("name1", config.Select(c => (ConfigureNamedOptions<TestOptions>)c).Single().Name);
+            Assert.Equal("name1", config.Select(c => (ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>)c).Single().Name);
         }
 
         [Fact]
@@ -158,11 +143,26 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             var sp = services.BuildServiceProvider();
 
             var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
-            var config = configs.Where(config => config is ConfigureNamedOptions<TestOptions> options).ToList();
+            var config = configs.Where(config => config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
 
             Assert.Single(config);
             Assert.Equal(Microsoft.Extensions.Options.Options.DefaultName,
-                config.Select(c => (ConfigureNamedOptions<TestOptions>)c).Single().Name);
+                config.Select(c => (ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>)c).Single().Name);
+        }
+        
+        [Fact]
+        public void RegisterAllOptionsPerTenant()
+        {
+            var services = new ServiceCollection();
+            services.AddMultiTenant<TenantInfo>();
+            services.ConfigureAllPerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+            var sp = services.BuildServiceProvider();
+
+            var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
+            var config = configs.Where(config => config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
+
+            Assert.Single(config);
+            Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>)c).Single().Name);
         }
     }
 }

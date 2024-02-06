@@ -143,11 +143,12 @@ public static class FinbuckleServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IConfigureOptions<TOptions>>(sp =>
-            new ConfigureNamedOptions<TOptions, TTenantInfo?>(
+            new ConfigureNamedOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
                 name,
-                sp.GetService<TTenantInfo>(),
-                (options, tenantInfo) =>
+                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
+                (options, mtcAccessor) =>
                 {
+                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -207,11 +208,12 @@ public static class FinbuckleServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
-            new PostConfigureOptions<TOptions, TTenantInfo?>(
+            new PostConfigureOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
                 name,
-                sp.GetService<TTenantInfo>(),
-                (options, tenantInfo) =>
+                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
+                (options, mtcAccessor) =>
                 {
+                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));

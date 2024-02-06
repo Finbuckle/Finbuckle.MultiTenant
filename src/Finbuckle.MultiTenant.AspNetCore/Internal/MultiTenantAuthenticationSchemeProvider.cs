@@ -17,6 +17,7 @@ namespace Finbuckle.MultiTenant.AspNetCore
     /// <summary>
     /// Implements <see cref="IAuthenticationSchemeProvider"/>.
     /// </summary>
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     internal class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
     {
         private readonly IAuthenticationSchemeProvider _inner;
