@@ -1,6 +1,8 @@
 # added
 .vscode/
 *.db
+*.db-shm
+*.db-wal
 
 # globs
 Makefile.in
