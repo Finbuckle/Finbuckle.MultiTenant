@@ -1,17 +1,39 @@
 # Per-Tenant Options
 
-Finbuckle.MultiTenant integrates with the standard ASP.NET
-Core [Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps
-customize options distinctly for each tenant. The current tenant determines which options are retrieved via
-the `IOptions<TOptions>` (or derived) instance's `Value` property and `Get(string name)` method.
+Finbuckle.MultiTenant is designed to emphasize using per-tenant options in an app to drive per-tenant behavior. This
+approach allows app logic to be written having to add tenant-dependent or
+tenant-specific logic to the code.
 
-A specialized variation of this is [per-tenant authentication](Authentication).
+By using per-tenant options, the options values used within app logic will automatically
+reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
+multi-tenant capability with minimal code changes.
+
+Finbuckle.MultiTenant integrates with the
+standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also the [ASP.NET
+Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps
+customize options distinctly for each tenant.
+
+Note: For authentication options, Finbuckle.MultiTenant provides special support
+for [per-tenant authentication](Authentication).
+
+The current tenant determines which options are retrieved via
+the `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instances' `Value` property and
+`Get(string name)` method.
 
 Per-tenant options will work with *any* options class when using `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`,
 or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes an app's own code *and*
-code internal to ASP.NET Core or other libraries that use the Options pattern. There is one potential caveat: ASP.NET
-Core and other libraries may internally cache options or exhibit other unexpected behavior resulting in the wrong option
-values!
+code internal to ASP.NET Core or other libraries that use the Options pattern.
+
+A potential issue arises when code internally stores or caches options values from
+an `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instance. This is usually
+unnecessary because the options are already cached within the .NET options infrastructure, and in these cases the
+initial instance of the options is always used, regardless of the current tenant. Finbuckle.MultiTenant works around
+this for some parts of
+ASP.NET Core, and recommends that in your own code to always access options values via
+the `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instance. This will ensure the
+correct values for the current tenant are used.
+
+## Options Basics
 
 Consider a typical scenario in ASP.Net Core, starting with a simple class:
 
@@ -23,25 +45,24 @@ public class MyOptions
 }
 ```
 
-In the `ConfigureServices` method of the startup class, `services.Configure<MyOptions>` is called with a delegate
+In the app configuration, `services.Configure<MyOptions>` is called with a delegate
 or `IConfiguration` parameter to set the option values:
 
 ```cs
-public class Startup
-{
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.Configure<MyOptions>(options => options.Option1 = 1);
+var builder = WebApplication.CreateBuilder(args);
+
+// other code omitted...
+
+builder.Services.Configure<MyOptions>(options => options.Option1 = 1);
         
-        // Other services configured here...
-    }
-}
+ // rest of app code...
 ```
 
-Dependency injection of `IOptions<MyOptions>` into a controller (or anywhere DI can be used) provides access to the
-options values, which are the same for every tenant at this point:
+Dependency injection of `IOptions<MyOptions>` or its siblings into a class constructor, such as a controller, provides
+access to the options values. A service provider instance can also provide access to the options values.
 
 ```cs
+// access options via dependency injection in a class constructor
 public MyController : Controller
 {
     private readonly MyOptions _myOptions;
@@ -52,34 +73,64 @@ public MyController : Controller
         _myOptions = optionsAccessor.Value;
     }
 }
+
+// or with a service provider
+httpContext.RequestServices.GetServices<IOptionsSnaption<MyOptions>();
 ```
+
+With standard options each tenant would get see the same exact options.
 
 ## Customizing Options Per Tenant
 
-This sections assumes Finbuckle.MultiTenant is installed and configured. See [Getting Started](GettingStarted) for
-details.
+This sections assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
+a `TTenantInfo` type of `TenantInfo`.
+See [Getting Started](GettingStarted) for details.
 
-Call `WithPerTenantOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
+To configure options per tenant, the standard `Configure` method variants on the service collection now all
+have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at
+runtime the delegate will be called with the current tenant details.
 
 ```cs
-services.AddMultiTenant<MyTenantInfo>()...
-        .WithPerTenantOptions<MyOptions>((options, tenantInfo) =>
+// configure options per tenant
+builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+        {
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
+        });
+
+// or configure named options per tenant
+builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
+        {
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
+        });
+
+// ConfigureAll options variant
+builder.Services.ConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+        {
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
+        });
+
+// can also configure post options, named post options, and all post options variants
+builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+        {
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
+        });
+
+builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
+        {
+            options.MyOption1 = tenantInfo.Option1Value;
+            options.MyOption2 = tenantInfo.Option2Value;
+        });
+
+builder.Services.PostConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
         {
             options.MyOption1 = tenantInfo.Option1Value;
             options.MyOption2 = tenantInfo.Option2Value;
         });
 ```
-
-The type parameter `TOptions` is the options type being customized per-tenant. The method parameter is
-an `Action<TOptions, TenantInfo>`. This action will modify the options instance *after* the options normal configuration
-and *before* its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions)
-.
-
-`WithPerTenantOptions<TOptions>` can be called multiple times on the same `TOptions`
-type and the configuration will run in the respective order.
-
-The same delegate passed to `WithPerTenantOptions<TOptions>` is applied to all options generated of type `TOptions`
-regardless of the option name, similar to the .NET `ConfigureAll` method.
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
@@ -96,42 +147,27 @@ public MyController : Controller
 }
 ```
 
-## Named Options
+## Using the OptionsBuilder API
 
-You can configure options by name using the `WithPerTenantNamedOptions<TOptions>` method.
+.NET provides
+the [OptionsBuilder](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-8.0#optionsbuilder-api)
+API to provide more flexibility for configuring options. This pattern simplifies dependency injection and validation for
+the standard [Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options). Finbuckle.MultiTenant
+extends this API to enable options configuration for per-tenant options similarly. Note that while the `OptionsBuilder`
+normally supports up to five dependencies, Finbuckle.MultiTenant support only supports four.
 
-Call `WithPerTenantNamedOptions<TOptions>` after `AddMultiTenant<T>` in the `ConfigureServices` method:
-
-```cs
-services.AddMultiTenant<MyTenantInfo>()...
-    .WithPerTenantNamedOptions<MyOptions>(someOptionsName, (options, tenantInfo) =>
-    {
-        // only update options named "someOptionsName"
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
-    });
+```csharp
+// use OptionsBuilder API to configure per-tenant options with dependencies
+builder.Services
+    .AddOptions<MyOptions>("optionalName")
+    .ConfigurePerTenant<ExampleService, TenantInfo>(
+        (options, es, tenantInfo) =>
+            options.Property = DoSomethingWith(es, tenantInfo));
 ```
 
-The `string` parameter is the name of the options. The type parameter `TOptions` is the options type being customized
-per-tenant. The method parameter is an `Action<string, TOptions, TenantInfo>`. This action will modify the options
-instance *after* the options normal configuration and *before*
-its [post configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?#ipostconfigureoptions)
-.
+## Options and Caching
 
-`WithPerTenantNameOptions<TOptions>` can be called multiple times on the same `TOptions`
-type and the configuration will run in the respective order.
-
-The same delegate passed to `WithPerTenantNameOptions<TOptions>` is applied to all options generated of type `TOptions`
-regardless of the option name. You can use the `name` argument in the callback to help you set the correct options by
-name.
-
-`WithPerTenantOptions<TOptions>` can be used in combination with `WithPerTenantNameOptions<TOptions>` for the same
-type `TOptions`. The `WithPerTenantOptions<TOptions>` callbacks will be invoked first, followed by
-the `WithPerTenantNameOptions<TOptions>` callbacks.
-
-## Options Caching
-
-Internally ASP.NET Core caches options, and Finbuckle.MultiTenant extends this to cache options per tenant. Caching
+Internally .NET caches options, and Finbuckle.MultiTenant extends this to cache options per tenant. Caching
 occurs when a `TOptions` instance is retrieved via `Value` or `Get` on the injected `IOptions<TOptions>` (or derived)
 instance for the first time for a tenant.
 

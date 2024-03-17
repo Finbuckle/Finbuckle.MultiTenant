@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Builder
         /// <summary>
         /// Use Finbuckle.MultiTenant middleware in processing the request.
         /// </summary>
-        /// <param name="builder">The IApplicationBuilder<c/> instance the extension method applies to.</param>
+        /// <param name="builder">The <c>IApplicationBuilder</c> instance the extension method applies to.</param>
         /// <returns>The same IApplicationBuilder passed into the method.</returns>
         public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder)
             => builder.UseMiddleware<MultiTenantMiddleware>();

@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Threading;
-
 namespace Finbuckle.MultiTenant.Internal;
 
 /// <summary>
@@ -26,7 +24,8 @@ public class AsyncLocalMultiTenantContextAccessor<T> : IMultiTenantContextAccess
     }
 
     /// <inheritdoc />
-    /// TODO move this to the interface?
+    // TODO move this to the interface?
+    // TODO should the set throw if "as" returns null?
     IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext
     {
         get => MultiTenantContext as IMultiTenantContext;

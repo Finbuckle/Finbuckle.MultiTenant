@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Generic;
-
 namespace Finbuckle.MultiTenant.Stores;
 
 public class InMemoryStoreOptions<TTenantInfo>

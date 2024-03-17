@@ -1,8 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
@@ -13,6 +13,12 @@ namespace Finbuckle.MultiTenant.Test.Options
 {
     public class MultiTenantOptionsCacheShould
     {
+        internal class TestOptions
+        {
+            [Required]
+            public string? DefaultConnectionString { get; set; }
+        }
+        
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -24,7 +30,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -46,7 +52,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         public void HandleNullMultiTenantContextOnAdd()
         {
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -59,7 +65,7 @@ namespace Finbuckle.MultiTenant.Test.Options
         public void HandleNullMultiTenantContextOnGetOrAdd()
         {
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -79,7 +85,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
             var options2 = new TestOptions();
@@ -104,7 +110,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             var tc = new MultiTenantContext<TenantInfo>();
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null!));
         }
@@ -116,21 +122,21 @@ namespace Finbuckle.MultiTenant.Test.Options
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
 
-            Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions, TenantInfo>(null!));
+            Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions>(null!));
         }
 
         [Theory]
         [InlineData("")]
         [InlineData(null)]
         [InlineData("name")]
-        public void RemoveNamedOptionsForCurrentTenantOnly(string name)
+        public void RemoveNamedOptionsForCurrentTenantOnly(string? name)
         {
             var ti = new TenantInfo { Id = "test-id-123" };
             var tc = new MultiTenantContext<TenantInfo>();
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -156,14 +162,14 @@ namespace Finbuckle.MultiTenant.Test.Options
                 .GetValue(tenantCache[ti.Id]);
 
             // Assert named options removed and other options on tenant left as-is.
-            Assert.False(tenantInternalCache!.Keys.Contains(name ?? ""));
+            Assert.False(tenantInternalCache!.Keys.Contains(name));
             Assert.True(tenantInternalCache.Keys.Contains("diffName"));
 
             // Assert other tenant not affected.
             ti.Id = "test-id-123";
             tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
                 .GetValue(tenantCache[ti.Id]);
-            Assert.True(tenantInternalCache!.ContainsKey(name ?? ""));
+            Assert.True(tenantInternalCache!.ContainsKey(name ?? Microsoft.Extensions.Options.Options.DefaultName));
         }
 
         [Fact]
@@ -174,7 +180,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -215,7 +221,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 
@@ -254,7 +260,7 @@ namespace Finbuckle.MultiTenant.Test.Options
             tc.TenantInfo = ti;
             var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
             tca.MultiTenantContext = tc;
-            var cache = new MultiTenantOptionsCache<TestOptions, TenantInfo>(tca);
+            var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
             var options = new TestOptions();
 

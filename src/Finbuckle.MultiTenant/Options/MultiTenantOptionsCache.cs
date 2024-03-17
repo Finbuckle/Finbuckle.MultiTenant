@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 
@@ -10,26 +9,22 @@ namespace Finbuckle.MultiTenant.Options;
 /// <summary>
 /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
 /// </summary>
-public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCache<TOptions>
+public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     where TOptions : class
-    where TTenantInfo : class, ITenantInfo, new()
 {
-    private readonly IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor;
-
-    // The object is just a dummy because there is no ConcurrentSet<T> class.
-    //private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _adjustedOptionsNames =
-    //  new ConcurrentDictionary<string, ConcurrentDictionary<string, object>>();
-
-    private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>>();
+    private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
+    
+    private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new();
 
     /// <summary>
     /// Constructs a new instance of MultiTenantOptionsCache.
     /// </summary>
     /// <param name="multiTenantContextAccessor"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public MultiTenantOptionsCache(IMultiTenantContextAccessor<TTenantInfo> multiTenantContextAccessor)
+    public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
-        this.multiTenantContextAccessor = multiTenantContextAccessor ?? throw new ArgumentNullException(nameof(multiTenantContextAccessor));
+        this.multiTenantContextAccessor = multiTenantContextAccessor ??
+                                          throw new ArgumentNullException(nameof(multiTenantContextAccessor));
     }
 
     /// <summary>
@@ -59,7 +54,7 @@ public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCac
     /// </summary>
     public void ClearAll()
     {
-        foreach(var cache in map.Values)
+        foreach (var cache in map.Values)
             cache.Clear();
     }
 
@@ -76,7 +71,7 @@ public class MultiTenantOptionsCache<TOptions, TTenantInfo> : IOptionsMonitorCac
             throw new ArgumentNullException(nameof(createOptions));
         }
 
-        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
+        name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 

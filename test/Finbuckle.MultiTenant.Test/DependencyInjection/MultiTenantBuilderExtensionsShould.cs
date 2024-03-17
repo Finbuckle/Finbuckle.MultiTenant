@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.Extensions
+namespace Finbuckle.MultiTenant.Test.DependencyInjection
 {
     public class MultiTenantBuilderExtensionsShould
     {

@@ -97,7 +97,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             // Set per-tenant cookie options by convention.
-            builder.WithPerTenantOptions<CookieAuthenticationOptions>((options, tc) =>
+            builder.Services.ConfigureAllPerTenant<CookieAuthenticationOptions, TTenantInfo>((options, tc) =>
             {
                 if (GetPropertyWithValidValue(tc, "CookieLoginPath") is string loginPath)
                     options.LoginPath = loginPath.Replace(Constants.TenantToken, tc.Identifier);
@@ -110,7 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             // Set per-tenant OpenIdConnect options by convention.
-            builder.WithPerTenantOptions<OpenIdConnectOptions>((options, tc) =>
+            builder.Services.ConfigureAllPerTenant<OpenIdConnectOptions, TTenantInfo>((options, tc) =>
             {
                 if (GetPropertyWithValidValue(tc, "OpenIdConnectAuthority") is string authority)
                     options.Authority = authority.Replace(Constants.TenantToken, tc.Identifier);
@@ -122,7 +122,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.ClientSecret = clientSecret.Replace(Constants.TenantToken, tc.Identifier);
             });
 
-            builder.WithPerTenantOptions<AuthenticationOptions>((options, tc) =>
+            builder.Services.ConfigureAllPerTenant<AuthenticationOptions, TTenantInfo>((options, tc) =>
             {
                 if (GetPropertyWithValidValue(tc, "ChallengeScheme") is string challengeScheme)
                     options.DefaultChallengeScheme = challengeScheme;
@@ -156,7 +156,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // properties in the state parameter.
             if (builder.Services.All(s => s.ServiceType != typeof(IAuthenticationService)))
                 throw new MultiTenantException(
-                    "WithPerTenantAuthenticationCore() must be called after AddAuthentication() in ConfigureServices.");
+                    "WithPerTenantAuthenticationCore() must be called after AddAuthentication().");
             builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
 
             // We need to "decorate" IAuthenticationScheme provider.
