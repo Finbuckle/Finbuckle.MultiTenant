@@ -9,7 +9,7 @@ public class DelegateStrategy : IMultiTenantStrategy
 
     public DelegateStrategy(Func<object, Task<string?>> doStrategy)
     {
-        this._doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
+        _doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));
     }
 
     public async Task<string?> GetIdentifierAsync(object context)

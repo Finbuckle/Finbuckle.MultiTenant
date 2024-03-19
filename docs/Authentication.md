@@ -21,7 +21,7 @@ The sections below assume Finbuckle.MultiTenant is installed and configured. See
 ## Using WithPerTenantAuthentication()
 
 The `WithPerTenantAuthentication()` method can be called after
-`AddMultiTenant<T>()` and uses conventions to configure common authentication
+`AddMultiTenant<TTenantInfo>()` and uses conventions to configure common authentication
 options based on public properties of the `ITenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
@@ -75,78 +75,73 @@ will be replaced with the identifier for each specific tenant. For example, a
 
 The code setup is straight-forward:
 
-```cs
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddControllersWithViews();
-    
-    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie()
-            .AddOpenIdConnect();
+```csharp
+using Finbuckle.MultiTenant;
 
-    services.AddMultiTenant<TenantInfo>()
-            .WithConfigurationStore()
-            .WithRouteStrategy()
-            .WithPerTenantAuthentication();
-}
+var builder = WebApplication.CreateBuilder(args);
 
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-    if (env.EnvironmentName == "Development")
-    {
-        app.UseDeveloperExceptionPage();
-    }
+ // ...add app services
 
-    app.UseStaticFiles();
-    app.UseRouting();
-    app.UseMultiTenant();
-    app.UseAuthentication();
-    app.UseAuthorization();
+// add authentication services
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+       .AddCookie()
+       .AddOpenIdConnect();
 
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllerRoute("default", "{__tenant__=}/{controller=Home}/{action=Index}");
-    });
-}
+// add Finbuckle.MultiTenant services
+builder.Services.AddMultiTenant<TenantInfo>()
+       .WithRouteStrategy()
+       .WithConfigurationStore()
+       .WithPerTenantAuthentication();
+
+var app = builder.Build();
+
+// add the Finbuckle.MultiTenant middleware
+app.UseMultiTenant();
+
+// ...add other middleware
+
+app.Run();
 ```
 
-The code above paired with the `appSettings.json` tenant configuration below
+The code above paired with the `appsettings.json` tenant configuration below
 produces the behavior described. Any tenant store configured similarly will also
 work.
 
 ```json
-"Finbuckle:MultiTenant:Stores:ConfigurationStore": {
-  "Defaults": {
-  "ConnectionString": "",
-  "CookieLoginPath": "/__tenant__/home/login",
-  "CookieLogoutPath": "/__tenant__/home/logout"
-  },
-  "Tenants": [
-    {
-    "Id": "93f330717e5d4f039cd05da312d559cc",
-    "Identifier": "megacorp",
-    "Name": "MegaCorp",
-    "ChallengeScheme": "Cookies"
+{
+  "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
+    "Defaults": {
+      "ConnectionString": "",
+      "CookieLoginPath": "/__tenant__/home/login",
+      "CookieLogoutPath": "/__tenant__/home/logout"
     },
-    {
-    "Id": "505c5c97f4e2442394610c673ac91f61",
-    "Identifier": "acme",
-    "Name": "ACME",
-    "ChallengeScheme": "OpenIdConnect",
-    "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
-    "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
-    "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
-    },
-    {
-    "Id": "4ee609d6da0342e682012232566cff0e",
-    "Identifier": "initech",
-    "Name": "Initech",
-    "ChallengeScheme": "OpenIdConnect",
-    "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
-    "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
-    "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
-    }]
-}
+    "Tenants": [
+      {
+        "Id": "93f330717e5d4f039cd05da312d559cc",
+        "Identifier": "megacorp",
+        "Name": "MegaCorp",
+        "ChallengeScheme": "Cookies"
+      },
+      {
+        "Id": "505c5c97f4e2442394610c673ac91f61",
+        "Identifier": "acme",
+        "Name": "ACME",
+        "ChallengeScheme": "OpenIdConnect",
+        "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
+        "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
+        "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+      },
+      {
+        "Id": "4ee609d6da0342e682012232566cff0e",
+        "Identifier": "initech",
+        "Name": "Initech",
+        "ChallengeScheme": "OpenIdConnect",
+        "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
+        "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
+        "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+      }
+    ]
+  }
 ```
 
 ## Other Authentication Options
@@ -155,38 +150,44 @@ Internally `WithPerTenantAuthentication()` makes use of
 [per-tenant options](Options). For authentication options not covered by
 `WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
 
-For example, if we want to configure JWT tokens so that each tenant has a
+For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
-`ITenantInfo` implementation and configure the option per-tenant:
+`ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
+configureations:
 
-```cs
-services.AddMultiTenant<TenantInfo>()
+```csharp 
+builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
-        .WithPerTenantOptions<JwtBearerOptions>((o, tenantInfo) =>
-        {
-            // Assume tenants are configured with an authority string to use here.
-            o.Authority = tenantInfo.JwtAuthority;
-        });
+        .WithPerTenantAuthentication()
+
+// WithPerTenantAuthentication, as shown above, is needed for this to work as intended
+builder.Services.ConfigurePerTenant<JwtBearerOptions, Tenantnfo>((options, tenantInfo) =>
+    {
+        // assume tenants are configured with an authority string to use here.
+        options.Authority = tenantInfo.JwtAuthority;
+    }
 ```
 
 The same approach can be used for cookie, OpenID Connect, or any other
 authentication options type.
 
 Another common use case is the need to have separate cookies per tenant in
-addition to the functionality provided by `WithPerTenantOptions` which by
+addition to the functionality provided by `WithPerTenantAuthentication` which by
 default only uses a single cookie for all tenants. By using per-tenant options
 we can give each tenant's cookie a different name. This effectively maintains
 existing tenant sign-ins when switching between requests on the same browser or
 agent because new sign-ins are not replacing the existing cookie:
 
-```cs
-services.AddMultiTenant<TenantInfo>()
+```csharp
+builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication()
-        .WithPerTenantOptions<CookieAuthenticationOptions>((o, tenantInfo) =>
-        {
-            o.Cookie.Name = "SignInCookie-" + tenantInfo.Id;
-        });
+
+// WithPerTenantAuthentication, as shown above, is needed for this to work as intended
+builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, Tenantnfo>((options, tenantInfo) =>
+    {
+        o.Cookie.Name = "SignInCookie-" + tenantInfo.Id;
+    }
 ```

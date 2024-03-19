@@ -1,8 +1,7 @@
 # Per-Tenant Options
 
 Finbuckle.MultiTenant is designed to emphasize using per-tenant options in an app to drive per-tenant behavior. This
-approach allows app logic to be written having to add tenant-dependent or
-tenant-specific logic to the code.
+approach allows app logic to be written having to add tenant-dependent or tenant-specific logic to the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -37,7 +36,7 @@ correct values for the current tenant are used.
 
 Consider a typical scenario in ASP.Net Core, starting with a simple class:
 
-```cs
+```csharp
 public class MyOptions
 {
     public int Option1 { get; set; }
@@ -48,20 +47,18 @@ public class MyOptions
 In the app configuration, `services.Configure<MyOptions>` is called with a delegate
 or `IConfiguration` parameter to set the option values:
 
-```cs
+```csharp
 var builder = WebApplication.CreateBuilder(args);
-
-// other code omitted...
 
 builder.Services.Configure<MyOptions>(options => options.Option1 = 1);
         
- // rest of app code...
+ // ...rest of app code
 ```
 
 Dependency injection of `IOptions<MyOptions>` or its siblings into a class constructor, such as a controller, provides
 access to the options values. A service provider instance can also provide access to the options values.
 
-```cs
+```csharp
 // access options via dependency injection in a class constructor
 public MyController : Controller
 {
@@ -69,7 +66,7 @@ public MyController : Controller
     
     public MyController(IOptionsMonitor<MyOptions> optionsAccessor)
     {
-        // Same options regardless of the current tenant.
+        // same options regardless of the current tenant
         _myOptions = optionsAccessor.Value;
     }
 }
@@ -90,51 +87,51 @@ To configure options per tenant, the standard `Configure` method variants on the
 have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at
 runtime the delegate will be called with the current tenant details.
 
-```cs
+```csharp
 // configure options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 
 // or configure named options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 
 // ConfigureAll options variant
 builder.Services.ConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 
 // can also configure post options, named post options, and all post options variants
 builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 
 builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 
 builder.Services.PostConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
-        {
-            options.MyOption1 = tenantInfo.Option1Value;
-            options.MyOption2 = tenantInfo.Option2Value;
-        });
+    {
+        options.MyOption1 = tenantInfo.Option1Value;
+        options.MyOption2 = tenantInfo.Option2Value;
+    });
 ```
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
-```cs
+```csharp
 public MyController : Controller
 {
     private readonly MyOptions _myOptions;
@@ -158,8 +155,7 @@ normally supports up to five dependencies, Finbuckle.MultiTenant support only su
 
 ```csharp
 // use OptionsBuilder API to configure per-tenant options with dependencies
-builder.Services
-    .AddOptions<MyOptions>("optionalName")
+builder.Services.AddOptions<MyOptions>("optionalName")
     .ConfigurePerTenant<ExampleService, TenantInfo>(
         (options, es, tenantInfo) =>
             options.Property = DoSomethingWith(es, tenantInfo));

@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-
-
 // TODO move to options folder/namespace on future major release
 namespace Finbuckle.MultiTenant;
 

@@ -15,12 +15,12 @@ namespace Finbuckle.MultiTenant
         /// <summary>
         /// Returns the current MultiTenantContext or null if there is none.
         /// </summary>
-        public static IMultiTenantContext<T>? GetMultiTenantContext<T>(this HttpContext httpContext)
-        where T : class, ITenantInfo, new()
+        public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
+        where TTenantInfo : class, ITenantInfo, new()
         {
             var services = httpContext.RequestServices;
-            var context = services.GetRequiredService<IMultiTenantContextAccessor<T>>();
-            return context?.MultiTenantContext;
+            var context = services.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>();
+            return context.MultiTenantContext;
         }
 
         /// <summary>
