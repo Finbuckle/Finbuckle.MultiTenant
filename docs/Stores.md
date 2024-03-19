@@ -185,7 +185,7 @@ Uses an Entity Framework Core database context as the backing store. This store 
 retrieving tenant information by tenant identifier, depending on the underlying database.
 
 The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from
-the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/EFCoreStoreSample)
+the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/EFCoreStoreSample)
 .
 
 The database context used with the EFCore store must derive from `EFCoreStoreDbContext`, but other entities can be
@@ -247,7 +247,7 @@ context.
 
 Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object
 in return.
-The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/HttpRemoteStoreSample)
+The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/HttpRemoteStoreSample)
 projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant
 identifier, but the remote server might be more restrictive.
 
