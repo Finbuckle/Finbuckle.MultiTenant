@@ -8,10 +8,10 @@ If each tenant uses a separate database then the `ConnectionString` tenant info
 property can be used directly in the `OnConfiguring` method of the database
 context class to configure the connection. The `TenantInfo` instance can be
 injected into the database context using either an `ITenantInfo` or custom
-`ITenantInfo` implementation (as configured with `AddMultiTenant<T>`) parameter
+`ITenantInfo` implementation (as configured with `AddMultiTenant<TTenantInfo>`) parameter
 on the database context constructor.
 
-```cs
+```csharp
 public class MyAppDbContext : DbContext
 {
    private TTenantInfo TenantInfo { get; set; }
@@ -61,7 +61,7 @@ all instances are shared across all tenants.
 The `[MultiTenant]` attribute designates a class to be isolated per-tenant when
 it is used as an entity type in a database context:
 
-```cs
+```csharp
 // Tenants will only see their own blog posts.
 [MultiTenant]
 public class BlogPost
@@ -88,7 +88,7 @@ respect the `[MultiTenant]` attribute. Otherwise a database context class can
 be configured to respect the attribute by calling `ConfigureMultiTenant` in the
 `OnModelCreating` method.
 
-```cs
+```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // Not needed if db context derives from MultiTenantDbContext
@@ -100,7 +100,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 The fluent API entity type builder extension method `IsMultiTenant` can be called in `OnModelCreating` to provide the
 multitenant functionality for entity types:
 
-```cs
+```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // Configure an entity type to be multitenant.
@@ -116,7 +116,7 @@ it can be used for types which do not have the attribute, e.g. from another asse
 ## Existing Query Filters
 `IsMultiTenant` and the `[MultiTenant]` attribute use a query filter for data isolation and will automatically merge its query filter with an existing query filter is one is present. For that reason, if the type to be multitenant has a existing query filter, `IsMultiTenant` and `ConfigureMultiTenant` should be called *after* the existing query filter is configured: 
 
-```cs
+```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // set a global query filter, e.g. to support soft delete
@@ -140,7 +140,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 
 Next, implement `IMultiTenantDbContext` on the context. These interface properties ensure that the extension methods will have the information needed to provide proper data isolation.
 
-```cs
+```csharp
 public class MyDbContext : DbContext, IMultiTenantDbContext
 {
     ...
@@ -156,7 +156,7 @@ Finally, call the library extension methods as described below. This requires ov
 
 In `OnModelCreating` use the `EntityTypeBuilder` fluent API extension method `IsMultiTenant` to designate entity types as multitenant. Call `ConfigureMultiTenant` on the `ModelBuilder` to configure each entity type marked with the `[MultiTenant]` data attribute. This is only needed if using the attribute and internally uses the `IsMultiTenant` fluent API. Make sure to call the base class `OnModelCreating` method if necessary, such as if inheriting from `IdentityDbContext`.
 
-```cs
+```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // If necessary call the base class method.
@@ -173,7 +173,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 
 In `SaveChanges` and `SaveChangesAsync` call the `IMultiTenantDbContext` extension method `EnforceMultiTenant` before calling the base class method. This ensures proper data isolation and behavior for `TenantMismatchMode` and `TenantNotSetMode`.
 
-```cs
+```csharp
 public override int SaveChanges(bool acceptAllChangesOnSuccess)
 {
     this.EnforceMultiTenant();
@@ -205,7 +205,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 
 The `MultiTenantDbContext` has two constructors which should be called from any derived db context. Make sure to forward the `ITenantInfo` and, if applicable the `DbContextOptions<T>` into the base constructor.
 
-```cs
+```csharp
 public class BloggingDbContext : MultiTenantDbContext
 {
     public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
@@ -220,7 +220,7 @@ public class BloggingDbContext : MultiTenantDbContext
 
 If relying on the `ConnectionString` property of the `TenantInfo` then the db context will need to configures itself in its `OnConfiguring` method using its inherited `ConnectionString` property:
 
-```cs
+```csharp
 public class BloggingDbContext : MultiTenantDbContext
 {
    ...
@@ -234,7 +234,7 @@ public class BloggingDbContext : MultiTenantDbContext
 
 If the derived db context overrides `OnModelCreating` is it recommended that the base class `OnModelCreating` method is called last so that the multitenant query filters are not overwritten.
 
-```cs
+```csharp
 public class BloggingDbContext : MultiTenantDbContext
 {
 ...
@@ -272,7 +272,7 @@ When registering the db context as a service in ASP.NET Core it is important to 
 ## Adding Data
 Added entities are automatically associated with the current `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`.
 
-```cs
+```csharp
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };;
 var db = new BloggingDbContext(myTenantInfo, null);
@@ -289,7 +289,7 @@ await db.SaveChangesAsync(); // Throws MultiTenantException.
 ## Querying Data
 Queries only return results associated to the `TenantInfo`.
 
-```cs
+```csharp
 // Will only return "My Blog".
 var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlog = db.Blogs.First();
@@ -301,7 +301,7 @@ var tenantBlogs = db.Blogs.First();
 
 `IgnoreQueryFilters` can be used to bypass the filter for LINQ queries.
 
-```cs
+```csharp
 // TenantBlogs will contain all blogs, regardless of tenant.
 var db = new BloggingDbContext(myTenantInfo, null);
 var tenantBlogs = db.Blogs.IgnoreQueryFilters().ToList(); 
@@ -312,7 +312,7 @@ The query filter is applied only at the root level of a query. Any entity classe
 ## Updating and Deleting Data
 Updated or deleted entities are checked to make sure they are associated with the `TenantInfo`. If an entity is associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`.
 
-```cs
+```csharp
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };
 var db = new BloggingDbContext(myTenantInfo);
@@ -338,7 +338,7 @@ When configuring a multitenant entity type it is often useful to include the imp
 * `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
 * `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
 
-```cs
+```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // Configure an entity type to be multitenant, adjust the existing keys and indexes
