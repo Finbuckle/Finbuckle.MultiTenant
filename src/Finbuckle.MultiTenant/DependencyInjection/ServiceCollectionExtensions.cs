@@ -29,15 +29,7 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(
             sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
-
-        services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext!);
-
-        services.AddScoped<TTenantInfo>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo!);
-        services.AddScoped<ITenantInfo>(sp => sp.GetService<TTenantInfo>()!);
-
-        // TODO this might require instance to ensure it already exists when needed
+        
         services
             .AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
                 AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
