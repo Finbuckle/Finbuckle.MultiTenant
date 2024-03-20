@@ -35,45 +35,6 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         }
 
         [Fact]
-        public void RegisterIMultiTenantContextInDi()
-        {
-            var services = new ServiceCollection();
-            services.AddMultiTenant<TenantInfo>();
-
-            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                                        s.ServiceType == typeof(IMultiTenantContext<TenantInfo>));
-
-            Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
-        }
-
-        [Fact]
-        public void RegisterTenantInfoInDi()
-        {
-            var services = new ServiceCollection();
-            services.AddMultiTenant<TenantInfo>();
-
-            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                                        s.ServiceType == typeof(TenantInfo));
-
-            Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
-        }
-
-        [Fact]
-        public void RegisterITenantInfoInDi()
-        {
-            var services = new ServiceCollection();
-            services.AddMultiTenant<TenantInfo>();
-
-            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Scoped &&
-                                                        s.ServiceType == typeof(ITenantInfo));
-
-            Assert.NotNull(service);
-            Assert.Equal(ServiceLifetime.Scoped, service!.Lifetime);
-        }
-
-        [Fact]
         public void RegisterIMultiTenantContextAccessorInDi()
         {
             var services = new ServiceCollection();
@@ -106,7 +67,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>();
 
-            var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
+            var service = services.FirstOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
                                                         s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>));
 
             Assert.NotNull(service);

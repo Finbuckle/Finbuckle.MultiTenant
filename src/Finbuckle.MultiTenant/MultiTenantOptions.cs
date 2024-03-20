@@ -6,6 +6,7 @@ namespace Finbuckle.MultiTenant;
 
 public class MultiTenantOptions
 {
-    public IList<string> IgnoredIdentifiers = new List<string>();
-    public MultiTenantEvents Events { get; set; } = new MultiTenantEvents();
+    public Type? TenantInfoType { get; internal set; }
+    public IList<string> IgnoredIdentifiers { get; set; } = new List<string>();
+    public MultiTenantEvents Events { get; set; } = new ();
 }

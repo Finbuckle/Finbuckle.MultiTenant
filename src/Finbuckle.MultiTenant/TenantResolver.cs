@@ -9,18 +9,25 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant;
 
-public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
-    where T : class, ITenantInfo, new()
+/// <summary>
+/// Resolves the current tenant.
+/// </summary>
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IOptionsMonitor<MultiTenantOptions> options;
     private readonly ILoggerFactory? loggerFactory;
 
-    public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options) :
+    public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
+        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options) :
         this(strategies, stores, options, null)
     {
     }
 
-    public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies, IEnumerable<IMultiTenantStore<T>> stores, IOptionsMonitor<MultiTenantOptions> options, ILoggerFactory? loggerFactory)
+    public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
+        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options,
+        ILoggerFactory? loggerFactory)
     {
         Stores = stores;
         this.options = options;
@@ -29,30 +36,39 @@ public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
         Strategies = strategies.OrderByDescending(s => s.Priority);
     }
 
+    /// <inheritdoc />
     public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
-    public IEnumerable<IMultiTenantStore<T>> Stores { get; set; }
 
-    public async Task<IMultiTenantContext<T>?> ResolveAsync(object context)
+    /// <inheritdoc />
+    public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
+
+    /// <inheritdoc />
+    public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
     {
+        var mtc = new MultiTenantContext<TTenantInfo>();
+
         string? identifier = null;
         foreach (var strategy in Strategies)
         {
-            var _strategy = new MultiTenantStrategyWrapper(strategy, loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance);
-            identifier = await _strategy.GetIdentifierAsync(context);
+            var wrappedStrategy = new MultiTenantStrategyWrapper(strategy,
+                loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance);
+            identifier = await wrappedStrategy.GetIdentifierAsync(context);
 
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
-                (loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance).LogInformation("Ignored identifier: {Identifier}", identifier);
+                (loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance).LogInformation(
+                    "Ignored identifier: {Identifier}", identifier);
                 identifier = null;
             }
-            
+
             if (identifier == null)
                 continue;
 
             foreach (var store in Stores)
             {
-                var _store = new MultiTenantStoreWrapper<T>(store, loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance);
-                var tenantInfo = await _store.TryGetByIdentifierAsync(identifier);
+                var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store,
+                    loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance);
+                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
                 if (tenantInfo == null)
                     continue;
 
@@ -63,23 +79,22 @@ public class TenantResolver<T> : ITenantResolver<T>, ITenantResolver
                     StrategyType = strategy.GetType(),
                     StoreType = store.GetType()
                 });
-                
-                return new MultiTenantContext<T>
-                {
-                    StoreInfo = new StoreInfo<T> { Store = store, StoreType = store.GetType() },
-                    StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() },
-                    TenantInfo = tenantInfo
-                };
+
+                mtc.StoreInfo = new StoreInfo<TTenantInfo> { Store = store, StoreType = store.GetType() };
+                mtc.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
+                mtc.TenantInfo = tenantInfo;
+                return mtc;
             }
         }
-        
-        await options.CurrentValue.Events.OnTenantNotResolved(new TenantNotResolvedContext { Context = context, Identifier = identifier });
-        return null;
+
+        await options.CurrentValue.Events.OnTenantNotResolved(new TenantNotResolvedContext
+            { Context = context, Identifier = identifier });
+        return mtc;
     }
 
-    // TODO move this to the base interface?
-    async Task<IMultiTenantContext?> ITenantResolver.ResolveAsync(object context)
+    /// <inheritdoc />
+    async Task<IMultiTenantContext> ITenantResolver.ResolveAsync(object context)
     {
-        return (await ResolveAsync(context)) as IMultiTenantContext;
+        return (IMultiTenantContext)(await ResolveAsync(context));
     }
 }

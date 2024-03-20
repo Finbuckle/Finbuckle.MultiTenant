@@ -2,13 +2,14 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
-    /// Middleware for resolving the TenantContext and storing it in HttpContext.
+    /// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
     /// </summary>
     internal class MultiTenantMiddleware
     {
@@ -21,14 +22,14 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
         public async Task Invoke(HttpContext context)
         {
-            var accessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
-
-            if (accessor.MultiTenantContext == null)
-            {
-                var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
-                var multiTenantContext = await resolver.ResolveAsync(context);
-                accessor.MultiTenantContext = multiTenantContext;
-            }
+            var mtcAccessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
+            var mtcSetter = context.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
+            
+            var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
+            
+            var multiTenantContext = await resolver.ResolveAsync(context);
+            mtcSetter.MultiTenantContext = multiTenantContext;
+            context.Items[typeof(IMultiTenantContext)] = multiTenantContext;
 
             await next(context);
         }

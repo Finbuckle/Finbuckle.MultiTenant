@@ -52,19 +52,22 @@ namespace Finbuckle.MultiTenant.Test.Stores
         }
 
         [Fact]
-        public void IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
+        public async Task IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
         {
             var store = CreateTestStore();
 
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result!.Identifier);
+            var tenant = await store.TryGetByIdentifierAsync("INITECH");
+
+            Assert.NotNull(tenant);
+            Assert.Equal("initech", tenant.Identifier);
         }
 
         [Fact]
-        public void ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
+        public async Task ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
         {
             var store = CreateTestStore();
 
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
         }
 
         // Basic store functionality tested in MultiTenantStoresShould.cs

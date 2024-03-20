@@ -26,7 +26,7 @@ using Finbuckle.MultiTenant;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ...add app services
+// add app services...
 
 // add Finbuckle.MultiTenant services
 builder.Services.AddMultiTenant<TenantInfo>()
@@ -38,7 +38,7 @@ var app = builder.Build();
 // add the Finbuckle.MultiTenant middleware
 app.UseMultiTenant();
 
-// ...add other middleware
+// add other middleware...
 
 app.Run();
 ```

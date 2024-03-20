@@ -1,34 +1,32 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
+
 namespace Finbuckle.MultiTenant.Internal;
 
 /// <summary>
 /// Provides access the current MultiTenantContext via an AsyncLocal variable.
 /// </summary>
-/// <typeparam name="T">The ITenantInfo implementation type.</typeparam>
-/// <remarks>
-/// This implementation may have performance impacts due to the use of AsyncLocal.
-/// </remarks>
-public class AsyncLocalMultiTenantContextAccessor<T> : IMultiTenantContextAccessor<T>, IMultiTenantContextAccessor
-    where T : class, ITenantInfo, new()
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
+    IMultiTenantContextAccessor<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
 {
-    private static readonly AsyncLocal<IMultiTenantContext<T>?> AsyncLocalContext = new();
+    private static readonly AsyncLocal<IMultiTenantContext<TTenantInfo>> AsyncLocalContext = new();
 
     /// <inheritdoc />
-    public IMultiTenantContext<T>? MultiTenantContext
+    public IMultiTenantContext<TTenantInfo> MultiTenantContext
     {
-        get => AsyncLocalContext.Value;
-
+        get => AsyncLocalContext.Value ?? (AsyncLocalContext.Value = new MultiTenantContext<TTenantInfo>());
         set => AsyncLocalContext.Value = value;
     }
 
     /// <inheritdoc />
-    // TODO move this to the interface?
-    // TODO should the set throw if "as" returns null?
-    IMultiTenantContext? IMultiTenantContextAccessor.MultiTenantContext
+    IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => (IMultiTenantContext)MultiTenantContext;
+
+    IMultiTenantContext IMultiTenantContextSetter.MultiTenantContext
     {
-        get => MultiTenantContext as IMultiTenantContext;
-        set => MultiTenantContext = value as IMultiTenantContext<T> ?? MultiTenantContext;
+        set => MultiTenantContext = (IMultiTenantContext<TTenantInfo>)value;
     }
 }

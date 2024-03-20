@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Finbuckle.MultiTenant;
 
-public static class TypeExtensions
+internal static class TypeExtensions
 {
     public static bool ImplementsOrInheritsUnboundGeneric(this Type source, Type unboundGeneric)
     {
@@ -34,7 +34,7 @@ public static class TypeExtensions
         return false;
     }
 
-    public static bool HasMultiTenantAttribute(this Type type)
+    internal static bool HasMultiTenantAttribute(this Type type)
     {
         return type.GetCustomAttribute<MultiTenantAttribute>() != null;
     }
