@@ -27,10 +27,11 @@ Table of Contents
 
 <!--_release-notes-->
 
-
 ### Bug Fixes
 
-* update dependency to protect against CVE-2024-21319 ([#781](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/781)) ([c5e0c8a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c5e0c8a8e3f60033f97993b7feaf4ff87150a0f8))
+* update dependency to protect against
+  CVE-2024-21319 ([#781](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/781)) ([c5e0c8a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c5e0c8a8e3f60033f97993b7feaf4ff87150a0f8))
+
 <!--_release-notes-->
 
 See the [changelog file](CHANGELOG.md) for a full history of changes.
@@ -53,21 +54,21 @@ $ dotnet add package Finbuckle.MultiTenant.AspNetCore
 
 ### Basic Configuration
 
-Next, in the app's service configuration call `AddMultiTenant<T>` and its various builder methods:
+Next, in the app's service configuration call `AddMultiTenant<TTenantInfo>` and its various builder methods and in the
+middleware configuration call `UseMultiTenant()`:
 
 ```cs
 builder.Services.AddMultiTenant<TenantInfo>()
-                .WithHostStrategy()
-                .WithConfigurationStore();
-```
+    .WithHostStrategy()
+    .WithConfigurationStore();
 
-Finally, in the app pipeline configuration call `UseMultiTenant()` before `UseEndpoints(...)` to register the
-middleware:
+// other app code...
 
-```cs
 app.UseMultiTenant();
-...
-app.UseEndpoints(...);
+
+// other app code...
+
+app.Run();
 ```
 
 That's all that is needed to get going. Let's breakdown each line:
@@ -77,9 +78,9 @@ That's all that is needed to get going. Let's breakdown each line:
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<T>` must be an implementation of `ITenantInfo` and holds basic information about
-the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom
-implementation can be used if more properties are needed.
+The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` which holds basic
+information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but
+a custom implementation can be used if more properties are needed.
 
 See [Core Concepts](https://www.finbuckle.com/MultiTenant/Docs/CoreConcepts) for more information on `ITenantInfo`.
 
@@ -88,7 +89,7 @@ See [Core Concepts](https://www.finbuckle.com/MultiTenant/Docs/CoreConcepts) for
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
 defaults to the extracting the subdomain as a tenant identifier.
 
-See [Strategies](https://www.finbuckle.com/MultiTenant/Docs/Strategies) for more information.
+See [MultiTenant Strategies](https://www.finbuckle.com/MultiTenant/Docs/Strategies) for more information.
 
 `.WithConfigurationStore()`
 
@@ -96,7 +97,7 @@ This line tells the app that information for all tenants are in the `appsettings
 If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the
 current request.
 
-See [Stores](https://www.finbuckle.com/MultiTenant/Docs/Stores) for more information.
+See [MultiTenant Stores](https://www.finbuckle.com/MultiTenant/Docs/Stores) for more information.
 
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
 ways.
@@ -104,8 +105,8 @@ ways.
 `app.UseMultiTenant()`
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
-settings. Be sure to call it before calling `UseEndpoints()` and other middleware which will use per-tenant
-functionality, e.g. `UseAuthentication()`.
+settings. Be sure to call it before other middleware which will use per-tenant functionality,
+e.g. `UseAuthentication()`.
 
 ### Basic Usage
 
@@ -132,7 +133,8 @@ See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/Configu
 
 ## Documentation
 
-The library builds on this basic functionality to provide a variety of higher level features. See the [documentation](https://www.finbuckle.com/multitenant/docs) for
+The library builds on this basic functionality to provide a variety of higher level features. See
+the [documentation](https://www.finbuckle.com/multitenant/docs) for
 more details:
 
 * [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
@@ -142,11 +144,12 @@ more details:
 
 ## Sample Projects
 
-A variety of [sample projects](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) are available in the repository.
+A variety of [sample projects](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) are available in
+the repository. Check older tagged release commits for samples from prior .NET versions.
 
 ## Build and Test Status
 
-![Build and Test Status](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/ci.yml/badge.svg)  
+![Build and Test Status](https://github.com/Finbuckle/Finbuckle.MultiTenant/actions/workflows/ci.yml/badge.svg)
 
 ## License
 
