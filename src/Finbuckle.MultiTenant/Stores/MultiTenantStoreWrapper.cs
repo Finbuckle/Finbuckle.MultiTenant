@@ -125,11 +125,8 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
-        if (tenantInfo == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo));
-        }
-
+        ArgumentNullException.ThrowIfNull(tenantInfo);
+        
         if (tenantInfo.Id == null)
         {
             throw new ArgumentNullException(nameof(tenantInfo.Id));

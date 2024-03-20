@@ -4,6 +4,9 @@
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Interface for basic tenant information.
+/// </summary>
 public interface ITenantInfo
 {
     

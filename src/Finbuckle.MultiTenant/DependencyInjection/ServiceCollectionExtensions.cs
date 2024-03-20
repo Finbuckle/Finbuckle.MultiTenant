@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -30,20 +31,15 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddScoped<ITenantResolver>(
             sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
-        services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext!);
-
-        services.AddScoped<TTenantInfo>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo!);
-        services.AddScoped<ITenantInfo>(sp => sp.GetService<TTenantInfo>()!);
-
-        // TODO this might require instance to ensure it already exists when needed
-        services
-            .AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
-                AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
+        services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
+            AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+        
+        services.AddSingleton<IMultiTenantContextSetter>(sp =>
+            (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
+        services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
 
         return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
