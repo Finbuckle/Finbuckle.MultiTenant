@@ -14,7 +14,7 @@ public interface IMultiTenantStrategy
     /// <summary>
     ///  Method for implementations to control how the identifier is determined.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">The context object used to determine an identifier.</param>
     /// <returns>The found identifier or null.</returns>
     Task<string?> GetIdentifierAsync(object context);
 

@@ -36,6 +36,7 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
             (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
 
+        services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
 
         return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);

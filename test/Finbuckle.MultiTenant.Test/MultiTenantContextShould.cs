@@ -14,8 +14,11 @@ public class MultiTenantContextShould
     [Fact]
     public void ReturnTrueInHasResolvedTenantIfTenantInfoIsNotNull()
     {
-        IMultiTenantContext<TenantInfo> context = new MultiTenantContext<TenantInfo>();
-        context.TenantInfo = new TenantInfo();
+        var context = new MultiTenantContext<TenantInfo>
+        {
+            TenantInfo = new TenantInfo()
+        };
+        
         Assert.True(context.HasResolvedTenant);
     }
     

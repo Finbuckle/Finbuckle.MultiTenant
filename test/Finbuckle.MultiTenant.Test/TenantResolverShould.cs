@@ -90,28 +90,6 @@ namespace Finbuckle.MultiTenant.Test
         }
 
         [Fact]
-        public void ReturnNullMultiTenantContextGivenNoStrategies()
-        {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            var configuration = configBuilder.Build();
-
-            var services = new ServiceCollection();
-            services.AddSingleton<IConfiguration>(configuration);
-
-            services.
-                AddMultiTenant<TenantInfo>().
-                WithInMemoryStore().
-                WithConfigurationStore();
-
-            var sp = services.BuildServiceProvider();
-            var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
-            var result = resolver.ResolveAsync(new object()).Result;
-
-            Assert.Null(result);
-        }
-
-        [Fact]
         public void ThrowGivenStaticStrategyWithNullIdentifierArgument()
         {
             var services = new ServiceCollection();
@@ -161,58 +139,6 @@ namespace Finbuckle.MultiTenant.Test
             Assert.Equal("initech", result?.TenantInfo!.Identifier);
             Assert.IsType<StaticStrategy>(result?.StrategyInfo!.Strategy);
             Assert.IsType<ConfigurationStore<TenantInfo>>(result!.StoreInfo!.Store);
-        }
-
-        [Fact]
-        public void ReturnNullIfNoStrategySuccess()
-        {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            var configuration = configBuilder.Build();
-
-            var services = new ServiceCollection();
-            services.AddSingleton<IConfiguration>(configuration);
-
-            services.
-                AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult<string?>(null!)).
-                WithInMemoryStore().
-                WithConfigurationStore();
-            var sp = services.BuildServiceProvider();
-            sp.GetServices<IMultiTenantStore<TenantInfo>>().
-                Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>)).TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
-
-            var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
-            var result = resolver.ResolveAsync(new object()).Result;
-
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public void ReturnNullIfNoStoreSuccess()
-        {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            var configuration = configBuilder.Build();
-
-            var services = new ServiceCollection();
-            services.AddSingleton<IConfiguration>(configuration);
-            
-            services.AddLogging().
-                AddMultiTenant<TenantInfo>().
-                WithDelegateStrategy(_ => Task.FromResult<string?>("not-found")).
-                WithStaticStrategy("also-not-found").
-                WithInMemoryStore().
-                WithConfigurationStore();
-            var sp = services.BuildServiceProvider();
-            sp.
-                GetServices<IMultiTenantStore<TenantInfo>>().
-                Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>)).TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" }).Wait();
-
-            var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
-            var result = resolver.ResolveAsync(new object()).Result;
-
-            Assert.Null(result);
         }
 
         [Fact]

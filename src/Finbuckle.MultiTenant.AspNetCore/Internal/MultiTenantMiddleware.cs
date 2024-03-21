@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Finbuckle.MultiTenant.AspNetCore
 {
     /// <summary>
-    /// Middleware for resolving the TenantContext and storing it in HttpContext.
+    /// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
     /// </summary>
-    internal class MultiTenantMiddleware
+    public class MultiTenantMiddleware
     {
         private readonly RequestDelegate next;
 
@@ -23,12 +23,9 @@ namespace Finbuckle.MultiTenant.AspNetCore
         {
             var accessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
 
-            if (accessor.MultiTenantContext == null)
-            {
-                var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
-                var multiTenantContext = await resolver.ResolveAsync(context);
-                accessor.MultiTenantContext = multiTenantContext;
-            }
+            var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
+            var multiTenantContext = await resolver.ResolveAsync(context);
+            accessor.MultiTenantContext = multiTenantContext;
 
             await next(context);
         }
