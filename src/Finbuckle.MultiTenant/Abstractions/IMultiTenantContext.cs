@@ -16,9 +16,9 @@ public interface IMultiTenantContext
     ITenantInfo? TenantInfo { get; }
 
     /// <summary>
-    /// True if a non-null tenant has been resolved.
+    /// True if a tenant has been resolved and TenantInfo is not null.
     /// </summary>
-    bool HasResolvedTenant { get; }
+    bool IsResolved { get; }
 
     /// <summary>
     /// Information about the MultiTenant strategies for this context.
@@ -26,30 +26,22 @@ public interface IMultiTenantContext
     StrategyInfo? StrategyInfo { get; }
 }
 
+
+
 /// <summary>
 /// Generic interface for the multi-tenant context.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public interface IMultiTenantContext<TTenantInfo>
+public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
     new TTenantInfo? TenantInfo { get; }
-
-    /// <summary>
-    /// True if a non-null tenant has been resolved.
-    /// </summary>
-    bool HasResolvedTenant { get; }
     
     /// <summary>
     /// Information about the MultiTenant stores for this context.
     /// </summary>
     StoreInfo<TTenantInfo>? StoreInfo { get; set; }
-
-    /// <summary>
-    /// Information about the MultiTenant strategies for this context.
-    /// </summary>
-    StrategyInfo? StrategyInfo { get; }
 }

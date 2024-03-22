@@ -1,6 +1,6 @@
-namespace Finbuckle.MultiTenant.Internal;
+namespace Finbuckle.MultiTenant.Abstractions;
 
 internal interface IMultiTenantContextSetter
 {
-    void SetMultiTenantContext(IMultiTenantContext multiTenantContext);
+    IMultiTenantContext MultiTenantContext { set; }
 }

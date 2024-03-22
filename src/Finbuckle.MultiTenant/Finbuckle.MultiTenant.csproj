@@ -12,6 +12,10 @@
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Extensions\" />
+    </ItemGroup>
+
     <Choose>
         <When Condition=" '$(TargetFramework)' == 'net8.0' ">
             <ItemGroup>

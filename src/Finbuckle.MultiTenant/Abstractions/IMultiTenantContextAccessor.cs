@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant;
 public interface IMultiTenantContextAccessor
 {
     /// <summary>
-    /// Gets or sets the current MultiTenantContext.
+    /// Gets the current MultiTenantContext.
     /// </summary>
     IMultiTenantContext MultiTenantContext { get; }
 }
@@ -20,10 +20,11 @@ public interface IMultiTenantContextAccessor
 /// Provides access the current MultiTenantContext.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public interface IMultiTenantContextAccessor<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public interface IMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor
+    where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>
-    /// Gets or sets the current MultiTenantContext.
+    /// Gets the current MultiTenantContext.
     /// </summary>
-    IMultiTenantContext<TTenantInfo>? MultiTenantContext { get; }
+    new IMultiTenantContext<TTenantInfo> MultiTenantContext { get; }
 }

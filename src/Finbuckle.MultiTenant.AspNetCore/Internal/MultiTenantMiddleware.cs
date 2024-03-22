@@ -27,6 +27,12 @@ namespace Finbuckle.MultiTenant.AspNetCore
             var multiTenantContext = await resolver.ResolveAsync(context);
             accessor.MultiTenantContext = multiTenantContext;
 
+            var g = new MultiTenantContext<TenantInfo>();
+            if (g is IMultiTenantContext)
+            {
+                
+            }
+
             await next(context);
         }
     }

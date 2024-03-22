@@ -1,6 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
+
 namespace Finbuckle.MultiTenant.Internal;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace Finbuckle.MultiTenant.Internal;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
-    IMultiTenantContextAccessor<TTenantInfo>, IMultiTenantContextAccessor
+    IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     private static readonly AsyncLocal<IMultiTenantContext<TTenantInfo>> AsyncLocalContext = new();
@@ -23,8 +25,8 @@ internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantC
     /// <inheritdoc />
     IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => (IMultiTenantContext)MultiTenantContext;
 
-    public void SetMultiTenantContext(IMultiTenantContext multiTenantContext)
+    IMultiTenantContext IMultiTenantContextSetter.MultiTenantContext
     {
-        MultiTenantContext = (IMultiTenantContext<TTenantInfo>)multiTenantContext;
+        set => MultiTenantContext = (IMultiTenantContext<TTenantInfo>)value;
     }
 }

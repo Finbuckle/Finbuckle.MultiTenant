@@ -12,8 +12,8 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo"></typeparam>
-public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>, ITenantResolver
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IOptionsMonitor<MultiTenantOptions> options;
@@ -36,7 +36,10 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>, ITenant
         Strategies = strategies.OrderByDescending(s => s.Priority);
     }
 
+    /// <inheritdoc />
     public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
 
     /// <inheritdoc />
@@ -47,9 +50,9 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>, ITenant
         string? identifier = null;
         foreach (var strategy in Strategies)
         {
-            var _strategy = new MultiTenantStrategyWrapper(strategy,
+            var wrappedStrategy = new MultiTenantStrategyWrapper(strategy,
                 loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance);
-            identifier = await _strategy.GetIdentifierAsync(context);
+            identifier = await wrappedStrategy.GetIdentifierAsync(context);
 
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
@@ -63,9 +66,9 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>, ITenant
 
             foreach (var store in Stores)
             {
-                var _store = new MultiTenantStoreWrapper<TTenantInfo>(store,
+                var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store,
                     loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance);
-                var tenantInfo = await _store.TryGetByIdentifierAsync(identifier);
+                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
                 if (tenantInfo == null)
                     continue;
 

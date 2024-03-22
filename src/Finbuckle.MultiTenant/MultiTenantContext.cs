@@ -7,13 +7,14 @@ namespace Finbuckle.MultiTenant;
 /// Contains contextual MultiTenant information.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>, IMultiTenantContext
+public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <inheritdoc />
     public TTenantInfo? TenantInfo { get; set; }
 
-    public bool HasResolvedTenant => TenantInfo != null;
+    /// <inheritdoc />
+    public bool IsResolved => TenantInfo != null;
 
     /// <inheritdoc />
     public StrategyInfo? StrategyInfo { get; set; }
@@ -23,7 +24,4 @@ public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>,
 
     /// <inheritdoc />
     ITenantInfo? IMultiTenantContext.TenantInfo => TenantInfo;
-
-    /// <inheritdoc />
-    StrategyInfo? IMultiTenantContext.StrategyInfo => StrategyInfo;
 }
