@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,12 +30,14 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(
             sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
-        
-        services
-            .AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
-                AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
+
+        services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
+            AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+        
+        services.AddSingleton<IMultiTenantContextSetter>(sp =>
+            (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
         services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);

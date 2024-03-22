@@ -5,14 +5,14 @@ namespace Finbuckle.MultiTenant.Test;
 public class MultiTenantContextShould
 {
     [Fact]
-    public void ReturnFalseInHasResolvedTenantIfTenantInfoIsNull()
+    public void ReturnFalseForIsResolvedIfTenantInfoIsNull()
     {
         IMultiTenantContext<TenantInfo> context = new MultiTenantContext<TenantInfo>();
         Assert.False(context.IsResolved);
     }
         
     [Fact]
-    public void ReturnTrueInHasResolvedTenantIfTenantInfoIsNotNull()
+    public void ReturnTrueIsResolvedIfTenantInfoIsNotNull()
     {
         var context = new MultiTenantContext<TenantInfo>
         {
@@ -23,14 +23,14 @@ public class MultiTenantContextShould
     }
     
     [Fact]
-    public void ReturnFalseInHasResolvedTenantIfTenantInfoIsNull_NonGeneric()
+    public void ReturnFalseForIsResolvedIfTenantInfoIsNull_NonGeneric()
     {
         IMultiTenantContext context = new MultiTenantContext<TenantInfo>();
         Assert.False(context.IsResolved);
     }
         
     [Fact]
-    public void ReturnTrueInHasResolvedTenantIfTenantInfoIsNotNull_NonGeneric()
+    public void ReturnTrueIsResolvedIfTenantInfoIsNotNull_NonGeneric()
     {
         var context = new MultiTenantContext<TenantInfo>
         {

@@ -2,11 +2,8 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -17,18 +14,6 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
         [Fact]
         public async Task ReturnPerTenantAuthenticationOptions()
         {
-            // var hostBuilder = GetTestHostBuilder();
-            //
-            // using (var server = new TestServer(hostBuilder))
-            // {
-            //     var client = server.CreateClient();
-            //     var response = await client.GetStringAsync("/tenant1");
-            //     Assert.Equal("tenant1Scheme", response);
-            //
-            //     response = await client.GetStringAsync("/tenant2");
-            //     Assert.Equal("tenant2Scheme", response);
-            // }
-
             var services = new ServiceCollection();
             services.AddAuthentication()
                 .AddCookie("tenant1Scheme")
@@ -55,18 +40,22 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
             };
             
             var mtc = new MultiTenantContext<TenantInfo>();
-            var multiTenantContextAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            multiTenantContextAccessor.MultiTenantContext = mtc;
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = mtc;
 
             mtc.TenantInfo = tenant1;
             var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>();
+
+            var option = await schemeProvider.GetDefaultChallengeSchemeAsync();
             
-            var option = schemeProvider.GetDefaultChallengeSchemeAsync().Result;
-            Assert.Equal("tenant1Scheme", option?.Name);
+            Assert.NotNull(option);
+            Assert.Equal("tenant1Scheme", option.Name);
 
             mtc.TenantInfo = tenant2;
-            option = schemeProvider.GetDefaultChallengeSchemeAsync().Result;
-            Assert.Equal("tenant2Scheme", option?.Name);
+            option = await schemeProvider.GetDefaultChallengeSchemeAsync();
+            
+            Assert.NotNull(option);
+            Assert.Equal("tenant2Scheme", option.Name);
         }
     }
 }
