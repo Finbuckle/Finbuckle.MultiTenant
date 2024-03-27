@@ -6,7 +6,7 @@
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
+        <RepositoryUrl>https://github.com/SirFull/Finbuckle.MultiTenant</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
