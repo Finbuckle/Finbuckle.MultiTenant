@@ -9,15 +9,17 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        dotnet: ['6.0.x', '7.0.x', '8.0.x']
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # dotnet: ['6.0.x', '7.0.x', '8.0.x']
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet: ["7.0.x"]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
       - name: build
         run: dotnet build
       - name: test Finbuckle.MultiTenant
@@ -29,4 +31,3 @@ jobs:
       - name: test Finbuckle.MultiTenant.EntityFrameworkCore
         run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
-        

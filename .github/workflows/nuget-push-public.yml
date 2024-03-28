@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Create the package
         run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
-      - name: Publish the package to NuGet.org
+      - name: Publish the package to github
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
-        run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://nuget.pkg.github.com/SirFull/index.json --skip-duplicate
