@@ -39,7 +39,7 @@ namespace Finbuckle.MultiTenant
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            if (IsMultiTenantEnables)
+            if (IsMultiTenantEnabled)
             {
                 this.EnforceMultiTenant();
             }
@@ -49,7 +49,7 @@ namespace Finbuckle.MultiTenant
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (IsMultiTenantEnables)
+            if (IsMultiTenantEnabled)
             {
                 this.EnforceMultiTenant();
             }
