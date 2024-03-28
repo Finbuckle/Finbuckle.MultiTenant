@@ -8,6 +8,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
         ITenantInfo TenantInfo { get; }
         TenantMismatchMode TenantMismatchMode { get; }
         TenantNotSetMode TenantNotSetMode { get; }
-        bool IsMultiTenantEnable { get; }
+        bool IsMultiTenantEnabled { get; }
     }
 }
