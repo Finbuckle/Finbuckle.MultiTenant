@@ -20,6 +20,8 @@ namespace Finbuckle.MultiTenant
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
+        public bool IsMultiTenantEnabled { get; set; } = true;
+
         protected MultiTenantDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
@@ -37,14 +39,20 @@ namespace Finbuckle.MultiTenant
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            this.EnforceMultiTenant();
+            if (IsMultiTenantEnables)
+            {
+                this.EnforceMultiTenant();
+            }
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            this.EnforceMultiTenant();
+            if (IsMultiTenantEnables)
+            {
+                this.EnforceMultiTenant();
+            }
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
     }
