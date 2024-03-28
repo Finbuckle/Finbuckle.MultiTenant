@@ -119,6 +119,8 @@ namespace Finbuckle.MultiTenant
 
         public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
+        public bool IsMultiTenantEnabled { get; set; } = true;
+
         protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo)
         {
             this.TenantInfo = tenantInfo;
