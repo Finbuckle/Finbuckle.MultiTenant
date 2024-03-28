@@ -90,11 +90,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             var predicate = Expression.Equal(leftExp, rightExp);
 
             #region Fork Sirfull
-            // build expression tree for : "IsMultiTenantEnable == False || EF.Property<string>(e, "TenantId") == TenantInfo.Id"
+            // build expression tree for : "IsMultiTenantEnabled == False || EF.Property<string>(e, "TenantId") == TenantInfo.Id"
             //                              -------------------------------
             predicate = Expression.OrElse(
                 Expression.Equal(
-                    Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnable)),
+                    Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)),
                     Expression.Constant(false)
                 ),
                 predicate
