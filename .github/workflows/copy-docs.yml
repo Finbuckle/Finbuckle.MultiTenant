@@ -6,7 +6,7 @@ jobs:
   checkout-copy-checkin:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Finbuckl.MultiTenant
+      - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@v4
         with:
           path: main
@@ -27,7 +27,6 @@ jobs:
         run: mkdir -p website/docs/${{ steps.currentversion.outputs.tag }} && cp main/docs/* website/docs/${{ steps.currentversion.outputs.tag }}
       - name: Checkin Website
         working-directory: website
-        env:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
