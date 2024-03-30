@@ -27,7 +27,7 @@ jobs:
       - name: Checkin Website
         working-directory: website
         env:
-          GITHUB_TOKEN: ${{secrets.WORKFLOW_PAT}}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_PAT }}
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
