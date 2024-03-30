@@ -33,5 +33,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "chore: docs generated"
-          git remote set-url "https://$GITHUB_TOKEN@github.com/Finbuckle/Website.git"
+          git remote set-url origin https://$GITHUB_TOKEN@github.com/Finbuckle/Website.git
           git push
