@@ -112,6 +112,14 @@ public static class FinbuckleMultiTenantBuilderExtensions
 
         return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
     }
+    
+    /// <summary>
+    /// Adds an EchoStore to the application.
+    /// </summary>
+    /// <param name="builder">The builder instance.</param>
+    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithEchoStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        where TTenantInfo : class, ITenantInfo, new()
+        => builder.WithStore<EchoStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
     /// <summary>
     /// Adds and configures a StaticStrategy to the application.

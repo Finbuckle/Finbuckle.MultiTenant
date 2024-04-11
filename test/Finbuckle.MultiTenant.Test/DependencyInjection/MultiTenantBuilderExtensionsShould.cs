@@ -175,6 +175,26 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         }
 
         [Fact]
+        public void AddEchoStore()
+        {
+            var services = new ServiceCollection();
+            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            builder.WithEchoStore();
+            var sp = services.BuildServiceProvider();
+            
+            var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+            Assert.IsType<EchoStore<TenantInfo>>(store);
+
+            var tc = store.TryGetByIdentifierAsync("initech").Result;
+            Assert.Equal("initech", tc!.Id);
+            Assert.Equal("initech", tc.Identifier);
+
+            tc = store.TryGetByIdentifierAsync("lol").Result;
+            Assert.Equal("lol", tc!.Id);
+            Assert.Equal("lol", tc.Identifier);
+        }
+
+        [Fact]
         public void AddStaticStrategy()
         {
             var services = new ServiceCollection();
