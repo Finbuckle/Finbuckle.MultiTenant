@@ -21,29 +21,29 @@ using Moq;
 using Xunit;
 using Constants = Finbuckle.MultiTenant.Internal.Constants;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions;
+
+public class MultiTenantBuilderExtensionsShould
 {
-    public class MultiTenantBuilderExtensionsShould
+    private class TestTenantInfo : ITenantInfo
     {
-        private class TestTenantInfo : ITenantInfo
-        {
-            public string? Id { get; set; }
-            public string? Identifier { get; set; }
-            public string? Name { get; set; }
-            public string? ConnectionString { get; set; }
+        public string? Id { get; set; }
+        public string? Identifier { get; set; }
+        public string? Name { get; set; }
+        public string? ConnectionString { get; set; }
 
-            public string? ChallengeScheme { get; set; }
-            public string? CookieLoginPath { get; set; }
-            public string? CookieLogoutPath { get; set; }
-            public string? CookieAccessDeniedPath { get; set; }
-            public string? OpenIdConnectAuthority { get; set; }
-            public string? OpenIdConnectClientId { get; set; }
-            public string? OpenIdConnectClientSecret { get; set; }
-        }
+        public string? ChallengeScheme { get; set; }
+        public string? CookieLoginPath { get; set; }
+        public string? CookieLogoutPath { get; set; }
+        public string? CookieAccessDeniedPath { get; set; }
+        public string? OpenIdConnectAuthority { get; set; }
+        public string? OpenIdConnectClientId { get; set; }
+        public string? OpenIdConnectClientSecret { get; set; }
+    }
 
-        [Fact]
-        public async Task NotThrowIfOriginalPrincipalValidationNotSet()
-        {
+    [Fact]
+    public async Task NotThrowIfOriginalPrincipalValidationNotSet()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -77,9 +77,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.True(true);
         }
 
-        [Fact]
-        public async Task CallOriginalPrincipalValidation()
-        {
+    [Fact]
+    public async Task CallOriginalPrincipalValidation()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -123,9 +123,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.True(called);
         }
 
-        [Fact]
-        public async Task PassPrincipalValidationIfTenantMatch()
-        {
+    [Fact]
+    public async Task PassPrincipalValidationIfTenantMatch()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -160,9 +160,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(cookieValidationContext);
         }
 
-        [Fact]
-        public async Task SkipPrincipalValidationIfBypassSet_WithPerTenantAuthentication()
-        {
+    [Fact]
+    public async Task SkipPrincipalValidationIfBypassSet_WithPerTenantAuthentication()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -204,9 +204,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.False(called);
         }
 
-        [Fact]
-        public async Task SkipPrincipalValidationIfBypassSet_WithClaimStrategy()
-        {
+    [Fact]
+    public async Task SkipPrincipalValidationIfBypassSet_WithClaimStrategy()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -248,9 +248,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.False(called);
         }
 
-        [Fact]
-        public async Task RejectPrincipalValidationIfTenantMatch()
-        {
+    [Fact]
+    public async Task RejectPrincipalValidationIfTenantMatch()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -285,9 +285,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Null(cookieValidationContext.Principal);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_RegisterServices()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_RegisterServices()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -308,9 +308,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(strategy);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationCore_RegisterServices()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationCore_RegisterServices()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -326,9 +326,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<MultiTenantAuthenticationSchemeProvider>(schemeProvider);
         }
 
-        [Fact]
-        public void AddRemoteAuthenticationCallbackStrategy()
-        {
+    [Fact]
+    public void AddRemoteAuthenticationCallbackStrategy()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -342,9 +342,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(strategy);
         }
 
-        [Fact]
-        public async Task ConfigurePerTenantAuthentication_UseChallengeScheme()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthentication_UseChallengeScheme()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
@@ -369,9 +369,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.ChallengeScheme, scheme.Name);
         }
 
-        [Fact]
-        public async Task ConfigurePerTenantAuthenticationConventions_UseChallengeScheme()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthenticationConventions_UseChallengeScheme()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
@@ -397,9 +397,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.ChallengeScheme, scheme.Name);
         }
 
-        [Fact]
-        public async Task ConfigurePerTenantAuthenticationConventions_UseDefaultChallengeSchemeOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthenticationConventions_UseDefaultChallengeSchemeOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             var defaultValue = "defaultScheme";
@@ -427,9 +427,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(defaultValue, scheme.Name);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_UseOpenIdConnectConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_UseOpenIdConnectConvention()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             services.AddOptions();
@@ -458,9 +458,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.OpenIdConnectClientSecret, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseOpenIdConnectConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseOpenIdConnectConvention()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             services.AddOptions();
@@ -489,9 +489,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.OpenIdConnectClientSecret, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseDefaultOpenIdConnectOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseDefaultOpenIdConnectOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             var defaultValue = "https://defaultValue";
@@ -523,9 +523,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(defaultValue, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_UseCookieOptionsConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_UseCookieOptionsConvention()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie();
@@ -553,9 +553,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.CookieAccessDeniedPath, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseCookieOptionsConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseCookieOptionsConvention()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie();
@@ -583,9 +583,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.CookieAccessDeniedPath, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseDefaultCookieOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseDefaultCookieOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             var defaultValue = "/defaultValue";
             services.AddOptions().AddAuthentication().AddCookie(options =>
@@ -615,18 +615,18 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(defaultValue, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
-        {
+    [Fact]
+    public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
 
             Assert.Throws<MultiTenantException>(() => builder.WithPerTenantAuthentication());
         }
 
-        [Fact]
-        public void AddBasePathStrategy()
-        {
+    [Fact]
+    public void AddBasePathStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
@@ -636,9 +636,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<BasePathStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddBasePathStrategyDefaultRebaseFalse()
-        {
+    [Fact]
+    public void AddBasePathStrategyDefaultRebaseFalse()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
@@ -651,9 +651,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.False(options.Value.RebaseAspNetCorePathBase);
         }
 
-        [Fact]
-        public void AddBasePathStrategyWithOptions()
-        {
+    [Fact]
+    public void AddBasePathStrategyWithOptions()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
@@ -666,9 +666,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.True(options.Value.RebaseAspNetCorePathBase);
         }
 
-        [Fact]
-        public void AddClaimStrategy()
-        {
+    [Fact]
+    public void AddClaimStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithClaimStrategy();
@@ -678,9 +678,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<ClaimStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddHeaderStrategy()
-        {
+    [Fact]
+    public void AddHeaderStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHeaderStrategy();
@@ -690,9 +690,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<HeaderStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddHostStrategy()
-        {
+    [Fact]
+    public void AddHostStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHostStrategy();
@@ -702,18 +702,18 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<HostStrategy>(strategy);
         }
 
-        [Fact]
-        public void ThrowIfNullParamAddingHostStrategy()
-        {
+    [Fact]
+    public void ThrowIfNullParamAddingHostStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithHostStrategy(null!));
         }
 
-        [Fact]
-        public void AddRouteStrategy()
-        {
+    [Fact]
+    public void AddRouteStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithRouteStrategy("routeParam");
@@ -723,13 +723,12 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<RouteStrategy>(strategy);
         }
 
-        [Fact]
-        public void ThrowIfNullParamAddingRouteStrategy()
-        {
+    [Fact]
+    public void ThrowIfNullParamAddingRouteStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithRouteStrategy(null!));
         }
-    }
 }

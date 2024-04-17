@@ -242,7 +242,7 @@
 - .NET 5.0 support.
 - New `DistributedCacheStore` uses the ASP.NET Core distributed cache for tenant resolution.
 - New `HeaderStrategy` uses HTTP headers for tenant resolution. Thanks to ****!
-- Support for inheritance in multitenant Entity Framework Core entity. Thanks to ****!
+- Support for inheritance in multi-tenant Entity Framework Core entity. Thanks to ****!
 - Fixed a conflict between ClaimStrategy and per-tenant authentication.
 - Updated docs, samples, and unit tests.
 
@@ -295,7 +295,7 @@
 ### Changes
 
 - Added support for ASP.NET Core 3.1.
-- Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
+- Major refactor of how Entity Framework multi-tenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multi-tenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
 - Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
 - Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
 - Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
@@ -314,7 +314,7 @@
 - Added support for ASP.NET Core 3! Valid project targets are `netcoreapp3.0`, `netcoreapp2.0`, and `netcoreapp2.1`.
 - Added a sample app for ASP.NET 3 highlighting the route strategy improvements due to the endpoint routing mechanism.
 - Fixed a bug where route strategy could throw an exception when used with Razor Pages. Thanks -services!
-- Support for configuring multiple multitenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
+- Support for configuring multiple multi-tenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
 - Refactored component assemblies for better dependency control. EFCore can be excluded by referencing `Finbuckle.MultiTenant.AspNetCore` instead of `Finbuckle.MultiTenant`.
 - Updated documentation.
 - Updated unit tests to check against all valid project targets.
@@ -365,7 +365,7 @@
 
 ### Changes
 
-- Fixed bug in Identity where `UserLogins` primary key was not adjusted for multitenant usage.
+- Fixed bug in Identity where `UserLogins` primary key was not adjusted for multi-tenant usage.
 - Updated and Fixed the IdentityDataIsolation sample project.
 - General code and test cleanup.
 

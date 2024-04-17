@@ -1,30 +1,24 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Options;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Moq;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.DependencyInjection
-{
-    public class MultiTenantBuilderShould
-    {
-        // Used in some tests.
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        private string? TestProperty { get; set; }
+namespace Finbuckle.MultiTenant.Test.DependencyInjection;
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
-        {
+public class MultiTenantBuilderShould
+{
+    // Used in some tests.
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
+    private string? TestProperty { get; set; }
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore<TestStore<TenantInfo>>(lifetime);
@@ -53,12 +47,12 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
-        {
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore<TestStore<TenantInfo>>(lifetime, true);
@@ -90,12 +84,12 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
-        {
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore(lifetime, _ => new TestStore<TenantInfo>());
@@ -124,21 +118,21 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Fact]
-        public void ThrowIfNullFactoryAddingCustomStore()
-        {
+    [Fact]
+    public void ThrowIfNullFactoryAddingCustomStore()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(() =>
                 builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
         }
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
-        {
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy<StaticStrategy>(lifetime, "initech");
@@ -169,12 +163,12 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
-        {
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy<StaticStrategy>(lifetime, "id");
@@ -203,12 +197,12 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Theory]
-        [InlineData(ServiceLifetime.Singleton)]
-        [InlineData(ServiceLifetime.Scoped)]
-        [InlineData(ServiceLifetime.Transient)]
-        public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
-        {
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy(lifetime, _ => new StaticStrategy("id"));
@@ -237,61 +231,60 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             }
         }
 
-        [Fact]
-        public void ThrowIfNullFactoryAddingCustomStrategy()
-        {
+    [Fact]
+    public void ThrowIfNullFactoryAddingCustomStrategy()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(() =>
                 builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null!));
         }
 
-        private class TestStore<TTenant> : IMultiTenantStore<TTenant>
-            where TTenant : class, ITenantInfo, new()
-        {
-            // ReSharper disable once NotAccessedField.Local
-            private readonly bool _testParam;
+    private class TestStore<TTenant> : IMultiTenantStore<TTenant>
+        where TTenant : class, ITenantInfo, new()
+    {
+        // ReSharper disable once NotAccessedField.Local
+        private readonly bool _testParam;
 
-            public TestStore()
-            {
+        public TestStore()
+        {
             }
 
-            // ReSharper disable once UnusedMember.Local
-            // Needed to test param injection
-            public TestStore(bool testParam)
-            {
+        // ReSharper disable once UnusedMember.Local
+        // Needed to test param injection
+        public TestStore(bool testParam)
+        {
                 this._testParam = testParam;
             }
 
-            public Task<bool> TryAddAsync(TTenant tenantInfo)
-            {
+        public Task<bool> TryAddAsync(TTenant tenantInfo)
+        {
                 throw new NotImplementedException();
             }
 
-            public Task<TTenant?> TryGetAsync(string id)
-            {
+        public Task<TTenant?> TryGetAsync(string id)
+        {
                 throw new NotImplementedException();
             }
 
-            public Task<IEnumerable<TTenant>> GetAllAsync()
-            {
+        public Task<IEnumerable<TTenant>> GetAllAsync()
+        {
                 throw new NotImplementedException();
             }
 
-            public Task<TTenant?> TryGetByIdentifierAsync(string identifier)
-            {
+        public Task<TTenant?> TryGetByIdentifierAsync(string identifier)
+        {
                 throw new NotImplementedException();
             }
 
-            public Task<bool> TryRemoveAsync(string identifier)
-            {
+        public Task<bool> TryRemoveAsync(string identifier)
+        {
                 throw new NotImplementedException();
             }
 
-            public Task<bool> TryUpdateAsync(TTenant tenantInfo)
-            {
+        public Task<bool> TryUpdateAsync(TTenant tenantInfo)
+        {
                 throw new NotImplementedException();
             }
-        }
     }
 }

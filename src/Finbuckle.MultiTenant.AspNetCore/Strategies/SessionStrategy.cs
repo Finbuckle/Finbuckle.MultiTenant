@@ -5,14 +5,14 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies
-{
-    public class SessionStrategy : IMultiTenantStrategy
-    {
-        private readonly string tenantKey;
+namespace Finbuckle.MultiTenant.Strategies;
 
-        public SessionStrategy(string tenantKey)
-        {
+public class SessionStrategy : IMultiTenantStrategy
+{
+    private readonly string tenantKey;
+
+    public SessionStrategy(string tenantKey)
+    {
             if (string.IsNullOrWhiteSpace(tenantKey))
             {
                 throw new ArgumentException("message", nameof(tenantKey));
@@ -21,8 +21,8 @@ namespace Finbuckle.MultiTenant.Strategies
             this.tenantKey = tenantKey;
         }
 
-        public Task<string?> GetIdentifierAsync(object context)
-        {
+    public Task<string?> GetIdentifierAsync(object context)
+    {
             if(!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
@@ -30,5 +30,4 @@ namespace Finbuckle.MultiTenant.Strategies
             var identifier = httpContext.Session.GetString(tenantKey);
             return Task.FromResult<string?>(identifier); // Prevent the compiler warning that no await exists.
         }
-    }
 }

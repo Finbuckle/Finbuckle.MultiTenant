@@ -9,13 +9,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test
+namespace Finbuckle.MultiTenant.AspNetCore.Test;
+
+public class MultiTenantMiddlewareShould
 {
-    public class MultiTenantMiddlewareShould
+    [Fact]
+    public async void SetHttpContextItemIfTenantFound()
     {
-        [Fact]
-        public async void SetHttpContextItemIfTenantFound()
-        {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
                 WithStaticStrategy("initech").
@@ -40,9 +40,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
             Assert.Equal("initech", mtc.TenantInfo.Id);
         }
 
-        [Fact]
-        public async void SetTenantAccessor()
-        {
+    [Fact]
+    public async void SetTenantAccessor()
+    {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
                 WithStaticStrategy("initech").
@@ -75,9 +75,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
             Assert.NotNull(mtc.TenantInfo);
         }
         
-        [Fact]
-        public async void NotSetTenantAccessorIfNoTenant()
-        {
+    [Fact]
+    public async void NotSetTenantAccessorIfNoTenant()
+    {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
                 WithStaticStrategy("not_initech").
@@ -109,5 +109,4 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
             Assert.False(mtc.IsResolved);
             Assert.Null(mtc.TenantInfo);
         }
-    }
 }

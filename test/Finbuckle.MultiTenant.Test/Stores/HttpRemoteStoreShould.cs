@@ -1,25 +1,21 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.Stores
+namespace Finbuckle.MultiTenant.Test.Stores;
+
+public class HttpRemoteStoreShould : MultiTenantStoreTestBase
 {
-    public class HttpRemoteStoreShould : MultiTenantStoreTestBase
+    public class TestHandler : DelegatingHandler
     {
-        public class TestHandler : DelegatingHandler
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            {
                 var result = new HttpResponseMessage();
 
                 var numSegments = request.RequestUri!.Segments.Length;
@@ -36,29 +32,29 @@ namespace Finbuckle.MultiTenant.Test.Stores
 
                 return Task.FromResult(result);
             }
-        }
+    }
 
-        [Fact]
-        public void ThrowIfTypedClientParamIsNull()
-        {
+    [Fact]
+    public void ThrowIfTypedClientParamIsNull()
+    {
             Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore<TenantInfo>(null!, "http://example.com"));
         }
 
-        [Theory]
-        [InlineData("null")]
-        [InlineData("")]
-        [InlineData("invalidUri")]
-        [InlineData("file://nothttp")]
-        public void ThrowIfEndpointTemplateIsNotWellFormed(string uri)
-        {
+    [Theory]
+    [InlineData("null")]
+    [InlineData("")]
+    [InlineData("invalidUri")]
+    [InlineData("file://nothttp")]
+    public void ThrowIfEndpointTemplateIsNotWellFormed(string uri)
+    {
             var clientFactory = new Mock<IHttpClientFactory>();
             var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
             Assert.Throws<ArgumentException>(() => new HttpRemoteStore<TenantInfo>(client, uri));
         }
 
-        [Fact]
-        public void AppendTenantToTemplateIfMissing()
-        {
+    [Fact]
+    public void AppendTenantToTemplateIfMissing()
+    {
             var clientFactory = new Mock<IHttpClientFactory>();
             var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
             var store = new HttpRemoteStore<TenantInfo>(client, "http://example.com/");
@@ -69,9 +65,9 @@ namespace Finbuckle.MultiTenant.Test.Stores
             Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}", endpointTemplate);
         }
 
-        [Fact]
-        public void AppendTenantWithSlashToTemplateIfMissing()
-        {
+    [Fact]
+    public void AppendTenantWithSlashToTemplateIfMissing()
+    {
             var clientFactory = new Mock<IHttpClientFactory>();
             var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
             var store = new HttpRemoteStore<TenantInfo>(client, "http://example.com");
@@ -82,10 +78,10 @@ namespace Finbuckle.MultiTenant.Test.Stores
             Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}", endpointTemplate);
         }
 
-        // Basic store functionality tested in MultiTenantStoresShould.cs
+    // Basic store functionality tested in MultiTenantStoresShould.cs
 
-        protected override IMultiTenantStore<TenantInfo> CreateTestStore()
-        {
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    {
             var client = new HttpClient(new TestHandler());
             var clientFactory = new Mock<IHttpClientFactory>();
             clientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
@@ -93,41 +89,40 @@ namespace Finbuckle.MultiTenant.Test.Stores
             return new HttpRemoteStore<TenantInfo>(typedClient, "http://example.com");
         }
 
-        protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
-        {
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    {
             throw new NotImplementedException();
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void GetTenantInfoFromStoreById()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void GetTenantInfoFromStoreById()
+    {
         }
 
-        [Fact]
-        public override void GetTenantInfoFromStoreByIdentifier()
-        {
+    [Fact]
+    public override void GetTenantInfoFromStoreByIdentifier()
+    {
             base.GetTenantInfoFromStoreByIdentifier();
         }
 
-        [Fact]
-        public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
-        {
+    [Fact]
+    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    {
             base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void AddTenantInfoToStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void AddTenantInfoToStore()
+    {
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void RemoveTenantInfoFromStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void RemoveTenantInfoFromStore()
+    {
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void UpdateTenantInfoInStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void UpdateTenantInfoInStore()
+    {
         }
-    }
 }

@@ -1,21 +1,20 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.Options
+namespace Finbuckle.MultiTenant.Test.Options;
+
+public class MultiTenantOptionsManagerShould
 {
-    public class MultiTenantOptionsManagerShould
+    [Theory]
+    [InlineData("OptionName1")]
+    [InlineData("OptionName2")]
+    public void GetOptionByName(string optionName)
     {
-        [Theory]
-        [InlineData("OptionName1")]
-        [InlineData("OptionName2")]
-        public void GetOptionByName(string optionName)
-        {
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
@@ -26,9 +25,9 @@ namespace Finbuckle.MultiTenant.Test.Options
             mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == optionName), It.IsAny<Func<Object>>()), Times.Once);
         }
 
-        [Fact]
-        public void GetOptionByDefaultNameIfNameNull()
-        {
+    [Fact]
+    public void GetOptionByDefaultNameIfNameNull()
+    {
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
@@ -39,9 +38,9 @@ namespace Finbuckle.MultiTenant.Test.Options
             mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == Microsoft.Extensions.Options.Options.DefaultName), It.IsAny<Func<Object>>()), Times.Once);
         }
 
-        [Fact]
-        public void GetOptionByDefaultNameIfGettingValueProp()
-        {
+    [Fact]
+    public void GetOptionByDefaultNameIfGettingValueProp()
+    {
             var mock = new Mock<IOptionsMonitorCache<Object>>();
             mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
 
@@ -52,9 +51,9 @@ namespace Finbuckle.MultiTenant.Test.Options
             mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == Microsoft.Extensions.Options.Options.DefaultName), It.IsAny<Func<Object>>()), Times.Once);
         }
 
-        [Fact]
-        public void ClearCacheOnReset()
-        {
+    [Fact]
+    public void ClearCacheOnReset()
+    {
             var mock = new Mock<TestOptionsCache<Object>>();
             mock.Setup(i => i.Clear());
 
@@ -64,28 +63,27 @@ namespace Finbuckle.MultiTenant.Test.Options
             mock.Verify(i => i.Clear(), Times.Once);
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Global
-        public class TestOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class TestOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    {
+        public virtual void Clear()
         {
-            public virtual void Clear()
-            {
                 throw new NotImplementedException();
             }
 
-            public virtual TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
-            {
+        public virtual TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
+        {
                 throw new NotImplementedException();
             }
 
-            public virtual bool TryAdd(string? name, TOptions options)
-            {
+        public virtual bool TryAdd(string? name, TOptions options)
+        {
                 throw new NotImplementedException();
             }
 
-            public virtual bool TryRemove(string? name)
-            {
+        public virtual bool TryRemove(string? name)
+        {
                 throw new NotImplementedException();
             }
-        }
     }
 }

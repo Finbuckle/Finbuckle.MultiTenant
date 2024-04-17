@@ -3,18 +3,17 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBuilderExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBuilderExtensions;
+
+public class TestIdentityDbContext : EntityFrameworkCore.MultiTenantIdentityDbContext
 {
-    public class TestIdentityDbContext : MultiTenant.MultiTenantIdentityDbContext
+    public TestIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
     {
-        public TestIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
-        {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
             optionsBuilder.UseSqlite("DataSource=:memory:");
             base.OnConfiguring(optionsBuilder);
         }
-    }
 }

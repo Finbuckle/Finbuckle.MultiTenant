@@ -88,15 +88,16 @@ There are several ways an app can see the current tenant:
 
 ### Dependency Injection
 
-* By default Finbuckle.MultiTenant registers the `ITenantInfo` and your custom `TTenantInfo` for dependency injection.
-  However, be aware that these can be `null` if there is no current tenant.
+* `IMultiTenantContextAccessor` and `IMultiContextContextAccessor` are available via dependency injection and behave
+  similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async contexts
+  any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the post-endpoint
+  processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
+  extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
 
-* `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` are also available for depency injection. These will
-  never
-  be `null` although there may not be a valid current tenant.
-
-* `IMultiTenantContextAccessor` and `IMultiContextContextAccessor` are also available via dependency injection for
-  advanced scenarios.
+> Prior versions of Finbuckle.MultiTenant also exposed `IMultiTenantContext`, `ITenantInfo`, and their implementations
+> via dependency injection. This was removed as these are not actual services, similar to
+> how [HttpContext is not a service](https://github.com/dotnet/aspnetcore/issues/47996#issuecomment-1529364233) and not
+> available directly via dependency injection.
 
 ### `HttpContext` Extension Methods
 
@@ -105,7 +106,8 @@ For web apps these convenience methods are also available:
 * `GetMultiTenantContext<TTenantInfo>`
 
   Use this `HttpContext` extension method to get the `MultiTenantContext<TTenantInfo>` instance for the current
-  request.
+  request. This should be preferred to `IMultiTenantContextAccessor` or `IMultiTenantContextAccessor<TTenantInfo>` when
+  possible.
 
   ```csharp
   var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;

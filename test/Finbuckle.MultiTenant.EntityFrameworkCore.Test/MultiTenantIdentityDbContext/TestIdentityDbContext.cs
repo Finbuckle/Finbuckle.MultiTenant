@@ -3,19 +3,34 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbContext
-{
-    public class TestIdentityDbContext : MultiTenant.MultiTenantIdentityDbContext
-    {
-        public TestIdentityDbContext(TenantInfo tenantInfo)
-            : base(tenantInfo)
-        {
-        }
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbContext;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("DataSource=:memory:");
-            base.OnConfiguring(optionsBuilder);
-        }
+public class TestIdentityDbContext : EntityFrameworkCore.MultiTenantIdentityDbContext
+{
+    public TestIdentityDbContext(TenantInfo tenantInfo)
+        : base(tenantInfo)
+    {
+    }
+
+    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    {
+    }
+
+    public TestIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
+    {
+    }
+
+    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    {
+    }
+
+    public TestIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+    {
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite("DataSource=:memory:");
+        base.OnConfiguring(optionsBuilder);
     }
 }

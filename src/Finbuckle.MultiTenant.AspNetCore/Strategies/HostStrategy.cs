@@ -7,14 +7,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Internal;
 
-namespace Finbuckle.MultiTenant.Strategies
-{
-    public class HostStrategy : IMultiTenantStrategy
-    {
-        private readonly string regex;
+namespace Finbuckle.MultiTenant.Strategies;
 
-        public HostStrategy(string template)
-        {
+public class HostStrategy : IMultiTenantStrategy
+{
+    private readonly string regex;
+
+    public HostStrategy(string template)
+    {
             // New in 2.1, match whole domain if just "__tenant__".
             if (template == Constants.TenantToken)
             {
@@ -61,8 +61,8 @@ namespace Finbuckle.MultiTenant.Strategies
             this.regex = $"^{template}$";
         }
 
-        public Task<string?> GetIdentifierAsync(object context)
-        {
+    public Task<string?> GetIdentifierAsync(object context)
+    {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
@@ -85,5 +85,4 @@ namespace Finbuckle.MultiTenant.Strategies
 
             return Task.FromResult(identifier);
         }
-    }
 }

@@ -7,24 +7,24 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantDbContextExtensions
-{
-    public class MultiTenantDbContextExtensionsShould
-    {
-        private readonly DbContextOptions _options;
-        private readonly DbConnection _connection;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantDbContextExtensions;
 
-        public MultiTenantDbContextExtensionsShould()
-        {
+public class MultiTenantDbContextExtensionsShould
+{
+    private readonly DbContextOptions _options;
+    private readonly DbConnection _connection;
+
+    public MultiTenantDbContextExtensionsShould()
+    {
             _connection = new SqliteConnection("DataSource=:memory:");
             _options = new DbContextOptionsBuilder()
                     .UseSqlite(_connection)
                     .Options;
         }
 
-        [Fact]
-        public void HandleTenantNotSetWhenAdding()
-        {
+    [Fact]
+    public void HandleTenantNotSetWhenAdding()
+    {
             try
             {
                 _connection.Open();
@@ -68,9 +68,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
             }
         }
 
-        [Fact]
-        public void HandleTenantMismatchWhenAdding()
-        {
+    [Fact]
+    public void HandleTenantMismatchWhenAdding()
+    {
             try
             {
                 _connection.Open();
@@ -130,9 +130,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
             }
         }
 
-        [Fact]
-        public void HandleTenantNotSetWhenUpdating()
-        {
+    [Fact]
+    public void HandleTenantNotSetWhenUpdating()
+    {
             try
             {
                 _connection.Open();
@@ -183,9 +183,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
             }
         }
 
-        [Fact]
-        public void HandleTenantMismatchWhenUpdating()
-        {
+    [Fact]
+    public void HandleTenantMismatchWhenUpdating()
+    {
             try
             {
                 _connection.Open();
@@ -253,9 +253,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
             }
         }
 
-        [Fact]
-        public void HandleTenantNotSetWhenDeleting()
-        {
+    [Fact]
+    public void HandleTenantNotSetWhenDeleting()
+    {
             try
             {
                 _connection.Open();
@@ -307,9 +307,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
             }
         }
 
-        [Fact]
-        public void HandleTenantMismatchWhenDeleting()
-        {
+    [Fact]
+    public void HandleTenantMismatchWhenDeleting()
+    {
             try
             {
                 _connection.Open();
@@ -371,5 +371,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantD
                 _connection.Close();
             }
         }
-    }
 }

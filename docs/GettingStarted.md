@@ -43,14 +43,15 @@ app.UseMultiTenant();
 app.Run();
 ```
 
-That's all that is needed to get going. Let's breakdown each line:
+That's all that is needed to get going. Let's break down each line:
 
 `builder.Services.AddMultiTenant<TenantInfo>()`
 
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` and holds basic information about
+The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` and holds basic
+information about
 the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom
 implementation can be used if more properties are needed.
 
@@ -99,7 +100,8 @@ if(tenantInfo != null)
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `ITenantInfo` instance and the typed instance are also available directly through dependency injection.
+The `ITenantInfo` instance and the typed instance are also available using
+the `IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 

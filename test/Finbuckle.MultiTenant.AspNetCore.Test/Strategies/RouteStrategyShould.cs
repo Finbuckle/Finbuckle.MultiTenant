@@ -13,82 +13,83 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies;
+
+public class RouteStrategyShould
 {
-    public class RouteStrategyShould
+    [Theory]
+    [InlineData("/initech", "initech", "initech")]
+    [InlineData("/", "initech", "")]
+    public async Task ReturnExpectedIdentifier(string path, string identifier, string expected)
     {
-        [Theory]
-        [InlineData("/initech", "initech", "initech")]
-        [InlineData("/", "initech", "")]
-        public async Task ReturnExpectedIdentifier(string path, string identifier, string expected)
-        {
-            IWebHostBuilder hostBuilder = GetTestHostBuilder(identifier, "{__tenant__=}");
+        IWebHostBuilder hostBuilder = GetTestHostBuilder(identifier, "{__tenant__=}");
 
-            using (var server = new TestServer(hostBuilder))
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync(path);
+            Assert.Equal(expected, response);
+        }
+    }
+
+    [Fact]
+    public async void ThrowIfContextIsNotHttpContext()
+    {
+        var context = new Object();
+        var strategy = new RouteStrategy("__tenant__");
+
+        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+    }
+
+    [Fact]
+    public async Task ReturnNullIfNoRouteParamMatch()
+    {
+        IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant", "{controller}");
+
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync("/test_tenant");
+            Assert.Equal("", response);
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void ThrowIfRouteParamIsNullOrWhitespace(string? testString)
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new RouteStrategy(testString!));
+    }
+
+    private static IWebHostBuilder GetTestHostBuilder(string identifier, string routePattern)
+    {
+        return new WebHostBuilder()
+            .ConfigureServices(services =>
             {
-                var client = server.CreateClient();
-                var response = await client.GetStringAsync(path);
-                Assert.Equal(expected, response);
-            }
-        }
-
-        [Fact]
-        public async void ThrowIfContextIsNotHttpContext()
-        {
-            var context = new Object();
-            var strategy = new RouteStrategy("__tenant__");
-
-            await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
-        }
-
-        [Fact]
-        public async Task ReturnNullIfNoRouteParamMatch()
-        {
-            IWebHostBuilder hostBuilder = GetTestHostBuilder("test_tenant", "{controller}");
-
-            using (var server = new TestServer(hostBuilder))
+                services.AddMultiTenant<TenantInfo>().WithRouteStrategy().WithInMemoryStore();
+                services.AddMvc();
+            })
+            .Configure(app =>
             {
-                var client = server.CreateClient();
-                var response = await client.GetStringAsync("/test_tenant");
-                Assert.Equal("", response);
-            }
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void ThrowIfRouteParamIsNullOrWhitespace(string testString)
-        {
-            Assert.Throws<ArgumentException>(() => new RouteStrategy(testString));
-        }
-
-        private static IWebHostBuilder GetTestHostBuilder(string identifier, string routePattern)
-        {
-            return new WebHostBuilder()
-                .ConfigureServices(services =>
+                app.UseRouting();
+                app.UseMultiTenant();
+                app.UseEndpoints(endpoints =>
                 {
-                    services.AddMultiTenant<TenantInfo>().WithRouteStrategy().WithInMemoryStore();
-                    services.AddMvc();
-                })
-                .Configure(app =>
-                {
-                    app.UseRouting();
-                    app.UseMultiTenant();
-                    app.UseEndpoints(endpoints =>
+                    endpoints.Map(routePattern, async context =>
                     {
-                        endpoints.Map(routePattern, async context =>
+                        if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
                         {
-                            if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
-                            {
-                                await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!.TenantInfo!.Id!);
-                            }
-                        });
+                            await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!
+                                .TenantInfo!.Id!);
+                        }
                     });
-
-                    var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-                    store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
                 });
-        }
+
+                var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
+            });
     }
 }
