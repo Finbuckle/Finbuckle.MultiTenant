@@ -9,6 +9,7 @@ using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
+using Finbuckle.MultiTenant.DependencyInjection;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test

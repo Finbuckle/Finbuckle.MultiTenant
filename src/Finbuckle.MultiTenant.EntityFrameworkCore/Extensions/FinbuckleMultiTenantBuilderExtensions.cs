@@ -17,7 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <returns>The same MultiTenantBuilder passed into the method.</returns>
         // ReSharper disable once InconsistentNaming
-        public static FinbuckleMultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+        public static MultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
             where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
             where TTenantInfo : class, ITenantInfo, new()
         {

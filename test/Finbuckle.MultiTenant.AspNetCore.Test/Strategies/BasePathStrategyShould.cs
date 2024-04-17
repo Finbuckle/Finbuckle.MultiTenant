@@ -2,7 +2,9 @@
 // Refer to the solution LICENSE file for more information.
 
 using System;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
+using Finbuckle.MultiTenant.DependencyInjection;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

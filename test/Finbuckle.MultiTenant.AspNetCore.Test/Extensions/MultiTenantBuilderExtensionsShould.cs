@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
@@ -618,7 +619,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
 
             Assert.Throws<MultiTenantException>(() => builder.WithPerTenantAuthentication());
         }
@@ -627,7 +628,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddBasePathStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -639,7 +640,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddBasePathStrategyDefaultRebaseFalse()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -654,7 +655,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddBasePathStrategyWithOptions()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
             var sp = services.BuildServiceProvider();
 
@@ -669,7 +670,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddClaimStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithClaimStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -681,7 +682,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddHeaderStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHeaderStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -693,7 +694,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddHostStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHostStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -705,7 +706,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void ThrowIfNullParamAddingHostStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithHostStrategy(null!));
         }
@@ -714,7 +715,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void AddRouteStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithRouteStrategy("routeParam");
             var sp = services.BuildServiceProvider();
 
@@ -726,7 +727,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
         public void ThrowIfNullParamAddingRouteStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithRouteStrategy(null!));
         }

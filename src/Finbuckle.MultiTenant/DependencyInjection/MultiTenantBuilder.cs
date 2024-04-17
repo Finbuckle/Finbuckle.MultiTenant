@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>
     /// Gets or sets the IServiceCollection instance used by the builder.
@@ -21,7 +21,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// Construction a new instance of FinbuckleMultiTenantBuilder.
     /// </summary>
     /// <param name="services">An IServiceCollection instance to be used by the builder.</param>
-    public FinbuckleMultiTenantBuilder(IServiceCollection services)
+    public MultiTenantBuilder(IServiceCollection services)
     {
         Services = services;
     }
@@ -33,7 +33,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     /// <remarks>This is similar to `ConfigureAll` in that it applies to all named and unnamed options of the type.</remarks>
     [Obsolete]
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(
+    public MultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(
         Action<TOptions, TTenantInfo> tenantConfigureOptions) where TOptions : class, new()
     {
         // TODO remove this method
@@ -49,7 +49,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     [Obsolete]
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithPerTenantNamedOptions<TOptions>(string? name,
+    public MultiTenantBuilder<TTenantInfo> WithPerTenantNamedOptions<TOptions>(string? name,
         Action<TOptions, TTenantInfo> tenantConfigureNamedOptions) where TOptions : class, new()
     {
         // TODO remove this method
@@ -73,7 +73,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
         params object[] parameters)
         where TStore : IMultiTenantStore<TTenantInfo>
         => WithStore<TStore>(lifetime, sp => ActivatorUtilities.CreateInstance<TStore>(sp, parameters));
@@ -85,7 +85,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <param name="factory">A delegate that will create and configure the store.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStore> factory)
         where TStore : IMultiTenantStore<TTenantInfo>
     {
@@ -107,7 +107,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         params object[] parameters) where TStrategy : IMultiTenantStrategy
         => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<TStrategy>(sp, parameters));
 
@@ -118,7 +118,7 @@ public class FinbuckleMultiTenantBuilder<TTenantInfo> where TTenantInfo : class,
     /// <param name="factory">A delegate that will create and configure the strategy.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public FinbuckleMultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStrategy> factory)
         where TStrategy : IMultiTenantStrategy
     {

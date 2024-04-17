@@ -1,25 +1,24 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-// ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Finbuckle.MultiTenant.DependencyInjection;
 
 /// <summary>
 /// Provides builder methods for Finbuckle.MultiTenant services and configuration.
 /// </summary>
-public static class FinbuckleMultiTenantBuilderExtensions
+public static class MultiTenantBuilderExtensions
 {
     /// <summary>
     /// Adds a DistributedCacheStore to the application.
     /// </summary>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : class, ITenantInfo, new()
         => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
 
@@ -29,7 +28,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder instance.</param>
     /// <param name="slidingExpiration">The timespan for a cache entry's sliding expiration.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
+    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
         where TTenantInfo : class, ITenantInfo, new()
     {
         var storeParams = slidingExpiration is null ? new object[] { Constants.TenantToken } : new object[] { Constants.TenantToken, slidingExpiration };
@@ -42,7 +41,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder instance.</param>
     /// <param name="endpointTemplate">The endpoint URI template.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder, string endpointTemplate)
+    public static MultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder, string endpointTemplate)
         where TTenantInfo : class, ITenantInfo, new()
         => builder.WithHttpRemoteStore(endpointTemplate, null);
 
@@ -52,7 +51,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// <param name="builder">The builder instance.</param>
     /// <param name="endpointTemplate">The endpoint URI template.</param>
     /// <param name="clientConfig">An action to configure the underlying HttpClient.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+    public static MultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         string endpointTemplate,
         Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : class, ITenantInfo, new()
     {
@@ -68,7 +67,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// Adds a ConfigurationStore to the application. Uses the default IConfiguration and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
     /// </summary>
     /// <param name="builder">The builder instance.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+    public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : class, ITenantInfo, new()
         => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
@@ -78,7 +77,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// <param name="builder">The builder instance.</param>
     /// <param name="configuration">The IConfiguration to load the section from.</param>
     /// <param name="sectionName">The configuration section to load.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+    public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         IConfiguration configuration,
         string sectionName)
         where TTenantInfo : class, ITenantInfo, new()
@@ -88,7 +87,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// Adds an empty InMemoryStore to the application.
     /// </summary>
     /// <param name="builder">The builder instance.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder)
+    public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : class, ITenantInfo, new()
     // ReSharper disable once RedundantTypeArgumentsOfMethod
         => builder.WithInMemoryStore<TTenantInfo>(_ => {});
@@ -97,8 +96,8 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// Adds and configures InMemoryStore to the application using the provided action.
     /// </summary>
     /// <param name="builder">The builder instance.</param>
-    /// <param name="config">A action for configuring the store.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+    /// <param name="config">An action for configuring the store.</param>
+    public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         Action<InMemoryStoreOptions<TTenantInfo>> config)
         where TTenantInfo : class, ITenantInfo, new()
     {
@@ -118,7 +117,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder instance.</param>
     /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+    public static MultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         string identifier)
         where TTenantInfo : class, ITenantInfo, new()
     {
@@ -135,7 +134,7 @@ public static class FinbuckleMultiTenantBuilderExtensions
     /// </summary>
     /// <param name="builder">The builder instance.</param>
     /// <param name="doStrategy">The delegate implementing the strategy.</param>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this FinbuckleMultiTenantBuilder<TTenantInfo> builder,
+    public static MultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         Func<object, Task<string?>> doStrategy)
         where TTenantInfo : class, ITenantInfo, new()
     {
