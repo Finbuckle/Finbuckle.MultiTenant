@@ -26,7 +26,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore<TestStore<TenantInfo>>(lifetime);
 
             var sp = services.BuildServiceProvider();
@@ -60,7 +60,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore<TestStore<TenantInfo>>(lifetime, true);
 
             var sp = services.BuildServiceProvider();
@@ -97,7 +97,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStore(lifetime, _ => new TestStore<TenantInfo>());
 
             var sp = services.BuildServiceProvider();
@@ -128,7 +128,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void ThrowIfNullFactoryAddingCustomStore()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(() =>
                 builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
         }
@@ -140,7 +140,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy<StaticStrategy>(lifetime, "initech");
 
             var sp = services.BuildServiceProvider();
@@ -176,7 +176,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy<StaticStrategy>(lifetime, "id");
 
             var sp = services.BuildServiceProvider();
@@ -210,7 +210,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStrategy(lifetime, _ => new StaticStrategy("id"));
 
             var sp = services.BuildServiceProvider();
@@ -241,7 +241,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void ThrowIfNullFactoryAddingCustomStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(() =>
                 builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null!));
         }

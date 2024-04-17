@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.DependencyInjection;
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
         public void AddEfCoreStore()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
@@ -26,7 +27,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
         public void AddEfCoreStoreWithExistingDbContext()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             services.AddDbContext<TestEfCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
             builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;

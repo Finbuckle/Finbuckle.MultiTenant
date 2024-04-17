@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.DependencyInjection;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             services.AddDistributedMemoryCache();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithDistributedCacheStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
@@ -30,7 +31,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         {
             var services = new ServiceCollection();
             services.AddDistributedMemoryCache();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithDistributedCacheStore(TimeSpan.FromMinutes(5));
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
@@ -41,7 +42,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHttpRemoteStore("http://example.com");
             var sp = services.BuildServiceProvider();
 
@@ -54,7 +55,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddHttpRemoteStoreWithHttpClientBuilders()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             var flag = false;
             builder.WithHttpRemoteStore("http://example.com", _ => flag = true);
             var sp = services.BuildServiceProvider();
@@ -73,7 +74,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             var configuration = configBuilder.Build();
 
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithConfigurationStore();
             services.AddSingleton<IConfiguration>(configuration);
             var sp = services.BuildServiceProvider();
@@ -103,7 +104,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
             IConfiguration configuration = configBuilder.Build();
 
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
 
             // Non-default section name.
             configuration = configuration.GetSection("Finbuckle");
@@ -131,7 +132,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void ThrowIfNullParamAddingInMemoryStore()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(()
                 => builder.WithInMemoryStore(null!));
         }
@@ -140,7 +141,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddInMemoryStoreWithCaseSensitivity()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithInMemoryStore(options =>
             {
                 options.IsCaseSensitive = true;
@@ -166,7 +167,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddDelegateStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithDelegateStrategy(_ => Task.FromResult<string?>("Hi"));
             var sp = services.BuildServiceProvider();
 
@@ -178,7 +179,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void AddStaticStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStaticStrategy("initech");
             var sp = services.BuildServiceProvider();
 
@@ -190,7 +191,7 @@ namespace Finbuckle.MultiTenant.Test.DependencyInjection
         public void ThrowIfNullParamAddingStaticStrategy()
         {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentNullException>(()
                 => builder.WithStaticStrategy(null!));
         }

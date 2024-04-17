@@ -23,7 +23,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
+    public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions> config)
         where TTenantInfo : class, ITenantInfo, new()
     {
@@ -42,7 +42,7 @@ public static class FinbuckleServiceCollectionExtensions
         services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
 
-        return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
+        return new MultiTenantBuilder<TTenantInfo>(services);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
     /// <returns>An new instance of MultiTenantBuilder.</returns>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+    public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
         where TTenantInfo : class, ITenantInfo, new()
     {
         return services.AddMultiTenant<TTenantInfo>(_ => { });
