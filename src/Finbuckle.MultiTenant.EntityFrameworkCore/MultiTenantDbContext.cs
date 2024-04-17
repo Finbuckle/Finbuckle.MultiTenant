@@ -3,49 +3,71 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+
+/// <summary>
+/// A database context that enforces tenant integrity on multi-tenant entity types.
+/// </summary>
+public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
-    /// <summary>
-    /// A database context that enforces tenant integrity on entity types
-    /// marked with the MultiTenant annotation or attribute.
-    /// </summary>
-    public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
+    /// <inheritdoc />
+    public ITenantInfo? TenantInfo { get; internal set; }
+
+    /// <inheritdoc />
+    public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+    /// <inheritdoc />
+    public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+    protected MultiTenantDbContext(ITenantInfo? tenantInfo)
     {
-        public ITenantInfo TenantInfo { get; internal set; }
+        TenantInfo = tenantInfo;
+    }
 
-        public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+    /// <summary>
+    /// Constructs the database context instance and binds to the current tenant.
+    /// </summary>
+    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
+    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
+    {
+        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+    }
 
-        public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+    protected MultiTenantDbContext(ITenantInfo? tenantInfo, DbContextOptions options) : base(options)
+    {
+        TenantInfo = tenantInfo;
+    }
 
-        protected MultiTenantDbContext(ITenantInfo tenantInfo)
-        {
-            this.TenantInfo = tenantInfo;
-        }
+    /// <summary>
+    /// Constructs the database context instance and binds to the current tenant.
+    /// </summary>
+    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
+    /// <param name="options">The database options instance.</param>
+    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
+    {
+        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+    }
 
-        protected MultiTenantDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
-        {
-            this.TenantInfo = tenantInfo;
-        }
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ConfigureMultiTenant();
+    }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ConfigureMultiTenant();
-        }
+    /// <inheritdoc />
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        this.EnforceMultiTenant();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
 
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            this.EnforceMultiTenant();
-            return base.SaveChanges(acceptAllChangesOnSuccess);
-        }
-
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            this.EnforceMultiTenant();
-            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        }
+    /// <inheritdoc />
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default(CancellationToken))
+    {
+        this.EnforceMultiTenant();
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 }

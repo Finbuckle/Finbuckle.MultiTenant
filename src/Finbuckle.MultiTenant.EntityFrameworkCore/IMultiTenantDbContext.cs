@@ -5,7 +5,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 {
     public interface IMultiTenantDbContext
     {
-        ITenantInfo TenantInfo { get; }
+        ITenantInfo? TenantInfo { get; }
         TenantMismatchMode TenantMismatchMode { get; }
         TenantNotSetMode TenantNotSetMode { get; }
     }
