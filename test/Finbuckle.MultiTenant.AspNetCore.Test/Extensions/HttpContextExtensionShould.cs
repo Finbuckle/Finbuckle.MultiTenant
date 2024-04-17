@@ -3,19 +3,18 @@
 
 using System;
 using System.Collections.Generic;
-using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions;
+
+public class HttpContextExtensionShould
 {
-    public class HttpContextExtensionShould
+    [Fact]
+    public void GetExistingMultiTenantContext()
     {
-        [Fact]
-        public void GetExistingMultiTenantContext()
-        {
             var ti = new TenantInfo { Id = "test" };
             var mtc = new MultiTenantContext<TenantInfo>
             {
@@ -34,9 +33,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Same(mtc, returnedMtc);
         }
         
-        [Fact]
-        public void GetEmptyMultiTenantContextIfNoneSet()
-        {
+    [Fact]
+    public void GetEmptyMultiTenantContextIfNoneSet()
+    {
             var httpContextMock = new Mock<HttpContext>();
             var itemsDict = new Dictionary<object, object?>();
             httpContextMock.Setup(c => c.Items).Returns(itemsDict);
@@ -49,9 +48,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Null(returnedMtc.StrategyInfo);
         }
         
-        [Fact]
-        public void ReturnTenantInfo()
-        {
+    [Fact]
+    public void ReturnTenantInfo()
+    {
             var ti = new TenantInfo { Id = "test" };
             var mtc = new MultiTenantContext<TenantInfo>
             {
@@ -70,9 +69,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Same(ti, returnedTi);
         }
 
-        [Fact]
-        public void ReturnNullTenantInfoIfNoTenantInfo()
-        {
+    [Fact]
+    public void ReturnNullTenantInfoIfNoTenantInfo()
+    {
             var httpContextMock = new Mock<HttpContext>();
             var itemsDict = new Dictionary<object, object?>();
             httpContextMock.Setup(c => c.Items).Returns(itemsDict);
@@ -82,9 +81,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Null(returnedTi);
         }
 
-        [Fact]
-        public void SetTenantInfo()
-        {
+    [Fact]
+    public void SetTenantInfo()
+    {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>();
             var sp = services.BuildServiceProvider();
@@ -102,9 +101,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Same(ti2, ti);
         }
 
-        [Fact]
-        public void SetMultiTenantContextAccessor()
-        {
+    [Fact]
+    public void SetMultiTenantContextAccessor()
+    {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>();
             var sp = services.BuildServiceProvider();
@@ -123,9 +122,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Same(mtc, accessor.MultiTenantContext);
         }
 
-        [Fact]
-        public void SetStoreInfoAndStrategyInfoNull()
-        {
+    [Fact]
+    public void SetStoreInfoAndStrategyInfoNull()
+    {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>();
             var sp = services.BuildServiceProvider();
@@ -144,9 +143,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Null(mtc.StrategyInfo);
         }
 
-        [Fact]
-        public void ResetScopeIfApplicable()
-        {
+    [Fact]
+    public void ResetScopeIfApplicable()
+    {
             var httpContextMock = new Mock<HttpContext>();
 
             httpContextMock.SetupProperty(c => c.RequestServices);
@@ -167,9 +166,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 (DateTime?)httpContextMock.Object.RequestServices.GetService<object>());
         }
 
-        [Fact]
-        public void NotResetScopeIfNotApplicable()
-        {
+    [Fact]
+    public void NotResetScopeIfNotApplicable()
+    {
             var httpContextMock = new Mock<HttpContext>();
 
             httpContextMock.SetupProperty(c => c.RequestServices);
@@ -189,5 +188,4 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.StrictEqual((DateTime?)sp.GetService<object>(),
                 (DateTime?)httpContextMock.Object.RequestServices.GetService<object>());
         }
-    }
 }

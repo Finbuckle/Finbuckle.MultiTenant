@@ -3,17 +3,17 @@
 
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+
+public static class EntityTypeExtensions
 {
-    public static class EntityTypeExtensions
+    /// <summary>
+    /// Whether or not the <see cref="IEntityType"/> is configured as MultiTenant.
+    /// </summary>
+    /// <param name="entityType">The entity type to test for MultiTenant configuration.</param>
+    /// <returns>Returns true if the entity type has MultiTenant configuration, false if not.</returns>
+    public static bool IsMultiTenant(this IMutableEntityType? entityType)
     {
-        /// <summary>
-        /// Whether or not the <see cref="IEntityType"/> is configured as MultiTenant.
-        /// </summary>
-        /// <param name="entityType">The entity type to test for MultiTenant configuration.</param>
-        /// <returns>Returns true if the entity type has MultiTenant configuration, false if not.</returns>
-        public static bool IsMultiTenant(this IMutableEntityType? entityType)
-        {
             while (entityType != null)
             {
                 var hasMultiTenantAnnotation = (bool?) entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
@@ -25,8 +25,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return false;
         }
 
-        public static bool IsMultiTenant(this IEntityType? entityType)
-        {
+    public static bool IsMultiTenant(this IEntityType? entityType)
+    {
             while (entityType != null)
             {
                 var hasMultiTenantAnnotation = (bool?) entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
@@ -37,5 +37,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return false;
         }
-    }
 }

@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test
+namespace Finbuckle.MultiTenant.AspNetCore.Test;
+
+public class MultiTenantAuthenticationSchemeProviderShould
 {
-    public class MultiTenantAuthenticationSchemeProviderShould
+    [Fact]
+    public async Task ReturnPerTenantAuthenticationOptions()
     {
-        [Fact]
-        public async Task ReturnPerTenantAuthenticationOptions()
-        {
             var services = new ServiceCollection();
             services.AddAuthentication()
                 .AddCookie("tenant1Scheme")
@@ -58,5 +58,4 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test
             Assert.NotNull(option);
             Assert.Equal("tenant2Scheme", option.Name);
         }
-    }
 }

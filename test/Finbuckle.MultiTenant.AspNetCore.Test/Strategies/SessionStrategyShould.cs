@@ -12,12 +12,12 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies;
+
+public class SessionStrategyShould
 {
-    public class SessionStrategyShould
+    private static IWebHostBuilder GetTestHostBuilder(string identifier, string sessionKey)
     {
-        private static IWebHostBuilder GetTestHostBuilder(string identifier, string sessionKey)
-        {
             return new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
@@ -52,18 +52,18 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
                 });
         }
 
-        [Fact]
-        public async void ThrowIfContextIsNotHttpContext()
-        {
+    [Fact]
+    public async void ThrowIfContextIsNotHttpContext()
+    {
             var context = new Object();
             var strategy = new SessionStrategy("__tenant__");
 
             await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
         }
 
-        [Fact]
-        public async Task ReturnNullIfNoSessionValue()
-        {
+    [Fact]
+    public async Task ReturnNullIfNoSessionValue()
+    {
             var hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
 
             using (var server = new TestServer(hostBuilder))
@@ -74,9 +74,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
             }
         }
 
-        // TODO: Figure out how to test this
-        // public async Task ReturnIdentifierIfSessionValue()
-        // {
-        // }
-    }
+    // TODO: Figure out how to test this
+    // public async Task ReturnIdentifierIfSessionValue()
+    // {
+    // }
 }

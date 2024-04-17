@@ -7,28 +7,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 
-namespace Finbuckle.MultiTenant.AspNetCore
-{
-    internal class MultiTenantRouteBuilder : IRouteBuilder
-    {
-        private readonly IServiceProvider serviceProvider;
-        private IRouter defaultHandler = new RouteHandler(_ => Task.CompletedTask);
+namespace Finbuckle.MultiTenant.AspNetCore;
 
-        public MultiTenantRouteBuilder(IServiceProvider serviceProvider)
-        {
+internal class MultiTenantRouteBuilder : IRouteBuilder
+{
+    private readonly IServiceProvider serviceProvider;
+    private IRouter defaultHandler = new RouteHandler(_ => Task.CompletedTask);
+
+    public MultiTenantRouteBuilder(IServiceProvider serviceProvider)
+    {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public IApplicationBuilder ApplicationBuilder => throw new NotImplementedException();
+    public IApplicationBuilder ApplicationBuilder => throw new NotImplementedException();
 
-        public IRouter? DefaultHandler { get => defaultHandler; set => throw new NotImplementedException(); }
+    public IRouter? DefaultHandler { get => defaultHandler; set => throw new NotImplementedException(); }
 
-        public IServiceProvider ServiceProvider => serviceProvider;
+    public IServiceProvider ServiceProvider => serviceProvider;
 
-        public IList<IRouter> Routes { get; } = new List<IRouter>();
+    public IList<IRouter> Routes { get; } = new List<IRouter>();
 
-        public IRouter Build()
-        {
+    public IRouter Build()
+    {
             var routeCollection = new RouteCollection();
 
             foreach (var route in Routes)
@@ -38,5 +38,4 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             return routeCollection;
         }
-    }
 }

@@ -7,13 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions;
+
+public class MultiTenantBuilderExtensionsShould
 {
-    public class MultiTenantBuilderExtensionsShould
+    [Fact]
+    public void AddEfCoreStore()
     {
-        [Fact]
-        public void AddEfCoreStore()
-        {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
@@ -23,9 +23,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
             Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
         }
 
-        [Fact]
-        public void AddEfCoreStoreWithExistingDbContext()
-        {
+    [Fact]
+    public void AddEfCoreStoreWithExistingDbContext()
+    {
             var services = new ServiceCollection();
             var builder = new MultiTenantBuilder<TenantInfo>(services);
             services.AddDbContext<TestEfCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
@@ -35,5 +35,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
             var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
             Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
         }
-    }
 }

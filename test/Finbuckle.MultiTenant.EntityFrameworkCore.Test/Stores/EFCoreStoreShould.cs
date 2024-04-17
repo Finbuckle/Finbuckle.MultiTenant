@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Test.Stores;
 using Microsoft.Data.Sqlite;
@@ -10,27 +11,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores;
+
+public class EfCoreStoreShould
+    : MultiTenantStoreTestBase, IDisposable
 {
-    public class EfCoreStoreShould
-        : MultiTenantStoreTestBase, IDisposable
+    public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
     {
-        public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+        public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
         {
-            public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
-            {
             }
-        }
+    }
 
-        private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
+    private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
 
-        public void Dispose()
-        {
+    public void Dispose()
+    {
             _connection.Dispose();
         }
 
-        private IProperty? GetModelProperty(string propName)
-        {
+    private IProperty? GetModelProperty(string propName)
+    {
             _connection.Open();
             var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
             var dbContext = new TestEfCoreStoreDbContext(options);
@@ -40,8 +41,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
             return prop;
         }
 
-        protected override IMultiTenantStore<TenantInfo> CreateTestStore()
-        {
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    {
             _connection.Open();
             var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
             var dbContext = new TestEfCoreStoreDbContext(options);
@@ -51,66 +52,66 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
             return PopulateTestStore(store);
         }
 
-        // ReSharper disable once RedundantOverriddenMember
-        protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
-        {
+    // ReSharper disable once RedundantOverriddenMember
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    {
             return base.PopulateTestStore(store);
         }
 
-        [Fact]
-        public void AddTenantIdLengthConstraint()
-        {
+    [Fact]
+    public void AddTenantIdLengthConstraint()
+    {
             var prop = GetModelProperty("Id");
             Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
         }
 
-        [Fact]
-        public void AddTenantIdAsKey()
-        {
+    [Fact]
+    public void AddTenantIdAsKey()
+    {
             var prop = GetModelProperty("Id");
             Assert.True(prop!.IsPrimaryKey());
         }
 
-        [Fact]
-        public void AddIdentifierUniqueConstraint()
-        {
+    [Fact]
+    public void AddIdentifierUniqueConstraint()
+    {
             var prop = GetModelProperty("Identifier");
             Assert.True(prop!.IsIndex());
         }
         
-        [Fact]
-        public void NotTrackContextOnGet()
-        {
+    [Fact]
+    public async Task NotTrackContextOnGet()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = store.TryGetAsync("initech-id").Result;
+            var tenant = await store.TryGetAsync("initech-id");
             
             var entity = store.dbContext.Entry(tenant!);
             Assert.Equal(EntityState.Detached, entity.State);
         }
         
-        [Fact]
-        public void NotTrackContextOnGetByIdentifier()
-        {
+    [Fact]
+    public async Task NotTrackContextOnGetByIdentifier()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            var tenant = await store.TryGetByIdentifierAsync("initech");
             
             var entity = store.dbContext.Entry(tenant!);
             Assert.Equal(EntityState.Detached, entity.State);
         }
         
-        [Fact]
-        public void NotTrackContextOnGetAll()
-        {
+    [Fact]
+    public async Task NotTrackContextOnGetAll()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = store.GetAllAsync().Result.First();
+            var tenant = (await store.GetAllAsync()).First();
             
             var entity = store.dbContext.Entry(tenant);
             Assert.Equal(EntityState.Detached, entity.State);
         }
         
-        [Fact]
-        public void NotTrackContextOnAdd()
-        {
+    [Fact]
+    public async Task NotTrackContextOnAdd()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
             var tenant = new TenantInfo
             {
@@ -118,84 +119,83 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores
                 Identifier = "test-identifier",
                 Name = "test"
             };
-            store.TryAddAsync(tenant).Wait();
+            await store.TryAddAsync(tenant);
             
             var entity = store.dbContext.Entry(tenant);
             Assert.Equal(EntityState.Detached, entity.State);
         }
         
-        [Fact]
-        public void NotTrackContextOnUpdate()
-        {
+    [Fact]
+    public async Task NotTrackContextOnUpdate()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            var tenant = await store.TryGetByIdentifierAsync("initech");
             tenant!.Name = "new name";
-            store.TryUpdateAsync(tenant).Wait();
+            await store.TryUpdateAsync(tenant);
             
             var entity = store.dbContext.Entry(tenant);
             Assert.Equal(EntityState.Detached, entity.State);
         }
         
-        [Fact]
-        public void NotTrackContextOnRemove()
-        {
+    [Fact]
+    public async Task NotTrackContextOnRemove()
+    {
             var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = store.TryGetByIdentifierAsync("initech").Result;
+            var tenant = await store.TryGetByIdentifierAsync("initech");
             tenant!.Name = "new name";
-            store.TryRemoveAsync(tenant.Id!).Wait();
+            await store.TryRemoveAsync(tenant.Id!);
             
             var entity = store.dbContext.Entry(tenant);
             Assert.Equal(EntityState.Detached, entity.State);
         }
 
-        // Basic store functionality tested in MultiTenantStoresShould.cs
+    // Basic store functionality tested in MultiTenantStoresShould.cs
 
-        [Fact]
-        public override void GetTenantInfoFromStoreById()
-        {
+    [Fact]
+    public override void GetTenantInfoFromStoreById()
+    {
             base.GetTenantInfoFromStoreById();
         }
 
-        [Fact]
-        public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
-        {
+    [Fact]
+    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    {
             base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
         }
 
-        [Fact]
-        public override void GetTenantInfoFromStoreByIdentifier()
-        {
+    [Fact]
+    public override void GetTenantInfoFromStoreByIdentifier()
+    {
             base.GetTenantInfoFromStoreByIdentifier();
         }
 
-        [Fact]
-        public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
-        {
+    [Fact]
+    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    {
             base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
         }
 
-        [Fact]
-        public override void AddTenantInfoToStore()
-        {
+    [Fact]
+    public override void AddTenantInfoToStore()
+    {
             base.AddTenantInfoToStore();
         }
 
-        [Fact]
-        public override void RemoveTenantInfoFromStore()
-        {
+    [Fact]
+    public override void RemoveTenantInfoFromStore()
+    {
             base.RemoveTenantInfoFromStore();
         }
 
-        [Fact]
-        public override void UpdateTenantInfoInStore()
-        {
+    [Fact]
+    public override void UpdateTenantInfoInStore()
+    {
             base.UpdateTenantInfoInStore();
         }
 
-        [Fact]
-        public override void GetAllTenantsFromStoreAsync()
-        {
+    [Fact]
+    public override void GetAllTenantsFromStoreAsync()
+    {
             base.GetAllTenantsFromStoreAsync();
         }
-    }
 }

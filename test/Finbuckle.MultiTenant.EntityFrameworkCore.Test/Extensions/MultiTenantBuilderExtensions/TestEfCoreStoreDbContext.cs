@@ -4,12 +4,11 @@
 using Finbuckle.MultiTenant.Stores;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions;
+
+public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
 {
-    public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+    public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-        public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
-        {
         }
-    }
 }

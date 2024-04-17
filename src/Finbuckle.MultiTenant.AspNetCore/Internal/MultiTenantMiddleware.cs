@@ -6,22 +6,22 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Finbuckle.MultiTenant.AspNetCore
-{
-    /// <summary>
-    /// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
-    /// </summary>
-    internal class MultiTenantMiddleware
-    {
-        private readonly RequestDelegate next;
+namespace Finbuckle.MultiTenant.AspNetCore;
 
-        public MultiTenantMiddleware(RequestDelegate next)
-        {
+/// <summary>
+/// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
+/// </summary>
+internal class MultiTenantMiddleware
+{
+    private readonly RequestDelegate next;
+
+    public MultiTenantMiddleware(RequestDelegate next)
+    {
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context)
-        {
+    public async Task Invoke(HttpContext context)
+    {
             var mtcAccessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
             var mtcSetter = context.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
             
@@ -33,5 +33,4 @@ namespace Finbuckle.MultiTenant.AspNetCore
 
             await next(context);
         }
-    }
 }

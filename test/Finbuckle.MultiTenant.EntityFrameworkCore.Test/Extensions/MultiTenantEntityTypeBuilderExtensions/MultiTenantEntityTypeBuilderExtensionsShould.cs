@@ -7,12 +7,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantEntityTypeBuilderExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantEntityTypeBuilderExtensions;
+
+public class MultiTenantEntityTypeBuilderExtensionsShould
 {
-    public class MultiTenantEntityTypeBuilderExtensionsShould
+    private TestDbContext GetDbContext(Action<ModelBuilder> config)
     {
-        private TestDbContext GetDbContext(Action<ModelBuilder> config)
-        {
             var options = new DbContextOptionsBuilder()
                           .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>()
                           .Options;
@@ -20,9 +20,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
             return db;
         }
 
-        [Fact]
-        public void AdjustUniqueIndexesOnAdjustUniqueIndexes()
-        {
+    [Fact]
+    public void AdjustUniqueIndexesOnAdjustUniqueIndexes()
+    {
             using var db = GetDbContext(builder =>
             {
                 builder.Entity<Blog>()
@@ -43,9 +43,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
             }
         }
 
-        [Fact]
-        public void NotAdjustNonUniqueIndexesOnAdjustUniqueIndexes()
-        {
+    [Fact]
+    public void NotAdjustNonUniqueIndexesOnAdjustUniqueIndexes()
+    {
             using var db = GetDbContext(builder =>
             {
                 builder.Entity<Blog>()
@@ -65,9 +65,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
             }
         }
 
-        [Fact]
-        public void AdjustAllIndexesOnAdjustIndexes()
-        {
+    [Fact]
+    public void AdjustAllIndexesOnAdjustIndexes()
+    {
             using var db = GetDbContext(builder =>
             {
                 builder.Entity<Blog>()
@@ -86,5 +86,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantE
                 Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
             }
         }
-    }
 }

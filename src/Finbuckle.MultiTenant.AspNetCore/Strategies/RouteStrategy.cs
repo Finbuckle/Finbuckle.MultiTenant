@@ -5,14 +5,14 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies
-{
-    public class RouteStrategy : IMultiTenantStrategy
-    {
-        internal readonly string tenantParam;
+namespace Finbuckle.MultiTenant.Strategies;
 
-        public RouteStrategy(string tenantParam)
-        {
+public class RouteStrategy : IMultiTenantStrategy
+{
+    internal readonly string tenantParam;
+
+    public RouteStrategy(string tenantParam)
+    {
             if (string.IsNullOrWhiteSpace(tenantParam))
             {
                 throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam));
@@ -21,8 +21,8 @@ namespace Finbuckle.MultiTenant.Strategies
             this.tenantParam = tenantParam;
         }
 
-        public Task<string?> GetIdentifierAsync(object context)
-        {
+    public Task<string?> GetIdentifierAsync(object context)
+    {
 
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
@@ -33,7 +33,6 @@ namespace Finbuckle.MultiTenant.Strategies
 
             return Task.FromResult(identifier as string);
         }
-    }
 }
 
 // #endif

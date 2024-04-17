@@ -13,14 +13,12 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Xunit;
 
 // ReSharper disable once CheckNamespace
-namespace MultiTenantEntityTypeBuilderShould
+namespace MultiTenantEntityTypeBuilderShould;
+
+public class MultiTenantEntityTypeBuilderShould
 {
-
-
-    public class MultiTenantEntityTypeBuilderShould
+    private TestDbContext GetDbContext(Action<ModelBuilder> config)
     {
-        private TestDbContext GetDbContext(Action<ModelBuilder> config)
-        {
             var connection = new SqliteConnection("DataSource=:memory:");
             var options = new DbContextOptionsBuilder().UseSqlite(connection)
                                                        .ReplaceService<IModelCacheKeyFactory,
@@ -30,9 +28,9 @@ namespace MultiTenantEntityTypeBuilderShould
             return new TestDbContext(config, options);
         }
 
-        [Fact]
-        public void AdjustIndexOnAdjustIndex()
-        {
+    [Fact]
+    public void AdjustIndexOnAdjustIndex()
+    {
             IMutableIndex? origIndex = null;
 
             using var db = GetDbContext(builder =>
@@ -47,9 +45,9 @@ namespace MultiTenantEntityTypeBuilderShould
             Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
         }
 
-        [Fact]
-        public void PreserveIndexNameOnAdjustIndex()
-        {
+    [Fact]
+    public void PreserveIndexNameOnAdjustIndex()
+    {
             IMutableIndex? origIndex = null;
 
             using var db = GetDbContext(builder =>
@@ -66,9 +64,9 @@ namespace MultiTenantEntityTypeBuilderShould
             Assert.Equal("CustomIndexDbName", index.GetDatabaseName());
         }
 
-        [Fact]
-        public void PreserveIndexUniquenessOnAdjustIndex()
-        {
+    [Fact]
+    public void PreserveIndexUniquenessOnAdjustIndex()
+    {
             using var db = GetDbContext(builder =>
             {
                 builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique();
@@ -89,9 +87,9 @@ namespace MultiTenantEntityTypeBuilderShould
             }
         }
         
-        [Fact]
-        public void PreserveIndexFilterOnAdjustIndex()
-        {
+    [Fact]
+    public void PreserveIndexFilterOnAdjustIndex()
+    {
             using var db = GetDbContext(builder =>
             {
                 var index = builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique().HasFilter("some filter").Metadata;
@@ -104,9 +102,9 @@ namespace MultiTenantEntityTypeBuilderShould
             Assert.Equal("some filter", index!.GetFilter());
         }
 
-        [Fact]
-        public void AdjustPrimaryKeyOnAdjustKey()
-        {
+    [Fact]
+    public void AdjustPrimaryKeyOnAdjustKey()
+    {
             using var db = GetDbContext(builder =>
             {
                 var key = builder.Entity<Post>().Metadata.GetKeys().First();
@@ -122,9 +120,9 @@ namespace MultiTenantEntityTypeBuilderShould
             }
         }
 
-        [Fact]
-        public void AdjustDependentForeignKeyOnAdjustPrimaryKey()
-        {
+    [Fact]
+    public void AdjustDependentForeignKeyOnAdjustPrimaryKey()
+    {
             using var db = GetDbContext(builder =>
             {
                 var key = builder.Entity<Blog>().Metadata.GetKeys().First();
@@ -141,9 +139,9 @@ namespace MultiTenantEntityTypeBuilderShould
             }
         }
 
-        [Fact]
-        public void AdjustAlternateKeyOnAdjustKey()
-        {
+    [Fact]
+    public void AdjustAlternateKeyOnAdjustKey()
+    {
             using var db = GetDbContext(builder =>
             {
                 var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
@@ -159,9 +157,9 @@ namespace MultiTenantEntityTypeBuilderShould
             }
         }
 
-        [Fact]
-        public void AdjustDependentForeignKeyOnAdjustAlternateKey()
-        {
+    [Fact]
+    public void AdjustDependentForeignKeyOnAdjustAlternateKey()
+    {
             using var db = GetDbContext(builder =>
             {
                 var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
@@ -181,5 +179,4 @@ namespace MultiTenantEntityTypeBuilderShould
                 Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
             }
         }
-    }
 }

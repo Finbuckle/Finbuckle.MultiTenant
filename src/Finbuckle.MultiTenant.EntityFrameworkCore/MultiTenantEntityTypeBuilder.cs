@@ -1,32 +1,30 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+
+public class MultiTenantEntityTypeBuilder
 {
-    public class MultiTenantEntityTypeBuilder
-    {
-        public EntityTypeBuilder Builder { get; }
+    public EntityTypeBuilder Builder { get; }
 
-        public MultiTenantEntityTypeBuilder(EntityTypeBuilder builder)
-        {
+    public MultiTenantEntityTypeBuilder(EntityTypeBuilder builder)
+    {
             Builder = builder;
         }
 
-        /// <summary>
-        /// Adds TenantId to the index.
-        /// </summary>
-        /// <param name="index">The index to adjust for TenantId.</param>
-        /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
-        public MultiTenantEntityTypeBuilder AdjustIndex(IMutableIndex index)
-        {
+    /// <summary>
+    /// Adds TenantId to the index.
+    /// </summary>
+    /// <param name="index">The index to adjust for TenantId.</param>
+    /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
+    public MultiTenantEntityTypeBuilder AdjustIndex(IMutableIndex index)
+    {
             // set the new unique index with TenantId preserving name and database name
             IndexBuilder indexBuilder;
             Builder.Metadata.RemoveIndex(index);
@@ -49,14 +47,14 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             return this;
         }
 
-        /// <summary>
-        /// Adds TenantId to the key and adds the TenantId property to any dependent types' foreign keys.
-        /// </summary>
-        /// <param name="key">The key to adjust for TenantId.</param>
-        /// <param name="modelBuilder">The modelBuilder for the DbContext.</param>
-        /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
-        public MultiTenantEntityTypeBuilder AdjustKey(IMutableKey key, ModelBuilder modelBuilder)
-        {
+    /// <summary>
+    /// Adds TenantId to the key and adds the TenantId property to any dependent types' foreign keys.
+    /// </summary>
+    /// <param name="key">The key to adjust for TenantId.</param>
+    /// <param name="modelBuilder">The modelBuilder for the DbContext.</param>
+    /// <returns>The MultiTenantEntityTypeBuilder&lt;T&gt; instance.</returns>
+    public MultiTenantEntityTypeBuilder AdjustKey(IMutableKey key, ModelBuilder modelBuilder)
+    {
             var prop = Builder.Metadata.GetProperty("TenantId");
             var props = key.Properties.Append(prop).ToImmutableList();
             var foreignKeys = key.GetReferencingForeignKeys().ToArray();
@@ -75,5 +73,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return this;
         }
-    }
 }
