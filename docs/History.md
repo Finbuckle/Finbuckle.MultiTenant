@@ -1,6 +1,33 @@
 # Version History
 
 <!--_history-->
+## [7.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.1...v7.0.0) (2024-04-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* Many namespaces have been updated for consistency. Most code will only need to reference the `Finbuckle.MultiTenant` namespace.
+* Connection string is removed because in many cases it is not needed. Closes #624
+* all unique indexes and the UserLogin primary key in the standard Identity models are adjusted to include the tenant id
+* (I)MultiTenantContext and (I)TenantInfo are no longer available via DI. Use IMultiTenantContextAccessor instead. Also IMultiTenantContext nullability reworked and should never be null.
+* WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
+
+Added support for `OptionsBuilder` API and more efficient per-tenant options overall.
+
+### Features
+
+* better options support ([#681](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/681)) ([1859017](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/185901786f2225eb38b3609770c60b98fdcbc122))
+* change default MultiTenantIdentityDbContext default index and key behavior ([81f5612](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/81f5612008c3335192d9b26beb22be9a28beca8b))
+* MultiTenantDbContext and MultiTenantIdentityDbContext support for IMultiTenantContextAccessor DI ([9015085](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/901508563af4fa872a0dc3930ff3b8315777b912))
+* namespace cleaned up ([b354838](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b354838a90741626c47ea4f109c49f7fe2ca5b3d))
+* refactor DI and improve nullability ([eca24bf](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/eca24bfa0c314f95794b235141cff42059cf3fcf))
+* remove ConnectionString from ITenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
+
+
+### Bug Fixes
+
+* AdjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
+
 ## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
 
 
@@ -242,7 +269,7 @@
 - .NET 5.0 support.
 - New `DistributedCacheStore` uses the ASP.NET Core distributed cache for tenant resolution.
 - New `HeaderStrategy` uses HTTP headers for tenant resolution. Thanks to ****!
-- Support for inheritance in multi-tenant Entity Framework Core entity. Thanks to ****!
+- Support for inheritance in multitenant Entity Framework Core entity. Thanks to ****!
 - Fixed a conflict between ClaimStrategy and per-tenant authentication.
 - Updated docs, samples, and unit tests.
 
@@ -295,7 +322,7 @@
 ### Changes
 
 - Added support for ASP.NET Core 3.1.
-- Major refactor of how Entity Framework multi-tenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multi-tenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
+- Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
 - Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
 - Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
 - Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
@@ -314,7 +341,7 @@
 - Added support for ASP.NET Core 3! Valid project targets are `netcoreapp3.0`, `netcoreapp2.0`, and `netcoreapp2.1`.
 - Added a sample app for ASP.NET 3 highlighting the route strategy improvements due to the endpoint routing mechanism.
 - Fixed a bug where route strategy could throw an exception when used with Razor Pages. Thanks -services!
-- Support for configuring multiple multi-tenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
+- Support for configuring multiple multitenant strategies. Each will be tried in the order configured until a non-null tenant identifier is returned. The exception is the fallback strategy which always goes last.
 - Refactored component assemblies for better dependency control. EFCore can be excluded by referencing `Finbuckle.MultiTenant.AspNetCore` instead of `Finbuckle.MultiTenant`.
 - Updated documentation.
 - Updated unit tests to check against all valid project targets.
@@ -365,7 +392,7 @@
 
 ### Changes
 
-- Fixed bug in Identity where `UserLogins` primary key was not adjusted for multi-tenant usage.
+- Fixed bug in Identity where `UserLogins` primary key was not adjusted for multitenant usage.
 - Updated and Fixed the IdentityDataIsolation sample project.
 - General code and test cleanup.
 
