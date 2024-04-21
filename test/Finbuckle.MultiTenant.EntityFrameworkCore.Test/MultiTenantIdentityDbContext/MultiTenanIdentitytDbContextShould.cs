@@ -30,8 +30,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContext(tenant1);
 
@@ -52,8 +51,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContext(tenant1);
 
@@ -78,8 +76,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContext(tenant1);
 
@@ -104,8 +101,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContext(tenant1);
 
@@ -126,8 +122,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContextTUser(tenant1);
 
@@ -148,8 +143,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContextTUserTRole(tenant1);
 
@@ -170,8 +164,7 @@ public class MultiTenantIdentityDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         using var c = new TestIdentityDbContextAll(tenant1);
 

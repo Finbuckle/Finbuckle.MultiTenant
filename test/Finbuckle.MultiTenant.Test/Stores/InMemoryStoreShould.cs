@@ -91,8 +91,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db" });
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db" });
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
         });
         var sp = services.BuildServiceProvider();
 
@@ -112,7 +112,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo { Id = id, Identifier = identifier, Name = "LOL", ConnectionString = "Datasource=lol.db" });
+            options.Tenants.Add(new TenantInfo { Id = id, Identifier = identifier, Name = "LOL"});
         });
         var sp = services.BuildServiceProvider();
 

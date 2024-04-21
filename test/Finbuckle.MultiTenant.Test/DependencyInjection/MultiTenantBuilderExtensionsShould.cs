@@ -84,14 +84,11 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
-        // Note: connection string below loading from default in json.
-        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         tc = await store.TryGetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
     }
 
     [Fact]
@@ -116,14 +113,11 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
-        // Note: connection string below loading from default in json.
-        Assert.Equal("Datasource=sample.db", tc.ConnectionString);
 
         tc = await store.TryGetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
     }
 
     [Fact]
@@ -143,7 +137,7 @@ public class MultiTenantBuilderExtensionsShould
         builder.WithInMemoryStore(options =>
         {
             options.IsCaseSensitive = true;
-            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL", ConnectionString = "Datasource=lol.db"});
+            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL"});
         });
         var sp = services.BuildServiceProvider();
 
@@ -154,7 +148,6 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
-        Assert.Equal("Datasource=lol.db", tc.ConnectionString);
 
         // Case sensitive test.
         tc = await store.TryGetByIdentifierAsync("LOL");

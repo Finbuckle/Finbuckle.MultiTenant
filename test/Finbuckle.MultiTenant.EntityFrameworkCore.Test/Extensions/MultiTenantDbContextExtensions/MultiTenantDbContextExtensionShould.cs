@@ -32,8 +32,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=TestDb.db"
+                    Name = "abc"
                 };
 
                 // TenantNotSetMode.Throw, should act as Overwrite when adding
@@ -78,8 +77,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=testDb.db"
+                    Name = "abc"
                 };
 
                 // TenantMismatchMode.Throw
@@ -140,8 +138,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=testDb.db"
+                    Name = "abc"
                 };
 
                 // TenantNotSetMode.Throw
@@ -193,8 +190,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=testDb.db"
+                    Name = "abc"
                 };
 
                 // TenantMismatchMode.Throw
@@ -263,8 +259,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=testDb.db"
+                    Name = "abc"
                 };
 
                 // TenantNotSetMode.Throw
@@ -317,8 +312,7 @@ public class MultiTenantDbContextExtensionsShould
                 {
                     Id = "abc",
                     Identifier = "abc",
-                    Name = "abc",
-                    ConnectionString = "DataSource=testDb.db"
+                    Name = "abc"
                 };
 
                 // TenantMismatchMode.Throw
