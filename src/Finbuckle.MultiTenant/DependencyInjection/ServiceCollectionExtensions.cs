@@ -1,19 +1,21 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant;
+using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// IServiceCollection extension methods for Finbuckle.MultiTenant.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
 public static class FinbuckleServiceCollectionExtensions
 {
     /// <summary>
@@ -103,7 +105,7 @@ public static class FinbuckleServiceCollectionExtensions
                     TService inner = (TService)existingService.ImplementationFactory(sp);
                     if (inner is null)
                         throw new Exception(
-                            $"Unable to instantiate decorated type via implementation factory.");
+                            "Unable to instantiate decorated type via implementation factory.");
 
                     return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
                 },
@@ -112,7 +114,7 @@ public static class FinbuckleServiceCollectionExtensions
         else
         {
             throw new Exception(
-                $"Unable to instantiate decorated type.");
+                "Unable to instantiate decorated type.");
         }
 
         services.Remove(existingService);
@@ -166,7 +168,7 @@ public static class FinbuckleServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.ConfigurePerTenant(Options.Options.DefaultName, configureOptions);
+        return services.ConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
 
     /// <summary>
@@ -231,7 +233,7 @@ public static class FinbuckleServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.PostConfigurePerTenant(Options.Options.DefaultName, configureOptions);
+        return services.PostConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
 
     /// <summary>

@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.Stores;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 
 public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>

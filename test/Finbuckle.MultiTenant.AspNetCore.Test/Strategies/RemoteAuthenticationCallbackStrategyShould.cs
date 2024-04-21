@@ -3,7 +3,7 @@
 
 // TODO: Implement more tests.
 
-using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies;

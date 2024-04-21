@@ -3,9 +3,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies;
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
 public class SessionStrategy : IMultiTenantStrategy
 {

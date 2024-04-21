@@ -15,14 +15,15 @@ type parameter defines the`ITenantInfo` use throughout the library and app.
   crazy symbols in a web app where the identifier will be part of the URL). Unlike `Id`, `Identifier` can be changed if
   necessary.
 * `Name` is a display name for the tenant.
-* `ConnectionString` is a connection string that should be used for database operations for this tenant. It might
-  connect to a shared database or a dedicated database for the single tenant.
 
 `TenantInfo` is a provided basic implementation of `ITenantInfo` with only the required properties.
 
 An app can define a custom `ITenantInfo` and add custom properties as needed. We recommend keeping these
 classes lightweight since they are often queried. Keep heavier associated data in an external area that can be pulled in
 when needed via the tenant `Id`.
+
+> Previous versions of `ITenantInfo` and `TenantInfo` included a connection string property. If you still need this
+> simply add it to your custom `ITenantInfo` implementation.
 
 ## `MultiTenantContext<TTenantInfo>`
 

@@ -3,9 +3,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.DependencyInjection;
-using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

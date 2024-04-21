@@ -1,14 +1,19 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
-using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Stores.ConfigurationStore;
+using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
+using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
+using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Finbuckle.MultiTenant.DependencyInjection;
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Provides builder methods for Finbuckle.MultiTenant services and configuration.

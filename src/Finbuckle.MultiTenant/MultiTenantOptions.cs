@@ -2,6 +2,9 @@
 // Refer to the solution LICENSE file for more information.
 
 // TODO move to options folder/namespace on future major release
+
+using Finbuckle.MultiTenant.Events;
+
 namespace Finbuckle.MultiTenant;
 
 public class MultiTenantOptions

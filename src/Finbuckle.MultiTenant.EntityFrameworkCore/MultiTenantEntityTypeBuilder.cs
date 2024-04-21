@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
+[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
 public class MultiTenantEntityTypeBuilder
 {
     public EntityTypeBuilder Builder { get; }

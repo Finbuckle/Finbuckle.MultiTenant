@@ -4,11 +4,12 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Options/src/OptionsBuilder.cs
 
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Finbuckle.MultiTenant;
 
 public static class OptionsBuilderExtensions
 {

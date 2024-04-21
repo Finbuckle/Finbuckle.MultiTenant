@@ -1,7 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
 /// <summary>
 /// Determines how entities where TenantId does not match the TenantContext are handled

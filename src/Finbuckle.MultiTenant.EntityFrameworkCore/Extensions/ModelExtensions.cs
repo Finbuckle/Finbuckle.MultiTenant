@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 public static class ModelExtensions
 {

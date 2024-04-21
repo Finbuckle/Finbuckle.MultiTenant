@@ -3,9 +3,12 @@
 
 using System;
 using System.Linq;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Finbuckle.MultiTenant.AspNetCore.Options;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Finbuckle.MultiTenant.Internal;
-using Finbuckle.MultiTenant.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -14,7 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Provides builder methods for Finbuckle.MultiTenant services and configuration.

@@ -2,7 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System;
-using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;

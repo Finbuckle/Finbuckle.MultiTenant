@@ -2,11 +2,11 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections.Concurrent;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
+namespace Finbuckle.MultiTenant.Stores.ConfigurationStore;
 
 /// <summary>
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not

@@ -3,7 +3,8 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.DependencyInjection;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

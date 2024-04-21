@@ -2,9 +2,11 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Linq;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 public static class FinbuckleModelBuilderExtensions
 {

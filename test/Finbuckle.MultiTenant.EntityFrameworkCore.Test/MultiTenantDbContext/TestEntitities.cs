@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections.Generic;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext;

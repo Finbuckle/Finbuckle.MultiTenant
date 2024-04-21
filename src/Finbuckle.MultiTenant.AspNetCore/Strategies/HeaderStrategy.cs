@@ -2,12 +2,15 @@
 // Refer to the solution LICENSE file for more information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies;
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class HeaderStrategy : IMultiTenantStrategy
 {
     private readonly string _headerKey;
