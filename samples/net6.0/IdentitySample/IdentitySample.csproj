@@ -4,7 +4,6 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>aspnet-IdentitySample-B6EEA98C-2E15-441E-820E-F00D43BD6171</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,14 +13,14 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.2" />
-        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.*" />
-        <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="6.*" />
+<!--        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="7.*" />-->
+<!--        <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="7.*" />-->
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Data\InitechIdentity.db-shm" />
-      <None Remove="Data\InitechIdentity.db-wal" />
+        <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" />
+        <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
     </ItemGroup>
 
 </Project>
