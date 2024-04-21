@@ -31,8 +31,7 @@ public class MultiTenantDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         var c = new TestBlogDbContext(tenant1);
 
@@ -46,8 +45,7 @@ public class MultiTenantDbContextShould
         {
             Id = "abc",
             Identifier = "abc",
-            Name = "abc",
-            ConnectionString = "DataSource=testDb.db"
+            Name = "abc"
         };
         var c = new TestBlogDbContext(tenant1, new DbContextOptions<TestBlogDbContext>());
 

@@ -31,9 +31,4 @@ public interface ITenantInfo
     /// Gets or sets a display friendly name for the tenant.
     /// </summary>
     string? Name { get; set; }
-    
-    /// <summary>
-    /// Gets or sets a connection string for the tenant.
-    /// </summary>
-    string? ConnectionString { get; set; }
 }

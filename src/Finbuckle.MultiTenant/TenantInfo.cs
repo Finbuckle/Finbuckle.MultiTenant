@@ -34,5 +34,4 @@ public class TenantInfo : ITenantInfo
 
     public string? Identifier { get; set; }
     public string? Name { get; set; }
-    public string? ConnectionString { get; set; }
 }
