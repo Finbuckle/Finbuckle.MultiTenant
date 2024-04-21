@@ -1,3 +1,4 @@
+using Finbuckle.MultiTenant.Abstractions;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test;

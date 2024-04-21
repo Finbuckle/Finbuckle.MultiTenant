@@ -4,13 +4,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Strategies;
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ClaimStrategy : IMultiTenantStrategy

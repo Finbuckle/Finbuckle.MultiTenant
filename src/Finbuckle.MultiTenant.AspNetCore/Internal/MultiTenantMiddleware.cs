@@ -6,12 +6,12 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Finbuckle.MultiTenant.AspNetCore;
+namespace Finbuckle.MultiTenant.AspNetCore.Internal;
 
 /// <summary>
 /// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
 /// </summary>
-internal class MultiTenantMiddleware
+public class MultiTenantMiddleware
 {
     private readonly RequestDelegate next;
 
@@ -22,7 +22,7 @@ internal class MultiTenantMiddleware
 
     public async Task Invoke(HttpContext context)
     {
-            var mtcAccessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
+            context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
             var mtcSetter = context.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
             
             var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();

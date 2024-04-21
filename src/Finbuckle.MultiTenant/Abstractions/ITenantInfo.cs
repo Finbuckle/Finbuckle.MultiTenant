@@ -1,8 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
 /// Interface for basic tenant information.

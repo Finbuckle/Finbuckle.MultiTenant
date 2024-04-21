@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Xunit;
 
 #pragma warning disable xUnit1013 // Public method should be marked as test

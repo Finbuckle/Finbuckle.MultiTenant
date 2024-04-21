@@ -1,10 +1,10 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
-// ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
@@ -24,47 +24,6 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     public MultiTenantBuilder(IServiceCollection services)
     {
         Services = services;
-    }
-
-    /// <summary>
-    /// Adds per-tenant configuration for an options class.
-    /// </summary>
-    /// <param name="tenantConfigureOptions">The configuration action to be run for each tenant.</param>
-    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    /// <remarks>This is similar to `ConfigureAll` in that it applies to all named and unnamed options of the type.</remarks>
-    [Obsolete]
-    public MultiTenantBuilder<TTenantInfo> WithPerTenantOptions<TOptions>(
-        Action<TOptions, TTenantInfo> tenantConfigureOptions) where TOptions : class, new()
-    {
-        // TODO remove this method
-        // TODO maybe change this to string empty so null an be used for all options, note remarks.
-        return WithPerTenantNamedOptions<TOptions>(null, tenantConfigureOptions);
-    }
-
-    /// <summary>
-    /// Adds per-tenant configuration for an named options class.
-    /// </summary>
-    /// <param name="name">The option name.</param>
-    /// <param name="tenantConfigureNamedOptions">The configuration action to be run for each tenant.</param>
-    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    // ReSharper disable once MemberCanBePrivate.Global
-    [Obsolete]
-    public MultiTenantBuilder<TTenantInfo> WithPerTenantNamedOptions<TOptions>(string? name,
-        Action<TOptions, TTenantInfo> tenantConfigureNamedOptions) where TOptions : class, new()
-    {
-        // TODO remove this method
-        // if (tenantConfigureNamedOptions == null)
-        // {
-        //     throw new ArgumentNullException(nameof(tenantConfigureNamedOptions));
-        // }
-        //
-        // // Services.AddOptionsCore<TOptions>();
-        // Services.TryAddEnumerable(ServiceDescriptor
-        //     .Scoped<IConfigureOptions<TOptions>, TenantConfigureNamedOptionsWrapper<TOptions, T>>());
-        // Services.AddScoped<ITenantConfigureNamedOptionsOld<TOptions, T>>(sp =>
-        //     new MultiTenantConfigureNamedOptions<TOptions, T>(name, tenantConfigureNamedOptions));
-
-        return this;
     }
 
     /// <summary>
@@ -117,7 +76,6 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="factory">A delegate that will create and configure the strategy.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    // ReSharper disable once MemberCanBePrivate.Global
     public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStrategy> factory)
         where TStrategy : IMultiTenantStrategy

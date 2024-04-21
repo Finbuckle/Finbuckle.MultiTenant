@@ -6,8 +6,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 public static class EntityTypeBuilderExtensions
 {
@@ -38,7 +40,7 @@ public static class EntityTypeBuilderExtensions
         {
             builder.Property<string>("TenantId")
                 .IsRequired()
-                .HasMaxLength(Finbuckle.MultiTenant.Internal.Constants.TenantIdMaxLength);
+                .HasMaxLength(Internal.Constants.TenantIdMaxLength);
         }
         catch (Exception ex)
         {

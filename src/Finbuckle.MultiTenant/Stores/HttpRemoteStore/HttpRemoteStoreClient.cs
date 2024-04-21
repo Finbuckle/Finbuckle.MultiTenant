@@ -2,9 +2,9 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Text.Json;
+using Finbuckle.MultiTenant.Abstractions;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
+namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 
 public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
 {

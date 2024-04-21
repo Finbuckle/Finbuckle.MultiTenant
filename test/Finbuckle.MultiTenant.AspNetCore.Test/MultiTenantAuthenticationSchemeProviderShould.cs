@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

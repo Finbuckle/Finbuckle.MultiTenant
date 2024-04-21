@@ -1,10 +1,11 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.AspNetCore;
+using Finbuckle.MultiTenant.AspNetCore.Internal;
+using Microsoft.AspNetCore.Builder;
 
-// ReSharper disable once CheckNamespace
-namespace Microsoft.AspNetCore.Builder;
+//ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Extension methods for using Finbuckle.MultiTenant.AspNetCore.

@@ -4,7 +4,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 using Finbuckle.MultiTenant.Test.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

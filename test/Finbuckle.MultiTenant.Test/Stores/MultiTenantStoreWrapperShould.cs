@@ -1,7 +1,9 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;

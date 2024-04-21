@@ -1,10 +1,9 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 
-
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Events;
 
 // TODO consider making these setters private
 

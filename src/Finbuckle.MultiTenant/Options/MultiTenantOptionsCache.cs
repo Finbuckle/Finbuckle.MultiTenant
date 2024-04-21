@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections.Concurrent;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options;

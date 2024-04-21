@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
