@@ -13,14 +13,16 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant;
 
 /// <summary>
-/// IServiceCollection extension methods for Finbuckle.MultiTenant.
+/// This static class provides extension methods for the IServiceCollection interface.
+/// These methods are used to configure Finbuckle.MultiTenant services for the application.
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
 public static class FinbuckleServiceCollectionExtensions
 {
     /// <summary>
-    /// Configure Finbuckle.MultiTenant services for the application.
+    /// Configures Finbuckle.MultiTenant services for the application.
     /// </summary>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
@@ -31,7 +33,7 @@ public static class FinbuckleServiceCollectionExtensions
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(
-            sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
+            sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
         services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
             AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
@@ -48,17 +50,25 @@ public static class FinbuckleServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure Finbuckle.MultiTenant services for the application.
+    /// Configures Finbuckle.MultiTenant services for the application.
     /// </summary>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
-    /// <returns>An new instance of MultiTenantBuilder.</returns>
+    /// <returns>A new instance of MultiTenantBuilder.</returns>
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
         where TTenantInfo : class, ITenantInfo, new()
     {
         return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
 
-    // TODO: better document and extract
+    /// <summary>
+    /// Decorates an existing service with a new implementation.
+    /// </summary>
+    /// <typeparam name="TService">The type of the service to be decorated.</typeparam>
+    /// <typeparam name="TImpl">The type of the new implementation.</typeparam>
+    /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
+    /// <param name="parameters">Additional parameters for the new implementation.</param>
+    /// <returns>True if the decoration was successful, false otherwise.</returns>
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
         var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
@@ -146,7 +156,7 @@ public static class FinbuckleServiceCollectionExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -211,7 +221,7 @@ public static class FinbuckleServiceCollectionExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
