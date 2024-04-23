@@ -1,32 +1,30 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeExtensions;
+
+public class EntityTypeExtensionShould
 {
-    public class EntityTypeExtensionShould
+    [Fact]
+    public void ReturnTrueOnIsMultiTenantOnIfMultiTenant()
     {
-        [Fact]
-        public void ReturnTrueOnIsMultiTenantOnIfMultiTenant()
-        {
             using var db = new TestDbContext();
             Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant());
         }
         
-        [Fact]
-        public void ReturnTrueOnIsMultiTenantOnIfAncestorIsMultiTenant()
-        {
+    [Fact]
+    public void ReturnTrueOnIsMultiTenantOnIfAncestorIsMultiTenant()
+    {
             using var db = new TestDbContext();
             Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantChildThing)).IsMultiTenant());
         }
 
-        [Fact]
-        public void ReturnFalseOnIsMultiTenantOnIfNotMultiTenant()
-        {
+    [Fact]
+    public void ReturnFalseOnIsMultiTenantOnIfNotMultiTenant()
+    {
             using var db = new TestDbContext();
             Assert.False(db.Model.FindEntityType(typeof(MyThing)).IsMultiTenant());
         }
-    }
 }

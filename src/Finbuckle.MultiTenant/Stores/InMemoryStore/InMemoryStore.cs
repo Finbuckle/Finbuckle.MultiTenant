@@ -1,16 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Options;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
-
+namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 
 /// <summary>
 /// Basic store that keeps tenants in memory.

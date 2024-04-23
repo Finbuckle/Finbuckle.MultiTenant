@@ -1,13 +1,10 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
+namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 
 public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
 {

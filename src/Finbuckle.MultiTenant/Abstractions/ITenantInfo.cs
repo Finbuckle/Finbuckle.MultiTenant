@@ -1,9 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Abstractions;
 
+/// <summary>
+/// Interface for basic tenant information.
+/// </summary>
 public interface ITenantInfo
 {
     
@@ -28,9 +30,4 @@ public interface ITenantInfo
     /// Gets or sets a display friendly name for the tenant.
     /// </summary>
     string? Name { get; set; }
-    
-    /// <summary>
-    /// Gets or sets a connection string for the tenant.
-    /// </summary>
-    string? ConnectionString { get; set; }
 }

@@ -1,5 +1,7 @@
 ﻿@using Finbuckle.MultiTenant
-@inject IMultiTenantStore<TenantInfo> _tenantStore
+@using Finbuckle.MultiTenant.Abstractions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IMultiTenantStore<AppTenantInfo> _tenantStore
 
 <!DOCTYPE html>
 <html lang="en">

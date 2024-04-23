@@ -1,10 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Threading.Tasks;
-
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
 /// Determines the tenant identifier.
@@ -14,7 +11,7 @@ public interface IMultiTenantStrategy
     /// <summary>
     ///  Method for implementations to control how the identifier is determined.
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="context">The context object used to determine an identifier.</param>
     /// <returns>The found identifier or null.</returns>
     Task<string?> GetIdentifierAsync(object context);
 

@@ -1,14 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Microsoft.Extensions.Caching.Distributed;
-using System;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
+using Microsoft.Extensions.Caching.Distributed;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
+namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 
 /// <summary>
 /// Basic store that uses an IDistributedCache instance as its backing. Note that GetAllAsync is not implemented.

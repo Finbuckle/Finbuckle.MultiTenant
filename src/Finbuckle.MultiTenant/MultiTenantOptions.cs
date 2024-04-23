@@ -1,13 +1,15 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Generic;
-
 // TODO move to options folder/namespace on future major release
+
+using Finbuckle.MultiTenant.Events;
+
 namespace Finbuckle.MultiTenant;
 
 public class MultiTenantOptions
 {
-    public IList<string> IgnoredIdentifiers = new List<string>();
-    public MultiTenantEvents Events { get; set; } = new MultiTenantEvents();
+    public Type? TenantInfoType { get; internal set; }
+    public IList<string> IgnoredIdentifiers { get; set; } = new List<string>();
+    public MultiTenantEvents Events { get; set; } = new ();
 }

@@ -1,9 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Stores;
@@ -128,11 +126,8 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
-        if (tenantInfo == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo));
-        }
-
+        ArgumentNullException.ThrowIfNull(tenantInfo);
+        
         if (tenantInfo.Id == null)
         {
             throw new ArgumentNullException(nameof(tenantInfo.Id));

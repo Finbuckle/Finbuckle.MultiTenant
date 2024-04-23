@@ -1,13 +1,10 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-
 namespace Finbuckle.MultiTenant;
 
 /// <summary>
-/// Marks a class as multitenant when used with a database context
-/// derived from MultiTenantDbContext or MultiTenantIdentityDbContext.
+/// Marks a type as multi-tenant.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class MultiTenantAttribute : Attribute
