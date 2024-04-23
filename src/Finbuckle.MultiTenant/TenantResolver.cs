@@ -21,12 +21,25 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     private readonly IOptionsMonitor<MultiTenantOptions> options;
     private readonly ILoggerFactory? loggerFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the TenantResolver class.
+    /// </summary>
+    /// <param name="strategies">A collection of IMultiTenantStrategy instances.</param>
+    /// <param name="stores">A collection of IMultiTenantStore instances.</param>
+    /// <param name="options">An IOptionsMonitor instance for accessing MultiTenantOptions.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
         IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options) :
         this(strategies, stores, options, null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the TenantResolver class with logging capabilities.
+    /// </summary>
+    /// <param name="strategies">A collection of IMultiTenantStrategy instances.</param>
+    /// <param name="stores">A collection of IMultiTenantStore instances.</param>
+    /// <param name="options">An IOptionsMonitor instance for accessing MultiTenantOptions.</param>
+    /// <param name="loggerFactory">An ILoggerFactory instance for creating loggers.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
         IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions> options,
         ILoggerFactory? loggerFactory)
