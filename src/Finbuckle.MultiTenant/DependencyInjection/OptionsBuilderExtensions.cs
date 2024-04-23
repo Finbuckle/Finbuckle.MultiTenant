@@ -11,8 +11,22 @@ using Microsoft.Extensions.Options;
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// This static class provides extension methods for the OptionsBuilder class.
+/// These methods allow for the configuration and post-configuration of options on a per-tenant basis.
+/// Additional dependencies can also be included in the configuration.
+/// </summary>
 public static class OptionsBuilderExtensions
 {
+    /// <summary>
+    /// Configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
@@ -28,7 +42,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -36,6 +50,16 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures the options for a specific tenant with an additional dependency.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being configured.</typeparam>
+    /// <typeparam name="TDep">The type of the additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
@@ -53,14 +77,25 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep, tenantInfo);
                 }));
 
         return optionsBuilder;
     }
-
+    
+    /// <summary>
+    /// Configures the options for a specific tenant with two additional dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep1, TDep2, TTenantInfo> configureOptions)
         where TOptions : class
@@ -80,7 +115,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, tenantInfo);
                 }));
@@ -88,6 +123,18 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures the options for a specific tenant with two additional dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TDep3">The type of the third additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TTenantInfo> configureOptions)
@@ -110,7 +157,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, tenantInfo);
                 }));
@@ -118,6 +165,19 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures the options for a specific tenant with two additional dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TDep3">The type of the third additional dependency.</typeparam>
+    /// <typeparam name="TDep4">The type of the fourth additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo> configureOptions)
@@ -142,7 +202,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, dep4, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, dep4, tenantInfo);
                 }));
@@ -178,7 +238,7 @@ public static class OptionsBuilderExtensions
     //             sp.GetRequiredService<TDep5>(),
     //             (options, dep1, dep2, dep3, dep4, dep5) =>
     //             {
-    //                 var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+    //                 var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
     //                 if (tenantInfo is not null)
     //                     configureOptions(options, dep1, dep2, dep3, dep4, dep5, tenantInfo);
     //             });
@@ -187,6 +247,15 @@ public static class OptionsBuilderExtensions
     //     return optionsBuilder;
     // }
 
+    /// <summary>
+    /// Post-configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being post-configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to post-configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
@@ -202,7 +271,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -210,6 +279,16 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being post-configured.</typeparam>
+    /// <typeparam name="TDep">The type of the additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to post-configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
@@ -227,7 +306,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep, tenantInfo);
                 }));
@@ -235,6 +314,17 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being post-configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to post-configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep1, TDep2, TTenantInfo> configureOptions)
         where TOptions : class
@@ -254,7 +344,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, tenantInfo);
                 }));
@@ -262,6 +352,18 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being post-configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TDep3">The type of the third additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to post-configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TTenantInfo> configureOptions)
@@ -284,7 +386,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, tenantInfo);
                 }));
@@ -292,6 +394,19 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures the options for a specific tenant.
+    /// </summary>
+    /// <typeparam name="TOptions">The type of options being post-configured.</typeparam>
+    /// <typeparam name="TDep1">The type of the first additional dependency.</typeparam>
+    /// <typeparam name="TDep2">The type of the second additional dependency.</typeparam>
+    /// <typeparam name="TDep3">The type of the third additional dependency.</typeparam>
+    /// <typeparam name="TDep4">The type of the fourth additional dependency.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="configureOptions">The action used to post-configure the options.</param>
+    /// <returns>The same options builder so that multiple calls can be chained.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the configureOptions parameter is null.</exception>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo> configureOptions)
@@ -316,7 +431,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, dep4, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, dep4, tenantInfo);
                 }));
@@ -353,7 +468,7 @@ public static class OptionsBuilderExtensions
     //             sp.GetRequiredService<TDep5>(),
     //             (options, dep1, dep2, dep3, dep4, dep5) =>
     //             {
-    //                 var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+    //                 var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
     //                 if (tenantInfo is not null)
     //                     configureOptions(options, dep1, dep2, dep3, dep4, dep5, tenantInfo);
     //             });
