@@ -1,6 +1,13 @@
 # Version History
 
 <!--_history-->
+## [7.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.0...v7.0.1) (2024-04-28)
+
+
+### Bug Fixes
+
+* only throw exception in EnforceMultiTenant for null tenant if there are entity changes. ([#819](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/819)) ([ca9e9fd](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca9e9fd9a55789d790d31f82756e5ecdac03a28f))
+
 ## [7.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.1...v7.0.0) (2024-04-21)
 
 
@@ -29,7 +36,7 @@
 
 ### Bug Fixes
 
-* adjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
+* AdjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
 
 ## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
 
@@ -84,7 +91,7 @@
 
 ### Features
 
-* add non-generic IMultiTenantContext for flexibility ([b3a198f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3a198f46aba9370f3671b62c35ae06b829a7d73))
+* add nongeneric IMultiTenantContext for flexibility ([b3a198f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3a198f46aba9370f3671b62c35ae06b829a7d73))
 
 
 ### Bug Fixes
@@ -172,7 +179,7 @@
 
 ### Bug Fixes
 
-* change delegate strategy func return type as nullable and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
 * remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)

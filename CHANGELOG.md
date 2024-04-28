@@ -1,3 +1,10 @@
+## [7.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.0...v7.0.1) (2024-04-28)
+
+
+### Bug Fixes
+
+* only throw exception in EnforceMultiTenant for null tenant if there are entity changes. ([#819](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/819)) ([ca9e9fd](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca9e9fd9a55789d790d31f82756e5ecdac03a28f))
+
 ## [7.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.1...v7.0.0) (2024-04-21)
 
 
