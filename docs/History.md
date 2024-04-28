@@ -6,13 +6,16 @@
 
 ### ⚠ BREAKING CHANGES
 
-* Many namespaces have been updated for consistency. Most code will only need to reference the `Finbuckle.MultiTenant` namespace.
-* Connection string is removed because in many cases it is not needed. Closes #624
-* all unique indexes and the UserLogin primary key in the standard Identity models are adjusted to include the tenant id
-* (I)MultiTenantContext and (I)TenantInfo are no longer available via DI. Use IMultiTenantContextAccessor instead. Also IMultiTenantContext nullability reworked and should never be null.
+* (I)MultiTenantContext and (I)TenantInfo are no longer available via dependency injection. Use
+  IMultiTenantContextAccessor instead. MultiTenantDbContext and MultiTenantIdentityDbContext will require a new
+  constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
+* Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
+  Finbuckle.MultiTenant.Abstractions namespace.
+* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
+* Added support for OptionsBuilder API and more efficient per-tenant options overall.
 * WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
-
-Added support for `OptionsBuilder` API and more efficient per-tenant options overall.
+* Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
+* IMultiTenantContext nullability reworked and should never be null.
 
 ### Features
 
@@ -26,7 +29,7 @@ Added support for `OptionsBuilder` API and more efficient per-tenant options ove
 
 ### Bug Fixes
 
-* AdjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
+* adjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
 
 ## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
 
@@ -81,7 +84,7 @@ Added support for `OptionsBuilder` API and more efficient per-tenant options ove
 
 ### Features
 
-* add nongeneric IMultiTenantContext for flexibility ([b3a198f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3a198f46aba9370f3671b62c35ae06b829a7d73))
+* add non-generic IMultiTenantContext for flexibility ([b3a198f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3a198f46aba9370f3671b62c35ae06b829a7d73))
 
 
 ### Bug Fixes
@@ -169,7 +172,7 @@ Added support for `OptionsBuilder` API and more efficient per-tenant options ove
 
 ### Bug Fixes
 
-* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* change delegate strategy func return type as nullable and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
 * remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)
@@ -324,7 +327,7 @@ Added support for `OptionsBuilder` API and more efficient per-tenant options ove
 - Added support for ASP.NET Core 3.1.
 - Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks ****!
 - Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
-- Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
+- Fixed a bug with user id not being set correctly in legacy `IdentityMultiTenantDbContext`.
 - Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
 - Deprecated `InMemoryStore` functionality that reads from configuration.
 - Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to ****!

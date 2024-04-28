@@ -88,11 +88,15 @@ There are several ways an app can see the current tenant:
 
 ### Dependency Injection
 
-* `IMultiTenantContextAccessor` and `IMultiContextContextAccessor` are available via dependency injection and behave
-  similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async contexts
-  any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the post-endpoint
-  processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
+* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTeenantInfo>` are available via dependency injection
+  and behave similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async
+  contexts any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the
+  post-endpoint processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
   extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
+
+* `IMultiTenantContextSetter` is available via dependency injection and can be used to set the current tenant. This is
+  useful in advanced scenarios and should be used with caution. Prefer using the `HttpContext` extension
+  method `TrySetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
 
 > Prior versions of Finbuckle.MultiTenant also exposed `IMultiTenantContext`, `ITenantInfo`, and their implementations
 > via dependency injection. This was removed as these are not actual services, similar to
