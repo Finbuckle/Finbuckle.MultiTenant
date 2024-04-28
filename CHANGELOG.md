@@ -3,13 +3,16 @@
 
 ### ⚠ BREAKING CHANGES
 
-* Many namespaces have been updated for consistency. Most code will only need to reference the `Finbuckle.MultiTenant` namespace.
-* Connection string is removed because in many cases it is not needed. Closes #624
-* all unique indexes and the UserLogin primary key in the standard Identity models are adjusted to include the tenant id
-* (I)MultiTenantContext and (I)TenantInfo are no longer available via DI. Use IMultiTenantContextAccessor instead. Also IMultiTenantContext nullability reworked and should never be null.
+* (I)MultiTenantContext and (I)TenantInfo are no longer available via dependency injection. Use
+  IMultiTenantContextAccessor instead. MultiTenantDbContext and MultiTenantIdentityDbContext will require a new
+  constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
+* Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
+  Finbuckle.MultiTenant.Abstractions namespace.
+* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
+* Added support for OptionsBuilder API and more efficient per-tenant options overall.
 * WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
-
-Added support for `OptionsBuilder` API and more efficient per-tenant options overall.
+* Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
+* IMultiTenantContext nullability reworked and should never be null.
 
 ### Features
 
@@ -321,7 +324,7 @@ Added support for `OptionsBuilder` API and more efficient per-tenant options ove
 - Added support for ASP.NET Core 3.1.
 - Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks **@GordonBlahut**!
 - Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
-- Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
+- Fixed a bug with user id not being set correctly in legacy `IdentityMultiTenantDbContext`.
 - Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
 - Deprecated `InMemoryStore` functionality that reads from configuration.
 - Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to **@colindekker**!

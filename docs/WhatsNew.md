@@ -1,4 +1,6 @@
-# What's New in Finbuckle.MultiTenant <span class="_version">7.0.0</span>
+# What's New in v<span class="_version">7.0.0</span>
+
+> This page only lists release update details specific to v<span class="_version">7.0.0</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
 ## [7.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.1...v7.0.0) (2024-04-21)
@@ -6,13 +8,16 @@
 
 ### ⚠ BREAKING CHANGES
 
-* Many namespaces have been updated for consistency. Most code will only need to reference the  namespace.
-* Connection string is removed because in many cases it is not needed. Closes #624
-* all unique indexes and the UserLogin primary key in the standard Identity models are adjusted to include the tenant id
-* (I)MultiTenantContext and (I)TenantInfo are no longer available via DI. Use IMultiTenantContextAccessor instead. Also IMultiTenantContext nullability reworked and should never be null.
+* (I)MultiTenantContext and (I)TenantInfo are no longer available via dependency injection. Use
+  IMultiTenantContextAccessor instead. MultiTenantDbContext and MultiTenantIdentityDbContext will require a new
+  constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
+* Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
+  Finbuckle.MultiTenant.Abstractions namespace.
+* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
+* Added support for OptionsBuilder API and more efficient per-tenant options overall.
 * WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
-
-Added support for  API and more efficient per-tenant options overall.
+* Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
+* IMultiTenantContext nullability reworked and should never be null.
 
 ### Features
 
