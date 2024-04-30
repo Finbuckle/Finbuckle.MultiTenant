@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.13.1</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">7.0.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -11,7 +11,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in Finbuckle.MultiTenant <span class="_version">6.13.1</span>](#whats-new)
+1. [What's New in v<span class="_version">7.0.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -23,18 +23,18 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in Finbuckle.MultiTenant <span class="_version">6.13.1</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">7.0.1</span>
+
+> This section only lists release update details specific to v<span class="_version">7.0.1</span>. See
+> the [changelog file](CHANGELOG.md) for all release update details.
 
 <!--_release-notes-->
+
 
 ### Bug Fixes
 
-* update dependency to protect against
-  CVE-2024-21319 ([#781](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/781)) ([c5e0c8a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c5e0c8a8e3f60033f97993b7feaf4ff87150a0f8))
-
+* only throw exception in EnforceMultiTenant for null tenant if there are entity changes. ([#819](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/819)) ([ca9e9fd](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca9e9fd9a55789d790d31f82756e5ecdac03a28f))
 <!--_release-notes-->
-
-See the [changelog file](CHANGELOG.md) for a full history of changes.
 
 ## Quick Start
 

@@ -2,17 +2,19 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Linq;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+// ReSharper disable once CheckNamespace
+namespace Finbuckle.MultiTenant;
+
+public static class FinbuckleModelBuilderExtensions
 {
-    public static class FinbuckleModelBuilderExtensions
+    /// <summary>
+    /// Configures any entity's with the [MultiTenant] attribute.
+    /// </summary>
+    public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
     {
-        /// <summary>
-        /// Configures any entity's with the [MultiTenant] attribute.
-        /// </summary>
-        public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
-        {
             // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
             foreach (var clrType in modelBuilder.Model.GetEntityTypes()
                                                  .Where(et => et.ClrType.HasMultiTenantAttribute())
@@ -24,5 +26,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
 
             return modelBuilder;
         }
-    }
 }

@@ -1,3 +1,40 @@
+## [7.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.0...v7.0.1) (2024-04-28)
+
+
+### Bug Fixes
+
+* only throw exception in EnforceMultiTenant for null tenant if there are entity changes. ([#819](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/819)) ([ca9e9fd](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca9e9fd9a55789d790d31f82756e5ecdac03a28f))
+
+## [7.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.1...v7.0.0) (2024-04-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* (I)MultiTenantContext and (I)TenantInfo are no longer available via dependency injection. Use
+  IMultiTenantContextAccessor instead. MultiTenantDbContext and MultiTenantIdentityDbContext will require a new
+  constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
+* Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
+  Finbuckle.MultiTenant.Abstractions namespace.
+* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
+* Added support for OptionsBuilder API and more efficient per-tenant options overall.
+* WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
+* Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
+* IMultiTenantContext nullability reworked and should never be null.
+
+### Features
+
+* better options support ([#681](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/681)) ([1859017](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/185901786f2225eb38b3609770c60b98fdcbc122))
+* change default MultiTenantIdentityDbContext default index and key behavior ([81f5612](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/81f5612008c3335192d9b26beb22be9a28beca8b))
+* MultiTenantDbContext and MultiTenantIdentityDbContext support for IMultiTenantContextAccessor DI ([9015085](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/901508563af4fa872a0dc3930ff3b8315777b912))
+* namespace cleaned up ([b354838](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b354838a90741626c47ea4f109c49f7fe2ca5b3d))
+* refactor DI and improve nullability ([eca24bf](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/eca24bfa0c314f95794b235141cff42059cf3fcf))
+* remove ConnectionString from ITenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
+
+
+### Bug Fixes
+
+* AdjustKey correctly adding TenantId to primary and foreign keys ([613b4a8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/613b4a855e919e02910c42f9f534cddba40339c9))
+
 ## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
 
 
@@ -294,7 +331,7 @@
 - Added support for ASP.NET Core 3.1.
 - Major refactor of how Entity Framework multitenant data isolation works. No longer need to derive from `MultiTenantDbContext` greatly improving flexibility. `IdentityMultiTenantDbContext` reworked under this new model and no longer requires or recommends use of multitenant support classes, e.g. `MultiTenantIdentityUser`. Attempted to minimize impact, but if using `IdentityMultiTenantDbContext` **this may be a breaking change!** Thanks **@GordonBlahut**!
 - Simplified `EFCoreStore` to use `TenantInfo` directly. **This is a breaking change!**
-- Fixed a bug with user id not being set correctly in legacy 'IdentityMultiTenantDbContext'.
+- Fixed a bug with user id not being set correctly in legacy `IdentityMultiTenantDbContext`.
 - Added `ConfigurationStore` to load tenant information from app configuration. The store is read-only in code, but changes in configuration (e.g. appsettings.json) are picked up at runtime. Updated most sample projects to use this store.
 - Deprecated `InMemoryStore` functionality that reads from configuration.
 - Added `HttpRemoteStore` which will make an http request to get a `TenantInfo` object. It can be extended with `DelegatingHandler`s (i.e. to add authentication headers). Added sample projects for this store. Thanks to **@colindekker**!

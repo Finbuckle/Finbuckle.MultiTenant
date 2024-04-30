@@ -5,8 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Finbuckle.MultiTenant.AspNetCore.Options;
-using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -18,31 +21,29 @@ using Moq;
 using Xunit;
 using Constants = Finbuckle.MultiTenant.Internal.Constants;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions;
+
+public class MultiTenantBuilderExtensionsShould
 {
-    public class MultiTenantBuilderExtensionsShould
+    private class TestTenantInfo : ITenantInfo
     {
-        private class TestTenantInfo : ITenantInfo
-        {
-            public string? Id { get; set; }
-            public string? Identifier { get; set; }
-            public string? Name { get; set; }
-            public string? ConnectionString { get; set; }
+        public string? Id { get; set; }
+        public string? Identifier { get; set; }
+        public string? Name { get; set; }
+        public string? ConnectionString { get; set; }
 
-            public string? ChallengeScheme { get; set; }
+        public string? ChallengeScheme { get; set; }
+        public string? CookieLoginPath { get; set; }
+        public string? CookieLogoutPath { get; set; }
+        public string? CookieAccessDeniedPath { get; set; }
+        public string? OpenIdConnectAuthority { get; set; }
+        public string? OpenIdConnectClientId { get; set; }
+        public string? OpenIdConnectClientSecret { get; set; }
+    }
 
-            // public string? CookiePath { get; set; }
-            public string? CookieLoginPath { get; set; }
-            public string? CookieLogoutPath { get; set; }
-            public string? CookieAccessDeniedPath { get; set; }
-            public string? OpenIdConnectAuthority { get; set; }
-            public string? OpenIdConnectClientId { get; set; }
-            public string? OpenIdConnectClientSecret { get; set; }
-        }
-
-        [Fact]
-        public void NotThrowIfOriginalPrincipalValidationNotSet()
-        {
+    [Fact]
+    public async Task NotThrowIfOriginalPrincipalValidationNotSet()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -55,14 +56,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
             httpContextMock.Setup(c => c.RequestServices).Returns(sp);
             httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object?>());
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -71,14 +72,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.True(true);
         }
 
-        [Fact]
-        public void CallOriginalPrincipalValidation()
-        {
+    [Fact]
+    public async Task CallOriginalPrincipalValidation()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -101,14 +102,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
             httpContextMock.Setup(c => c.RequestServices).Returns(sp);
             httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object?>());
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -117,14 +118,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.True(called);
         }
 
-        [Fact]
-        public void PassPrincipalValidationIfTenantMatch()
-        {
+    [Fact]
+    public async Task PassPrincipalValidationIfTenantMatch()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -138,14 +139,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
             httpContextMock.Setup(c => c.RequestServices).Returns(sp);
             httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object?>());
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -154,14 +155,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.NotNull(cookieValidationContext);
         }
 
-        [Fact]
-        public void SkipPrincipalValidationIfBypassSet_WithPerTenantAuthentication()
-        {
+    [Fact]
+    public async Task SkipPrincipalValidationIfBypassSet_WithPerTenantAuthentication()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -177,7 +178,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc1" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
@@ -187,8 +188,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 [$"{Constants.TenantToken}__bypass_validate_principal__"] = true
             };
             httpContextMock.Setup(c => c.Items).Returns(httpContextItems);
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -197,15 +198,15 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.NotNull(cookieValidationContext.Principal);
             Assert.False(called);
         }
 
-        [Fact]
-        public void SkipPrincipalValidationIfBypassSet_WithClaimStrategy()
-        {
+    [Fact]
+    public async Task SkipPrincipalValidationIfBypassSet_WithClaimStrategy()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             var called = false;
@@ -221,7 +222,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc1" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
@@ -231,8 +232,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 [$"{Constants.TenantToken}__bypass_validate_principal__"] = true
             };
             httpContextMock.Setup(c => c.Items).Returns(httpContextItems);
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -241,15 +242,15 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.NotNull(cookieValidationContext.Principal);
             Assert.False(called);
         }
 
-        [Fact]
-        public void RejectPrincipalValidationIfTenantMatch()
-        {
+    [Fact]
+    public async Task RejectPrincipalValidationIfTenantMatch()
+    {
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddAuthentication().AddCookie();
@@ -263,14 +264,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             {
                 TenantInfo = new TenantInfo { Identifier = "abc1" }
             };
-            sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>().MultiTenantContext = mtc;
+            sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
             // Trigger the ValidatePrincipal event
             var httpContextMock = new Mock<HttpContext>();
             httpContextMock.Setup(c => c.RequestServices).Returns(sp);
             httpContextMock.Setup(c => c.Items).Returns(new Dictionary<object, object?>());
-            var scheme = sp.GetRequiredService<IAuthenticationSchemeProvider>()
-                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+            var scheme = await sp.GetRequiredService<IAuthenticationSchemeProvider>()
+                .GetSchemeAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var options = sp.GetRequiredService<IOptionsMonitor<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(new ClaimsIdentity());
@@ -279,14 +280,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             var cookieValidationContext =
                 new CookieValidatePrincipalContext(httpContextMock.Object, scheme!, options, authTicket);
 
-            options.Events.ValidatePrincipal(cookieValidationContext).Wait();
+            await options.Events.ValidatePrincipal(cookieValidationContext);
 
             Assert.Null(cookieValidationContext.Principal);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_RegisterServices()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_RegisterServices()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -307,9 +308,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(strategy);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationCore_RegisterServices()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationCore_RegisterServices()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -325,9 +326,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<MultiTenantAuthenticationSchemeProvider>(schemeProvider);
         }
 
-        [Fact]
-        public void AddRemoteAuthenticationCallbackStrategy()
-        {
+    [Fact]
+    public void AddRemoteAuthenticationCallbackStrategy()
+    {
             var services = new ServiceCollection();
             services.AddAuthentication();
             services.AddLogging();
@@ -341,9 +342,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.NotNull(strategy);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_UseChallengeScheme()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthentication_UseChallengeScheme()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
@@ -358,16 +359,19 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 ChallengeScheme = "customScheme"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IAuthenticationSchemeProvider>();
-            Assert.Equal(ti1.ChallengeScheme, options.GetDefaultChallengeSchemeAsync()!.Result!.Name);
+            var scheme = await options.GetDefaultChallengeSchemeAsync();
+
+            Assert.NotNull(scheme);
+            Assert.Equal(ti1.ChallengeScheme, scheme.Name);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseChallengeScheme()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthenticationConventions_UseChallengeScheme()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
@@ -382,16 +386,20 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 ChallengeScheme = "customScheme"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IAuthenticationSchemeProvider>();
-            Assert.Equal(ti1.ChallengeScheme, options.GetDefaultChallengeSchemeAsync()!.Result!.Name);
+            Assert.NotNull(options);
+
+            var scheme = await options.GetDefaultChallengeSchemeAsync();
+            Assert.NotNull(scheme);
+            Assert.Equal(ti1.ChallengeScheme, scheme.Name);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseDefaultChallengeSchemeOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public async Task ConfigurePerTenantAuthenticationConventions_UseDefaultChallengeSchemeOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             var defaultValue = "defaultScheme";
@@ -408,16 +416,20 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 Identifier = "identifier1"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IAuthenticationSchemeProvider>();
-            Assert.Equal(defaultValue, options.GetDefaultChallengeSchemeAsync()!.Result!.Name);
+            Assert.NotNull(options);
+
+            var scheme = await options.GetDefaultChallengeSchemeAsync();
+            Assert.NotNull(scheme);
+            Assert.Equal(defaultValue, scheme.Name);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_UseOpenIdConnectConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_UseOpenIdConnectConvention()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             services.AddOptions();
@@ -435,8 +447,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 OpenIdConnectClientSecret = "secret"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<OpenIdConnectOptions>>()
                 .Get(OpenIdConnectDefaults.AuthenticationScheme);
@@ -446,9 +458,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.OpenIdConnectClientSecret, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseOpenIdConnectConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseOpenIdConnectConvention()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             services.AddOptions();
@@ -465,9 +477,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 OpenIdConnectClientId = "tenant",
                 OpenIdConnectClientSecret = "secret"
             };
-
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<OpenIdConnectOptions>>()
                 .Get(OpenIdConnectDefaults.AuthenticationScheme);
@@ -477,9 +489,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.OpenIdConnectClientSecret, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseDefaultOpenIdConnectOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseDefaultOpenIdConnectOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>((new ConfigurationBuilder()).Build()); // net7.0+
             var defaultValue = "https://defaultValue";
@@ -499,20 +511,21 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 Id = "id1",
                 Identifier = "identifier1"
             };
-
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
+            
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<OpenIdConnectOptions>>()
                 .Get(OpenIdConnectDefaults.AuthenticationScheme);
+            
             Assert.Equal(defaultValue, options.Authority);
             Assert.Equal(defaultValue, options.ClientId);
             Assert.Equal(defaultValue, options.ClientSecret);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthentication_UseCookieOptionsConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthentication_UseCookieOptionsConvention()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie();
@@ -529,8 +542,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 CookieAccessDeniedPath = "/path3"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -540,9 +553,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.CookieAccessDeniedPath, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseCookieOptionsConvention()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseCookieOptionsConvention()
+    {
             var services = new ServiceCollection();
             services.AddOptions();
             services.AddAuthentication().AddCookie();
@@ -559,8 +572,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 CookieAccessDeniedPath = "/path3"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TestTenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TestTenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -570,9 +583,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(ti1.CookieAccessDeniedPath, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void ConfigurePerTenantAuthenticationConventions_UseDefaultCookieOptionsIfNoTenantProp()
-        {
+    [Fact]
+    public void ConfigurePerTenantAuthenticationConventions_UseDefaultCookieOptionsIfNoTenantProp()
+    {
             var services = new ServiceCollection();
             var defaultValue = "/defaultValue";
             services.AddOptions().AddAuthentication().AddCookie(options =>
@@ -591,8 +604,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
                 Identifier = "identifier1"
             };
 
-            var accessor = sp.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            accessor.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
+            var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+            setter.MultiTenantContext = new MultiTenantContext<TenantInfo> { TenantInfo = ti1 };
 
             var options = sp.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>()
                 .Get(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -602,20 +615,20 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.Equal(defaultValue, options.AccessDeniedPath);
         }
 
-        [Fact]
-        public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
-        {
+    [Fact]
+    public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
 
             Assert.Throws<MultiTenantException>(() => builder.WithPerTenantAuthentication());
         }
 
-        [Fact]
-        public void AddBasePathStrategy()
-        {
+    [Fact]
+    public void AddBasePathStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -623,11 +636,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<BasePathStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddBasePathStrategyDefaultRebaseFalse()
-        {
+    [Fact]
+    public void AddBasePathStrategyDefaultRebaseFalse()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -638,11 +651,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.False(options.Value.RebaseAspNetCorePathBase);
         }
 
-        [Fact]
-        public void AddBasePathStrategyWithOptions()
-        {
+    [Fact]
+    public void AddBasePathStrategyWithOptions()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
             var sp = services.BuildServiceProvider();
 
@@ -653,11 +666,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.True(options.Value.RebaseAspNetCorePathBase);
         }
 
-        [Fact]
-        public void AddClaimStrategy()
-        {
+    [Fact]
+    public void AddClaimStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithClaimStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -665,11 +678,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<ClaimStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddHeaderStrategy()
-        {
+    [Fact]
+    public void AddHeaderStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHeaderStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -677,11 +690,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<HeaderStrategy>(strategy);
         }
 
-        [Fact]
-        public void AddHostStrategy()
-        {
+    [Fact]
+    public void AddHostStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithHostStrategy();
             var sp = services.BuildServiceProvider();
 
@@ -689,20 +702,20 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<HostStrategy>(strategy);
         }
 
-        [Fact]
-        public void ThrowIfNullParamAddingHostStrategy()
-        {
+    [Fact]
+    public void ThrowIfNullParamAddingHostStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithHostStrategy(null!));
         }
 
-        [Fact]
-        public void AddRouteStrategy()
-        {
+    [Fact]
+    public void AddRouteStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithRouteStrategy("routeParam");
             var sp = services.BuildServiceProvider();
 
@@ -710,13 +723,12 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions
             Assert.IsType<RouteStrategy>(strategy);
         }
 
-        [Fact]
-        public void ThrowIfNullParamAddingRouteStrategy()
-        {
+    [Fact]
+    public void ThrowIfNullParamAddingRouteStrategy()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             Assert.Throws<ArgumentException>(()
                 => builder.WithRouteStrategy(null!));
         }
-    }
 }

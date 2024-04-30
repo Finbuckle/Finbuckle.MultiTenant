@@ -3,7 +3,7 @@
 @inject UserManager<IdentityUser> UserManager
 
 <ul class="navbar-nav">
-    @if (Context.GetMultiTenantContext<TenantInfo>()?.TenantInfo is not null)
+    @if (Context.GetMultiTenantContext<AppTenantInfo>()?.TenantInfo is not null)
     {
         @if (SignInManager.IsSignedIn(User))
         {

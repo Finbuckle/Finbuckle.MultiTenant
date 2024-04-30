@@ -4,26 +4,26 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Strategies
-{
-	// ReSharper disable once ClassNeverInstantiated.Global
-	public class ClaimStrategy : IMultiTenantStrategy
-	{
-		private readonly string _tenantKey;
-		private readonly string? _authenticationScheme;
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
-		public ClaimStrategy(string template) : this(template, null)
-		{
+// ReSharper disable once ClassNeverInstantiated.Global
+public class ClaimStrategy : IMultiTenantStrategy
+{
+	private readonly string _tenantKey;
+	private readonly string? _authenticationScheme;
+
+	public ClaimStrategy(string template) : this(template, null)
+	{
 		}
 
-		public ClaimStrategy(string template, string? authenticationScheme)
-		{
+	public ClaimStrategy(string template, string? authenticationScheme)
+	{
 			if (string.IsNullOrWhiteSpace(template))
 				throw new ArgumentException(nameof(template));
 
@@ -31,8 +31,8 @@ namespace Finbuckle.MultiTenant.Strategies
 			_authenticationScheme = authenticationScheme;
 		}
 
-		public async Task<string?> GetIdentifierAsync(object context)
-		{
+	public async Task<string?> GetIdentifierAsync(object context)
+	{
 			if (!(context is HttpContext httpContext))
 				throw new MultiTenantException(null, new ArgumentException($@"""{nameof(context)}"" type must be of type HttpContext", nameof(context)));
 
@@ -64,5 +64,4 @@ namespace Finbuckle.MultiTenant.Strategies
 			var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;
 			return identifier;
 		}
-	}
 }

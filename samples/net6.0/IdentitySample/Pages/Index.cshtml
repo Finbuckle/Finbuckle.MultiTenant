@@ -11,7 +11,7 @@
     <a href="https://www.finbuckle.com/MultiTenant/Docs/Identity">documentation</a> for more details.
 </p>
 
-@if (Model.TenantInfo is null)
+@if (Model.AppTenantInfo is null)
 {
     <h2>There is no tenant selected. Use the menu bar to select a tenant.</h2>
 
@@ -46,7 +46,7 @@
 }
 else
 {
-    <h2>@Model.TenantInfo.Name</h2>
+    <h2>@Model.AppTenantInfo.Name</h2>
     <table class="table">
         <thead>
         <tr>
@@ -57,20 +57,20 @@ else
 
         <tbody>
         <tr>
-            <td>@nameof(Model.TenantInfo.Id)</td>
-            <td>@Model.TenantInfo.Id</td>
+            <td>@nameof(Model.AppTenantInfo.Id)</td>
+            <td>@Model.AppTenantInfo.Id</td>
         </tr>
         <tr>
-            <td>@nameof(Model.TenantInfo.Identifier)</td>
-            <td>@Model.TenantInfo.Identifier</td>
+            <td>@nameof(Model.AppTenantInfo.Identifier)</td>
+            <td>@Model.AppTenantInfo.Identifier</td>
         </tr>
         <tr>
-            <td>@nameof(Model.TenantInfo.Name)</td>
-            <td>@Model.TenantInfo.Name</td>
+            <td>@nameof(Model.AppTenantInfo.Name)</td>
+            <td>@Model.AppTenantInfo.Name</td>
         </tr>
         <tr>
-            <td>@nameof(Model.TenantInfo.ConnectionString)</td>
-            <td>@Model.TenantInfo.ConnectionString</td>
+            <td>@nameof(Model.AppTenantInfo.ConnectionString)</td>
+            <td>@Model.AppTenantInfo.ConnectionString</td>
         </tr>
         </tbody>
     </table>

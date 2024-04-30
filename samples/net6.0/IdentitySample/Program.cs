@@ -1,4 +1,6 @@
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using IdentitySample;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using IdentitySample.Data;
@@ -14,7 +16,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 
 // Add MultiTenant
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
     .WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true)
     .WithConfigurationStore()
     .WithPerTenantAuthentication();
@@ -22,7 +24,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 var app = builder.Build();
 
 // Apply migrations if needed
-var store = app.Services.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+var store = app.Services.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
 foreach(var tenant in await store.GetAllAsync())
 {
     await using var db = new ApplicationDbContext(tenant);

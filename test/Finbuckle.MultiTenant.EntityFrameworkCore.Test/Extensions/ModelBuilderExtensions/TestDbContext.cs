@@ -3,33 +3,32 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelBuilderExtensions
-{
-    public class TestDbContext : DbContext
-    {
-        public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
-        public DbSet<MyThing>? MyThings { get; set; }
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelBuilderExtensions;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+public class TestDbContext : DbContext
+{
+    public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
+    public DbSet<MyThing>? MyThings { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
             optionsBuilder.UseSqlite("DataSource=:memory:");
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
             modelBuilder.ConfigureMultiTenant();
         }
-    }
+}
 
-    [MultiTenant]
-    public class MyMultiTenantThing
-    {
-        public int Id { get; set; }
-    }
+[MultiTenant]
+public class MyMultiTenantThing
+{
+    public int Id { get; set; }
+}
 
-    public class MyThing
-    {
-        public int Id { get; set; }
-    }
+public class MyThing
+{
+    public int Id { get; set; }
 }

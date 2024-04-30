@@ -4,13 +4,13 @@
 using Finbuckle.MultiTenant.Internal;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test
+namespace Finbuckle.MultiTenant.Test;
+
+public class TenantInfoShould
 {
-    public class TenantInfoShould
+    [Fact]
+    public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
     {
-        [Fact]
-        public void ThrowIfIdSetWithLengthAboveTenantIdMaxLength()
-        {
             // ReSharper disable once ObjectCreationAsStatement
             new TenantInfo { Id = "".PadRight(1, 'a') };
 
@@ -25,5 +25,4 @@ namespace Finbuckle.MultiTenant.Test
                                  + 999, 'a')
             });
         }
-    }
 }

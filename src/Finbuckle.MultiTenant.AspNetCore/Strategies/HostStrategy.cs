@@ -2,23 +2,24 @@
 // Refer to the solution LICENSE file for more information.
 
 using System;
-using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
+using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
+
+public class HostStrategy : IMultiTenantStrategy
 {
-    public class HostStrategy : IMultiTenantStrategy
-    {
-        private readonly string regex;
+    private readonly string regex;
 
-        public HostStrategy(string template)
-        {
+    public HostStrategy(string template)
+    {
             // New in 2.1, match whole domain if just "__tenant__".
             if (template == Constants.TenantToken)
             {
-                template = template.Replace(Constants.TenantToken, @"(?<identifier>.+)");
+                template = template.Replace(Constants.TenantToken, "(?<identifier>.+)");
             }
             else
             {
@@ -61,8 +62,8 @@ namespace Finbuckle.MultiTenant.Strategies
             this.regex = $"^{template}$";
         }
 
-        public Task<string?> GetIdentifierAsync(object context)
-        {
+    public Task<string?> GetIdentifierAsync(object context)
+    {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
@@ -85,5 +86,4 @@ namespace Finbuckle.MultiTenant.Strategies
 
             return Task.FromResult(identifier);
         }
-    }
 }

@@ -3,7 +3,8 @@
 
 using System;
 using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Strategies;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,71 +12,70 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies;
+
+public class SessionStrategyShould
 {
-    public class SessionStrategyShould
+    private static IWebHostBuilder GetTestHostBuilder(string identifier, string sessionKey)
     {
-        private static IWebHostBuilder GetTestHostBuilder(string identifier, string sessionKey)
-        {
-            return new WebHostBuilder()
-                .ConfigureServices(services =>
-                {
-                    services.AddDistributedMemoryCache();
-                    services.AddSession(options =>
-                    {
-                        options.IdleTimeout = TimeSpan.FromSeconds(10);
-                        options.Cookie.HttpOnly = true;
-                        options.Cookie.IsEssential = true;
-                    });
-
-                    services.AddMultiTenant<TenantInfo>()
-                        .WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, sessionKey)
-                        .WithInMemoryStore();
-                    services.AddMvc();
-                })
-                .Configure(app =>
-                {
-                    app.UseSession();
-                    app.UseMultiTenant();
-                    app.Run(async context =>
-                    {
-                        context.Session.SetString(sessionKey, identifier);
-                        if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
-                        {
-                            await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!.TenantInfo!.Id!);
-                        }
-                    });
-
-                    var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-                    store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
-                });
-        }
-
-        [Fact]
-        public async void ThrowIfContextIsNotHttpContext()
-        {
-            var context = new Object();
-            var strategy = new SessionStrategy("__tenant__");
-
-            await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
-        }
-
-        [Fact]
-        public async Task ReturnNullIfNoSessionValue()
-        {
-            var hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
-
-            using (var server = new TestServer(hostBuilder))
+        return new WebHostBuilder()
+            .ConfigureServices(services =>
             {
-                var client = server.CreateClient();
-                var response = await client.GetStringAsync("/test_tenant");
-                Assert.Equal("", response);
-            }
-        }
+                services.AddDistributedMemoryCache();
+                services.AddSession(options =>
+                {
+                    options.IdleTimeout = TimeSpan.FromSeconds(10);
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.IsEssential = true;
+                });
 
-        // TODO: Figure out how to test this
-        // public async Task ReturnIdentifierIfSessionValue()
-        // {
-        // }
+                services.AddMultiTenant<TenantInfo>()
+                    .WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, sessionKey)
+                    .WithInMemoryStore();
+                services.AddMvc();
+            })
+            .Configure(app =>
+            {
+                app.UseSession();
+                app.UseMultiTenant();
+                app.Run(async context =>
+                {
+                    context.Session.SetString(sessionKey, identifier);
+                    if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
+                    {
+                        await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!.TenantInfo!.Id!);
+                    }
+                });
+
+                var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
+            });
     }
+
+    [Fact]
+    public async void ThrowIfContextIsNotHttpContext()
+    {
+        var context = new Object();
+        var strategy = new SessionStrategy("__tenant__");
+
+        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+    }
+
+    [Fact]
+    public async Task ReturnNullIfNoSessionValue()
+    {
+        var hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
+
+        using (var server = new TestServer(hostBuilder))
+        {
+            var client = server.CreateClient();
+            var response = await client.GetStringAsync("/test_tenant");
+            Assert.Equal("", response);
+        }
+    }
+
+    // TODO: Figure out how to test this
+    // public async Task ReturnIdentifierIfSessionValue()
+    // {
+    // }
 }

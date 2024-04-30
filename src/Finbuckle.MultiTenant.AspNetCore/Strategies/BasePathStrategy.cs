@@ -3,14 +3,15 @@
 
 using System;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Finbuckle.MultiTenant.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
+
+public class BasePathStrategy : IMultiTenantStrategy
 {
-    public class BasePathStrategy : IMultiTenantStrategy
+    public Task<string?> GetIdentifierAsync(object context)
     {
-        public Task<string?> GetIdentifierAsync(object context)
-        {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
@@ -27,5 +28,4 @@ namespace Finbuckle.MultiTenant.Strategies
 
             return Task.FromResult<string?>(identifier);
         }
-    }
 }

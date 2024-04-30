@@ -1,18 +1,21 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant;
+using System.Diagnostics.CodeAnalysis;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// IServiceCollection extension methods for Finbuckle.MultiTenant.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
 public static class FinbuckleServiceCollectionExtensions
 {
     /// <summary>
@@ -22,7 +25,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
+    public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions> config)
         where TTenantInfo : class, ITenantInfo, new()
     {
@@ -30,23 +33,18 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddScoped<ITenantResolver>(
             sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
-        services.AddScoped<IMultiTenantContext<TTenantInfo>>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext!);
-
-        services.AddScoped<TTenantInfo>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>().MultiTenantContext?.TenantInfo!);
-        services.AddScoped<ITenantInfo>(sp => sp.GetService<TTenantInfo>()!);
-
-        // TODO this might require instance to ensure it already exists when needed
-        services
-            .AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
-                AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
+        services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
+            AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            (IMultiTenantContextAccessor)sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
+        
+        services.AddSingleton<IMultiTenantContextSetter>(sp =>
+            (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
+        services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
 
-        return new FinbuckleMultiTenantBuilder<TTenantInfo>(services);
+        return new MultiTenantBuilder<TTenantInfo>(services);
     }
 
     /// <summary>
@@ -54,7 +52,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
     /// <returns>An new instance of MultiTenantBuilder.</returns>
-    public static FinbuckleMultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
+    public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
         where TTenantInfo : class, ITenantInfo, new()
     {
         return services.AddMultiTenant<TTenantInfo>(_ => { });
@@ -107,7 +105,7 @@ public static class FinbuckleServiceCollectionExtensions
                     TService inner = (TService)existingService.ImplementationFactory(sp);
                     if (inner is null)
                         throw new Exception(
-                            $"Unable to instantiate decorated type via implementation factory.");
+                            "Unable to instantiate decorated type via implementation factory.");
 
                     return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
                 },
@@ -116,7 +114,7 @@ public static class FinbuckleServiceCollectionExtensions
         else
         {
             throw new Exception(
-                $"Unable to instantiate decorated type.");
+                "Unable to instantiate decorated type.");
         }
 
         services.Remove(existingService);
@@ -170,7 +168,7 @@ public static class FinbuckleServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.ConfigurePerTenant(Options.Options.DefaultName, configureOptions);
+        return services.ConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
 
     /// <summary>
@@ -235,7 +233,7 @@ public static class FinbuckleServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        return services.PostConfigurePerTenant(Options.Options.DefaultName, configureOptions);
+        return services.PostConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
 
     /// <summary>

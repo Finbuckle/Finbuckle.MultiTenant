@@ -1,12 +1,14 @@
-# What's New in Finbuckle.MultiTenant <span class="_version">6.13.1</span>
+# What's New in v<span class="_version">7.0.1</span>
+
+> This page only lists release update details specific to v<span class="_version">7.0.1</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
-## [6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.13.0...v6.13.1) (2024-01-24)
+## [7.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.0...v7.0.1) (2024-04-28)
 
 
 ### Bug Fixes
 
-* update dependency to protect against CVE-2024-21319 ([#781](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/781)) ([c5e0c8a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c5e0c8a8e3f60033f97993b7feaf4ff87150a0f8))
+* only throw exception in EnforceMultiTenant for null tenant if there are entity changes. ([#819](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/819)) ([ca9e9fd](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca9e9fd9a55789d790d31f82756e5ecdac03a28f))
 
 
 <!--_release-notes-->
