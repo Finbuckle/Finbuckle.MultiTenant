@@ -2,7 +2,10 @@
 // Refer to the solution LICENSE file for more information.
 
 // ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant.Stores;
+
+using Finbuckle.MultiTenant.Abstractions;
+
+namespace Finbuckle.MultiTenant.Stores.EchoStore;
 
 /// <summary>
 /// Basic store that simply returns a tenant based on the identifier without any additional settings.

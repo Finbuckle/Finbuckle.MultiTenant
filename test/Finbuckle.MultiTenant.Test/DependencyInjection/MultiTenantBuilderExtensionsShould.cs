@@ -2,7 +2,11 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Stores.ConfigurationStore;
+using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
+using Finbuckle.MultiTenant.Stores.EchoStore;
+using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
+using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -155,7 +159,7 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void AddEchoStore()
+    public async Task AddEchoStore()
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
@@ -165,11 +169,11 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<EchoStore<TenantInfo>>(store);
 
-        var tc = store.TryGetByIdentifierAsync("initech").Result;
+        var tc = await store.TryGetByIdentifierAsync("initech");
         Assert.Equal("initech", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
 
-        tc = store.TryGetByIdentifierAsync("lol").Result;
+        tc = await store.TryGetByIdentifierAsync("lol");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
     }
