@@ -89,40 +89,40 @@ runtime the delegate will be called with the current tenant details.
 
 ```csharp
 // configure options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
     });
 
 // or configure named options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
     });
 
 // ConfigureAll options variant
-builder.Services.ConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
     });
 
 // can also configure post options, named post options, and all post options variants
-builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigurePerTenant<MyOptions, Tenantnfo>("scheme2", (options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigureAllPerTenant<MyOptions, Tenantnfo>((options, tenantInfo) =>
+builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Option1Value;
         options.MyOption2 = tenantInfo.Option2Value;
