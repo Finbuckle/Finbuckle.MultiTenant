@@ -1,25 +1,28 @@
-﻿using Finbuckle.MultiTenant.EntityFrameworkCore;
+﻿using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentitySample.Data;
 
 public class ApplicationDbContext : MultiTenantIdentityDbContext
 {
-    private readonly AppTenantInfo _tenantInfo;
-
-    public ApplicationDbContext(AppTenantInfo tenantInfo) : base(tenantInfo)
+    public ApplicationDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
-        _tenantInfo = tenantInfo;
     }
 
-    public ApplicationDbContext(AppTenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+    public ApplicationDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
     {
-        _tenantInfo = tenantInfo;
     }
-    
+
+    public ApplicationDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
+    {
+        // used for the design-time factory and progammatic migrations in program.cs
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite(_tenantInfo.ConnectionString ?? throw new InvalidOperationException());
+        var tenantInfo = TenantInfo as AppTenantInfo;
+        optionsBuilder.UseSqlite(tenantInfo?.ConnectionString ?? throw new InvalidOperationException());
         base.OnConfiguring(optionsBuilder);
     }
 }
