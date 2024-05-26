@@ -46,6 +46,11 @@ public class MultiTenantEntityTypeBuilder
                 indexBuilder.HasFilter(filter);
             }
 
+            foreach (var annotation in index.GetAnnotations())
+            {
+                indexBuilder.HasAnnotation(annotation.Name, annotation.Value);
+            }
+
             return this;
         }
 
