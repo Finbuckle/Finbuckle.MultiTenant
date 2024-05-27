@@ -54,4 +54,11 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+app.MapGet("/create-client", (ApplicationDbContext applicationDbContext) =>
+{
+    applicationDbContext.Clients.Add(new Client { Name = "Client 1" });
+    applicationDbContext.SaveChanges();
+    return Results.Ok("Client created");
+});
+
 app.Run();
