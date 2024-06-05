@@ -112,7 +112,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore
             var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
 
             // set the filter
-            builder.HasQueryFilter(lambdaExp);
+            //builder.HasQueryFilter(lambdaExp);
 
             // TODO: Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
