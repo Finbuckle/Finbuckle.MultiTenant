@@ -196,4 +196,21 @@ public class MultiTenantEntityTypeBuilderShould
 
         Assert.Equal("some value", index!.GetAnnotation("some annotation").Value);
     }
+    
+    [Fact]
+    public void PreserveAnnotationsOnKey()
+    {
+        using var db = GetDbContext(builder =>
+        {
+            var key = builder.Entity<Blog>().Metadata.GetKeys().First();
+            key.AddAnnotation("some annotation", "some value");
+            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+        });
+
+        var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?
+            .GetKeys()
+            .First();
+
+        Assert.Equal("some value", index!.GetAnnotation("some annotation").Value);
+    }
 }

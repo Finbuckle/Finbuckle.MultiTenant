@@ -65,6 +65,7 @@ public class MultiTenantEntityTypeBuilder
             var prop = Builder.Metadata.GetProperty("TenantId");
             var props = key.Properties.Append(prop).ToImmutableList();
             var foreignKeys = key.GetReferencingForeignKeys().ToArray();
+            var annotations = key.GetAnnotations();
             var newKey = key.IsPrimaryKey() ? Builder.Metadata.SetPrimaryKey(props) : Builder.Metadata.AddKey(props);
 
             foreach (var fk in foreignKeys)
@@ -74,6 +75,8 @@ public class MultiTenantEntityTypeBuilder
                 var fkProps = fk.Properties.Append(newFkProp).ToImmutableList();
                 fk.SetProperties(fkProps, newKey!);
             }
+            
+            newKey?.AddAnnotations(annotations);
 
             // remove key
             Builder.Metadata.RemoveKey(key);
