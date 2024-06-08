@@ -179,4 +179,38 @@ public class MultiTenantEntityTypeBuilderShould
             Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
         }
     }
+
+    [Fact]
+    public void PreserveAnnotations()
+    {
+        using var db = GetDbContext(builder =>
+        {
+            var index = builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique()
+                .HasAnnotation("some annotation", "some value").Metadata;
+            builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
+        });
+
+        var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?
+            .GetIndexes()
+            .Single(i => i.Properties.Select(p => p.Name).Contains("BlogId"));
+
+        Assert.Equal("some value", index!.GetAnnotation("some annotation").Value);
+    }
+    
+    [Fact]
+    public void PreserveAnnotationsOnKey()
+    {
+        using var db = GetDbContext(builder =>
+        {
+            var key = builder.Entity<Blog>().Metadata.GetKeys().First();
+            key.AddAnnotation("some annotation", "some value");
+            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+        });
+
+        var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?
+            .GetKeys()
+            .First();
+
+        Assert.Equal("some value", index!.GetAnnotation("some annotation").Value);
+    }
 }
