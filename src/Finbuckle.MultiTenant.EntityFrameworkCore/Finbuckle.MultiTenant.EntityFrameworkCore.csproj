@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
+    <LangVersion>12</LangVersion>
     <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
     <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
     <Nullable>enable</Nullable>

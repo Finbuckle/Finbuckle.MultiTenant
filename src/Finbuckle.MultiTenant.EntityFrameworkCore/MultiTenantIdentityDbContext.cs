@@ -149,11 +149,14 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TUserToken : IdentityUserToken<TKey>
     where TKey : IEquatable<TKey>
 {
-    public ITenantInfo? TenantInfo { get; }
+    public virtual ITenantInfo? TenantInfo => _tenantInfo ?? _multiTenantContextAccessor?.MultiTenantContext.TenantInfo;
 
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+    private readonly IMultiTenantContextAccessor? _multiTenantContextAccessor;
+    private readonly ITenantInfo? _tenantInfo;
 
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
@@ -161,12 +164,12 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+        _multiTenantContextAccessor = multiTenantContextAccessor;
     }
     
     protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo)
     {
-        TenantInfo = tenantInfo;
+        _tenantInfo = tenantInfo;
     }
     
     /// <summary>
@@ -176,12 +179,12 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     /// <param name="options">The database options instance.</param>
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+        _multiTenantContextAccessor = multiTenantContextAccessor;
     }
 
     protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
     {
-        TenantInfo = tenantInfo;
+        _tenantInfo = tenantInfo;
     }
 
     /// <inheritdoc />

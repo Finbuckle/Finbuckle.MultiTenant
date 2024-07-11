@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Linq;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,15 +16,26 @@ public static class FinbuckleModelBuilderExtensions
     /// </summary>
     public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
     {
-            // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
-            foreach (var clrType in modelBuilder.Model.GetEntityTypes()
-                                                 .Where(et => et.ClrType.HasMultiTenantAttribute())
-                                                 .Select(et => et.ClrType))
-            {
-                modelBuilder.Entity(clrType)
-                            .IsMultiTenant();
-            }
-
-            return modelBuilder;
+        // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
+        foreach (var clrType in modelBuilder.Model.GetEntityTypes()
+                     .Where(et => et.ClrType.HasMultiTenantAttribute())
+                     .Select(et => et.ClrType))
+        {
+            modelBuilder.Entity(clrType)
+                .IsMultiTenant();
         }
+
+        return modelBuilder;
+    }
+
+    public static void ConfigureTenantInfoEntity<T>(this ModelBuilder modelBuilder) where T : class, ITenantInfo
+    {
+        modelBuilder.Entity<T>(entity =>
+        {
+            entity.HasKey(ti => ti.Id);
+            entity.Property(ti => ti.Id).HasMaxLength(Constants.TenantIdMaxLength);
+            entity.HasIndex(ti => ti.Identifier).IsUnique();
+        });
+    }
+
 }

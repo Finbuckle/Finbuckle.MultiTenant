@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
@@ -19,7 +20,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once InconsistentNaming
     public static MultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
-        where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+        where TEFCoreStoreDbContext : DbContext, IEFCoreStoreDbContext<TTenantInfo>
         where TTenantInfo : class, ITenantInfo, new()
     {
         builder.Services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
