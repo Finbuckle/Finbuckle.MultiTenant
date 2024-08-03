@@ -24,5 +24,5 @@ jobs:
           npm install -D conventional-changelog-conventionalcommits
       - name: run semantic-release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.workflow_pat }}
         run: npx semantic-release
