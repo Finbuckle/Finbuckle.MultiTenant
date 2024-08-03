@@ -190,8 +190,6 @@ default values.
 > injection, but this was removed in v7.0.0 for consistency. Instead, inject the `IMultiTenantContextAccessor` and use
 > it to set the `TenantInfo` property in the database context constructor.
 
-```csharp
-
 Finally, call the library extension methods as described below. This requires overriding
 the `OnModelCreating`, `SaveChanges`, and `SaveChangesAsync` methods.
 
