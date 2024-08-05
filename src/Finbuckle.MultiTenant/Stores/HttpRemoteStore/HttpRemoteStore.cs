@@ -68,13 +68,11 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Not implemented in this implementation.
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    /// <inheritdoc />
+    /// <exception cref="NotImplementedException">When a not-found (404) status code is encountered</exception>
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _client.GetAllAsync(endpointTemplate);
     }
 
     /// <inheritdoc />
