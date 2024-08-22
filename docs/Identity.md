@@ -3,7 +3,7 @@
 ## Introduction
 
 Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is
-used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except Identity
+used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](../EFCore) except Identity
 calls into the database instead of your own code.
 
 See the Identity data isolation sample projects in
@@ -14,7 +14,7 @@ and integrate the Identity UI to work with a route multi-tenant strategy.
 ## Configuration
 
 Configuring an Identity db context to be multi-tenant is identical to that of a regular db context as described
-in [Data Isolation With Entity Framework Core](EFCore) with a few extra specifics to keep in mind.
+in [Data Isolation With Entity Framework Core](../EFCore) with a few extra specifics to keep in mind.
 
 The simplest approach is to derive a db context from `MultiTenantIdentityDbContext` (which itself derives
 from `IdentityDbContext`) and configure Identity to use the derived context.
@@ -27,7 +27,7 @@ designate the customized entity type as multi-tenant either:
   method (to ensure the Identity model exists).
 
 If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the
-appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is
+appropriate extension methods as described in [Data Isolation with Entity Framework Core](../EFCore). In this case it is
 required that base class `OnModelCreating` method is called **before** any multi-tenant extension methods.
 
 By default, all unique indexes will have the `TenantId` property added to prevent conflicts. Additionally,
@@ -59,7 +59,7 @@ a [slightly different method for configuring cookies](https://docs.microsoft.com
 but under the hood standard ASP.NET Core authentication is used.
 
 Finbuckle.MultiTenant can isolate Identity authentication per tenant so that user sessions are unique per tenant.
-See [per-tenant authentication](Authentication) for information on how to customize authentication options per tenant.
+See [per-tenant authentication](../Authentication) for information on how to customize authentication options per tenant.
 
 ## Identity Model Customization with MultiTenantIdentityDbContext
 

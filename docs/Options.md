@@ -13,7 +13,7 @@ Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/
 customize options distinctly for each tenant.
 
 Note: For authentication options, Finbuckle.MultiTenant provides special support
-for [per-tenant authentication](Authentication).
+for [per-tenant authentication](../Authentication).
 
 The current tenant determines which options are retrieved via
 the `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instances' `Value` property and
@@ -81,7 +81,7 @@ With standard options each tenant would get see the same exact options.
 
 This sections assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
 a `TTenantInfo` type of `TenantInfo`.
-See [Getting Started](GettingStarted) for details.
+See [Getting Started](../GettingStarted) for details.
 
 To configure options per tenant, the standard `Configure` method variants on the service collection now all
 have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at

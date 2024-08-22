@@ -41,7 +41,7 @@ The `MultiTenantContext<TTenantInfo>` contains information about the current ten
 
 Responsible for determining and returning a tenant identifier string for the current request.
 
-* Several strategies are provided based on host, route, etc. See [MultiTenant Strategies](Strategies) for more
+* Several strategies are provided based on host, route, etc. See [MultiTenant Strategies](../Strategies) for more
   information.
 * Custom strategies implementing `IMultiTenantStrategy` can be used as well.
 

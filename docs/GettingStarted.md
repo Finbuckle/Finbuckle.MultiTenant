@@ -55,14 +55,14 @@ information about
 the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom
 implementation can be used if more properties are needed.
 
-See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
+See [Core Concepts](../CoreConcepts) for more information on `ITenantInfo`.
 
 `.WithHostStrategy()`
 
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
 defaults to the extracting the subdomain as a tenant identifier.
 
-See [Strategies](Strategies) for more information.
+See [Strategies](../Strategies) for more information.
 
 `.WithConfigurationStore()`
 
@@ -70,7 +70,7 @@ This line tells the app that information for all tenants are in the `appsettings
 If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the
 current request.
 
-See [Stores](Stores) for more information.
+See [Stores](../Stores) for more information.
 
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
 ways.
@@ -103,17 +103,17 @@ configuration. If the current tenant could not be determined then `TenantInfo` w
 The `ITenantInfo` instance and the typed instance are also available using
 the `IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
 
-See [Configuration and Usage](ConfigurationAndUsage) for more information.
+See [Configuration and Usage](../ConfigurationAndUsage) for more information.
 
 ## Advanced Usage
 
 The library builds on this basic functionality to provide a variety of higher level features. See the documentation for
 more details:
 
-* [Per-tenant Options](Options)
-* [Per-tenant Authentication](Authentication)
-* [Entity Framework Core Data Isolation](EFCore)
-* [ASP.NET Core Identity Data Isolation](Identity)
+* [Per-tenant Options](../Options)
+* [Per-tenant Authentication](../Authentication)
+* [Entity Framework Core Data Isolation](../EFCore)
+* [ASP.NET Core Identity Data Isolation](../Identity)
 
 ## Samples
 

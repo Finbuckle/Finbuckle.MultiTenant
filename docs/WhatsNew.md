@@ -1,6 +1,6 @@
 # What's New in v<span class="_version">7.0.2</span>
 
-> This page only lists release update details specific to v<span class="_version">7.0.2</span>. [Release update details for all releases are shown in the history page.](History)
+> This page only lists release update details specific to v<span class="_version">7.0.2</span>. [Release update details for all releases are shown in the history page.](../History)
 
 <!--_release-notes-->
 ## [7.0.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.1...v7.0.2) (2024-08-03)

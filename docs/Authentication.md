@@ -9,14 +9,14 @@ avoids the need to create separate authentication schemes for each tenant.
 
 Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
-[per-tenant options](Options) as needed.
+[per-tenant options](../Options) as needed.
 
 See
 the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
 for a demonstration of the features discussed in this topic.
 
 The sections below assume Finbuckle.MultiTenant is installed and configured. See
-[Getting Started](GettingStarted) for details.
+[Getting Started](../GettingStarted) for details.
 
 ## Using WithPerTenantAuthentication()
 
@@ -148,7 +148,7 @@ work.
 ## Other Authentication Options
 
 Internally `WithPerTenantAuthentication()` makes use of
-[per-tenant options](Options). For authentication options not covered by
+[per-tenant options](../Options). For authentication options not covered by
 `WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
 
 For example, if you want to configure JWT tokens so that each tenant has a

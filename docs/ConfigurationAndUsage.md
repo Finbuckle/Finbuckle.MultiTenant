@@ -3,7 +3,7 @@
 ## Configuration
 
 Finbuckle.MultiTenant uses the standard application builder pattern for its configuration. In addition to adding the
-services, configuration for one or more [MultiTenant Stores](Stores) and [MultiTenant Strategies](Strategies) are
+services, configuration for one or more [MultiTenant Stores](../Stores) and [MultiTenant Strategies](../Strategies) are
 required:
 
 ```csharp
@@ -40,7 +40,7 @@ for chaining method calls.
 ### WithStore Variants
 
 Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used.
-See [MultiTenant Stores](Stores) for more information on each type.
+See [MultiTenant Stores](../Stores) for more information on each type.
 
 - `WithStore<TStore>`
 - `WithInMemoryStore<TTenantStore>`
@@ -52,7 +52,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 ### WithStrategy Variants
 
 Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used
-in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
+in the order registered. See [MultiTenant Strategies](../Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
 - `WithBasePathStrategy`
@@ -66,19 +66,19 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 
 ### WithPerTenantAuthentication
 
-Configures support for per-tenant authentication. See [Per-Tenant Authentication](Authentication) for more details.
+Configures support for per-tenant authentication. See [Per-Tenant Authentication](../Authentication) for more details.
 
 ## Per-Tenant Options
 
 Finbuckle.MultiTenant integrates with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also the [ASP.NET
 Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps
-customize options distinctly for each tenant. See [Per-Tenant Options](Options) for more details.
+customize options distinctly for each tenant. See [Per-Tenant Options](../Options) for more details.
 
 ## Tenant Resolution
 
 Most of the capability enabled by Finbuckle.MultiTenant is utilized through its middleware and use
-the [Options pattern with per-tenant options](Options). For web applications the middleware will resolve the app's
+the [Options pattern with per-tenant options](../Options). For web applications the middleware will resolve the app's
 current tenant on each request using the configured strategies and stores, and the per-tenant
 options will alter the app's behavior as dependency injection passes the options to app components.
 

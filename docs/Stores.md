@@ -1,7 +1,7 @@
 # MultiTenant Stores
 
 A MultiTenant store is responsible for retrieving information about a tenant based on an identifier string determined
-by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which
+by [MultiTenant strategies](../Strategies). The retrieved information is then used to create a `TenantInfo` object which
 provides the current tenant information to an app.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" stores for resolving the tenant. Custom stores can be created by
