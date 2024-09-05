@@ -1,107 +1,82 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using System.Threading;
+using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
-public static class EntityTypeBuilderExtensions
+/// <summary>
+/// A database context that enforces tenant integrity on multi-tenant entity types.
+/// </summary>
+public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
-    private class ExpressionVariableScope
-    {
-        public IMultiTenantDbContext? Context { get; }
-    }
+    /// <inheritdoc />
+    public ITenantInfo? TenantInfo { get; internal set; }
 
-    private static LambdaExpression? GetQueryFilter(this EntityTypeBuilder builder)
+    /// <inheritdoc />
+    public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
+
+    /// <inheritdoc />
+    public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
+
+    public bool IsMultiTenantEnabled { get; set; } = true;
+
+    protected MultiTenantDbContext(ITenantInfo? tenantInfo)
     {
-        return builder.Metadata.GetQueryFilter();
+        TenantInfo = tenantInfo;
     }
 
     /// <summary>
-    /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after
-    /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
+    /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
-    /// <param name="builder">The typed EntityTypeBuilder instance.</param>
-    /// <returns>A MultiTenantEntityTypeBuilder instance.</returns>
-    public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
+    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
+    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
-        if (builder.Metadata.IsMultiTenant())
-            return new MultiTenantEntityTypeBuilder(builder);
+        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+    }
 
-        builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
+    protected MultiTenantDbContext(ITenantInfo? tenantInfo, DbContextOptions options) : base(options)
+    {
+        TenantInfo = tenantInfo;
+    }
 
-        try
+    /// <summary>
+    /// Constructs the database context instance and binds to the current tenant.
+    /// </summary>
+    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
+    /// <param name="options">The database options instance.</param>
+    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
+    {
+        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+    }
+
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ConfigureMultiTenant();
+    }
+
+    /// <inheritdoc />
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        if (IsMultiTenantEnabled)
         {
-            builder.Property<string>("TenantId")
-                .IsRequired()
-                .HasMaxLength(Internal.Constants.TenantIdMaxLength);
+            this.EnforceMultiTenant();
         }
-        catch (Exception ex)
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    /// <inheritdoc />
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default(CancellationToken))
+    {
+        if (IsMultiTenantEnabled)
         {
-            throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
+            this.EnforceMultiTenant();
         }
-
-        // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
-
-        // where e is one of our entity types
-        // will need this ParameterExpression for next step and for final step
-        var entityParamExp = Expression.Parameter(builder.Metadata.ClrType, "e");
-
-        var existingQueryFilter = builder.GetQueryFilter();
-
-        // override to match existing query parameter if applicable
-        if (existingQueryFilter != null)
-        {
-            entityParamExp = existingQueryFilter.Parameters.First();
-        }
-
-        // build up expression tree for: EF.Property<string>(e, "TenantId")
-        var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-        var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
-        var leftExp = efPropertyExp;
-
-        // build up express tree for: TenantInfo.Id
-        // EF will magically sub the current db context in for scope.Context
-        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
-        var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
-        var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
-        var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
-
-        // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
-        var predicate = Expression.Equal(leftExp, rightExp);
-
-          #region Fork Sirfull
-            // build expression tree for : "IsMultiTenantEnabled == False || EF.Property<string>(e, "TenantId") == TenantInfo.Id"
-            //                              -------------------------------
-            predicate = Expression.OrElse(
-                Expression.Equal(
-                    Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)),
-                    Expression.Constant(false)
-                ),
-                predicate
-            );
-            #endregion
-
-        // combine with existing filter
-        if (existingQueryFilter != null)
-        {
-            predicate = Expression.AndAlso(existingQueryFilter.Body, predicate);
-        }
-
-        // build the final expression tree
-        var delegateType = Expression.GetDelegateType(builder.Metadata.ClrType, typeof(bool));
-        var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
-
-        // set the filter
-        builder.HasQueryFilter(lambdaExp);
-
-        return new MultiTenantEntityTypeBuilder(builder);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 }
