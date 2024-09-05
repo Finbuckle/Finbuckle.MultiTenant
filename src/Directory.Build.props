@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <Version>7.0.2</Version>
-		<Authors>Finbuckle LLC (Sirfull fork)</Authors>
+        <Version>7.0.3</Version>
+        <Authors>Finbuckle LLC (Sirfull fork)</Authors>
         <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors (Sirfull fork)</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
