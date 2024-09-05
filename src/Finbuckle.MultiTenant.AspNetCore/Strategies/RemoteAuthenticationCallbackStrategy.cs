@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -12,21 +13,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.Strategies
+namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
+
+public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
 {
-    public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
+    private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
+
+    public int Priority { get => -900; }
+
+    public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
     {
-        private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
-
-        public int Priority { get => -900; }
-
-        public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
-        {
             this.logger = logger;
         }
 
-        public async virtual Task<string?> GetIdentifierAsync(object context)
-        {
+    public async virtual Task<string?> GetIdentifierAsync(object context)
+    {
             if (!(context is HttpContext httpContext))
                 throw new MultiTenantException(null,
                     new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
@@ -103,5 +104,4 @@ namespace Finbuckle.MultiTenant.Strategies
 
             return null;
         }
-    }
 }

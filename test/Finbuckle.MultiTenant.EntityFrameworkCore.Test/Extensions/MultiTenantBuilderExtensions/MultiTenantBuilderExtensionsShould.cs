@@ -1,20 +1,21 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions;
+
+public class MultiTenantBuilderExtensionsShould
 {
-    public class MultiTenantBuilderExtensionsShould
+    [Fact]
+    public void AddEfCoreStore()
     {
-        [Fact]
-        public void AddEfCoreStore()
-        {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
@@ -22,11 +23,11 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
             Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
         }
 
-        [Fact]
-        public void AddEfCoreStoreWithExistingDbContext()
-        {
+    [Fact]
+    public void AddEfCoreStoreWithExistingDbContext()
+    {
             var services = new ServiceCollection();
-            var builder = new FinbuckleMultiTenantBuilder<TenantInfo>(services);
+            var builder = new MultiTenantBuilder<TenantInfo>(services);
             services.AddDbContext<TestEfCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
             builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
             var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
@@ -34,5 +35,4 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantB
             var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
             Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
         }
-    }
 }

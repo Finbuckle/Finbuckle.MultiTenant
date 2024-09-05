@@ -1,9 +1,10 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">6.13.1</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">7.0.2</span>
 
 ## About Finbuckle.MultiTenant
 
-Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation. See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
+Finbuckle.MultiTenant is open source multitenancy middleware library for .NET. It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation. See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multi-tenant) for more details and documentation.
 
+**This release supports .NET 6, .NET 7, and .NET 8.**
 
 ## Main Build and Test Status
 

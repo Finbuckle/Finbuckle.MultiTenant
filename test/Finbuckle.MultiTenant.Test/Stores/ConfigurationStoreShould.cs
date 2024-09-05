@@ -1,19 +1,18 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Threading.Tasks;
-using Finbuckle.MultiTenant.Stores;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.Stores
+namespace Finbuckle.MultiTenant.Test.Stores;
+
+public class ConfigurationStoreShould : MultiTenantStoreTestBase
 {
-    public class ConfigurationStoreShould : MultiTenantStoreTestBase
+    [Fact]
+    public void NotThrowIfNoDefaultSection()
     {
-        [Fact]
-        public void NotThrowIfNoDefaultSection()
-        {
             // See https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/426
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings_NoDefaults.json");
@@ -24,15 +23,15 @@ namespace Finbuckle.MultiTenant.Test.Stores
             new ConfigurationStore<TenantInfo>(configuration);
         }
 
-        [Fact]
-        public void ThrowIfNullConfiguration()
-        {
+    [Fact]
+    public void ThrowIfNullConfiguration()
+    {
             Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null!));
         }
 
-        [Fact]
-        public void ThrowIfEmptyOrNullSection()
-        {
+    [Fact]
+    public void ThrowIfEmptyOrNullSection()
+    {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
             IConfiguration configuration = configBuilder.Build();
@@ -41,9 +40,9 @@ namespace Finbuckle.MultiTenant.Test.Stores
             Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null!));
         }
 
-        [Fact]
-        public void ThrowIfInvalidSection()
-        {
+    [Fact]
+    public void ThrowIfInvalidSection()
+    {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
             IConfiguration configuration = configBuilder.Build();
@@ -51,26 +50,29 @@ namespace Finbuckle.MultiTenant.Test.Stores
             Assert.Throws<MultiTenantException>(() => new ConfigurationStore<TenantInfo>(configuration, "invalid"));
         }
 
-        [Fact]
-        public void IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
-        {
+    [Fact]
+    public async Task IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
+    {
             var store = CreateTestStore();
 
-            Assert.Equal("initech", store.TryGetByIdentifierAsync("INITECH").Result!.Identifier);
+            var tenant = await store.TryGetByIdentifierAsync("INITECH");
+
+            Assert.NotNull(tenant);
+            Assert.Equal("initech", tenant.Identifier);
         }
 
-        [Fact]
-        public void ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
-        {
+    [Fact]
+    public async Task ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
+    {
             var store = CreateTestStore();
 
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
         }
 
-        // Basic store functionality tested in MultiTenantStoresShould.cs
+    // Basic store functionality tested in MultiTenantStoresShould.cs
 
-        protected override IMultiTenantStore<TenantInfo> CreateTestStore()
-        {
+    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    {
             var configBuilder = new ConfigurationBuilder();
             configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
             var configuration = configBuilder.Build();
@@ -78,54 +80,53 @@ namespace Finbuckle.MultiTenant.Test.Stores
             return new ConfigurationStore<TenantInfo>(configuration);
         }
 
-        protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
-        {
+    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    {
             throw new NotImplementedException();
         }
 
-        [Fact]
-        public override void GetTenantInfoFromStoreById()
-        {
+    [Fact]
+    public override void GetTenantInfoFromStoreById()
+    {
             base.GetTenantInfoFromStoreById();
         }
 
-        [Fact]
-        public override void GetTenantInfoFromStoreByIdentifier()
-        {
+    [Fact]
+    public override void GetTenantInfoFromStoreByIdentifier()
+    {
             base.GetTenantInfoFromStoreByIdentifier();
         }
 
-        [Fact]
-        public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
-        {
+    [Fact]
+    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    {
             base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
         }
 
-        [Fact]
-        public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
-        {
+    [Fact]
+    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    {
             base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void AddTenantInfoToStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void AddTenantInfoToStore()
+    {
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void RemoveTenantInfoFromStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void RemoveTenantInfoFromStore()
+    {
         }
 
-        // [Fact(Skip = "Not valid for this store.")]
-        public override void UpdateTenantInfoInStore()
-        {
+    // [Fact(Skip = "Not valid for this store.")]
+    public override void UpdateTenantInfoInStore()
+    {
         }
 
-        [Fact]
-        public override void GetAllTenantsFromStoreAsync()
-        {
+    [Fact]
+    public override void GetAllTenantsFromStoreAsync()
+    {
             base.GetAllTenantsFromStoreAsync();
         }
-    }
 }

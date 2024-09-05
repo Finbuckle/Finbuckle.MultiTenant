@@ -2,35 +2,35 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Threading.Tasks;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Finbuckle.MultiTenant.AspNetCore
-{
-    /// <summary>
-    /// Middleware for resolving the TenantContext and storing it in HttpContext.
-    /// </summary>
-    internal class MultiTenantMiddleware
-    {
-        private readonly RequestDelegate next;
+namespace Finbuckle.MultiTenant.AspNetCore.Internal;
 
-        public MultiTenantMiddleware(RequestDelegate next)
-        {
+/// <summary>
+/// Middleware for resolving the MultiTenantContext and storing it in HttpContext.
+/// </summary>
+public class MultiTenantMiddleware
+{
+    private readonly RequestDelegate next;
+
+    public MultiTenantMiddleware(RequestDelegate next)
+    {
             this.next = next;
         }
 
-        public async Task Invoke(HttpContext context)
-        {
-            var accessor = context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
-
-            if (accessor.MultiTenantContext == null)
-            {
-                var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
-                var multiTenantContext = await resolver.ResolveAsync(context);
-                accessor.MultiTenantContext = multiTenantContext;
-            }
+    public async Task Invoke(HttpContext context)
+    {
+            context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
+            var mtcSetter = context.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
+            
+            var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
+            
+            var multiTenantContext = await resolver.ResolveAsync(context);
+            mtcSetter.MultiTenantContext = multiTenantContext;
+            context.Items[typeof(IMultiTenantContext)] = multiTenantContext;
 
             await next(context);
         }
-    }
 }

@@ -1,13 +1,14 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore
+using Finbuckle.MultiTenant.Abstractions;
+
+namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+
+public interface IMultiTenantDbContext
 {
-    public interface IMultiTenantDbContext
-    {
-        ITenantInfo TenantInfo { get; }
-        TenantMismatchMode TenantMismatchMode { get; }
-        TenantNotSetMode TenantNotSetMode { get; }
-        bool IsMultiTenantEnabled { get; }
-    }
+    ITenantInfo? TenantInfo { get; }
+    TenantMismatchMode TenantMismatchMode { get; }
+    TenantNotSetMode TenantNotSetMode { get; }
+    bool IsMultiTenantEnabled { get; }
 }

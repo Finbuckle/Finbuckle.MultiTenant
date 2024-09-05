@@ -1,6 +1,6 @@
 # MultiTenant Strategies
 
-A multitenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier
+A multi-tenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier
 string which is used to create a `TenantInfo` object with information from the [MultiTenant store](Stores).
 
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be

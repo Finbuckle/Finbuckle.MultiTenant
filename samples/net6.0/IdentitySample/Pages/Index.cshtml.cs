@@ -7,7 +7,7 @@ public class IndexModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     
-    public TenantInfo? TenantInfo { get; private set; }
+    public AppTenantInfo? AppTenantInfo { get; private set; }
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -16,6 +16,6 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-        TenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>()?.TenantInfo;
+        AppTenantInfo = HttpContext.GetMultiTenantContext<AppTenantInfo>()?.TenantInfo;
     }
 }

@@ -149,8 +149,26 @@ of `ITenantInfo` properties are mapped from the JSON automatically.
 
 Uses an Entity Framework Core database context as the backing store.
 
-Case sensitivity will vary by how the database context is configured and the underlying database provider. The database
-context must derive from `EFCoreStoreDbContext` and additional entity types can be added.
+This store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
+
+The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from
+the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/EFCoreStoreSample)
+.
+
+The database context used with the EFCore store must derive from `EFCoreStoreDbContext`, but other entities can be
+added:
+
+```csharp
+public class MultiTenantStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+{
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+      // Use InMemory, but could be MsSql, Sqlite, MySql, etc...
+      optionsBuilder.UseInMemoryDatabase("EfCoreStoreSampleConnectionString");
+      base.OnConfiguring(optionsBuilder);
+  }
+}
+```
 
 This database context is not itself multi-tenant, but rather it globally contains the details of each tenant.
 It will often be a standalone database separate from any tenant database(s) and will have its own connection string.
@@ -171,15 +189,17 @@ Entity Framework Core works with any database context which can offer richer fun
 
 > NuGet package: Finbuckle.MultiTenant
 
-Sends the tenant identifier, provided by the [MultiTenant strategy](Strategies), to an http(s) endpoint to get
-a `TenantInfo` object in return. This store is usually case insensitive when retrieving tenant information by tenant
-identifier, but the remote server might be more restrictive.
+Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object
+in return.
+
+The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/HttpRemoteStoreSample)
+projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
 
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
-, `Name`, and `ConnectionString` and other properties which will be mapped into a `TenantInfo` object with the type
+, `Name`, and other properties which will be mapped into a `TenantInfo` object with the type
 passed to `AddMultiTenant<TTenantInfo>`.
 
 Any non-200 response code results in a null `TenantInfo`.

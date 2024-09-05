@@ -6,8 +6,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+<!--    <ItemGroup>-->
+<!--      <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="7.*" />-->
+<!--    </ItemGroup>-->
+
     <ItemGroup>
-      <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="6.*" />
+      <ProjectReference Include="..\..\..\src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" />
     </ItemGroup>
 
 </Project>

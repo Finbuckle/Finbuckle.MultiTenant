@@ -1,8 +1,8 @@
 <Project>
     <PropertyGroup>
-        <Version>6.14.0</Version>
+        <Version>7.0.2</Version>
         <Authors>Sirfull</Authors>
-        <Copyright>Copyright Sirfull and Contributors</Copyright>
+        <Copyright>Copyright Sirfull</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>
