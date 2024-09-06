@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ZiggyCreatures.FusionCache" Version="0.26.0" />
+    </ItemGroup>
+
+</Project>
