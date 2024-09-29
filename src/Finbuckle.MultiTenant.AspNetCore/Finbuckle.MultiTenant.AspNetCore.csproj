@@ -5,6 +5,7 @@
     <Title>Finbuckle.MultiTenant.AspNetCore</Title>
     <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +31,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options)
         : this(inner, options, new Dictionary<string, AuthenticationScheme>(StringComparer.Ordinal))
     {
-        }
+    }
 
     /// <summary>
     /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
@@ -41,26 +42,26 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <param name="schemes">The dictionary used to store authentication schemes.</param>
     public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
     {
-            _inner = inner;
-            _optionsProvider = options;
+        _inner = inner;
+        _optionsProvider = options;
 
-            _schemes = schemes ?? throw new ArgumentNullException(nameof(schemes));
-            _requestHandlers = new List<AuthenticationScheme>();
+        _schemes = schemes ?? throw new ArgumentNullException(nameof(schemes));
+        _requestHandlers = [];
 
-            foreach (var builder in _optionsProvider.Value.Schemes)
-            {
-                var scheme = builder.Build();
-                // ReSharper disable once VirtualMemberCallInConstructor
-                // As-is from MS source.
-                AddScheme(scheme);
-            }
+        foreach (var builder in _optionsProvider.Value.Schemes)
+        {
+            var scheme = builder.Build();
+            // ReSharper disable once VirtualMemberCallInConstructor
+            // As-is from MS source.
+            AddScheme(scheme);
+        }
     }
 
     private readonly IOptions<AuthenticationOptions> _optionsProvider;
-    private readonly object _lock = new object();
+    private readonly Lock _lock = new();
 
     private readonly IDictionary<string, AuthenticationScheme> _schemes;
-    private readonly List<AuthenticationScheme> _requestHandlers;
+    private readonly HashSet<AuthenticationScheme> _requestHandlers;
 
     private Task<AuthenticationScheme?> GetDefaultSchemeAsync()
         => _optionsProvider.Value.DefaultScheme != null
@@ -138,7 +139,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
 
         if (scheme == null)
         {
-            scheme = _schemes.ContainsKey(name) ? _schemes[name] : null;
+            _schemes.TryGetValue(name, out scheme);
         }
 
         return scheme;
@@ -189,9 +190,8 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         }
         lock (_lock)
         {
-            if (_schemes.ContainsKey(name))
+            if (_schemes.TryGetValue(name, out var scheme))
             {
-                var scheme = _schemes[name];
                 _requestHandlers.Remove(scheme);
                 _schemes.Remove(name);
             }
