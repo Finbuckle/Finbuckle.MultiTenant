@@ -4,6 +4,7 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
+using Finbuckle.MultiTenant.Stores.EchoStore;
 using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Finbuckle.MultiTenant.Strategies;
@@ -157,6 +158,26 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Null(tc);
     }
 
+    [Fact]
+    public async Task AddEchoStore()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithEchoStore();
+        var sp = services.BuildServiceProvider();
+            
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<EchoStore<TenantInfo>>(store);
+
+        var tc = await store.TryGetByIdentifierAsync("initech");
+        Assert.Equal("initech", tc!.Id);
+        Assert.Equal("initech", tc.Identifier);
+
+        tc = await store.TryGetByIdentifierAsync("lol");
+        Assert.Equal("lol", tc!.Id);
+        Assert.Equal("lol", tc.Identifier);
+    }
+    
     [Fact]
     public void AddDelegateStrategy()
     {

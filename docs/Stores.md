@@ -272,3 +272,21 @@ services.AddMultiTenant<TenantInfo>()
 services.AddMultiTenant<TenantInfo>()
         .WithDistributedCacheStore(TimeSpan.FromMinutes(5));
 ```
+
+## Echo Store
+
+> NuGet package: Finbuckle.MultiTenant
+
+The Echo Store serves as a simple, read-only store that directly returns a new tenant instance based on the given identifier
+without any additional settings. It's particularly suited for applications that require a simple, immediate method for tenant identification without the need for persistence, such as during testing phases or in environments where tenant information is static and predefined elsewhere.
+
+
+This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw
+a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync` will also throw an Exception.
+
+Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
+
+```csharp
+services.AddMultiTenant<TenantInfo>()
+    .WithEchoStore();
+```
