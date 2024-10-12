@@ -14,21 +14,20 @@ public class SessionStrategy : IMultiTenantStrategy
 
     public SessionStrategy(string tenantKey)
     {
-            if (string.IsNullOrWhiteSpace(tenantKey))
-            {
-                throw new ArgumentException("message", nameof(tenantKey));
-            }
-
-            this.tenantKey = tenantKey;
+        if (string.IsNullOrWhiteSpace(tenantKey))
+        {
+            throw new ArgumentException("message", nameof(tenantKey));
         }
+
+        this.tenantKey = tenantKey;
+    }
 
     public Task<string?> GetIdentifierAsync(object context)
     {
-            if(!(context is HttpContext httpContext))
-                throw new MultiTenantException(null,
-                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
+        if (context is not HttpContext httpContext)
+            return Task.FromResult<string?>(null);
 
-            var identifier = httpContext.Session.GetString(tenantKey);
-            return Task.FromResult<string?>(identifier); // Prevent the compiler warning that no await exists.
-        }
+        var identifier = httpContext.Session.GetString(tenantKey);
+        return Task.FromResult(identifier);
+    }
 }

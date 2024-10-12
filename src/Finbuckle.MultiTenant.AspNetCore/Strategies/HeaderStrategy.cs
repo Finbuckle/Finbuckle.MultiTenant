@@ -21,9 +21,8 @@ public class HeaderStrategy : IMultiTenantStrategy
 
     public Task<string?> GetIdentifierAsync(object context)
     {
-            if (!(context is HttpContext httpContext))
-                throw new MultiTenantException(null,
-                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
+            if (context is not HttpContext httpContext)
+                return Task.FromResult<string?>(null);
 
             return Task.FromResult(httpContext?.Request.Headers[_headerKey].FirstOrDefault());
         }

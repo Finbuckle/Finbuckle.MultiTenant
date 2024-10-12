@@ -12,20 +12,19 @@ public class BasePathStrategy : IMultiTenantStrategy
 {
     public Task<string?> GetIdentifierAsync(object context)
     {
-            if (!(context is HttpContext httpContext))
-                throw new MultiTenantException(null,
-                    new ArgumentException($"\"{nameof(context)}\" type must be of type HttpContext", nameof(context)));
+        if (context is not HttpContext httpContext)
+            return Task.FromResult<string?>(null);
 
-            var path = httpContext.Request.Path;
+        var path = httpContext.Request.Path;
 
-            var pathSegments =
-                path.Value?.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
+        var pathSegments =
+            path.Value?.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
 
-            if (pathSegments is null || pathSegments.Length == 0)
-                return Task.FromResult<string?>(null);
+        if (pathSegments is null || pathSegments.Length == 0)
+            return Task.FromResult<string?>(null);
 
-            string identifier = pathSegments[0];
+        string identifier = pathSegments[0];
 
-            return Task.FromResult<string?>(identifier);
-        }
+        return Task.FromResult<string?>(identifier);
+    }
 }

@@ -53,12 +53,12 @@ public class SessionStrategyShould
     }
 
     [Fact]
-    public async void ThrowIfContextIsNotHttpContext()
+    public async void ReturnNullIfContextIsNotHttpContext()
     {
-        var context = new Object();
+        var context = new object();
         var strategy = new SessionStrategy("__tenant__");
-
-        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+        
+        Assert.Null(await strategy.GetIdentifierAsync(context));
     }
 
     [Fact]
@@ -66,12 +66,10 @@ public class SessionStrategyShould
     {
         var hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
 
-        using (var server = new TestServer(hostBuilder))
-        {
-            var client = server.CreateClient();
-            var response = await client.GetStringAsync("/test_tenant");
-            Assert.Equal("", response);
-        }
+        using var server = new TestServer(hostBuilder);
+        var client = server.CreateClient();
+        var response = await client.GetStringAsync("/test_tenant");
+        Assert.Equal("", response);
     }
 
     // TODO: Figure out how to test this

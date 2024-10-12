@@ -13,7 +13,16 @@ public class RemoteAuthenticationCallbackStrategyShould
     [Fact]
     public void HavePriorityNeg900()
     {
-            var strategy = new RemoteAuthenticationCallbackStrategy(null!);
-            Assert.Equal(-900, strategy.Priority);
-        }
+        var strategy = new RemoteAuthenticationCallbackStrategy(null!);
+        Assert.Equal(-900, strategy.Priority);
+    }
+    
+    [Fact]
+    public async void ReturnNullIfContextIsNotHttpContext()
+    {
+        var context = new object();
+        var strategy = new RemoteAuthenticationCallbackStrategy(null!);
+
+        Assert.Null(await strategy.GetIdentifierAsync(context));
+    }
 }
