@@ -59,8 +59,7 @@ public static class MultiTenantBuilderExtensions
     /// </summary>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder,
-        Action<MultiTenantAuthenticationOptions>? config = null)
+        this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : class, ITenantInfo, new()
     {
         // Set events to set and validate tenant for each cookie based authentication principal.
