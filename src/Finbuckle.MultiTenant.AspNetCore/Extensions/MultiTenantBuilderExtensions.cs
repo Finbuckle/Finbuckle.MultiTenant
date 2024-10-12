@@ -220,10 +220,8 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolved;
             options.Events.OnTenantResolved = tenantResolvedContext =>
             {
-                var httpContext = tenantResolvedContext.Context as HttpContext ??
-                                  throw new MultiTenantException("BasePathStrategy expects HttpContext.");
-
                 if (tenantResolvedContext.StrategyType == typeof(BasePathStrategy) &&
+                    tenantResolvedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)
                 {
