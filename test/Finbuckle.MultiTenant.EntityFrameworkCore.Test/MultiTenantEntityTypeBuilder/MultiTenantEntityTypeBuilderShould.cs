@@ -181,7 +181,7 @@ public class MultiTenantEntityTypeBuilderShould
     }
 
     [Fact]
-    public void PreserveAnnotations()
+    public void PreserveAnnotationsOnIndex()
     {
         using var db = GetDbContext(builder =>
         {
