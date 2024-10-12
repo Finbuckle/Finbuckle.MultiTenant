@@ -98,12 +98,12 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void ThrowIfContextIsNotHttpContext()
+    public async void ReturnNullIfContextIsNotHttpContext()
     {
-        var context = new Object();
+        var context = new object();
         var strategy = new BasePathStrategy();
 
-        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+        Assert.Null(await strategy.GetIdentifierAsync(context));
     }
 
     [Fact]
