@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasePathStrategySample", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentitySample", "samples\net6.0\IdentitySample\IdentitySample.csproj", "{EF62B65E-C017-41D2-9D4F-EB3C6E5CD86D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Store.FusionCache", "src\Finbuckle.MultiTenant.Store.FusionCache\Finbuckle.MultiTenant.Store.FusionCache.csproj", "{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Store.FusionCache.Test", "test\Finbuckle.MultiTenant.Store.FusionCache.Test\Finbuckle.MultiTenant.Store.FusionCache.Test.csproj", "{289D544D-29BE-42DE-B686-7C15EACCFAD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +72,14 @@ Global
 		{CF531F18-3EA7-4DC9-8546-A9FD2B9834A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF531F18-3EA7-4DC9-8546-A9FD2B9834A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF531F18-3EA7-4DC9-8546-A9FD2B9834A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{289D544D-29BE-42DE-B686-7C15EACCFAD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{289D544D-29BE-42DE-B686-7C15EACCFAD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{289D544D-29BE-42DE-B686-7C15EACCFAD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{289D544D-29BE-42DE-B686-7C15EACCFAD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -79,5 +91,7 @@ Global
 		{CF531F18-3EA7-4DC9-8546-A9FD2B9834A7} = {32ACE1CC-3201-4AD2-9DA0-D3D7C31D2715}
 		{32ACE1CC-3201-4AD2-9DA0-D3D7C31D2715} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 		{EF62B65E-C017-41D2-9D4F-EB3C6E5CD86D} = {32ACE1CC-3201-4AD2-9DA0-D3D7C31D2715}
+		{7C9B7B46-9F0C-485A-914B-F6B6830AF0F4} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
+		{289D544D-29BE-42DE-B686-7C15EACCFAD4} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 	EndGlobalSection
 EndGlobal
