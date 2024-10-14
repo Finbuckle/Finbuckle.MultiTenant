@@ -5,6 +5,7 @@
     <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
     <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
