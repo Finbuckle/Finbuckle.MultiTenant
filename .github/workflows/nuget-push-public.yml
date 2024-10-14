@@ -6,9 +6,9 @@ jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Create the package
-        run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
+        run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
       - name: Publish the package to NuGet.org
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
