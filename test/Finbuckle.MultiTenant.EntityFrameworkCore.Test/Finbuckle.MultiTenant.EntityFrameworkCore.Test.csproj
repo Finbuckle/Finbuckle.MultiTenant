@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net8.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
@@ -12,8 +12,8 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(TfmMajVer).0.*"/>
-            <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(TfmMajVer).0.*-*"/>
+            <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="$(TfmMajVer).0.*-*"/>
         </ItemGroup>
     </Target>
 
