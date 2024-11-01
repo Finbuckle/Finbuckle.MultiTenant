@@ -1,4 +1,4 @@
-name: Release
+name: Release Dry Run
 
 on: [workflow_dispatch]
 
