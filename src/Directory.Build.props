@@ -15,9 +15,12 @@
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>CS1591</NoWarn>
-    </PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+
+</PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="\"/>
+        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
     </ItemGroup>
 </Project>
