@@ -3,10 +3,6 @@
 <!--_history-->
 # [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
 
-
-* feat!: version policy update ([#888](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/888)) ([487a3a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/487a3a6d9782803dc2c7a4c70f46cdecf876e991))
-
-
 ### Bug Fixes
 
 * BasePathStrategy no longer breaks the strategy chain ([#884](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/884)) ([3263eff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3263effae4638656aab827b24094a8e575ae19a0))
