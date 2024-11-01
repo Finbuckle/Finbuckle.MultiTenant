@@ -1,35 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
-    <Title>Finbuckle.MultiTenant.AspNetCore</Title>
-    <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;</TargetFrameworks>
+        <Title>Finbuckle.MultiTenant.AspNetCore</Title>
+        <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
-  </ItemGroup>
+    <Target Name="ReferenceFinbuckleDependencies" Condition=" '$(TargetFramework)' != '' " BeforeTargets="CollectPackageReferences">
+        <PropertyGroup>
+            <TfmMajVer>$(TargetFramework.Substring(3, 1))</TfmMajVer>
+        </PropertyGroup>
 
-  <Choose>
-    <When Condition=" '$(TargetFramework)' == 'net8.0' ">
-      <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.1" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net7.0' ">
-      <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="7.0.15" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net6.0' ">
-      <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.26" />
-      </ItemGroup>
-    </When>
-  </Choose>
+        <ItemGroup>
+            <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="$(TfmMajVer).0.*"/>
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.*" PrivateAssets="All"/>
+        <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
+    </ItemGroup>
 </Project>

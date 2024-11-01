@@ -1,50 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;</TargetFrameworks>
         <Title>Finbuckle.MultiTenant</Title>
         <Description>Main library package for Finbuckle.MultiTenant.</Description>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    </ItemGroup>
+    <Target Name="ReferenceFinbuckleDependencies" Condition=" '$(TargetFramework)' != '' " BeforeTargets="CollectPackageReferences">
+        <PropertyGroup>
+            <TfmMajVer>$(TargetFramework.Substring(3, 1))</TfmMajVer>
+        </PropertyGroup>
 
-    <Choose>
-        <When Condition=" '$(TargetFramework)' == 'net8.0' ">
-            <ItemGroup>
-                <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
-            </ItemGroup>
-        </When>
-        <When Condition=" '$(TargetFramework)' == 'net7.0' ">
-            <ItemGroup>
-                <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
-            </ItemGroup>
-        </When>
-        <When Condition=" '$(TargetFramework)' == 'net6.0' ">
-            <ItemGroup>
-                <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-                <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
-            </ItemGroup>
-        </When>
-    </Choose>
+        <ItemGroup>
+            <PackageReference Include="Microsoft.Extensions.Logging" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Options" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Http" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="$(TfmMajVer).0.*"/>
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.*" PrivateAssets="All"/>
+    </ItemGroup>
 </Project>
