@@ -323,17 +323,25 @@ database context instance for a specific tenant.
 
 ```csharp
 // create or otherwise obtain a tenant info instance
-var tenantInfo = new MyTenantInfo(...);
+using var tenantInfo = new MyTenantInfo(...);
 
 // create a database context instance for the tenant
-var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo);
+using var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo);
 
 // create a database context instance for the tenant with an instance of DbOptions<AppMultiTenantDbContext>
 var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
 dbOptions);
+
+// loop through a bunch of tenant instances
+foreach (var tenant in tenants)
+{
+    using var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenant);
+    // do something with the database context
+}
 ```
 
-Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block.
+Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block 
+or variable.
 This method will work for any database context class expecting a `IMultiTenantContextAccessor` in its constructor and an
 options DbContextOptions<T> in its constructor.
 
