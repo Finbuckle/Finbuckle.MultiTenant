@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -12,20 +13,19 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 {
     private readonly Action<ModelBuilder> _config;
 
-    public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(
-        new TenantInfo { Id = "dummy" },
-        options)
+    public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) :
+        base(new StaticMultiTenantContextAccessor<TenantInfo>(new TenantInfo { Id = "dummy" }), options)
     {
-            this._config = config;
-        }
+        this._config = config;
+    }
 
     public DbSet<Blog>? Blogs { get; set; }
     public DbSet<Post>? Posts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            _config(modelBuilder);
-        }
+        _config(modelBuilder);
+    }
 }
 
 public class Blog
@@ -50,11 +50,11 @@ public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
 {
     public object Create(DbContext context)
     {
-            return new object();
-        }
-        
+        return new object();
+    }
+
     public object Create(DbContext context, bool designTime)
     {
-            return new Object(); // Never cache!
-        }
+        return new Object(); // Never cache!
+    }
 }
