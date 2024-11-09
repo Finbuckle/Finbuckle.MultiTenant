@@ -97,4 +97,17 @@ public class MultiTenantDbContextShould
 
         Assert.NotNull(c);
     }
+    
+    [Fact]
+    public void ThrowOnInvalidDbContext()
+    {
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc"
+        };
+
+        Assert.Throws<ArgumentException>(() => EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
+    }
 }
