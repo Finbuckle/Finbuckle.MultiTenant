@@ -340,10 +340,9 @@ foreach (var tenant in tenants)
 }
 ```
 
-Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block 
-or variable.
-This method will work for any database context class expecting a `IMultiTenantContextAccessor` in its constructor and an
-options DbContextOptions<T> in its constructor.
+Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block or
+variable. This method will work for any database context class expecting a `IMultiTenantContextAccessor` in its
+constructor and an options DbContextOptions<T> in its constructor.
 
 ## Design Time Instantiation
 
@@ -352,8 +351,8 @@ challenging. By default, for things like migrations and command line tools Entit
 instance of the context using dependency injection, however usually no valid tenant exists in these cases and DI fails.
 For this reason it is recommended to use
 a [design time factory](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation#from-a-design-time-factory)
-wherein a dummy `ITenantInfo` with the desired connection string and passed to the database context
-creation factory described above.
+wherein a dummy `ITenantInfo` with the desired connection string and passed to the database context creation factory
+described above.
 
 ## Adding Data
 
