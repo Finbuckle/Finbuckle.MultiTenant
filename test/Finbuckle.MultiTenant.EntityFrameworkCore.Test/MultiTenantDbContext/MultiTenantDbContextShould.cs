@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -34,8 +33,7 @@ public class MultiTenantDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca);
+        var c = new TestBlogDbContext(tenant1);
 
         Assert.NotNull(c);
     }
@@ -49,65 +47,8 @@ public class MultiTenantDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca, new DbContextOptions<TestBlogDbContext>());
+        var c = new TestBlogDbContext(tenant1, new DbContextOptions<TestBlogDbContext>());
 
         Assert.NotNull(c);
-    }
-    
-    [Fact]
-    public void WorkWithCreate()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new DbContextOptions<TestBlogDbContext>());
-
-        Assert.NotNull(c);
-    }
-    
-    [Fact]
-    public void WorkWithCreateNoOptions()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1);
-
-        Assert.NotNull(c);
-    }
-    
-    [Fact]
-    public void CreateArbitraryDbContext()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        var c = EntityFrameworkCore.MultiTenantDbContext.Create<EntityFrameworkCore.MultiTenantIdentityDbContext, TenantInfo>(tenant1);
-
-        Assert.NotNull(c);
-    }
-    
-    [Fact]
-    public void ThrowOnInvalidDbContext()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-
-        Assert.Throws<ArgumentException>(() => EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
     }
 }
