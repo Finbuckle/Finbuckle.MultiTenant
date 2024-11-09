@@ -242,7 +242,7 @@ public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
 }
 ```
 
-Now whenever this database context is used it will only set and query records for the current tenant.
+Now whenever this database context is used, it will only set and query records for the current tenant.
 
 ## Deriving from `MultiTenantDbContext`
 
