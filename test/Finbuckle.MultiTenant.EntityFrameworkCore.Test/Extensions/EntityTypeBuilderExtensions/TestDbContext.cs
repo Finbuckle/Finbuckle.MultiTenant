@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -14,10 +15,11 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 {
     private readonly Action<ModelBuilder>? _config;
 
-    public TestDbContext(Action<ModelBuilder>? config, ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
+    public TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, DbContextOptions options) :
+        base(new StaticMultiTenantContextAccessor<TenantInfo>(tenantInfo), options)
     {
-            this._config = config;
-        }
+        this._config = config;
+    }
 
     public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
     public DbSet<MyThingWithTenantId>? MyThingsWithTenantIds { get; set; }
@@ -26,18 +28,18 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            // If the test passed in a custom builder use it
-            if (_config != null)
-                _config(modelBuilder);
-            // Of use the standard builder configuration
-            else
-            {
-                modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
-                modelBuilder.Entity<MyThingWithTenantId>().IsMultiTenant();
-            }
-
-            base.OnModelCreating(modelBuilder);
+        // If the test passed in a custom builder use it
+        if (_config != null)
+            _config(modelBuilder);
+        // Of use the standard builder configuration
+        else
+        {
+            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+            modelBuilder.Entity<MyThingWithTenantId>().IsMultiTenant();
         }
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -45,13 +47,13 @@ public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
 {
     public object Create(DbContext context)
     {
-            return new object();
-        }
-        
+        return new object();
+    }
+
     public object Create(DbContext context, bool designTime)
     {
-            return new object();
-        }
+        return new object();
+    }
 }
 
 public class MyMultiTenantThing
