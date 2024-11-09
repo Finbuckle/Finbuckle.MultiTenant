@@ -306,13 +306,14 @@ Now, whenever this database context is used it will only set and query records f
 
 ## Dependency Injection
 
-For many cases, such as typical ASP.NET Core apps, the normaly dependency injection registration of a database context
-is sufficient. The `AddDbContext` will register the context as a service and provide the necessary dependencies.
-Injected instances will automatically be associated with the current tenant.
+For many cases, such as typical ASP.NET Core apps, the normal dependency injection registration of a database context is
+sufficient. The `AddDbContext` will register the context as a service and provide the necessary dependencies. Injected
+instances will automatically be associated with the current tenant.
 
-When registering the database context as a service for use with depency injection it is important to take into account
-whether the connection string and/or provider will vary per-tenant. If so, it is recommended to set the connection
-string and provider in the `OnConfiguring` database context method as described above rather than in the `AddDbContext`
+When registering the database context as a service for use with dependency injection it is important to take into
+account whether the connection string and/or provider will vary per-tenant. If so, it is recommended to set the
+connection string and provider in the `OnConfiguring` database context method as described above rather than in the
+`AddDbContext`
 service registration method.
 
 ## Factory Instantiation
