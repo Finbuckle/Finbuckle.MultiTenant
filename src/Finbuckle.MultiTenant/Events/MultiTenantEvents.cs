@@ -15,15 +15,15 @@ public class MultiTenantEvents<TTenantInfo>
     /// <summary>
     /// Called after each MultiTenantStrategy has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.
     /// </summary>
-    public Func<StrategyCompletedContext, Task> OnStrategyCompleted { get; set; } = context => Task.CompletedTask;
+    public Func<StrategyResolutionCompletedContext, Task> OnStrategyResolutionCompleted { get; set; } = context => Task.CompletedTask;
 
     /// <summary>
     /// Called after each MultiTenantStore has attempted to find the tenant identifier. The resulting TenantInfo can be modified if desired or set to null to advance to the next store.
     /// </summary>
-    public Func<StoreLookupCompletedContext<TTenantInfo>, Task> OnStoreLookupCompleted { get; set; } = context => Task.CompletedTask;
+    public Func<StoreResolutionCompletedContext<TTenantInfo>, Task> OnStoreResolutionCompleted { get; set; } = context => Task.CompletedTask;
     
     /// <summary>
     /// Called after tenant resolution has completed for all strategies and stores. The resulting MultiTenantContext can be modified if desired.
     /// </summary>
-    public Func<ResolutionCompletedContext<TTenantInfo>, Task> OnResolutionCompleted { get; set; } = context => Task.CompletedTask;
+    public Func<TenantResolutionCompletedContext<TTenantInfo>, Task> OnTenantResolutionCompleted { get; set; } = context => Task.CompletedTask;
 }

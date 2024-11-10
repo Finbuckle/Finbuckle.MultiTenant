@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.Events;
 /// <summary>
 /// Context for when a MultiTenantStrategy has run.
 /// </summary>
-public class StrategyCompletedContext
+public class StrategyResolutionCompletedContext
 {
     /// <summary>
     /// Gets or sets the context used for attempted tenant resolution.

@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant.Events;
 /// Context for when a MultiTenantStore has attempted to look up a tenant identifier.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class StoreLookupCompletedContext<TTenantInfo>
+public class StoreResolutionCompletedContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>

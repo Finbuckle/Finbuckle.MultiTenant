@@ -58,8 +58,8 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             var wrappedStrategy = new MultiTenantStrategyWrapper(strategy, strategyLogger);
             identifier = await wrappedStrategy.GetIdentifierAsync(context);
             
-            var strategyRanContext = new StrategyCompletedContext { Context = context, Strategy = strategy, Identifier = identifier };
-            await options.CurrentValue.Events.OnStrategyCompleted(strategyRanContext);
+            var strategyRanContext = new StrategyResolutionCompletedContext { Context = context, Strategy = strategy, Identifier = identifier };
+            await options.CurrentValue.Events.OnStrategyResolutionCompleted(strategyRanContext);
             if(identifier is not null && strategyRanContext.Identifier is null)
                 tenantResoloverLogger.LogDebug("OnStrategyCompleted set non-null Identifier to null");
             identifier = strategyRanContext.Identifier;
@@ -80,8 +80,8 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store, storeLogger);
                 var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
                 
-                var storeLookupCompletedContext = new StoreLookupCompletedContext<TTenantInfo> { Store = store, Identifier = identifier, TenantInfo = tenantInfo };
-                await options.CurrentValue.Events.OnStoreLookupCompleted(storeLookupCompletedContext);
+                var storeLookupCompletedContext = new StoreResolutionCompletedContext<TTenantInfo> { Store = store, Identifier = identifier, TenantInfo = tenantInfo };
+                await options.CurrentValue.Events.OnStoreResolutionCompleted(storeLookupCompletedContext);
                 if(tenantInfo is not null && storeLookupCompletedContext.TenantInfo is null)
                     tenantResoloverLogger.LogDebug("OnStoreLookupCompleted set non-null TenantInfo to null");
                 tenantInfo = storeLookupCompletedContext.TenantInfo;
@@ -103,8 +103,8 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 break;
         }
 
-        var resolutionCompletedContext = new ResolutionCompletedContext<TTenantInfo>{ MultiTenantContext = mtc, Context = context };
-        await options.CurrentValue.Events.OnResolutionCompleted(resolutionCompletedContext);
+        var resolutionCompletedContext = new TenantResolutionCompletedContext<TTenantInfo>{ MultiTenantContext = mtc, Context = context };
+        await options.CurrentValue.Events.OnTenantResolutionCompleted(resolutionCompletedContext);
         return resolutionCompletedContext.MultiTenantContext;
     }
 
