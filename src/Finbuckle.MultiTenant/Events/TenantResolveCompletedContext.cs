@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Events;
 /// Context for when tenant resolution has completed.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public record TenantResolutionCompletedContext<TTenantInfo>
+public record TenantResolveCompletedContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>

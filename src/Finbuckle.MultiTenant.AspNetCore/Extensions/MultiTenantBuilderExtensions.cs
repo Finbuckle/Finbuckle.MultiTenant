@@ -216,8 +216,8 @@ public static class MultiTenantBuilderExtensions
         builder.Services.Configure(configureOptions);
         builder.Services.Configure<MultiTenantOptions<TTenantInfo>>(options =>
         {
-            var origOnTenantResolved = options.Events.OnTenantResolutionCompleted;
-            options.Events.OnTenantResolutionCompleted = resolutionCompletedContext =>
+            var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
+            options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
                 if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType == typeof(BasePathStrategy) &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
