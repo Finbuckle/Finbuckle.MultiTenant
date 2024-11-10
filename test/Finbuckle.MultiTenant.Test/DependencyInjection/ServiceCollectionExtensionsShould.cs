@@ -68,7 +68,7 @@ public class ServiceCollectionExtensionsShould
             services.AddMultiTenant<TenantInfo>();
 
             var service = services.FirstOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                                        s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions>));
+                                                        s.ServiceType == typeof(IConfigureOptions<MultiTenantOptions<TenantInfo>>));
 
             Assert.NotNull(service);
             Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
