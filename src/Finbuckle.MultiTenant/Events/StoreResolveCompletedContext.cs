@@ -13,9 +13,14 @@ public class StoreResolveCompletedContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>
-    /// The MultiTenantStore instance that was run.
+    /// The MultiTenantStore instance that completed.
     /// </summary>
-    public IMultiTenantStore<TTenantInfo> Store { get; init; }
+    public required IMultiTenantStore<TTenantInfo> Store { get; init; }
+    
+    /// <summary>
+    /// The multiTenantStrategy that was used to resolve the tenant.
+    /// </summary>
+    public required IMultiTenantStrategy Strategy { get; init; }
     
     /// <summary>
     /// The identifier used for tenant resolution by the store.
