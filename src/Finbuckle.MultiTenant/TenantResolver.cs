@@ -54,16 +54,17 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
         foreach (var strategy in Strategies)
         {
             var strategyLogger = loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance;
-            
+
             var wrappedStrategy = new MultiTenantStrategyWrapper(strategy, strategyLogger);
             identifier = await wrappedStrategy.GetIdentifierAsync(context);
-            
-            var strategyResolveCompletedContext = new StrategyResolveCompletedContext { Context = context, Strategy = strategy, Identifier = identifier };
+
+            var strategyResolveCompletedContext = new StrategyResolveCompletedContext
+                { Context = context, Strategy = strategy, Identifier = identifier };
             await options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext);
-            if(identifier is not null && strategyResolveCompletedContext.Identifier is null)
+            if (identifier is not null && strategyResolveCompletedContext.Identifier is null)
                 tenantResoloverLogger.LogDebug("OnStrategyResolveCompleted set non-null Identifier to null");
             identifier = strategyResolveCompletedContext.Identifier;
-            
+
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
                 tenantResoloverLogger.LogDebug("Ignored identifier: {Identifier}", identifier);
@@ -76,34 +77,36 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             foreach (var store in Stores)
             {
                 var storeLogger = loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance;
-                
+
                 var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store, storeLogger);
                 var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
-                
-                var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo> { Store = store, Identifier = identifier, TenantInfo = tenantInfo };
+
+                var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
+                    { Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
                 await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext);
-                if(tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
+                if (tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
                     tenantResoloverLogger.LogDebug("OnStoreResolveCompleted set non-null TenantInfo to null");
                 tenantInfo = storeResolveCompletedContext.TenantInfo;
-                
+
                 if (tenantInfo != null)
                 {
                     mtc.StoreInfo = new StoreInfo<TTenantInfo> { Store = store, StoreType = store.GetType() };
                     mtc.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
                     mtc.TenantInfo = tenantInfo;
                 }
-                
+
                 // no longer check stores if tenant is resolved
-                if(mtc.IsResolved)
+                if (mtc.IsResolved)
                     break;
             }
-            
+
             // no longer check strategies if tenant is resolved
-            if(mtc.IsResolved)
+            if (mtc.IsResolved)
                 break;
         }
 
-        var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>{ MultiTenantContext = mtc, Context = context };
+        var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>
+            { MultiTenantContext = mtc, Context = context };
         await options.CurrentValue.Events.OnTenantResolveCompleted(resolutionCompletedContext);
         return resolutionCompletedContext.MultiTenantContext;
     }
