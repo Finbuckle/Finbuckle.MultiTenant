@@ -85,7 +85,7 @@ public class MultiTenantDbContextShould
     }
     
     [Fact]
-    public void CreateArbitraryDbContext()
+    public void CreateMultiTenantIdentityDbContext()
     {
         var tenant1 = new TenantInfo
         {

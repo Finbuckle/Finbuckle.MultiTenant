@@ -1,9 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -25,17 +22,7 @@ public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<Identit
     }
 
     /// <inheritdoc />
-    public MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
-    {
-    }
-
-    /// <inheritdoc />
     public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
-    {
-    }
-
-    /// <inheritdoc />
-    public MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
     {
     }
     
@@ -64,17 +51,7 @@ public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityD
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
-    {
-    }
-
-    /// <inheritdoc />
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
-    {
-    }
-
-    /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
     {
     }
     
@@ -105,17 +82,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
-    {
-    }
-
-    /// <inheritdoc />
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
-    {
-    }
-
-    /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
     {
     }
     
@@ -164,11 +131,6 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
     
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo)
-    {
-        TenantInfo = tenantInfo;
-    }
-    
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
@@ -177,11 +139,6 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
     {
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
-    }
-
-    protected MultiTenantIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(options)
-    {
-        TenantInfo = tenantInfo;
     }
 
     /// <inheritdoc />
