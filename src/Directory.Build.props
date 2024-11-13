@@ -13,14 +13,15 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>CS1591</NoWarn>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-
 </PropertyGroup>
 
     <ItemGroup>
         <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
+        <None Include="../../README.md" Pack="true" PackagePath="/"/>
     </ItemGroup>
 </Project>

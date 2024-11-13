@@ -12,7 +12,7 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(TfmMajVer).0.*-*"/>
+            <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
     </Target>
 
