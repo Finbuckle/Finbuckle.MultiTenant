@@ -15,6 +15,7 @@
             <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(TfmMajVer).0.*"/>
             <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="$(TfmMajVer).0.*"/>
             <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Options" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
     </Target>
 
