@@ -14,9 +14,9 @@
         </PropertyGroup>
 
         <ItemGroup>
-            <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(TfmMajVer).0.*-*"/>
-            <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="$(TfmMajVer).0.*-*"/>
-            <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(TfmMajVer).0.*-*"/>
+            <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="$(TfmMajVer).0.*"/>
+            <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
     </Target>
 
