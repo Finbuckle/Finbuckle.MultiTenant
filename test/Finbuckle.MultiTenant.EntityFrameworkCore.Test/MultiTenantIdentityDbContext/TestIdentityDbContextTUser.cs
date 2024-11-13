@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,10 +9,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbCo
 
 public class TestIdentityDbContextTUser : MultiTenantIdentityDbContext<IdentityUser>
 {
-    public TestIdentityDbContextTUser(TenantInfo tenantInfo)
-        : base(tenantInfo)
+    public TestIdentityDbContextTUser(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
     {
-        }
+    }
+
+    public TestIdentityDbContextTUser(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    {
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

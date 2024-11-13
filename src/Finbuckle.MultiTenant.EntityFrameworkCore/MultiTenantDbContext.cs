@@ -25,6 +25,18 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// Creates a new instance of a multitenant context that accepts a IMultiTenantContextAccessor instance and an optional DbContextOptions instance.
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
+    /// <typeparam name="TContext">The TContext implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <returns></returns>
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo? tenantInfo)
+        where TContext : DbContext
+        where TTenantInfo : class, ITenantInfo, new()
+    => Create<TContext, TTenantInfo>(tenantInfo, null);
+    
+    /// <summary>
+    /// Creates a new instance of a multitenant context that accepts a IMultiTenantContextAccessor instance and an optional DbContextOptions instance.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <param name="options">The database options instance.</param>
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
