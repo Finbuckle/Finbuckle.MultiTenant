@@ -32,6 +32,8 @@ Table of Contents
 <!--_release-notes-->
 # [9.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v9.0.0) (2024-11-13)
 
+### Features
+
 * add multitenant db factory method ([#894](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/894)) (
   [ea216ff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ea216ffb37d241804899ab0f3cd5db1e9c6ae641))
 * better tenant resolution events ([#897](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/897)) ([956ca36](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/956ca36670aa8aed38afcbbbdd78f1b79d91287c))
