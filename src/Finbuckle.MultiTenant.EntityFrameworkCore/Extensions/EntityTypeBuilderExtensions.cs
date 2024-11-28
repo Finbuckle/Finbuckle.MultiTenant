@@ -1,12 +1,12 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
@@ -72,13 +72,23 @@ public static class EntityTypeBuilderExtensions
         var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
         var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
         var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
-
-        // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
-        var predicate = Expression.Equal(leftExp, rightExp);
 
         #region Fork Sirfull
-        // build expression tree for : "IsMultiTenantEnabled == False || EF.Property<string>(e, "TenantId") == TenantInfo.Id"
+
+        // ce code génère initialement ce type de code : EF.Property<string>(e, "TenantId") == TenantInfo.Id
+        // var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
+
+        // le code précédent est remplacé par celui-ci
+        // qui permet de générer ce type de code : EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
+        var rightExp = Expression.Condition(Expression.NotEqual(contextTenantInfoExp, Expression.Constant(null)),
+            Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id)),
+            Expression.Constant(string.Empty, typeof(string))
+        );
+
+        // build expression tree for EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
+        var predicate = Expression.Equal(leftExp, rightExp);
+
+        // build expression tree for : IsMultiTenantEnabled == False || EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
         //                              -------------------------------
         predicate = Expression.OrElse(
             Expression.Equal(
