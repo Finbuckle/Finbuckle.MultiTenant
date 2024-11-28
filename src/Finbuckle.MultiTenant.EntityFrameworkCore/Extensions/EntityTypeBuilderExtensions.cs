@@ -75,11 +75,11 @@ public static class EntityTypeBuilderExtensions
 
         #region Fork Sirfull
 
-        // ce code génère initialement ce type de code : EF.Property<string>(e, "TenantId") == TenantInfo.Id
+        // this code will generate this expression : EF.Property<string>(e, "TenantId") == TenantInfo.Id
         // var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
 
-        // le code précédent est remplacé par celui-ci
-        // qui permet de générer ce type de code : EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
+        // the previous instruction is replaced by this one
+        // which will generate this expression : EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
         var rightExp = Expression.Condition(Expression.NotEqual(contextTenantInfoExp, Expression.Constant(null)),
             Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id)),
             Expression.Constant(string.Empty, typeof(string))
