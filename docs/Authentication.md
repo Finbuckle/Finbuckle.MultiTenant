@@ -11,10 +11,6 @@ Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
-See
-the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
-for a demonstration of the features discussed in this topic.
-
 The sections below assume Finbuckle.MultiTenant is installed and configured. See
 [Getting Started](GettingStarted) for details.
 
