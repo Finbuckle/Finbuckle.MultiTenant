@@ -18,7 +18,7 @@ $ dotnet add package Finbuckle.MultiTenant.AspNetCore
 
 Finbuckle.MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant
 identifier and the app's [configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) (
-most likely from a`appsettings.json` file) as the source of tenant details.
+most likely from an `appsettings.json` file) as the source of tenant details.
 
 ```csharp
 using Finbuckle.MultiTenant;
