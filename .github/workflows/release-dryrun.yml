@@ -12,7 +12,9 @@ jobs:
           node-version: 20
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9'
+          dotnet-version: |
+            8
+            9
       - name: build and test
         run: |
           dotnet restore
