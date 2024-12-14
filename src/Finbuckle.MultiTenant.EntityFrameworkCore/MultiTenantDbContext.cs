@@ -28,7 +28,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <returns></returns>
-    public static TContext Create<TContext, TTenantInfo>(TTenantInfo? tenantInfo)
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
         where TContext : DbContext
         where TTenantInfo : class, ITenantInfo, new()
     => Create<TContext, TTenantInfo>(tenantInfo, null);
@@ -41,7 +41,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <returns></returns>
-    public static TContext Create<TContext, TTenantInfo>(TTenantInfo? tenantInfo, DbContextOptions? options)
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, DbContextOptions? options)
         where TContext : DbContext
         where TTenantInfo : class, ITenantInfo, new()
     {
