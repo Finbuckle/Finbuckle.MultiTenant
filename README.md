@@ -31,8 +31,6 @@ Table of Contents
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
-## [9.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v9.0.0) (2024-11-13)
-
 ### ⚠ BREAKING CHANGES
 
 * `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
