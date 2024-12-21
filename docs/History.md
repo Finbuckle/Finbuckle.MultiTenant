@@ -6,8 +6,7 @@
 ### ⚠ BREAKING CHANGES
 
 * `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
-* `MultiTenantDbContext` constructors accepting ITenantInfo removed, use `MultiTenantDbContext.Create` factory
-  method* `MultiTenantDbContext` constructors accepting ITenantInfo removed, use `MultiTenantDbContext.Create` factory method instead.
+* `MultiTenantDbContext` constructors accepting `ITenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
 * net6.0 and net7.0 are no longer supported targets.
 * dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
 
