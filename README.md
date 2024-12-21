@@ -6,31 +6,39 @@ Finbuckle.MultiTenant is an open-source multitenancy middleware library for .NET
 per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-**This release supports .NET 8 and .NET 9.**
+**This release supports .NET 9 and .NET 8.**
 
-Current publish feed release:  
-![Finbuckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
+## Open Source Support
 
 Table of Contents
 
 1. [What's New in v<span class="_version">9.0.0</span>](#whats-new)
-2. [Quick Start](#quick-start)
-3. [Documentation](#documentation)
-4. [Sample Projects](#sample-projects)
-5. [Build and Test Status](#build-and-test-status)
-6. [License](#license)
-7. [.NET Foundation](#net-foundation)
-8. [Code of Conduct](#code-of-conduct)
-9. [Community](#community)
-10. [Building from Source](#building-from-source)
-11. [Running Unit Tests](#running-unit-tests)
+2. [Open Source Support](#open-source-support)
+3. [Quick Start](#quick-start)
+4. [Documentation](#documentation)
+5. [Sample Projects](#sample-projects)
+6. [Build and Test Status](#build-and-test-status)
+7. [License](#license)
+8. [.NET Foundation](#net-foundation)
+9. [Code of Conduct](#code-of-conduct)
+10. [Community](#community)
+11. [Building from Source](#building-from-source)
+12. [Running Unit Tests](#running-unit-tests)
 
 ## <a name="whats-new"></a> What's New in v<span class="_version">9.0.0</span>
 
 > This section only lists release update details specific to v<span class="_version">9.0.0</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
+
 # [9.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v9.0.0) (2024-11-13)
+
+### ⚠ BREAKING CHANGES
+
+* `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
+* `MultiTenantDbContext` constructors accepting ITenantInfo removed, use `MultiTenantDbContext.Create` factory method instead.
+* net6.0 and net7.0 are no longer supported targets.
+* dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
 
 ### Features
 
@@ -39,16 +47,27 @@ Table of Contents
 * better tenant resolution events ([#897](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/897)) ([956ca36](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/956ca36670aa8aed38afcbbbdd78f1b79d91287c))
 * dotnet 9 support ([#893](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/893)) ([4be1b88](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4be1b88fb7103223517d2cd8a16ea62c6d6204d5))
 * make builds deterministic and set latest GH actions ([#889](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/889)) ([d82f89d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d82f89da2f7a82bb302aaedfdb5c676cc7051273))
-
-
-### BREAKING CHANGES
-
-* `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
-* `MultiTenantDbContext` constructors accepting ITenantInfo removed, use `MultiTenantDbContext.Create` factory
-  method* `MultiTenantDbContext` constructors accepting ITenantInfo removed, use `MultiTenantDbContext.Create` factory method instead.
-* net6.0 and net7.0 are no longer supported targets.
-* dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
 <!--_release-notes-->
+
+## Open Source Support
+
+Your support helps keep the project going and is greatly appreciated!
+
+Finbuckle.MultiTenant is primarily supported by its [GitHub sponsors](https://github.com/sponsors/Finbuckle) and [contributors](https://github.com/Finbuckle/Finbuckle.MultiTenant/graphs/contributors).  
+
+Additional support is provided by the following organizations:
+
+<p><a href="https://www.digitalocean.com/">
+  <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" alt="Digital Ocean logo" height="40">
+</a></p>
+
+<p><a href="https://www.github.com/">
+  <img src="https://github.githubassets.com/assets/GitHub-Logo-ee398b662d42.png" alt="GitHub logo" height="40">
+</a></p>
+
+<p><a href="https://www.jetbrains.com/">
+  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg" alt="Jetbrains logo" height="40">
+</a></p>
 
 ## Quick Start
 
@@ -119,8 +138,8 @@ ways.
 `app.UseMultiTenant()`
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
-settings. Be sure to call it before other middleware which will use per-tenant functionality,
-e.g. `UseAuthentication()`.
+settings. Be sure to call it before other middleware which will use per-tenant functionality, e.g.
+`UseAuthentication()`.
 
 ### Basic Usage
 
@@ -148,8 +167,7 @@ See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/Configu
 ## Documentation
 
 The library builds on this basic functionality to provide a variety of higher level features. See
-the [documentation](https://www.finbuckle.com/multitenant/docs) for
-more details:
+the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
 
 * [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
 * [Per-tenant Authentication](https://www.finbuckle.com/MultiTenant/Docs/Authentication)
