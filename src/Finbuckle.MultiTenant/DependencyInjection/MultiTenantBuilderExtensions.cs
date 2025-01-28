@@ -197,9 +197,9 @@ public static class MultiTenantBuilderExtensions
 
         Func<object, Task<string?>> wrapStrategy = context =>
         {
-            if (context is TContext typedContext)
+            if (context.GetType() == typeof(TContext))
             {
-                return doStrategy(typedContext);
+                return doStrategy((TContext)context);
             }
 
             return Task.FromResult<string?>(null);
