@@ -65,7 +65,9 @@ This strategy is good to use for testing or simple logic. This strategy is confi
 order configured.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>` A `Func<object, Task<string?>>`is passed
-in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter:
+in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter.
+Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. Tenant resolution will
+ignore this strategy if the context is not of the correct type:
 
 ```csharp
 // use async logic to get the tenant identifier
@@ -75,15 +77,11 @@ builder.Services.AddMultiTenant<TenantInfo>()
         string? tenantIdentifier = await DoSomethingAsync(context);
         return tenantIdentifier
     })...
-    
- // or do it without async
+
+// or register with a typed lambda, HttpContext in this case
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithDelegateStrategy(context =>
-    {
-        var httpContext = context as HttpContext;
-        if (httpContext == null)
-            return null;
-        
+    .WithDelegateStrategy<HttpContext, TenantInfo>(httpContext =>
+    {      
         httpContext.Request.Query.TryGetValue("tenant", out StringValues tenantIdentifier);
         
         if (tenantIdentifier is null)
