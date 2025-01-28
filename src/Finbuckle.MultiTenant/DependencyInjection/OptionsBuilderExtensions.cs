@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+// TODO XML comments
 public static class OptionsBuilderExtensions
 {
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo>(
@@ -18,6 +19,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
+        // TODO use ThrowNull here?
         if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);

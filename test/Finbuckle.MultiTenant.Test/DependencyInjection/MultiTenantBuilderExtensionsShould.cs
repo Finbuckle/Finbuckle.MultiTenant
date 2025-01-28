@@ -189,6 +189,31 @@ public class MultiTenantBuilderExtensionsShould
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<DelegateStrategy>(strategy);
     }
+    
+    [Fact]
+    public void AddTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult(context.ToString())!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<DelegateStrategy>(strategy);
+    }
+    
+    [Fact]
+    public async Task ReturnNullForWrongTypeSendToTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult("Shouldn't ever get here")!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var identifier = await strategy.GetIdentifierAsync(new object());
+        Assert.Null(identifier);
+    }
 
     [Fact]
     public void AddStaticStrategy()
