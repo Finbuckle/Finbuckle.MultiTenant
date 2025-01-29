@@ -61,6 +61,7 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 - `WithDelegateStrategy<TContext, TTenantInfo>`
 - `WithHeaderStrategy`
 - `WithHostStrategy`
+- `WithHttpContextStrategy`
 - `WithRouteStrategy`
 - `WithSessionStrategy`
 - `WithStaticStrategy`
