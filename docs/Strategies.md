@@ -61,8 +61,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda
 function `async context => "initech"` would use "initech" as the identifier when resolving the tenant for every request.
-This strategy is good to use for testing or simple logic. This strategy is configured multiple times and will run in the
-order configured.
+This strategy is good to use for testing or simple logic. This strategy can be used multiple times and will run
+in the order configured.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>` A `Func<object, Task<string?>>`is passed
 in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter.
@@ -88,6 +88,30 @@ builder.Services.AddMultiTenant<TenantInfo>()
             return Task.FromValue<string?>(null);
         
         return Task.FromValue(tenantIdentifier.ToString());
+    })...
+```
+
+## HttpContext Strategy
+
+> NuGet package: Finbuckle.MultiTenant.AspNetCore
+
+Uses a delegate that takes an `HttpContext` parameter to determine the tenant identifier. When used with the ASP.NET
+Core middleware each request's`HttpConeext` is passed to the strategy. This strategy can be used multiple times and will
+run in the order configured. Tenant resolution will ignore this strategy if the context is not of the correct type.
+
+Configure by calling `WithHttpContextStrategy` after `AddMultiTenant<TTenantInfo>`:
+
+```csharp
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithHttpContextStrategy(async httpContext =>
+    {
+         var identifier = httpContext.Request.Query["tenant"];
+         
+         // query value will be empty if the value didn't exist in the request
+         if(identifier == string.Empty)
+             return null;
+         
+         return identifier;
     })...
 ```
 
@@ -244,7 +268,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used, but
+Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used,
+but
 a custom key can also be used.
 
 Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type
