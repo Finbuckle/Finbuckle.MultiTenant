@@ -32,7 +32,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
             if (multiTenantContext?.TenantInfo != null)
             {
                 properties ??= new AuthenticationProperties();
-                if(!properties.Items.Keys.Contains(Constants.TenantToken))
+                if(!properties.Items.ContainsKey(Constants.TenantToken))
                     properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
             }
     }

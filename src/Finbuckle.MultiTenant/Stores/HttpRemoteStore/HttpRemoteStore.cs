@@ -32,7 +32,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         _client = client ?? throw new ArgumentNullException(nameof(client));
         if (!endpointTemplate.Contains(DefaultEndpointTemplateIdentifierToken))
         {
-            if (endpointTemplate.EndsWith("/"))
+            if (endpointTemplate.EndsWith('/'))
                 endpointTemplate += DefaultEndpointTemplateIdentifierToken;
             else
                 endpointTemplate += $"/{DefaultEndpointTemplateIdentifierToken}";

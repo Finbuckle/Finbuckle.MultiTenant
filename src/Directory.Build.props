@@ -18,10 +18,18 @@
         <NoWarn>CS1591</NoWarn>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-</PropertyGroup>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Analysis rules">
+        <AnalysisLevel>latest-Recommended</AnalysisLevel>
+        <NoWarn>$(NoWarn);CA1848</NoWarn> <!-- For improved performance, use the LoggerMessage delegates -->
+        <NoWarn>$(NoWarn);CA2201</NoWarn> <!-- Exception type System.Exception is not sufficiently specific -->
+        <NoWarn>$(NoWarn);CA2208</NoWarn> <!--TryAddAsync passes 'xxx' as the paramName argument to a ArgumentNullException constructor-->
+    </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
-        <None Include="../../README.md" Pack="true" PackagePath="/"/>
+        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/" />
+        <None Include="../../README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
 </Project>

@@ -73,8 +73,7 @@ public static class MultiTenantBuilderExtensions
             options.Events.OnValidatePrincipal = async context =>
             {
                 // Skip if bypass set (e.g. ClaimsStrategy in effect)
-                if (context.HttpContext.Items.Keys.Contains(
-                        $"{Constants.TenantToken}__bypass_validate_principal__"))
+                if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
                 var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo?.Identifier;
@@ -372,8 +371,7 @@ public static class MultiTenantBuilderExtensions
             options.Events.OnValidatePrincipal = async context =>
             {
                 // Skip if bypass set (e.g. ClaimStrategy in effect)
-                if (context.HttpContext.Items.Keys.Contains(
-                        $"{Constants.TenantToken}__bypass_validate_principal__"))
+                if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
                 await origOnValidatePrincipal(context);
