@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +22,12 @@ public class MultiTenantMiddleware
 
     public async Task Invoke(HttpContext context)
     {
+            if (context.GetEndpoint()?.Metadata.GetMetadata<IExcludeFromMultiTenantResolutionMetadata>() is { ExcludeFromResolution: true })
+            {
+                await next(context);
+                return;
+            }
+
             context.RequestServices.GetRequiredService<IMultiTenantContextAccessor>();
             var mtcSetter = context.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
             
