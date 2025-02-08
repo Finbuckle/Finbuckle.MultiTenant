@@ -53,7 +53,7 @@ public sealed class HostStrategy : IMultiTenantStrategy
             string singleSegmentPattern = @"[^\.]+";
             if (template.Substring(template.Length - 3, 3) == @"\.*")
             {
-                template = template.Substring(0, template.Length - 3) + wildcardSegmentsPattern;
+                template = string.Concat(template.AsSpan(0, template.Length - 3), wildcardSegmentsPattern);
             }
 
             wildcardSegmentsPattern = @"([^\.]+\.)*";

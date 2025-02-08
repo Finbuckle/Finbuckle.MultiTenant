@@ -138,7 +138,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
 
         if (scheme == null)
         {
-            scheme = _schemes.ContainsKey(name) ? _schemes[name] : null;
+            scheme = _schemes.TryGetValue(name, out AuthenticationScheme? value) ? value : null;
         }
 
         return scheme;
@@ -189,9 +189,8 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         }
         lock (_lock)
         {
-            if (_schemes.ContainsKey(name))
+            if (_schemes.TryGetValue(name, out AuthenticationScheme? scheme))
             {
-                var scheme = _schemes[name];
                 _requestHandlers.Remove(scheme);
                 _schemes.Remove(name);
             }

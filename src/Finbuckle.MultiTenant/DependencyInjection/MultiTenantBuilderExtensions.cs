@@ -122,10 +122,7 @@ public static class MultiTenantBuilderExtensions
         Action<InMemoryStoreOptions<TTenantInfo>> config)
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (config == null)
-        {
-            throw new ArgumentNullException(nameof(config));
-        }
+        ArgumentNullException.ThrowIfNull(config);
 
         // ReSharper disable once RedundantTypeArgumentsOfMethod
         builder.Services.Configure<InMemoryStoreOptions<TTenantInfo>>(config);
@@ -173,10 +170,7 @@ public static class MultiTenantBuilderExtensions
         Func<object, Task<string?>> doStrategy)
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (doStrategy == null)
-        {
-            throw new ArgumentNullException(nameof(doStrategy));
-        }
+        ArgumentNullException.ThrowIfNull(doStrategy);
 
         return builder.WithStrategy<DelegateStrategy>(ServiceLifetime.Singleton, new object[] { doStrategy });
     }
