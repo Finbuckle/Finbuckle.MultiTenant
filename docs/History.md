@@ -1,7 +1,22 @@
 # Version History
 
 <!--_history-->
+## [9.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.0.0...v9.1.0) (2025-03-12)
+
+### Features
+
+* add WithDelegateStrategy<TContext, TTenantInfo> ([#932](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/932)) ([a18a935](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a18a935ea397b4cbd9e52fdcee589212db9d0999))
+* add WithHttpContextStrategy ([#934](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/934)) ([e6aeb7c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e6aeb7c9c265d39eb4bec0d2be526f582f41f886))
+* better async pattern for class libraries ([#942](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/942)) ([8235462](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/82354625d24ced67228246885f9f326389209e9c))
+* improved perf for HostStrategy ([#936](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/936)) ([a70f7e0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a70f7e0f47eaf180e5f64f1bba61cae59086251a))
+
+### Bug Fixes
+
+* added new analyzers and multiple fixes  ([#937](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/937)) ([9d9b1e4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9d9b1e416929ebbd795c0eef3361cca7d6d238ce))
+* MultiTenantDbContext.Create should have non nullable TenantInfo ([#916](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/916)) ([9df0527](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9df0527841549e0dd6e2017cfff3ebc6f03b7e16))
+
 ## [9.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v9.0.0) (2024-11-13)
+
 
 ### ⚠ BREAKING CHANGES
 
@@ -17,7 +32,6 @@
 * better tenant resolution events ([#897](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/897)) ([956ca36](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/956ca36670aa8aed38afcbbbdd78f1b79d91287c))
 * dotnet 9 support ([#893](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/893)) ([4be1b88](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4be1b88fb7103223517d2cd8a16ea62c6d6204d5))
 * make builds deterministic and set latest GH actions ([#889](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/889)) ([d82f89d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d82f89da2f7a82bb302aaedfdb5c676cc7051273))
-
 
 ## [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
 
@@ -225,7 +239,7 @@
 
 ### Bug Fixes
 
-* change delegate strategy func return type as nullable and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
 * remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)
