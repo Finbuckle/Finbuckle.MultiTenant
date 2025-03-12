@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test;
 public class MultiTenantMiddlewareShould
 {
     [Fact]
-    public async void SetHttpContextItemIfTenantFound()
+    public async Task SetHttpContextItemIfTenantFound()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
@@ -42,7 +42,7 @@ public class MultiTenantMiddlewareShould
         }
 
     [Fact]
-    public async void SetTenantAccessor()
+    public async Task SetTenantAccessor()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
@@ -77,7 +77,7 @@ public class MultiTenantMiddlewareShould
         }
         
     [Fact]
-    public async void NotSetTenantAccessorIfNoTenant()
+    public async Task NotSetTenantAccessorIfNoTenant()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().

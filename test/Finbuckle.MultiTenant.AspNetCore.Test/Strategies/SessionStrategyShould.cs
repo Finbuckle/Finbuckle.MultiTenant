@@ -53,7 +53,7 @@ public class SessionStrategyShould
     }
 
     [Fact]
-    public async void ReturnNullIfContextIsNotHttpContext()
+    public async Task ReturnNullIfContextIsNotHttpContext()
     {
         var context = new object();
         var strategy = new SessionStrategy("__tenant__");

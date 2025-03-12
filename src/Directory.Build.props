@@ -25,7 +25,6 @@
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
         <NoWarn>$(NoWarn);CA1848</NoWarn> <!-- For improved performance, use the LoggerMessage delegates -->
         <NoWarn>$(NoWarn);CA2201</NoWarn> <!-- Exception type System.Exception is not sufficiently specific -->
-        <NoWarn>$(NoWarn);CA2208</NoWarn> <!--TryAddAsync passes 'xxx' as the paramName argument to a ArgumentNullException constructor-->
     </PropertyGroup>
 
     <ItemGroup>

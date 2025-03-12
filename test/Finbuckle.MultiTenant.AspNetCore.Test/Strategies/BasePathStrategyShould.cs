@@ -24,7 +24,7 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void RebaseAspNetCoreBasePathIfOptionTrue()
+    public async Task RebaseAspNetCoreBasePathIfOptionTrue()
     {
 
         var services = new ServiceCollection();
@@ -53,7 +53,7 @@ public class BasePathStrategyShould
     }
         
     [Fact]
-    public async void NotRebaseAspNetCoreBasePathIfOptionFalse()
+    public async Task NotRebaseAspNetCoreBasePathIfOptionFalse()
     {
 
         var services = new ServiceCollection();
@@ -87,7 +87,7 @@ public class BasePathStrategyShould
     [InlineData("", null)] // no path
     [InlineData("/", null)] // just trailing slash
     [InlineData("/initech/ignore/ignore", "initech")] // multiple path segments
-    public async void ReturnExpectedIdentifier(string path, string? expected)
+    public async Task ReturnExpectedIdentifier(string path, string? expected)
     {
         var httpContext = CreateHttpContextMock(path);
         var strategy = new BasePathStrategy();
@@ -98,7 +98,7 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void ReturnNullIfContextIsNotHttpContext()
+    public async Task ReturnNullIfContextIsNotHttpContext()
     {
         var context = new object();
         var strategy = new BasePathStrategy();
@@ -107,7 +107,7 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void AppendTenantToExistingBase()
+    public async Task AppendTenantToExistingBase()
     {
 
         var services = new ServiceCollection();
