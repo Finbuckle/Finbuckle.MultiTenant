@@ -29,17 +29,17 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
         this.logger = logger;
     }
 
-    public async virtual Task<string?> GetIdentifierAsync(object context)
+    public virtual async Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)
             return null;
 
         var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
-        foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync()).Where(s =>
+        foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync().ConfigureAwait(false)).Where(s =>
                      typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
         {
-            // TODO verify this comment (still true as of net8.0)
+            // TODO verify this comment (still true as of net9.0)
             // Unfortunately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
             // Instead we'll get the paths to check from the options.
             var optionsType = scheme.HandlerType.GetProperty("Options")?.PropertyType;
@@ -83,7 +83,7 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
                     {
                         var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
 
-                        var form = await httpContext.Request.ReadFormAsync(formOptions);
+                        var form = await httpContext.Request.ReadFormAsync(formOptions).ConfigureAwait(false);
                         state = form.Single(i => string.Equals(i.Key, "state", StringComparison.OrdinalIgnoreCase))
                             .Value;
                     }

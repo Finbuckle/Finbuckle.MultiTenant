@@ -23,12 +23,12 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken, identifier);
-        var response = await client.GetAsync(uri);
+        var response = await client.GetAsync(uri).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var json = await response.Content.ReadAsStringAsync();
+        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         var result = JsonSerializer.Deserialize<TTenantInfo>(json, _defaultSerializerOptions);
 
         return result;
@@ -38,7 +38,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken, string.Empty);
-        var response = await client.GetAsync(uri);
+        var response = await client.GetAsync(uri).ConfigureAwait(false);
 
 
         if (!response.IsSuccessStatusCode)
@@ -52,7 +52,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
             return Enumerable.Empty<TTenantInfo>();
         }
 
-        var json = await response.Content.ReadAsStringAsync();
+        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         var result = JsonSerializer.Deserialize<IEnumerable<TTenantInfo>>(json, _defaultSerializerOptions);
 
         return result!;

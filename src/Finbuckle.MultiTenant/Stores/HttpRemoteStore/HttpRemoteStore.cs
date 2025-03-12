@@ -72,13 +72,13 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <exception cref="NotImplementedException">When a not-found (404) status code is encountered</exception>
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await _client.GetAllAsync(endpointTemplate);
+        return await _client.GetAllAsync(endpointTemplate).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier);
+        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
         return result;
     }
 

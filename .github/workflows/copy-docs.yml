@@ -24,7 +24,7 @@ jobs:
           token: ${{ secrets.workflow_pat }}
           path: website
       - name: Copy Docs
-        run: mkdir -p website/docs/${{ steps.currentversion.outputs.tag }} && cp main/docs/* website/docs/${{ steps.currentversion.outputs.tag }}
+        run: mkdir -p website/content/docs/${{ steps.currentversion.outputs.tag }} && cp main/docs/* website/content/docs/${{ steps.currentversion.outputs.tag }}
       - name: Checkin Website
         working-directory: website
         run: |

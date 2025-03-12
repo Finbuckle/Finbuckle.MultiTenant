@@ -20,6 +20,6 @@ public class StaticStrategy : IMultiTenantStrategy
 
     public async Task<string?> GetIdentifierAsync(object context)
     {
-        return await Task.FromResult(Identifier);
+        return await Task.FromResult(Identifier).ConfigureAwait(false);
     }
 }

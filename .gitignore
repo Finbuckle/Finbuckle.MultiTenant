@@ -3,6 +3,7 @@
 *.db
 *.db-shm
 *.db-wal
+*.DotSettings
 
 # globs
 Makefile.in

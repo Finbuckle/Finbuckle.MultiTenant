@@ -16,7 +16,7 @@ public class DelegateStrategy : IMultiTenantStrategy
 
     public async Task<string?> GetIdentifierAsync(object context)
     {
-        var identifier = await _doStrategy(context);
-        return await Task.FromResult(identifier);
+        var identifier = await _doStrategy(context).ConfigureAwait(false);
+        return await Task.FromResult(identifier).ConfigureAwait(false);
     }
 }
