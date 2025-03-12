@@ -41,7 +41,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.TryGetAsync(id);
+            result = await Store.TryGetAsync(id).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -70,7 +70,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.GetAllAsync();
+            result = await Store.GetAllAsync().ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -89,7 +89,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.TryGetByIdentifierAsync(identifier);
+            result = await Store.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -136,7 +136,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing != null)
             {
                 _logger.LogDebug(
@@ -145,7 +145,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             }
             else
             {
-                existing = await TryGetByIdentifierAsync(tenantInfo.Identifier);
+                existing = await TryGetByIdentifierAsync(tenantInfo.Identifier).ConfigureAwait(false);
                 if (existing != null)
                 {
                     _logger.LogDebug(
@@ -153,7 +153,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
                         tenantInfo.Id, tenantInfo.Identifier);
                 }
                 else
-                    result = await Store.TryAddAsync(tenantInfo);
+                    result = await Store.TryAddAsync(tenantInfo).ConfigureAwait(false);
             }
         }
         catch (Exception e)
@@ -186,7 +186,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.TryRemoveAsync(identifier);
+            result = await Store.TryRemoveAsync(identifier).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -220,13 +220,13 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing == null)
             {
                 _logger.LogDebug("TryUpdateAsync: Tenant Id: \"{TenantId}\" not found", tenantInfo.Id);
             }
             else
-                result = await Store.TryUpdateAsync(tenantInfo);
+                result = await Store.TryUpdateAsync(tenantInfo).ConfigureAwait(false);
         }
         catch (Exception e)
         {

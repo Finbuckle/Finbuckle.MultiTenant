@@ -27,10 +27,10 @@ public class MultiTenantMiddleware
             
             var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
             
-            var multiTenantContext = await resolver.ResolveAsync(context);
+            var multiTenantContext = await resolver.ResolveAsync(context).ConfigureAwait(false);
             mtcSetter.MultiTenantContext = multiTenantContext;
             context.Items[typeof(IMultiTenantContext)] = multiTenantContext;
 
-            await next(context);
+            await next(context).ConfigureAwait(false);
         }
 }

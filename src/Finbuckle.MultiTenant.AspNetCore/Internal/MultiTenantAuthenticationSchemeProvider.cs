@@ -133,7 +133,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
 
         if (_inner != null)
         {
-            scheme = await _inner.GetSchemeAsync(name);
+            scheme = await _inner.GetSchemeAsync(name).ConfigureAwait(false);
         }
 
         if (scheme == null)

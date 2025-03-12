@@ -56,11 +56,11 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             var strategyLogger = loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance;
 
             var wrappedStrategy = new MultiTenantStrategyWrapper(strategy, strategyLogger);
-            identifier = await wrappedStrategy.GetIdentifierAsync(context);
+            identifier = await wrappedStrategy.GetIdentifierAsync(context).ConfigureAwait(false);
 
             var strategyResolveCompletedContext = new StrategyResolveCompletedContext
                 { Context = context, Strategy = strategy, Identifier = identifier };
-            await options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext);
+            await options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext).ConfigureAwait(false);
             if (identifier is not null && strategyResolveCompletedContext.Identifier is null)
                 tenantResoloverLogger.LogDebug("OnStrategyResolveCompleted set non-null Identifier to null");
             identifier = strategyResolveCompletedContext.Identifier;
@@ -79,11 +79,11 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 var storeLogger = loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance;
 
                 var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store, storeLogger);
-                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
+                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
 
                 var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
                     { Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
-                await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext);
+                await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext).ConfigureAwait(false);
                 if (tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
                     tenantResoloverLogger.LogDebug("OnStoreResolveCompleted set non-null TenantInfo to null");
                 tenantInfo = storeResolveCompletedContext.TenantInfo;
@@ -107,13 +107,13 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
 
         var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>
             { MultiTenantContext = mtc, Context = context };
-        await options.CurrentValue.Events.OnTenantResolveCompleted(resolutionCompletedContext);
+        await options.CurrentValue.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
         return resolutionCompletedContext.MultiTenantContext;
     }
 
     /// <inheritdoc />
     async Task<IMultiTenantContext> ITenantResolver.ResolveAsync(object context)
     {
-        return await ResolveAsync(context);
+        return await ResolveAsync(context).ConfigureAwait(false);
     }
 }

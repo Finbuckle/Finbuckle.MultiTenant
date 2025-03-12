@@ -43,12 +43,12 @@ public class ClaimStrategy : IMultiTenantStrategy
         var schemeProvider = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
         if (_authenticationScheme is null)
         {
-            authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync();
+            authScheme = await schemeProvider.GetDefaultAuthenticateSchemeAsync().ConfigureAwait(false);
         }
         else
         {
             authScheme =
-                (await schemeProvider.GetAllSchemesAsync()).FirstOrDefault(x => x.Name == _authenticationScheme);
+                (await schemeProvider.GetAllSchemesAsync().ConfigureAwait(false)).FirstOrDefault(x => x.Name == _authenticationScheme);
         }
 
         if (authScheme is null)
@@ -59,9 +59,9 @@ public class ClaimStrategy : IMultiTenantStrategy
         var handler =
             (IAuthenticationHandler)ActivatorUtilities.CreateInstance(httpContext.RequestServices,
                 authScheme.HandlerType);
-        await handler.InitializeAsync(authScheme, httpContext);
+        await handler.InitializeAsync(authScheme, httpContext).ConfigureAwait(false);
         httpContext.Items[$"{Constants.TenantToken}__bypass_validate_principal__"] = "true"; // Value doesn't matter.
-        var handlerResult = await handler.AuthenticateAsync();
+        var handlerResult = await handler.AuthenticateAsync().ConfigureAwait(false);
         httpContext.Items.Remove($"{Constants.TenantToken}__bypass_validate_principal__");
 
         var identifier = handlerResult.Principal?.FindFirst(_tenantKey)?.Value;

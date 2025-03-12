@@ -100,6 +100,6 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
         CancellationToken cancellationToken = default(CancellationToken))
     {
         this.EnforceMultiTenant();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -37,8 +37,8 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
         var bytes = JsonSerializer.Serialize(tenantInfo);
 
-        await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options);
-        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options);
+        await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options).ConfigureAwait(false);
+        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options).ConfigureAwait(false);
 
         return true;
     }
@@ -46,14 +46,14 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetAsync(string id)
     {
-        var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}");
+        var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}").ConfigureAwait(false);
         if (bytes == null)
             return null;
 
         var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
         // Refresh the identifier version to keep things synced
-        await cache.RefreshAsync($"{keyPrefix}identifier__{result?.Identifier}");
+        await cache.RefreshAsync($"{keyPrefix}identifier__{result?.Identifier}").ConfigureAwait(false);
 
         return result;
     }
@@ -70,14 +70,14 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}");
+        var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}").ConfigureAwait(false);
         if (bytes == null)
             return null;
 
         var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
         // Refresh the identifier version to keep things synced
-        await cache.RefreshAsync($"{keyPrefix}id__{result?.Id}");
+        await cache.RefreshAsync($"{keyPrefix}id__{result?.Id}").ConfigureAwait(false);
 
         return result;
     }
@@ -85,12 +85,12 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <inheritdoc />
     public async Task<bool> TryRemoveAsync(string identifier)
     {
-        var result = await TryGetByIdentifierAsync(identifier);
+        var result = await TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
         if (result == null)
             return false;
 
-        await cache.RemoveAsync($"{keyPrefix}id__{result.Id}");
-        await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}");
+        await cache.RemoveAsync($"{keyPrefix}id__{result.Id}").ConfigureAwait(false);
+        await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}").ConfigureAwait(false);
 
         return true;
     }

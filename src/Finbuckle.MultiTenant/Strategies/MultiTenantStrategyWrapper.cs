@@ -24,7 +24,7 @@ public class MultiTenantStrategyWrapper : IMultiTenantStrategy
 
         try
         {
-            identifier = await Strategy.GetIdentifierAsync(context);
+            identifier = await Strategy.GetIdentifierAsync(context).ConfigureAwait(false);
         }
         catch (Exception e)
         {

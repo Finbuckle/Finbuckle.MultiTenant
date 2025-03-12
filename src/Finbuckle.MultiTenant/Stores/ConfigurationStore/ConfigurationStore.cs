@@ -87,13 +87,13 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
+        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>());
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -106,7 +106,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
             return null;
         }
 
-        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
+        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null).ConfigureAwait(false);
     }
 
     /// <summary>
