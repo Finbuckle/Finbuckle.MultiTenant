@@ -54,7 +54,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
         {
             var wrappedStrategy = new MultiTenantStrategyWrapper(strategy,
                 loggerFactory?.CreateLogger(strategy.GetType()) ?? NullLogger.Instance);
-            identifier = await wrappedStrategy.GetIdentifierAsync(context);
+            identifier = await wrappedStrategy.GetIdentifierAsync(context).ConfigureAwait(false);
 
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
@@ -70,7 +70,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             {
                 var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store,
                     loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance);
-                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier);
+                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
                 if (tenantInfo == null)
                     continue;
 
@@ -80,7 +80,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                     TenantInfo = tenantInfo,
                     StrategyType = strategy.GetType(),
                     StoreType = store.GetType()
-                });
+                }).ConfigureAwait(false);
 
                 mtc.StoreInfo = new StoreInfo<TTenantInfo> { Store = store, StoreType = store.GetType() };
                 mtc.StrategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
@@ -90,13 +90,13 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
         }
 
         await options.CurrentValue.Events.OnTenantNotResolved(new TenantNotResolvedContext
-            { Context = context, Identifier = identifier });
+            { Context = context, Identifier = identifier }).ConfigureAwait(false);
         return mtc;
     }
 
     /// <inheritdoc />
     async Task<IMultiTenantContext> ITenantResolver.ResolveAsync(object context)
     {
-        return (IMultiTenantContext)(await ResolveAsync(context));
+        return (IMultiTenantContext)(await ResolveAsync(context).ConfigureAwait(false));
     }
 }

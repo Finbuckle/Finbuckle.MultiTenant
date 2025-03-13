@@ -49,24 +49,24 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
         }
 
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.ChallengeAsync(context, scheme, properties);
+        await _inner.ChallengeAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
     public async Task ForbidAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.ForbidAsync(context, scheme, properties);
+        await _inner.ForbidAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
     public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.SignInAsync(context, scheme, principal, properties);
+        await _inner.SignInAsync(context, scheme, principal, properties).ConfigureAwait(false);
     }
 
     public async Task SignOutAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.SignOutAsync(context, scheme, properties);
+        await _inner.SignOutAsync(context, scheme, properties).ConfigureAwait(false);
     }
 }
