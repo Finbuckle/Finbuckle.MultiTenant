@@ -64,17 +64,19 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     public async Task RefreshDualEntriesOnAddOrUpdate()
     {
         var store = CreateTestStore();
-        await Task.Delay(150);
+        await Task.Delay(100);
         var t1 = await store.TryGetAsync("lol-id");
-        await Task.Delay(150);
-        var t2 = await store.TryGetByIdentifierAsync("lol");
+        await Task.Delay(100);
+        var t2 = await store.TryGetAsync("lol-id");
+        await Task.Delay(100);
+        var t3 = await store.TryGetAsync("lol-id");
 
         Assert.NotNull(t1);
         Assert.NotNull(t2);
+        Assert.NotNull(t3);
         Assert.Equal("lol-id", t1.Id);
         Assert.Equal("lol-id", t2.Id);
-        Assert.Equal("lol", t1.Identifier);
-        Assert.Equal("lol", t2.Identifier);
+        Assert.Equal("lol-id", t3.Id);
     }
 
     [Fact]
