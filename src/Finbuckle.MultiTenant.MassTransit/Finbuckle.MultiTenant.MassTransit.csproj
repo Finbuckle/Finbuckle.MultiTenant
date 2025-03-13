@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks> 
+    <Title>Finbuckle.MultiTenant.Masstransit</Title>
+    <Description>Masstransit support for Finbuckle.MultiTenant.</Description>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MassTransit" Version="8.3.4" />
+    </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+  </ItemGroup>
+
+</Project>
