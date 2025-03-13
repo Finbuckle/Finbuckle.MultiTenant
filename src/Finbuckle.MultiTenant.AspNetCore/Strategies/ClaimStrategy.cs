@@ -1,9 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
@@ -24,8 +21,7 @@ public class ClaimStrategy : IMultiTenantStrategy
 
     public ClaimStrategy(string template, string? authenticationScheme)
     {
-        if (string.IsNullOrWhiteSpace(template))
-            throw new ArgumentException(nameof(template));
+        ArgumentException.ThrowIfNullOrWhiteSpace(template);
 
         _tenantKey = template;
         _authenticationScheme = authenticationScheme;
