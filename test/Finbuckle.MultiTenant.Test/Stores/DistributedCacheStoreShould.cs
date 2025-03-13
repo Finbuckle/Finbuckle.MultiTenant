@@ -64,9 +64,9 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     public async Task RefreshDualEntriesOnAddOrUpdate()
     {
         var store = CreateTestStore();
-        Thread.Sleep(2000);
+        await Task.Delay(150);
         var t1 = await store.TryGetAsync("lol-id");
-        Thread.Sleep(2000);
+        await Task.Delay(150);
         var t2 = await store.TryGetByIdentifierAsync("lol");
 
         Assert.NotNull(t1);
@@ -81,7 +81,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     public async Task ExpireDualEntriesAfterTimespan()
     {
         var store = CreateTestStore();
-        Thread.Sleep(3100);
+        await Task.Delay(210);
         var t1 = await store.TryGetAsync("lol-id");
         var t2 = await store.TryGetByIdentifierAsync("lol");
 
@@ -97,7 +97,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         services.AddOptions().AddDistributedMemoryCache();
         var sp = services.BuildServiceProvider();
 
-        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromSeconds(3));
+        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromMilliseconds(200));
 
         return PopulateTestStore(store);
     }
