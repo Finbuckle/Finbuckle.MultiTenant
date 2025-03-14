@@ -11,7 +11,8 @@ namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 /// Basic store that uses an IDistributedCache instance as its backing. Note that GetAllAsync is not implemented.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IDistributedCache cache;
     private readonly string keyPrefix;
@@ -38,7 +39,8 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         var bytes = JsonSerializer.Serialize(tenantInfo);
 
         await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options).ConfigureAwait(false);
-        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options).ConfigureAwait(false);
+        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options)
+            .ConfigureAwait(false);
 
         return true;
     }
@@ -96,9 +98,17 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
     {
-        // Same as adding for distributed cache.
-        return TryAddAsync(tenantInfo);
+        if (tenantInfo.Id is null)
+            return false;
+        
+        var current = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
+
+        if (current is null)
+            return false;
+
+        return await TryRemoveAsync(current.Identifier!).ConfigureAwait(false) &&
+               await TryAddAsync(tenantInfo).ConfigureAwait(false);
     }
 }
