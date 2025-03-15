@@ -67,8 +67,8 @@ Currently `InMemoryStore`, `ConfigurationStore`, and `EFCoreStore` implement `Ge
 
 Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store.
 
-Configure by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. By default the store is empty and the
-tenant identifier matching is case insensitive. Case insensitive is generally preferred. An overload
+Configure by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. By default, the store is empty and the
+tenant identifier matching is case-insensitive. Case-insensitive is generally preferred. An overload
 of `WithInMemoryStore` accepts an `Action<InMemoryStoreOptions>` delegate to configure the store further:
 
 ```csharp
@@ -93,14 +93,14 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 Uses an
 app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) as
-the underlying store. Most of the sample projects use this store for simplicity. This store is case insensitive when
+the underlying store. Most of the sample projects use this store for simplicity. This store is case-insensitive when
 retrieving tenant information by tenant identifier.
 
 This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw
 a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes,
 e.g. `appsettings.json` is updated, then the MultiTenant store will reflect the change.
 
-Configure by calling `WithConfigurationStore` after `AddMultiTenant<TTenantInfo>`. By default it will use the root
+Configure by calling `WithConfigurationStore` after `AddMultiTenant<TTenantInfo>`. By default, it will use the root
 configuration object and search for a section named "Finbuckle:MultiTenant:Stores:ConfigurationStore". An overload
 of `WithConfigurationStore` allows for a different base
 configuration object or section name if needed.
@@ -182,7 +182,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
-In addition the `IMultiTenantStore` interface methods, the database context can be used to modify data in the same way
+In addition to the `IMultiTenantStore` interface methods, the database context can be used to modify data in the 
+same way
 Entity Framework Core works with any database context which can offer richer functionality.
 
 ## Http Remote Store
@@ -193,12 +194,12 @@ Sends the tenant identifier, provided by the multitenant strategy, to an http(s)
 in return.
 
 The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/HttpRemoteStoreSample)
-projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
+projects demonstrate this store. This store is usually case-insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
 
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
-For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
+For a successful request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
 , `Name`, and other properties which will be mapped into a `TenantInfo` object with the type
 passed to `AddMultiTenant<TTenantInfo>`.
 
@@ -253,13 +254,13 @@ implementation. A sliding expiration is also supported. The store does not inter
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
-Each tenant info instance is actually stored twice in the cache, once using the Tenant Id as the key and another using
+Each tenant info instance is actually stored twice in the cache, once using the Tenant ID as the key and another using
 the Tenant Identifier as the key. Calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will keep these dual
 cache entries synced.
 
 This store does not implement `GetAllAsync`.
 
-Configure by calling `WithDistributedCacheStore` after `AddMultiTenant<TTenantInfo>`. By default entries do not expire,
+Configure by calling `WithDistributedCacheStore` after `AddMultiTenant<TTenantInfo>`. By default, entries do not expire,
 but a `TimeSpan` can be passed to be used as a sliding
 expiration:
 

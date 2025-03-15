@@ -8,24 +8,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbCo
 
 public class TestIdentityDbContext : EntityFrameworkCore.MultiTenantIdentityDbContext
 {
-    public TestIdentityDbContext(TenantInfo tenantInfo)
-        : base(tenantInfo)
-    {
-    }
-
-    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
-    {
-    }
-
-    public TestIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
+    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
+        multiTenantContextAccessor)
     {
     }
 
     public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
-    {
-    }
-
-    public TestIdentityDbContext(ITenantInfo tenantInfo, DbContextOptions options) : base(tenantInfo, options)
     {
     }
 

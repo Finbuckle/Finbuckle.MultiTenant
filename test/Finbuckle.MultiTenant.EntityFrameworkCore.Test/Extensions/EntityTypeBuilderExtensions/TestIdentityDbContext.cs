@@ -8,9 +8,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBu
 
 public class TestIdentityDbContext : EntityFrameworkCore.MultiTenantIdentityDbContext
 {
-    public TestIdentityDbContext(ITenantInfo tenantInfo) : base(tenantInfo)
+    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
     {
-        }
+    }
+
+    public TestIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    {
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

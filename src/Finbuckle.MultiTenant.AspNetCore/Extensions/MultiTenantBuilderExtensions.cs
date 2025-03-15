@@ -214,24 +214,24 @@ public static class MultiTenantBuilderExtensions
         where TTenantInfo : class, ITenantInfo, new()
     {
         builder.Services.Configure(configureOptions);
-        builder.Services.Configure<MultiTenantOptions>(options =>
+        builder.Services.Configure<MultiTenantOptions<TTenantInfo>>(options =>
         {
-            var origOnTenantResolved = options.Events.OnTenantResolved;
-            options.Events.OnTenantResolved = tenantResolvedContext =>
+            var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
+            options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (tenantResolvedContext.StrategyType == typeof(BasePathStrategy) &&
-                    tenantResolvedContext.Context is HttpContext httpContext &&
+                if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType == typeof(BasePathStrategy) &&
+                    resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)
                 {
-                    httpContext.Request.Path.StartsWithSegments($"/{tenantResolvedContext.TenantInfo?.Identifier}",
+                    httpContext.Request.Path.StartsWithSegments($"/{resolutionCompletedContext.MultiTenantContext.TenantInfo?.Identifier}",
                         out var matched, out var
                             newPath);
                     httpContext.Request.PathBase = httpContext.Request.PathBase.Add(matched);
                     httpContext.Request.Path = newPath;
                 }
 
-                return origOnTenantResolved(tenantResolvedContext);
+                return origOnTenantResolved(resolutionCompletedContext);
             };
         });
 

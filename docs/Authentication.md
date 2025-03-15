@@ -154,7 +154,7 @@ Internally `WithPerTenantAuthentication()` makes use of
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
 `ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
-configureations:
+configurations:
 
 ```csharp 
 builder.Services.AddMultiTenant<TenantInfo>()

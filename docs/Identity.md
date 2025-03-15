@@ -8,7 +8,7 @@ calls into the database instead of your own code.
 
 See the Identity data isolation sample projects in
 the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
-use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrates how to isolate the tenant Identity data
+use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate the tenant Identity data
 and integrate the Identity UI to work with a route multi-tenant strategy.
 
 ## Configuration

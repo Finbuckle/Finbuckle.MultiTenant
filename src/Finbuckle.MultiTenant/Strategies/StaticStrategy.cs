@@ -7,9 +7,11 @@ namespace Finbuckle.MultiTenant.Strategies;
 
 public class StaticStrategy : IMultiTenantStrategy
 {
+    // internal for testing
+    // ReSharper disable once MemberCanBePrivate.Global
     internal readonly string Identifier;
 
-    public int Priority { get => -1000; }
+    public int Priority => -1000;
 
     public StaticStrategy(string identifier)
     {

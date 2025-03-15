@@ -9,7 +9,7 @@ multi-tenant capability with minimal code changes.
 
 Finbuckle.MultiTenant integrates with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also the [ASP.NET
-Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps
+Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)) and lets apps
 customize options distinctly for each tenant.
 
 Note: For authentication options, Finbuckle.MultiTenant provides special support
