@@ -1,7 +1,7 @@
 # Version History
 
 <!--_history-->
-# [8.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v8.1.0) (2025-03-18)
+## [8.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v8.1.0) (2025-03-18)
 
 
 ### Bug Fixes
@@ -13,10 +13,11 @@
 
 * better async backported ([#951](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/951)) ([a204403](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a204403666794ea42c850ff5bfb736f1ced30e45))
 
-# [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
+## [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
 
+### ⚠ BREAKING CHANGES
 
-* feat!: version policy update ([#888](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/888)) ([487a3a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/487a3a6d9782803dc2c7a4c70f46cdecf876e991))
+* version policy update ([#888](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/888)) ([487a3a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/487a3a6d9782803dc2c7a4c70f46cdecf876e991))
 
 
 ### Bug Fixes

@@ -32,12 +32,6 @@ Table of Contents
 
 <!--_release-notes-->
 
-
-### Bug Fixes
-
-# [8.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v8.1.0) (2025-03-18)
-
-
 ### Bug Fixes
 
 * fix cache store leaving orphan tenant on some update scenarios ([#949](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/949)) ([7929f00](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7929f00bc2eb8ef82ee01e431bc04ef3b63d6f0f))
