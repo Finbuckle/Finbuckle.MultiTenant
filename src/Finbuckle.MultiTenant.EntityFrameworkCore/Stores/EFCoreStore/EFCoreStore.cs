@@ -25,25 +25,25 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     {
             return await dbContext.TenantInfo.AsNoTracking()
                 .Where(ti => ti.Id == id)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
     public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-            return await dbContext.TenantInfo.AsNoTracking().ToListAsync();
+            return await dbContext.TenantInfo.AsNoTracking().ToListAsync().ConfigureAwait(false);
         }
 
     public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
             return await dbContext.TenantInfo.AsNoTracking()
                 .Where(ti => ti.Identifier == identifier)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
     public virtual async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
-            await dbContext.TenantInfo.AddAsync(tenantInfo);
-            var result = await dbContext.SaveChangesAsync() > 0;
+            await dbContext.TenantInfo.AddAsync(tenantInfo).ConfigureAwait(false);
+            var result = await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
             dbContext.Entry(tenantInfo).State = EntityState.Detached;
             
             return result;
@@ -53,7 +53,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     {
             var existing = await dbContext.TenantInfo
                 .Where(ti => ti.Identifier == identifier)
-                .SingleOrDefaultAsync();
+                .SingleOrDefaultAsync().ConfigureAwait(false);
 
             if (existing is null)
             {
@@ -61,13 +61,13 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
             }
 
             dbContext.TenantInfo.Remove(existing);
-            return await dbContext.SaveChangesAsync() > 0;
+            return await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
         }
 
     public virtual async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
     {
             dbContext.TenantInfo.Update(tenantInfo);
-            var result = await dbContext.SaveChangesAsync() > 0;
+            var result = await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
             dbContext.Entry(tenantInfo).State = EntityState.Detached;
             return result;
         }

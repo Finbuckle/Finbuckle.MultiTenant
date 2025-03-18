@@ -91,7 +91,7 @@ public static class MultiTenantBuilderExtensions
                 if (!string.Equals(currentTenant, authTenant, StringComparison.OrdinalIgnoreCase))
                     context.RejectPrincipal();
 
-                await origOnValidatePrincipal(context);
+                await origOnValidatePrincipal(context).ConfigureAwait(false);
             };
         });
 
@@ -347,7 +347,7 @@ public static class MultiTenantBuilderExtensions
                         $"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
-                await origOnValidatePrincipal(context);
+                await origOnValidatePrincipal(context).ConfigureAwait(false);
             };
         });
     }

@@ -49,7 +49,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     public async Task<TTenantInfo?> TryGetAsync(string id)
     {
         var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
-        return await Task.FromResult(result);
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -57,13 +57,13 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         _tenantMap.TryGetValue(identifier, out var result);
 
-        return await Task.FromResult(result);
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList());
+        return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -71,7 +71,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         var result = tenantInfo.Identifier != null && _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
-        return await Task.FromResult(result);
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -79,20 +79,20 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         var result = _tenantMap.TryRemove(identifier, out var _);
 
-        return await Task.FromResult(result);
+        return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
     {
-        var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id) : null;
+        var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id).ConfigureAwait(false) : null;
 
         if (existingTenantInfo?.Identifier != null)
         {
             var result =  _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
-            return await Task.FromResult(result);
+            return await Task.FromResult(result).ConfigureAwait(false);
         }
 
-        return await Task.FromResult(false);
+        return await Task.FromResult(false).ConfigureAwait(false);
     }
 }

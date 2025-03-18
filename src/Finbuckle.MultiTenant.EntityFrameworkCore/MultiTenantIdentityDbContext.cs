@@ -203,6 +203,6 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
         CancellationToken cancellationToken = default(CancellationToken))
     {
         this.EnforceMultiTenant();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -36,7 +36,7 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
 
         var schemes = httpContext.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
 
-        foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync()).Where(s =>
+        foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync().ConfigureAwait(false)).Where(s =>
                      typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
         {
             // TODO verify this comment (still true as of net8.0)
@@ -83,7 +83,7 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
                     {
                         var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
 
-                        var form = await httpContext.Request.ReadFormAsync(formOptions);
+                        var form = await httpContext.Request.ReadFormAsync(formOptions).ConfigureAwait(false);
                         state = form.Single(i => string.Equals(i.Key, "state", StringComparison.OrdinalIgnoreCase))
                             .Value;
                     }
