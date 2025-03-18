@@ -10,7 +10,8 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframeworkcore;efcore</PackageTags>
+        <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;efcore</PackageTags>
+        <PackageIcon>finbuckle-128x128.png</PackageIcon>
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <NoWarn>CS1591</NoWarn>
