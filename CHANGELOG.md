@@ -30,6 +30,17 @@
 * dotnet 9 support ([#893](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/893)) ([4be1b88](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4be1b88fb7103223517d2cd8a16ea62c6d6204d5))
 * make builds deterministic and set latest GH actions ([#889](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/889)) ([d82f89d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d82f89da2f7a82bb302aaedfdb5c676cc7051273))
 
+## [8.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v8.1.0) (2025-03-18)
+
+### Bug Fixes
+
+* fix cache store leaving orphan tenant on some update scenarios ([#949](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/949)) ([7929f00](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7929f00bc2eb8ef82ee01e431bc04ef3b63d6f0f))
+
+
+### Features
+
+* better async backported ([#951](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/951)) ([a204403](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a204403666794ea42c850ff5bfb736f1ced30e45))
+
 ## [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
 
 ### ⚠ BREAKING CHANGES
