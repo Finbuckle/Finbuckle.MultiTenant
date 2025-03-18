@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.0.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.0</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -13,7 +13,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in v<span class="_version">8.0.0</span>](#whats-new)
+1. [What's New in v<span class="_version">8.1.0</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -25,35 +25,29 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">8.0.0</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">8.1.0</span>
 
-> This section only lists release update details specific to v<span class="_version">8.0.0</span>. See
+> This section only lists release update details specific to v<span class="_version">8.1.0</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 
 <!--_release-notes-->
 
 
-* feat!: version policy update ([#888](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/888)) ([487a3a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/487a3a6d9782803dc2c7a4c70f46cdecf876e991))
-
-
 ### Bug Fixes
 
-* BasePathStrategy no longer breaks the strategy chain ([#884](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/884)) ([3263eff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3263effae4638656aab827b24094a8e575ae19a0))
-* prevent duplicate key annotation in AdjustKey() ([#883](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/883)) ([f75ba2c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f75ba2c678079d2e956bf7d32b8e5aee0159e72b))
-* removed unused parameter from WithPerTenantRemoteAuthenticationConvention ([#886](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/886)) ([dd17ab5](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/dd17ab51825ec94f4ecfe704f42c6b0457562d98))
+* fix cache store leaving orphan tenant on some update scenarios ([#949](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/949)) ([7929f00](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7929f00bc2eb8ef82ee01e431bc04ef3b63d6f0f))
+* mitigation for security vulnerability ([b51122a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b51122a828994b235b3df035c117a0a2472d488a))
 
 
 ### Features
 
-* add GetAllAsync() support for HttpRemoteStore ([#848](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/848)) ([4208149](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4208149282eaee99e2c02a788a2653faaa24ef7a))
-* added the Echo Store. ([#807](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/807)) ([a3e5eee](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a3e5eee64f0581c5f3d6abca7bb77cc56ef1d75c))
-* strategies return null on invalid context type ([#885](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/885)) ([9834575](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9834575c957fb5bd314cf0970e54a29384026d02))
+* better async backported ([#951](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/951)) ([a204403](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a204403666794ea42c850ff5bfb736f1ced30e45))
+* Make builds deterministic and set latest GH actions ([#889](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/889)) ([d82f89d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d82f89da2f7a82bb302aaedfdb5c676cc7051273))
 
 
-### BREAKING CHANGES
+### Reverts
 
-* This commit brings the release into alignment with the new version policy. See #887 for details.
-* Included strategies for ASP.NET Core would throw an exception if the passed context was not an  type. Now they will return null indicating no identifier was found.
+* Revert fix:
 <!--_release-notes-->
 
 ## Quick Start
