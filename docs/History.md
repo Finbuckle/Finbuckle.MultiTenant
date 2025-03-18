@@ -17,7 +17,8 @@
 
 ### ⚠ BREAKING CHANGES
 
-* version policy update ([#888](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/888)) ([487a3a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/487a3a6d9782803dc2c7a4c70f46cdecf876e991))
+* This commit brings the release into alignment with the new version policy. See #887 for details.
+* Included strategies for ASP.NET Core would throw an exception if the passed context was not an `HttpContext` type. Now they will return null indicating no identifier was found.
 
 
 ### Bug Fixes
