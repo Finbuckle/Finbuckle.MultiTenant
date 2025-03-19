@@ -14,6 +14,7 @@
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 
