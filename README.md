@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -13,7 +13,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in v<span class="_version">8.1.0</span>](#whats-new)
+1. [What's New in v<span class="_version">8.1.1</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -25,21 +25,17 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">8.1.0</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">8.1.1</span>
 
-> This section only lists release update details specific to v<span class="_version">8.1.0</span>. See
+> This section only lists release update details specific to v<span class="_version">8.1.1</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 
 <!--_release-notes-->
 
+
 ### Bug Fixes
 
-* fix cache store leaving orphan tenant on some update scenarios ([#949](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/949)) ([7929f00](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7929f00bc2eb8ef82ee01e431bc04ef3b63d6f0f))
-
-
-### Features
-
-* better async backported ([#951](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/951)) ([a204403](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a204403666794ea42c850ff5bfb736f1ced30e45))
+* reenable deterministic builds ([178114d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/178114d03bb1d6dd3d16028b6d12fc8503bd0aab))
 <!--_release-notes-->
 
 ## Quick Start
