@@ -1,6 +1,12 @@
 # Version History
 
 <!--_history-->
+## [9.1.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.1...v9.1.2) (2025-03-20)
+
+### Bug Fixes
+
+* reenable deterministic builds ([#954](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/954)) ([0cd78b3](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0cd78b3ac917917dd58280733014a7589c05423a))
+
 ## [9.1.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.0...v9.1.1) (2025-03-18)
 
 ### Bug Fixes
