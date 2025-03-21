@@ -1,0 +1,35 @@
+name: Dependabot Clone
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+      
+jobs:
+  check-and-upgrade-dependencies:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [main, v8.x]
+    steps:
+      - name: Checkout Finbuckle.MultiTenant
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          
+      - name: Restore dependencies
+        run: dotnet restore --force-evaluate
+        
+      - name: Check for changes in a packages.lock.json
+        id: check-for-changes
+        run: echo "CHANGED=$(git diff --exit-code src/**/packages.lock.json)" >> "$GITHUB_ENV"
+        
+      - name: Create PR if changed
+        if: env.CHANGED != '0'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "fix: update dependencies"
+          git push origin --force fix/update-dependencies-${{ matrix.branch }}
+          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
