@@ -23,7 +23,7 @@ jobs:
           token: ${{ secrets.workflow_pat }}
           path: website
       - name: Copy Docs
-        run: mkdir -p website/content/docs/${{ env.tag }} && cp main/docs/* website/content/docs/${{ env.tag }}
+        run: mkdir -p website/content/docs/${{ env.tag }} && cp docs/* website/content/docs/${{ env.tag }}
       - name: Checkin Website
         working-directory: website
         run: |
