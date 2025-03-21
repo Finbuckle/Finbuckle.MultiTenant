@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [main, v8.x]
+        branch: [main, 8.x]
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
