@@ -13,13 +13,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: main
-          fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
+          fetch-depth: 0
       - name: Get Current Version
         id: currentversion
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        with:
-          workingDirectory: main
-          prefix: v
+        run: echo "tag=$(git describe --tags $(git rev-list --tags --max-count=1 --first-parent))" >> $GITHUB_ENV
+        working-directory: main
       - name: Checkout Website
         uses: actions/checkout@v4
         with:
