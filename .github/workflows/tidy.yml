@@ -9,13 +9,12 @@ jobs:
     steps:
       - uses: actions/stale@v9
         with:
-          days-before-stale: 30
+          days-before-stale: 180
+          days-before-close: -1
           stale-issue-label: 'inactive'
           stale-pr-label: 'inactive'
           exempt-issue-labels: 'pinned'
           exempt-pr-labels: 'pinned'
-          stale-issue-message: 'This issue has been labeled inactive because it has been open 30 days with no activity. This will be closed in 7 days without further activity.'
-          stale-pr-message: 'This PR has been labeled inactive because it has been open 30 days with no activity. This will be closed in 7 days without further activity.'
-          close-issue-message: 'This issue was closed because it has been labeled inactive for 7 days with no activity.'
-          close-pr-message: 'This PR was closed because it has been labeled inactive for 7 days with no activity.'
+          stale-issue-message: 'This issue has been labeled inactive because it has been open 180 days with no activity. Please consider closing this issue if no further action is needed.'
+          stale-pr-message: 'This PR has been labeled inactive because it has been open 180 days with no activity. Please consider closing this PR if no further action is needed.'
           
