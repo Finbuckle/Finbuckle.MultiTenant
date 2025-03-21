@@ -12,12 +12,10 @@ jobs:
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@v4
         with:
-          path: main
           fetch-depth: 0
       - name: Get Current Version
         id: currentversion
-        run: echo "tag=$(git describe --tags $(git rev-list --tags --max-count=1 --first-parent))" >> $GITHUB_ENV
-        working-directory: main
+        run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV
       - name: Checkout Website
         uses: actions/checkout@v4
         with:
@@ -25,7 +23,7 @@ jobs:
           token: ${{ secrets.workflow_pat }}
           path: website
       - name: Copy Docs
-        run: mkdir -p website/content/docs/${{ steps.currentversion.outputs.tag }} && cp main/docs/* website/content/docs/${{ steps.currentversion.outputs.tag }}
+        run: mkdir -p website/content/docs/${{ env.tag }} && cp main/docs/* website/content/docs/${{ env.tag }}
       - name: Checkin Website
         working-directory: website
         run: |
