@@ -4,42 +4,49 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
-      
+
 jobs:
   check-and-update-dependencies:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [main, 8.x]
+        branch: [ main, 8.x ]
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9
-          
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
-          
+          fetch-depth: 0
+
+      - name: Checkout branch for update
+        run: git checkout -b fix/update-dependencies-${{ matrix.branch }} || git checkout fix/update-dependencies-${{ matrix.branch }}
+        continue-on-error: true
+
       - name: Restore dependencies
         run: dotnet restore --force-evaluate
-        
+
       - name: Check for changes in a packages.lock.json
         id: check-for-changes
         run: git diff --exit-code src/*/packages.lock.json || echo CHANGED=1 >> $GITHUB_ENV
         continue-on-error: true
-      
+
+      - name: Push changes if changed
+        if: env.CHANGED == '1'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "fix: update dependencies"
+          git push origin fix/update-dependencies-${{ matrix.branch }}
+
       - name: Create PR if changed
         if: env.CHANGED == '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          DATE=$(date +'%Y-%m-%d')
-          git checkout -b fix/update-dependencies-${{ matrix.branch }}-$DATE
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "fix: update dependencies"
-          git push --force origin fix/update-dependencies-${{ matrix.branch }}-$DATE
-          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates project dependencies." --head fix/update-dependencies-${{ matrix.branch }}-$DATE --base ${{ matrix.branch }}
+          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates project dependencies." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
+        continue-on-error: true

@@ -1,9 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

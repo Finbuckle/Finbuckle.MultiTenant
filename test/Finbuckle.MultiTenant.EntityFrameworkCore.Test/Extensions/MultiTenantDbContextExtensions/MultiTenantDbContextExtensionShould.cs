@@ -2,7 +2,6 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Data.Common;
-using System.Linq;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;

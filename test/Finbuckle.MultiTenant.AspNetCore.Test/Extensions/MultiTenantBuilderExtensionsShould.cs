@@ -1,11 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Finbuckle.MultiTenant.AspNetCore.Options;
