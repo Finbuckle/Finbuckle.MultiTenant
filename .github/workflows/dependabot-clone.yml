@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [main, 8.x]
+        branch: [chore/dependabot-clone-bait]
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
