@@ -1,4 +1,4 @@
-name: Copy docs to website
+name: Copy Docs to Website
 
 on:
     workflow_dispatch:
@@ -14,7 +14,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Get Current Version
-        id: currentversion
         run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV
       - name: Checkout Website
         uses: actions/checkout@v4
