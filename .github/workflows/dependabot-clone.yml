@@ -41,5 +41,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "fix: update dependencies"
-          git push origin fix/update-dependencies-${{ github.ref_name }}
+          git push --force origin fix/update-dependencies-${{ github.ref_name }}
           gh pr create --title "Update dependencies for ${{ github.ref_name }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ github.ref_name }} --base ${{ github.ref_name }}
