@@ -6,7 +6,7 @@ on:
     - cron: '0 1 * * *'
       
 jobs:
-  check-and-upgrade-dependencies:
+  check-and-update-dependencies:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,14 +27,19 @@ jobs:
         
       - name: Check for changes in a packages.lock.json
         id: check-for-changes
-        run: echo "CHANGED=$(git diff --exit-code src/**/packages.lock.json)" >> "$GITHUB_ENV"
-        
+        run: git diff --exit-code src/*/packages.lock.json || echo CHANGED=1 >> $GITHUB_ENV
+        continue-on-error: true
+      
       - name: Create PR if changed
         if: env.CHANGED == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          DATE=$(date +'%Y-%m-%d')
+          git checkout -b fix/update-dependencies-${{ matrix.branch }}-$DATE
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
           git commit -m "fix: update dependencies"
-          git push origin --force fix/update-dependencies-${{ matrix.branch }}
-          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
+          git push --force origin fix/update-dependencies-${{ matrix.branch }}-$DATE
+          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates project dependencies." --head fix/update-dependencies-${{ matrix.branch }}-$DATE --base ${{ matrix.branch }}
