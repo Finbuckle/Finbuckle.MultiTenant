@@ -3,7 +3,6 @@
 
 // using System;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace IdentitySample.Data;
