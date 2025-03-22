@@ -5,7 +5,7 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Direct",
         "requested": "[8.0.*, )",
-        "resolved": "8.0.0",
+        "resolved": "8.0.14",
         "contentHash": "OGrLn0yynjUOqgMapk6OYIfZ805akhvgzRz6jIT9OgcNYnb808idHoGBK8D7sO/H2X/L02euW76KHDvHcMtMCw==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
@@ -14,7 +14,7 @@
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.1.*, )",
-        "resolved": "1.1.0",
+        "resolved": "1.1.1",
         "contentHash": "IaJGnOv/M7UQjRJks7B6p7pbPnOwisYGOIzqCz5ilGFTApZ3ktOR+6zJ12ZRPInulBmdAf1SrGdDG2MU8g6XTw==",
         "dependencies": {
           "Microsoft.Build.Tasks.Git": "1.1.1",
@@ -226,7 +226,7 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Direct",
         "requested": "[9.0.*, )",
-        "resolved": "9.0.0",
+        "resolved": "9.0.3",
         "contentHash": "UkWaM3tIVoj+W52DL39ueddx2vZwaiSTux9ueElmaYkRr7snTj7BU/V17hNk3UBG5A8+hCDtZuF+UE0N9EXRVw==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
@@ -235,7 +235,7 @@
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.1.*, )",
-        "resolved": "1.1.0",
+        "resolved": "1.1.1",
         "contentHash": "IaJGnOv/M7UQjRJks7B6p7pbPnOwisYGOIzqCz5ilGFTApZ3ktOR+6zJ12ZRPInulBmdAf1SrGdDG2MU8g6XTw==",
         "dependencies": {
           "Microsoft.Build.Tasks.Git": "1.1.1",
