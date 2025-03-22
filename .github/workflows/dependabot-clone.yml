@@ -28,7 +28,7 @@ jobs:
         
       - name: Check for changes in a packages.lock.json
         id: check-for-changes
-        run: echo "CHANGED=$(git diff --exit-code src/*/packages.lock.json)" >> "$GITHUB_ENV"
+        run: git diff --exit-code src/*/packages.lock.json && echo "CHANGED=1" >> "$GITHUB_ENV"
         
       - name: Create PR if changed
         if: env.CHANGED == '1'
