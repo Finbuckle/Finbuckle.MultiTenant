@@ -28,7 +28,7 @@ jobs:
         
       - name: Check for changes in a packages.lock.json
         id: check-for-changes
-        run: echo "CHANGED=$(git diff --exit-code src/**/packages.lock.json)" >> "$GITHUB_ENV"
+        run: echo "CHANGED=$(git diff --exit-code src/*/packages.lock.json)" >> "$GITHUB_ENV"
         
       - name: Create PR if changed
         if: env.CHANGED == '1'
@@ -38,4 +38,4 @@ jobs:
           git add .
           git commit -m "fix: update dependencies"
           git push origin --force fix/update-dependencies-${{ github.ref_name }}
-          gh pr create --title "Update dependencies for ${{ gitub.ref_name }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
+          gh pr create --title "Update dependencies for ${{ github.ref_name }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
