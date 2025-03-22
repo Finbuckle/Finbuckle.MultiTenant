@@ -7,10 +7,11 @@ on:
       
 jobs:
   check-and-upgrade-dependencies:
+    name: branch - ${{ github.ref_name }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch: [main, 8.x]
+#    strategy:
+#      matrix:
+#        branch: [main, 8.x]
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -19,8 +20,8 @@ jobs:
           
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@v4
-        with:
-          ref: ${{ matrix.branch }}
+#        with:
+#          ref: ${{ matrix.branch }}
           
       - name: Restore dependencies
         run: dotnet restore --force-evaluate
@@ -36,5 +37,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "fix: update dependencies"
-          git push origin --force fix/update-dependencies-${{ matrix.branch }}
-          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
+          git push origin --force fix/update-dependencies-${{ github.ref_name }}
+          gh pr create --title "Update dependencies for ${{ gitub.ref_name }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
