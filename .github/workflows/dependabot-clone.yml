@@ -6,12 +6,12 @@ on:
     - cron: '0 1 * * *'
       
 jobs:
-  check-and-upgrade-dependencies:
-    name: branch - ${{ github.ref_name }}
+  check-and-update-dependencies:
+    name: Update dependencides for${{ github.ref_name }}]
     runs-on: ubuntu-latest
-#    strategy:
-#      matrix:
-#        branch: [main, 8.x]
+    strategy:
+      matrix:
+        branch: [main, 8.x]
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -20,8 +20,8 @@ jobs:
           
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@v4
-#        with:
-#          ref: ${{ matrix.branch }}
+        with:
+          ref: ${{ matrix.branch }}
           
       - name: Restore dependencies
         run: dotnet restore --force-evaluate
@@ -36,10 +36,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git checkout -b fix/update-dependencies-${{ github.ref_name }}
+          DATE=$(date +'%Y-%m-%d')
+          git checkout -b fix/update-dependencies-${{ matrix.branch }}-$DATE
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
           git commit -m "fix: update dependencies"
-          git push --force origin fix/update-dependencies-${{ github.ref_name }}
-          gh pr create --title "Update dependencies for ${{ github.ref_name }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ github.ref_name }} --base ${{ github.ref_name }}
+          git push --force origin fix/update-dependencies-${{ matrix.branch }}-$DATE
+          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates the dependencies. Maybe one day Dependabot will better support dotnet." --head fix/update-dependencies-${{ matrix.branch }}-$DATE --base ${{ matrix.branch }}
