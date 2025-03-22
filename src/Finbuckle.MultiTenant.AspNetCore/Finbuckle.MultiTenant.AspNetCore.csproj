@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <Title>Finbuckle.MultiTenant.AspNetCore</Title>
         <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
     <Target Name="ReferenceFinbuckleDependencies" Condition=" '$(TargetFramework)' != '' " BeforeTargets="CollectPackageReferences">
@@ -20,7 +17,6 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.*" PrivateAssets="All"/>
         <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
     </ItemGroup>
 </Project>

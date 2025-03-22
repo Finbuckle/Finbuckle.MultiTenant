@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <Title>Finbuckle.MultiTenant</Title>
         <Description>Main library package for Finbuckle.MultiTenant.</Description>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
     <Target Name="ReferenceFinbuckleDependencies" Condition=" '$(TargetFramework)' != '' " BeforeTargets="CollectPackageReferences">
@@ -22,9 +19,5 @@
             <PackageReference Include="Microsoft.Extensions.Http" Version="$(TfmMajVer).0.*"/>
             <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
-    </Target>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.*" PrivateAssets="All"/>
-    </ItemGroup>
+    </Target>    
 </Project>

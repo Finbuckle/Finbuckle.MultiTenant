@@ -2,8 +2,6 @@
 // Refer to the solution LICENSE file for more information.
 
 using Microsoft.EntityFrameworkCore.Metadata;
-using System.Collections.Generic;
-using System.Linq;
 
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;

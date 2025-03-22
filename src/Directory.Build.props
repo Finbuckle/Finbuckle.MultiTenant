@@ -17,6 +17,8 @@
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
     <PropertyGroup Label="Analysis rules">
