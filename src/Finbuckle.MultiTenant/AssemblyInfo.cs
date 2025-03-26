@@ -7,3 +7,5 @@ using System.Runtime.CompilerServices;
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.AspNetCore.Test")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore.Test")]
+[assembly: InternalsVisibleTo("Finbuckle.MultiTenant.MassTransit")]
+[assembly: InternalsVisibleTo("Finbuckle.MultiTenant.MassTransit.Test")]

@@ -1,0 +1,20 @@
+@MassTransitSample_HostAddress = http://localhost:5205
+
+GET {{MassTransitSample_HostAddress}}/TestBus/
+Accept: application/json
+X-Tenant: tenant-1
+
+###
+
+GET {{MassTransitSample_HostAddress}}/TestBus/
+Accept: application/json
+X-Tenant: tenant-2
+
+###
+
+GET {{MassTransitSample_HostAddress}}/TestBus/
+Accept: application/json
+X-Tenant: tenant-3
+
+###
+
