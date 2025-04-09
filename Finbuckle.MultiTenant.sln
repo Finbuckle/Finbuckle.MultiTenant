@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CCC3146F-320C-4E1D-8017-056C9DCB6B0C}"
 EndProject
@@ -21,13 +21,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.EntityFrameworkCore.Test", "test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj", "{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.MassTransit", "src\Finbuckle.MultiTenant.MassTransit\Finbuckle.MultiTenant.MassTransit.csproj", "{B63E53B8-EEE1-4039-946E-14FB866E8A2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.MassTransit.Test", "test\Finbuckle.MultiTenant.MassTransit.Test\Finbuckle.MultiTenant.MassTransit.Test.csproj", "{FCE93B3F-C08F-411C-B28B-A39B3868EB14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MassTransitSample", "samples\net9.0\MassTransitSample\MassTransitSample.csproj", "{361FEBF5-7F51-4770-9948-E4386AA99670}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -54,6 +57,21 @@ Global
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B63E53B8-EEE1-4039-946E-14FB866E8A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B63E53B8-EEE1-4039-946E-14FB866E8A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B63E53B8-EEE1-4039-946E-14FB866E8A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B63E53B8-EEE1-4039-946E-14FB866E8A2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCE93B3F-C08F-411C-B28B-A39B3868EB14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCE93B3F-C08F-411C-B28B-A39B3868EB14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCE93B3F-C08F-411C-B28B-A39B3868EB14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCE93B3F-C08F-411C-B28B-A39B3868EB14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{361FEBF5-7F51-4770-9948-E4386AA99670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{361FEBF5-7F51-4770-9948-E4386AA99670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{361FEBF5-7F51-4770-9948-E4386AA99670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{361FEBF5-7F51-4770-9948-E4386AA99670}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -62,5 +80,8 @@ Global
 		{4B3A1C30-D42B-43F0-8541-4AB5B51CD05C} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
+		{B63E53B8-EEE1-4039-946E-14FB866E8A2D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
+		{FCE93B3F-C08F-411C-B28B-A39B3868EB14} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
+		{361FEBF5-7F51-4770-9948-E4386AA99670} = {78DD95B5-E466-4ED0-8824-36F78AB08174}
 	EndGlobalSection
 EndGlobal
