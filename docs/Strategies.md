@@ -14,12 +14,11 @@ If an identifier can't be determined, `GetIdentifierAsync` should return null wh
 null `TenantInfo`.
 
 Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>`
-after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. There are several
-available
-overrides for configuring the strategy. The first override uses dependency injection along with any passed parameters to
-construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>` factory method
-for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper providing basic
-logging and exception handling.
+after `AddMultiTenant<TTenantInfo>` in the app configuration. There are several
+available overrides for configuring the strategy. The first override uses dependency injection along with any passed
+parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>`
+factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper
+providing basic logging and exception handling.
 
 ```csharp
 // configure a strategy with a given type
@@ -45,7 +44,7 @@ type is for several instances of `DelegateStrategy` utilizing distinct logic or 
 > NuGet package: Finbuckle.MultiTenant
 
 Always uses the same identifier to resolve the tenant. Often useful in testing or to resolve to a fallback or default
-tenant by registering the strategy last.
+tenant. This strategy will run last no matter where it is configured.
 
 Configure by calling `WithStaticStrategy` after `AddMultiTenant<TTenantInfo>` and passing in the identifier to use for
 tenant resolution:
@@ -61,8 +60,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda
 function `async context => "initech"` would use "initech" as the identifier when resolving the tenant for every request.
-This strategy is good to use for testing or simple logic. This strategy is configured multiple times and will run in the
-order configured.
+This strategy is good to use for testing or simple logic. This strategy can be used multiple times and will run
+in the order configured.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>` A `Func<object, Task<string?>>`is passed
 in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter:
@@ -98,7 +97,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
 Uses the base (i.e. first) path segment to determine the tenant. For example, a request
-to "https://www.example.com/initech" would use "initech" as the identifier when resolving the tenant.
+to `https://www.example.com/initech` would use `initech` as the identifier when resolving the tenant.
 
 Configure by calling `WithBasePathStrategy` after `AddMultiTenant<TTenantInfo>`:
 
@@ -126,15 +125,15 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 Be aware that relative links to static files will be impacted so css files and other static resources may need to
 be referenced using absolute urls. Alternatively, you can place the `UseStaticFiles` middleware after
-the `UseMultiTenant` middware in the app pipeline configuration.
+the `UseMultiTenant` middleware in the app pipeline configuration.
 
 ## Claim Strategy
 
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses a claim to determine the tenant identifier. By default the first claim value with type `__tenant__` is used, but a
+Uses a claim to determine the tenant identifier. By default, the first claim value with type `__tenant__` is used, but a
 custom type name can also be used. This strategy uses the default authentication scheme, which is usually cookie based,
-but does not go so far as to set `HttpContext.User`. Thus the ASP.NET Core authentication middleware should still be
+but does not go so far as to set `HttpContext.User`. Thus, the ASP.NET Core authentication middleware should still be
 used as normal, and in most use cases should come after `UseMultiTenant`.
 
 Note that this strategy is does not work well with per-tenant cookie names since it must know the cookie name before the
@@ -185,7 +184,7 @@ tenant without invoking the expensive strategy.
 Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request
 to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}`
 would use "initech" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in
-the route path configuration. If explicity calling `UseRouting` in your app pipline make sure to place it
+the route path configuration. If explicitly calling `UseRouting` in your app pipeline make sure to place it
 before `WithRouteStrategy`.
 
 Configure by calling `WithRouteStrategy` after `AddMultiTenant<TTenantInfo>`. A custom route parameter can also be
@@ -209,14 +208,14 @@ app.UseMultiTenant();
 
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses request's host value to determine the tenant. By default the first host segment is used. For example, a request
-to "https://initech.example.com/abc123" would use "initech" as the identifier when resolving the tenant. This strategy
+Uses request's host value to determine the tenant. By default, the first host segment is used. For example, a request
+to `https://initech.example.com/abc123` would use "initech" as the identifier when resolving the tenant. This strategy
 can be difficult to use in a development environment. Make sure the development system is configured properly to allow
 subdomains on `localhost`. This strategy is configured as a singleton.
 
 The host strategy uses a template string which defines how the strategy will find the tenant identifier. The pattern
-specifies the location for the tenant identifier using "\_\_tenant\_\_" and can contain other valid domain characters.
-It can also use '?' and '\*' characters to represent one or "zero or more" segments. For example:
+specifies the location for the tenant identifier using `__tenant__` and can contain other valid domain characters.
+It can also use `?` and `*` characters to represent one or "zero or more" segments. For example:
 
 - `__tenant__.*` is the default if no pattern is provided and selects the first (or only) domain segment as the tenant
   identifier.
@@ -228,9 +227,8 @@ It can also use '?' and '\*' characters to represent one or "zero or more" segme
 - As a special case, a pattern string of just `__tenant__` will use the entire host as the tenant identifier, as opposed
   to a single segment.
 
-Configure by calling `WithHostStrategy` after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of
-the `Startup`
-class. A template pattern can be specified with the overloaded version:
+Configure by calling `WithHostStrategy` after `AddMultiTenant<TTenantInfo>`. A template pattern can be specified with
+the overloaded version:
 
 ```csharp
 // check the first domain segment (e.g. subdomain)
@@ -246,8 +244,8 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
-Uses an HTTP request header to determine the tenant identifier. By default the header with key `__tenant__` is used, but
-a custom key can also be used.
+Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used,
+but a custom key can also be used.
 
 Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type
 is also available:
@@ -267,7 +265,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
 This is a special strategy used for per-tenant authentication when remote authentication such as OpenID Connect or
-OAuth (e.g. Log in via Facebook) are used.
+OAuth2 (e.g. Log in via Facebook) are used.
 
 The strategy is configured internally when `WithPerTenantAuthentication` is called to
 configure [per-tenant authentication](Authentication).
