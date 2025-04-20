@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 
 public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
+    where TEFCoreStoreDbContext : DbContext, IEFCoreStoreTenants<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     internal readonly TEFCoreStoreDbContext dbContext;
