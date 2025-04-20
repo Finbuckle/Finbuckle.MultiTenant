@@ -11,14 +11,12 @@ public class EFCoreStoreDbContext<TTenantInfo> : DbContext, IEFCoreStoreTenants<
 {
     public EFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-        }
+    }
 
     public DbSet<TTenantInfo> TenantInfo => Set<TTenantInfo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
-            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id).HasMaxLength(Internal.Constants.TenantIdMaxLength);
-            modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
-        }
+        modelBuilder.ApplyConfiguration(new TenantInfoEntityConfiguration<TTenantInfo>());
+    }
 }
