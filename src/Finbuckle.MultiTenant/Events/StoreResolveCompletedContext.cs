@@ -13,6 +13,11 @@ public class StoreResolveCompletedContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     /// <summary>
+    /// Gets or sets the context used for attempted tenant resolution.
+    /// </summary>
+    public object? Context { get; set; }
+
+    /// <summary>
     /// The MultiTenantStore instance that was run.
     /// </summary>
     public required IMultiTenantStore<TTenantInfo> Store { get; init; }
