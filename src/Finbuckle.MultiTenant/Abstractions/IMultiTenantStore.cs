@@ -52,4 +52,12 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// </summary>
     /// <returns>An IEnumerable of all tenants in the store.</returns>
     Task<IEnumerable<TTenantInfo>> GetAllAsync();
+
+    /// <summary>
+    /// Retrieve all the TTenantInfo's from the store.
+    /// </summary>
+    /// <param name="take">Number of elements to take from the list.</param>
+    /// <param name="skip">Number of elements to skip from the list.</param>
+    /// <returns></returns>
+    Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip);
 }
