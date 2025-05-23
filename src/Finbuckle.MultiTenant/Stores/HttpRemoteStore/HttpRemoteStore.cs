@@ -75,6 +75,15 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         return await _client.GetAllAsync(endpointTemplate).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {

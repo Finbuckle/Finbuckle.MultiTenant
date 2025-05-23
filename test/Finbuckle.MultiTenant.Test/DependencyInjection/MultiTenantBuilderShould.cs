@@ -273,6 +273,11 @@ public class MultiTenantBuilderShould
                 throw new NotImplementedException();
             }
 
+        public Task<IEnumerable<TTenant>> GetAllAsync(int take, int skip)
+        {
+                throw new NotImplementedException();
+            }
+
         public Task<TTenant?> TryGetByIdentifierAsync(string identifier)
         {
                 throw new NotImplementedException();

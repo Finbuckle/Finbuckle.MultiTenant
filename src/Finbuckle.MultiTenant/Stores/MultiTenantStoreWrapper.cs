@@ -81,6 +81,23 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        IEnumerable<TTenantInfo> result = new List<TTenantInfo>();
+
+        try
+        {
+            result = await Store.GetAllAsync(take, skip).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Exception in GetAllAsync");
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
         ArgumentNullException.ThrowIfNull(identifier);

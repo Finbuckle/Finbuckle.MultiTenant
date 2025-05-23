@@ -29,6 +29,11 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
             return await dbContext.TenantInfo.AsNoTracking().ToListAsync().ConfigureAwait(false);
         }
 
+    public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+            return await dbContext.TenantInfo.Take(take).Skip(skip).AsNoTracking().ToListAsync().ConfigureAwait(false);
+        }
+
     public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
             return await dbContext.TenantInfo.AsNoTracking()
