@@ -89,4 +89,16 @@ public abstract class MultiTenantStoreTestBase
         var store = CreateTestStore();
         Assert.Equal(2, store.GetAllAsync().Result.Count());
     }
+
+    //[Fact]
+    public virtual void GetAllTenantsFromStoreAsyncSkip1Take1()
+    {
+        var store = CreateTestStore();
+        var tenants = store.GetAllAsync(1, 1).Result.ToList();
+        Assert.Single(tenants);
+
+        var tenant = tenants.FirstOrDefault();
+        Assert.NotNull(tenant);
+        Assert.Equal("lol", tenant!.Identifier);
+    }
 }

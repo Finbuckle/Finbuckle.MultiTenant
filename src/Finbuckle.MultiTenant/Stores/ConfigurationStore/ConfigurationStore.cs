@@ -97,6 +97,12 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     }
 
     /// <inheritdoc />
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
         ArgumentNullException.ThrowIfNull(identifier);
