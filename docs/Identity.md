@@ -2,12 +2,12 @@
 
 ## Introduction
 
-Finbuckle.MultiTenant has limited support for data isolation with ASP.NET Core Identity when Entity Framework Core is
+Finbuckle.MultiTenant has support for data isolation with ASP.NET Core Identity when Entity Framework Core is
 used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except Identity
 calls into the database instead of your own code.
 
-See the Identity data isolation sample projects in
-the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
+See the Identity data isolation sample projects
+in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
 use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate the tenant Identity data
 and integrate the Identity UI to work with a route multi-tenant strategy.
 
@@ -19,19 +19,21 @@ in [Data Isolation With Entity Framework Core](EFCore) with a few extra specific
 The simplest approach is to derive a db context from `MultiTenantIdentityDbContext` (which itself derives
 from `IdentityDbContext`) and configure Identity to use the derived context.
 
-When customizing the Identity data model, for example deriving a user entity type class from `IdentityUser`, to
-designate the customized entity type as multi-tenant either:
+When customizing the Identity data model, for example deriving a user entity type class from `IdentityUser`,
+designate the customized entity type as multi-tenant by either:
 
-- Add the `[MultiTenant]` data attribute to the entity type class, or
-- use the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating`
+- Adding the `[MultiTenant]` data attribute to the entity type class, or
+- Using the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating`
   method (to ensure the Identity model exists).
 
 If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the
 appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is
 required that base class `OnModelCreating` method is called **before** any multi-tenant extension methods.
 
-By default, all unique indexes will have the `TenantId` property added to prevent conflicts. Additionally,
-the `UserLogin` entity will have the `TenantId` added to its primary key.
+## Unique Indexes
+
+When using a variant of `MultiTenantIdentityDbContext` any entity designated as multi-tenant will also have the 
+`TenantId` property added to its unique index.
 
 ## Caveats
 
