@@ -7,7 +7,7 @@ used as the backing store. It works similarly to [Data Isolation with Entity Fra
 calls into the database instead of your own code.
 
 See the Identity data isolation sample projects
-in [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
+in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
 use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate the tenant Identity data
 and integrate the Identity UI to work with a route multi-tenant strategy.
 
@@ -20,7 +20,7 @@ The simplest approach is to derive a db context from `MultiTenantIdentityDbConte
 from `IdentityDbContext`) and configure Identity to use the derived context.
 
 When customizing the Identity data model, for example deriving a user entity type class from `IdentityUser`,
-designate the customized entity type by multi-tenant either:
+designate the customized entity type as multi-tenant by either:
 
 - Adding the `[MultiTenant]` data attribute to the entity type class, or
 - Using the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating`
