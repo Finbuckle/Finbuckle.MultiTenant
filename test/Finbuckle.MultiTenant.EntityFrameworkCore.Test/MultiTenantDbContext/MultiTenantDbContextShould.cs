@@ -56,7 +56,7 @@ public class MultiTenantDbContextShould
     }
     
     [Fact]
-    public void WorkWithCreate()
+    public void WorkWithCreateDbOptions()
     {
         var tenant1 = new TenantInfo
         {
@@ -66,6 +66,41 @@ public class MultiTenantDbContextShould
         };
         var c =
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new DbContextOptions<TestBlogDbContext>());
+
+        Assert.NotNull(c);
+    }
+    
+    [Fact]
+    public void WorkWithCreateDependencies()
+    {
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc"
+        };
+        var c =
+            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object());
+
+        Assert.NotNull(c);
+    }
+    
+    [Fact]
+    public void WorkWithCreateServiceProvider()
+    {
+        // create a sp
+        var services = new ServiceCollection();
+        services.AddTransient<object>(sp => 42);
+        var sp = services.BuildServiceProvider();
+        
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc"
+        };
+        var c =
+            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, sp);
 
         Assert.NotNull(c);
     }
