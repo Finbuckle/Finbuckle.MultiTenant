@@ -64,13 +64,13 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             if (identifier is not null && strategyResolveCompletedContext.Identifier is null)
                 tenantResoloverLogger.LogDebug("OnStrategyResolveCompleted set non-null Identifier to null");
             identifier = strategyResolveCompletedContext.Identifier;
-
+            
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
-                tenantResoloverLogger.LogDebug("Ignored identifier: {Identifier}", identifier);
+                tenantResoloverLogger.LogDebug("Ignored identifier: {Identifier}", identifier);               
                 identifier = null;
             }
-
+            
             if (identifier == null)
                 continue;
 
@@ -82,7 +82,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
 
                 var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
-                    { Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
+                    { Context = context, Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
                 await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext).ConfigureAwait(false);
                 if (tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
                     tenantResoloverLogger.LogDebug("OnStoreResolveCompleted set non-null TenantInfo to null");
