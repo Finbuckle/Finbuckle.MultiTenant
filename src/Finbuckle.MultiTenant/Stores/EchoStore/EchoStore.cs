@@ -62,4 +62,13 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     {
         throw new NotImplementedException();
     }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        throw new NotImplementedException();
+    }
 }

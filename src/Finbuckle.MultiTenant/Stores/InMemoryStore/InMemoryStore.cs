@@ -66,6 +66,15 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList()).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <inheritdoc />
     public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
