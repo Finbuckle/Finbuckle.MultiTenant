@@ -2,9 +2,9 @@
 
 ### Features
 
-* Add Context property to StoreResolveCompletedContext ([#976](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/976)) ([464a55c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/464a55c2ec490804642ccdfb050941fb6b9d3400))
+* add Context property to StoreResolveCompletedContext ([#976](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/976)) ([464a55c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/464a55c2ec490804642ccdfb050941fb6b9d3400))
 * add pagination support overload to IMultiTenantStore.GetAllAsync method ([#978](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/978)) ([b8e50a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b8e50a65061cc5739fc810ceeefe34617753e43a))
-* added more multi-tenant dbcontext factories ([#980](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/980)) ([de67550](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/de67550eb7dae649b30de3fef6fee0b1ba9d5d46))
+* add more multi-tenant dbcontext factories ([#980](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/980)) ([de67550](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/de67550eb7dae649b30de3fef6fee0b1ba9d5d46))
 
 ### Bug Fixes
 
