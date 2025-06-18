@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.2.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.2.1</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -12,7 +12,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 Table of Contents
 
-1. [What's New in v<span class="_version">9.2.0</span>](#whats-new)
+1. [What's New in v<span class="_version">9.2.1</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -25,21 +25,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">9.2.0</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">9.2.1</span>
 
-> This section only lists release update details specific to v<span class="_version">9.2.0</span>. See
+> This section only lists release update details specific to v<span class="_version">9.2.1</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
-### Features
-
-* Add Context property to StoreResolveCompletedContext ([#976](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/976)) ([464a55c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/464a55c2ec490804642ccdfb050941fb6b9d3400))
-* add pagination support overload to IMultiTenantStore.GetAllAsync method ([#978](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/978)) ([b8e50a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b8e50a65061cc5739fc810ceeefe34617753e43a))
-* added more multi-tenant dbcontext factories ([#980](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/980)) ([de67550](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/de67550eb7dae649b30de3fef6fee0b1ba9d5d46))
-
 ### Bug Fixes
 
-* remove TenantId from the UserLogin primary key ([#979](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/979)) ([a09fb7b](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a09fb7b8451bba3164bc13c1009163238d05872d))
+* update dependencies ([#982](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/982)) ([d40182a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d40182a31d49dd43875e0148259819391c28f5a0))
 <!--_release-notes-->
 
 ## Open Source Support
