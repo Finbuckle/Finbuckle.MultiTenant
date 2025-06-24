@@ -4,9 +4,6 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Core/src/AuthenticationSchemeProvider.cs
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -133,12 +130,12 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
 
         if (_inner != null)
         {
-            scheme = await _inner.GetSchemeAsync(name);
+            scheme = await _inner.GetSchemeAsync(name).ConfigureAwait(false);
         }
 
         if (scheme == null)
         {
-            scheme = _schemes.ContainsKey(name) ? _schemes[name] : null;
+            scheme = _schemes.TryGetValue(name, out AuthenticationScheme? value) ? value : null;
         }
 
         return scheme;
@@ -189,9 +186,8 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         }
         lock (_lock)
         {
-            if (_schemes.ContainsKey(name))
+            if (_schemes.TryGetValue(name, out AuthenticationScheme? scheme))
             {
-                var scheme = _schemes[name];
                 _requestHandlers.Remove(scheme);
                 _schemes.Remove(name);
             }

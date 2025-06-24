@@ -1,18 +1,16 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
-public class HostStrategy : IMultiTenantStrategy
+public sealed class HostStrategy : IMultiTenantStrategy
 {
-    private readonly string regex;
+    private readonly Regex regex;
 
     public HostStrategy(string template)
     {
@@ -53,7 +51,7 @@ public class HostStrategy : IMultiTenantStrategy
             string singleSegmentPattern = @"[^\.]+";
             if (template.Substring(template.Length - 3, 3) == @"\.*")
             {
-                template = template.Substring(0, template.Length - 3) + wildcardSegmentsPattern;
+                template = string.Concat(template.AsSpan(0, template.Length - 3), wildcardSegmentsPattern);
             }
 
             wildcardSegmentsPattern = @"([^\.]+\.)*";
@@ -62,7 +60,7 @@ public class HostStrategy : IMultiTenantStrategy
             template = template.Replace(Constants.TenantToken, @"(?<identifier>[^\.]+)");
         }
 
-        this.regex = $"^{template}$";
+        this.regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
     }
 
     public Task<string?> GetIdentifierAsync(object context)
@@ -77,9 +75,7 @@ public class HostStrategy : IMultiTenantStrategy
 
         string? identifier = null;
 
-        var match = Regex.Match(host.Host, regex,
-            RegexOptions.ExplicitCapture,
-            TimeSpan.FromMilliseconds(100));
+        var match = regex.Match(host.Host);
 
         if (match.Success)
         {

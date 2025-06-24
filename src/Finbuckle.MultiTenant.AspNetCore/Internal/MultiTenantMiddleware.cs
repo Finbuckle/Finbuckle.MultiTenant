@@ -1,7 +1,6 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.AspNetCore.Routing;
@@ -43,7 +42,7 @@ public class MultiTenantMiddleware
             
             var resolver = context.RequestServices.GetRequiredService<ITenantResolver>();
             
-            var multiTenantContext = await resolver.ResolveAsync(context);
+            var multiTenantContext = await resolver.ResolveAsync(context).ConfigureAwait(false);
             mtcSetter.MultiTenantContext = multiTenantContext;
             context.Items[typeof(IMultiTenantContext)] = multiTenantContext;
             

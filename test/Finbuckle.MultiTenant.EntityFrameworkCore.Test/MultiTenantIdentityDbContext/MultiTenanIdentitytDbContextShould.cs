@@ -61,31 +61,6 @@ public class MultiTenantIdentityDbContextShould
     }
 
     [Theory]
-    // [InlineData(typeof(IdentityUser))]
-    // [InlineData(typeof(IdentityRole))]
-    // [InlineData(typeof(IdentityUserClaim<string>))]
-    // [InlineData(typeof(IdentityUserRole<string>))]
-    [InlineData(typeof(IdentityUserLogin<string>))]
-    // [InlineData(typeof(IdentityRoleClaim<string>))]
-    // [InlineData(typeof(IdentityUserToken<string>))]
-    public void AdjustPrimaryKeys(Type entityType)
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
-
-        foreach (var key in c.Model.FindEntityType(entityType)!.GetKeys())
-        {
-            var props = key.Properties.Select(p => p.Name);
-            Assert.Contains("TenantId", props);
-        }
-    }
-
-    [Theory]
     [InlineData(typeof(IdentityUser), true)]
     [InlineData(typeof(IdentityRole), true)]
     [InlineData(typeof(IdentityUserClaim<string>), true)]

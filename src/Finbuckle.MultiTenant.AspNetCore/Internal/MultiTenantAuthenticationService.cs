@@ -3,7 +3,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
@@ -32,7 +31,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
             if (multiTenantContext?.TenantInfo != null)
             {
                 properties ??= new AuthenticationProperties();
-                if(!properties.Items.Keys.Contains(Constants.TenantToken))
+                if(!properties.Items.ContainsKey(Constants.TenantToken))
                     properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
             }
     }
@@ -49,24 +48,24 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
         }
 
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.ChallengeAsync(context, scheme, properties);
+        await _inner.ChallengeAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
     public async Task ForbidAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.ForbidAsync(context, scheme, properties);
+        await _inner.ForbidAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
     public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.SignInAsync(context, scheme, principal, properties);
+        await _inner.SignInAsync(context, scheme, principal, properties).ConfigureAwait(false);
     }
 
     public async Task SignOutAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
-        await _inner.SignOutAsync(context, scheme, properties);
+        await _inner.SignOutAsync(context, scheme, properties).ConfigureAwait(false);
     }
 }

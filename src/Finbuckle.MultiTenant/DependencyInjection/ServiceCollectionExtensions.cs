@@ -257,7 +257,7 @@ public static class FinbuckleServiceCollectionExtensions
     internal static void ConfigurePerTenantReqs<TOptions>(IServiceCollection services)
         where TOptions : class
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         // Required infrastructure.
         services.AddOptions();
@@ -270,10 +270,8 @@ public static class FinbuckleServiceCollectionExtensions
 
         MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
         {
-            var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
-                typeof(MultiTenantOptionsCache<TOptions>));
-            return (MultiTenantOptionsManager<TOptions>)
-                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
+            IOptionsMonitorCache<TOptions> cache = ActivatorUtilities.CreateInstance<MultiTenantOptionsCache<TOptions>>(sp);
+            return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp, cache);
         }
     }
 }

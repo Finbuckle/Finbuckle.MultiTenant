@@ -61,6 +61,9 @@ If multiple stores are registered a specific one can be retrieving an
 If implemented, `GetAllAsync` will return an `IEnumerable<TTenantInfo>` listing of all tenants in the store.
 Currently `InMemoryStore`, `ConfigurationStore`, and `EFCoreStore` implement `GetAllAsync`.
 
+### Pagination of GetAllAsync
+An overload to `GetAllAsync(int take, int skip)` exists to optionally allow take and skip parameters for pagination support if needed when iterating through a large number of tenants or retrieving from a remote source.
+
 ## In-Memory Store
 
 > NuGet package: Finbuckle.MultiTenant

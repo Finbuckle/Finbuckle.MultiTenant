@@ -32,7 +32,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         _client = client ?? throw new ArgumentNullException(nameof(client));
         if (!endpointTemplate.Contains(DefaultEndpointTemplateIdentifierToken))
         {
-            if (endpointTemplate.EndsWith("/"))
+            if (endpointTemplate.EndsWith('/'))
                 endpointTemplate += DefaultEndpointTemplateIdentifierToken;
             else
                 endpointTemplate += $"/{DefaultEndpointTemplateIdentifierToken}";
@@ -72,13 +72,22 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <exception cref="NotImplementedException">When a not-found (404) status code is encountered</exception>
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await _client.GetAllAsync(endpointTemplate);
+        return await _client.GetAllAsync(endpointTemplate).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        throw new NotImplementedException();
     }
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier);
+        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
         return result;
     }
 

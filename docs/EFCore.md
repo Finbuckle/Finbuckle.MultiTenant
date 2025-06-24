@@ -333,6 +333,20 @@ using var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext,
 var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
 dbOptions);
 
+// create a database context instance for the tenant with an instance of other dependencies
+// the final parameter is params object[] so any number of dependency arguments can be used
+var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
+dep1, dep2, dep3);
+
+// create a database context instance for the tenant with an instance from pulled from a given service provider
+var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
+serviceProvider);
+
+// create a database context instance for the tenant with an instance from pulled from a given service provider
+// and provided explicitly via params object[]
+var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
+serviceProvider, dep1, dep2, dep3);
+
 // loop through a bunch of tenant instances
 foreach (var tenant in tenants)
 {

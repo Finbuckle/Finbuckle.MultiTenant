@@ -1,9 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using System.Collections;
-using System.Linq;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantEntityTypeBuilder;
 using Microsoft.Data.Sqlite;

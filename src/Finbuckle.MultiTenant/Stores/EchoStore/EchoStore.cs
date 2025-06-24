@@ -18,13 +18,13 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        return await Task.FromResult(new TTenantInfo { Id = identifier, Identifier = identifier });
+        return await Task.FromResult(new TTenantInfo { Id = identifier, Identifier = identifier }).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetAsync(string id)
     {
-        return await Task.FromResult(new TTenantInfo { Id = id, Identifier = id });
+        return await Task.FromResult(new TTenantInfo { Id = id, Identifier = id }).ConfigureAwait(false);
     }
     
     /// <summary>
@@ -59,6 +59,15 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
     public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
         throw new NotImplementedException();
     }

@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Linq;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore;
 using Finbuckle.MultiTenant.AspNetCore.Internal;
@@ -126,8 +124,7 @@ public static class MultiTenantBuilderExtensions
             options.Events.OnValidatePrincipal = async context =>
             {
                 // Skip if bypass set (e.g. ClaimsStrategy in effect)
-                if (context.HttpContext.Items.Keys.Contains(
-                        $"{Constants.TenantToken}__bypass_validate_principal__"))
+                if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
                 var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo?.Identifier;
@@ -147,7 +144,7 @@ public static class MultiTenantBuilderExtensions
                 if (!string.Equals(currentTenant, authTenant, StringComparison.OrdinalIgnoreCase))
                     context.RejectPrincipal();
 
-                await origOnValidatePrincipal(context);
+                await origOnValidatePrincipal(context).ConfigureAwait(false);
             };
         });
 
@@ -425,11 +422,10 @@ public static class MultiTenantBuilderExtensions
             options.Events.OnValidatePrincipal = async context =>
             {
                 // Skip if bypass set (e.g. ClaimStrategy in effect)
-                if (context.HttpContext.Items.Keys.Contains(
-                        $"{Constants.TenantToken}__bypass_validate_principal__"))
+                if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
-                await origOnValidatePrincipal(context);
+                await origOnValidatePrincipal(context).ConfigureAwait(false);
             };
         });
     }

@@ -39,10 +39,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <exception cref="MultiTenantException"></exception>
     public ConfigurationStore(IConfiguration configuration, string sectionName)
     {
-        if (configuration is null)
-        {
-            throw new ArgumentNullException(nameof(configuration));
-        }
+        ArgumentNullException.ThrowIfNull(configuration);
 
         if (string.IsNullOrEmpty(sectionName))
         {
@@ -88,34 +85,34 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetAsync(string id)
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
-        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
+        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>());
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        if (identifier is null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
+        ArgumentNullException.ThrowIfNull(identifier);
 
         if (tenantMap is null)
         {
             return null;
         }
 
-        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
+        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null).ConfigureAwait(false);
     }
 
     /// <summary>

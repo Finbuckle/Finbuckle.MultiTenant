@@ -1,8 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Finbuckle.MultiTenant.AspNetCore.Options;
@@ -18,7 +16,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test;
 public class MultiTenantMiddlewareShould
 {
     [Fact]
-    public async void SetHttpContextItemIfTenantFound()
+    public async Task SetHttpContextItemIfTenantFound()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
@@ -124,7 +122,7 @@ public class MultiTenantMiddlewareShould
         }
         
     [Fact]
-    public async void NotSetTenantAccessorIfNoTenant()
+    public async Task NotSetTenantAccessorIfNoTenant()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().

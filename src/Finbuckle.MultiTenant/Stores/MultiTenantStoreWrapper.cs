@@ -35,16 +35,13 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetAsync(string id)
     {
-        if (id == null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
         TTenantInfo? result = null;
 
         try
         {
-            result = await Store.TryGetAsync(id);
+            result = await Store.TryGetAsync(id).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -73,7 +70,24 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.GetAllAsync();
+            result = await Store.GetAllAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Exception in GetAllAsync");
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        IEnumerable<TTenantInfo> result = new List<TTenantInfo>();
+
+        try
+        {
+            result = await Store.GetAllAsync(take, skip).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -86,16 +100,13 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        if (identifier == null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
+        ArgumentNullException.ThrowIfNull(identifier);
 
         TTenantInfo? result = null;
 
         try
         {
-            result = await Store.TryGetByIdentifierAsync(identifier);
+            result = await Store.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -127,22 +138,14 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
         ArgumentNullException.ThrowIfNull(tenantInfo);
-        
-        if (tenantInfo.Id == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Id));
-        }
-
-        if (tenantInfo.Identifier == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Identifier));
-        }
+        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
+        ArgumentNullException.ThrowIfNull(tenantInfo.Identifier);
 
         var result = false;
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing != null)
             {
                 _logger.LogDebug(
@@ -151,7 +154,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             }
             else
             {
-                existing = await TryGetByIdentifierAsync(tenantInfo.Identifier);
+                existing = await TryGetByIdentifierAsync(tenantInfo.Identifier).ConfigureAwait(false);
                 if (existing != null)
                 {
                     _logger.LogDebug(
@@ -159,7 +162,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
                         tenantInfo.Id, tenantInfo.Identifier);
                 }
                 else
-                    result = await Store.TryAddAsync(tenantInfo);
+                    result = await Store.TryAddAsync(tenantInfo).ConfigureAwait(false);
             }
         }
         catch (Exception e)
@@ -186,16 +189,13 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<bool> TryRemoveAsync(string identifier)
     {
-        if (identifier == null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
+        ArgumentNullException.ThrowIfNull(identifier);
 
         var result = false;
 
         try
         {
-            result = await Store.TryRemoveAsync(identifier);
+            result = await Store.TryRemoveAsync(identifier).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -218,27 +218,20 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
     {
-        if (tenantInfo == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo));
-        }
-
-        if (tenantInfo.Id == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Id));
-        }
+        ArgumentNullException.ThrowIfNull(tenantInfo);
+        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
 
         var result = false;
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing == null)
             {
                 _logger.LogDebug("TryUpdateAsync: Tenant Id: \"{TenantId}\" not found", tenantInfo.Id);
             }
             else
-                result = await Store.TryUpdateAsync(tenantInfo);
+                result = await Store.TryUpdateAsync(tenantInfo).ConfigureAwait(false);
         }
         catch (Exception e)
         {

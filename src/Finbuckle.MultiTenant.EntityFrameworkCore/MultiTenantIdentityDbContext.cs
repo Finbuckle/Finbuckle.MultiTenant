@@ -93,7 +93,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
 
         builder.Entity<IdentityUserClaim<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<IdentityUserRole<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-        builder.Entity<IdentityUserLogin<TKey>>().IsMultiTenant().AdjustUniqueIndexes().AdjustKeys(builder);
+        builder.Entity<IdentityUserLogin<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<IdentityRoleClaim<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<IdentityUserToken<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
     }
@@ -160,6 +160,6 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
         CancellationToken cancellationToken = default(CancellationToken))
     {
         this.EnforceMultiTenant();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
     }
 }

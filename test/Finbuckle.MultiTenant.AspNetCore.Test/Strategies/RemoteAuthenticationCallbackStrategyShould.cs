@@ -18,7 +18,7 @@ public class RemoteAuthenticationCallbackStrategyShould
     }
     
     [Fact]
-    public async void ReturnNullIfContextIsNotHttpContext()
+    public async Task ReturnNullIfContextIsNotHttpContext()
     {
         var context = new object();
         var strategy = new RemoteAuthenticationCallbackStrategy(null!);

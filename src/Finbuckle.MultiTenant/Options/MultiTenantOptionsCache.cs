@@ -67,10 +67,7 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     /// <returns>The existing or new options instance.</returns>
     public TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
     {
-        if (createOptions == null)
-        {
-            throw new ArgumentNullException(nameof(createOptions));
-        }
+        ArgumentNullException.ThrowIfNull(createOptions);
 
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";

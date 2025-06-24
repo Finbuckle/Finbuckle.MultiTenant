@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Generic;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +16,10 @@ public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext
     }
 
     public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    {
+    }
+    
+    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, object dependency) : base(multiTenantContextAccessor)
     {
     }
 }

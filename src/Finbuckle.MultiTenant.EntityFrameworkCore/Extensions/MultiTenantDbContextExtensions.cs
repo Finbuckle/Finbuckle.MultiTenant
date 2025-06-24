@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Linq;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +26,7 @@ public static class MultiTenantDbContextExtensions
             Where(e => e.Metadata.IsMultiTenant()).ToList();
 
         // ensure tenant context is valid
-        if (changedMultiTenantEntities.Any())
+        if (changedMultiTenantEntities.Count != 0)
         {
             if (tenantInfo == null)
                 throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
@@ -42,7 +41,7 @@ public static class MultiTenantDbContextExtensions
             Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
                        (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
-        if (mismatchedAdded.Any())
+        if (mismatchedAdded.Count != 0)
         {
             switch (tenantMismatchMode)
             {
@@ -80,7 +79,7 @@ public static class MultiTenantDbContextExtensions
             Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
                        (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
-        if (mismatchedModified.Any())
+        if (mismatchedModified.Count != 0)
         {
             switch (tenantMismatchMode)
             {
@@ -104,7 +103,7 @@ public static class MultiTenantDbContextExtensions
         var notSetModified = modifiedMultiTenantEntities.
             Where(e => (string?)e.Property("TenantId").CurrentValue == null).ToList();
 
-        if (notSetModified.Any())
+        if (notSetModified.Count != 0)
         {
             switch (tenantNotSetMode)
             {
@@ -129,7 +128,7 @@ public static class MultiTenantDbContextExtensions
             Where(e => (string?)e.Property("TenantId").CurrentValue != null &&
                        (string?)e.Property("TenantId").CurrentValue != tenantInfo.Id).ToList();
 
-        if (mismatchedDeleted.Any())
+        if (mismatchedDeleted.Count != 0)
         {
             switch (tenantMismatchMode)
             {
@@ -150,7 +149,7 @@ public static class MultiTenantDbContextExtensions
         var notSetDeleted = deletedMultiTenantEntities.
             Where(e => (string?)e.Property("TenantId").CurrentValue == null).ToList();
 
-        if (notSetDeleted.Any())
+        if (notSetDeleted.Count != 0)
         {
             switch (tenantNotSetMode)
             {
