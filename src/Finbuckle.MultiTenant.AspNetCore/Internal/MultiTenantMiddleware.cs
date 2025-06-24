@@ -49,5 +49,7 @@ public class MultiTenantMiddleware
             
             if (options?.Predicate is null || !options.Predicate(multiTenantContext))
                 await next(context);
-        }
+            else if (options.RedirectTo is not null)
+                context.Response.Redirect(options.RedirectTo.ToString());
+    }
 }
