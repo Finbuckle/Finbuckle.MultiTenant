@@ -29,13 +29,13 @@ public static class MultiTenantBuilderExtensions
     /// </summary>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> instance.</param>
-    /// <param name="options">The short circuit options to configure.</param>
+    /// <param name="configureOptions">The short circuit options to configure.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhen<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder, Action<ShortCircuitWhenOptions> options)
+        this MultiTenantBuilder<TTenantInfo> builder, Action<ShortCircuitWhenOptions> configureOptions)
         where TTenantInfo : class, ITenantInfo, new()
     {
-        builder.Services.Configure(options);
+        builder.Services.Configure(configureOptions);
 
         return builder;
     }
@@ -51,9 +51,29 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : class, ITenantInfo, new()
     {
-        builder.Services.Configure<ShortCircuitWhenOptions>(config => config.Predicate = context => !context.IsResolved);
+        return builder.ShortCircuitWhen(config =>
+        {
+            config.Predicate = context => !context.IsResolved;
+        });
+    }
 
-        return builder;
+    /// <summary>
+    /// Configures endpoints to be short circuited during MultiTenant resolution when
+    /// no Tenant was resolved.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> instance.</param>
+    /// <param name="redirectTo">A <see cref="Uri"/> to redirect the request to, if short circuited.</param>
+    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhenTenantNotResolved<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder, Uri redirectTo)
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        return builder.ShortCircuitWhen(config =>
+        {
+            config.Predicate = context => !context.IsResolved;
+            config.RedirectTo = redirectTo;
+        });
     }
 
     /// <summary>

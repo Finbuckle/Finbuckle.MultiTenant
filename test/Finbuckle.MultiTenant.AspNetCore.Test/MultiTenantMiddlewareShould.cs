@@ -45,7 +45,7 @@ public class MultiTenantMiddlewareShould
         }
 
     [Fact]
-    public async void NotShortCircuitIfTenantFound()
+    public async Task NotShortCircuitIfTenantFound()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
@@ -58,6 +58,8 @@ public class MultiTenantMiddlewareShould
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
             context.Setup(c => c.Features).Returns(new FeatureCollection());
+            var response = new Mock<HttpResponse>();
+            context.Setup(c => c.Response).Returns(response.Object);
 
             var itemsDict = new Dictionary<object, object?>();
             context.Setup(c => c.Items).Returns(itemsDict);
@@ -81,6 +83,7 @@ public class MultiTenantMiddlewareShould
             Assert.NotNull(mtc?.TenantInfo);
             Assert.Equal("initech", mtc.TenantInfo.Id);
             Assert.True(calledNext);
+            response.Verify(r => r.Redirect("/tenant/notfound"), Times.Never);
         }
 
     [Fact]
@@ -156,7 +159,7 @@ public class MultiTenantMiddlewareShould
         }
 
     [Fact]
-    public async void ShortCircuitIfNoTenant()
+    public async Task ShortCircuitIfNoTenant()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
@@ -169,6 +172,8 @@ public class MultiTenantMiddlewareShould
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
             context.Setup(c => c.Features).Returns(new FeatureCollection());
+            var response = new Mock<HttpResponse>();
+            context.Setup(c => c.Response).Returns(response.Object);
 
             var itemsDict = new Dictionary<object, object?>();
             context.Setup(c => c.Items).Returns(itemsDict);
@@ -193,5 +198,53 @@ public class MultiTenantMiddlewareShould
             Assert.False(mtc.IsResolved);
             Assert.Null(mtc.TenantInfo);
             Assert.False(calledNext);
+            response.Verify(r => r.Redirect("/tenant/notfound"), Times.Never);
         }
+
+    [Fact]
+    public async Task ShortCircuitAndRedirectIfNoTenant()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>().
+            WithStaticStrategy("not_initech").
+            WithInMemoryStore();
+        var sp = services.BuildServiceProvider();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+
+        var context = new Mock<HttpContext>();
+        context.Setup(c => c.RequestServices).Returns(sp);
+        context.Setup(c => c.Features).Returns(new FeatureCollection());
+        var response = new Mock<HttpResponse>();
+        context.Setup(c => c.Response).Returns(response.Object);
+
+        var itemsDict = new Dictionary<object, object?>();
+        context.Setup(c => c.Items).Returns(itemsDict);
+
+        var options = new ShortCircuitWhenOptions
+        {
+            Predicate = context => !context.IsResolved,
+            RedirectTo = new Uri("/tenant/notfound", UriKind.Relative)
+        };
+        var optionsMock = new Mock<IOptions<ShortCircuitWhenOptions>>();
+        optionsMock.Setup(c => c.Value).Returns(options);
+
+        var calledNext = false;
+        var mw = new MultiTenantMiddleware(_ =>
+        {
+            calledNext = true;
+
+            return Task.CompletedTask;
+        }, optionsMock.Object);
+
+        await mw.Invoke(context.Object);
+
+        var mtc = (IMultiTenantContext<TenantInfo>?)context.Object.Items[typeof(IMultiTenantContext)];
+
+        Assert.NotNull(mtc);
+        Assert.False(mtc.IsResolved);
+        Assert.Null(mtc.TenantInfo);
+        Assert.False(calledNext);
+        response.Verify(r => r.Redirect("/tenant/notfound"), Times.Once);
+    }
 }

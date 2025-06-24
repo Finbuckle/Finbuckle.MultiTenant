@@ -22,4 +22,9 @@ public class ShortCircuitWhenOptions
             _predicate = value;
         }
     }
+
+    /// <summary>
+    /// A <see cref="Uri"/> to redirect the request to, if short circuited.
+    /// </summary>
+    public Uri? RedirectTo { get; set; }
 }
