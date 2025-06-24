@@ -109,6 +109,108 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
       contains the resolved multi-tenant context and can be changed by the event handler to override the resolver's
       result.
 
+## ASP.NET Core Features
+
+Some additional features are avaiable to tailor the middleware to your specific needs.
+
+### Exclude Endpoints From Tenant Resolution
+
+If you have scenarios where you do not want Tenant resolution to be performed, you can exclude specific endpoints.
+
+Using the `IEndpointConventionBuilder` extension `ExcludeFromMultiTenantResolution`:
+
+```csharp
+var app = builder.Build();
+
+// Exclude OpenApi endpoints.
+app.MapOpenApi()
+    .ExcludeFromMultiTenantResolution();
+
+// Exclude a specific endpoint.
+app.MapGet("/oops", () => "Oops! An error happened.")
+    .ExcludeFromMultiTenantResolution();
+
+// Exclude a group of endpoints.
+app.MapGroup("api/v{version:apiVersion}/dashboard")
+    .ExcludeFromMultiTenantResolution();
+	
+// Exclude static asset endpoints.
+app.MapStaticAssets()
+    .ExcludeFromMultiTenantResolution();
+
+app.Run();
+```
+
+Using the `ExcludeFromMultiTenantResolutionAttribute` attribute to configure the behavior of controllers and action methods.
+
+```csharp
+// Here --> [ExcludeFromMultiTenantResolution]
+public class DashboardController : Controller
+{
+    // Or here --> [ExcludeFromMultiTenantResolution]
+    public ActionResult Index()
+    {
+        return View();
+    }
+}
+```
+
+### Short Curcuiting
+
+If you would like to short circuit for any reason, ending the request handling process early from within the `MultiTenantMiddleware`.
+The `ShortCircuitWhenTenantNotResolved<TTenantInfo()` or `ShortCircuitWhen<TTenantInfo>()` methods can be called after
+`AddMultiTenant<TTenantInfo>()`.
+
+DISCLAIMER: If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant, 
+then `ExcludeFromMultiTenantResolution` becomes a necessity, otherwise, these endpoints would never be reached.
+
+## Short Circuit When Tenant Not resolved
+
+`MultiTenantOptions` provides convenient events, such as `OnTenantResolveCompleted`, giving you the flexibility to take action during resolution 
+when no tenant was found. However, these events have no inherit way to direct the `MultiTenantMiddleware` to take any specific actions.
+In the case you want to short circuit when a tenant is not found, use the `MultiTenantBuilder<TTenantInfo>` extension 
+`ShortCircuitWhenTenantNotResolved()`.
+
+```csharp
+// Simply short circuit the request, ending request handling.
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithHostStrategy()
+    .WithConfigurationStore()
+    .ShortCircuitWhenTenantNotResolved();
+	
+// Short circuit and redirect to a specific Uri.
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithHostStrategy()
+    .WithConfigurationStore()
+    .ShortCircuitWhenTenantNotResolved(new Uri("/tenant/notfound", UriKind.Relative));
+```
+
+## Short Circuit When
+
+If you find that you need to short circuit for other, more advanced reasons,
+use the `MultiTenantBuilder<TTenantInfo>` extension `ShortCircuitWhen()`.
+
+```csharp
+// Advanced short circuiting, if an obsolete strategy was used or when tenant not resolved.
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithHostStrategy()
+    .WithConfigurationStore()
+    .ShortCircuitWhen(config =>
+	{
+		config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+	});
+	
+// Including a redirect.
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithHostStrategy()
+    .WithConfigurationStore()
+	.ShortCircuitWhen(config =>
+	{
+		config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+		config.RedirectTo = new Uri("/tenant/notfound", UriKind.Relative)
+	});
+```
+
 ## Getting the Current Tenant
 
 There are several ways an app can see the current tenant:
