@@ -86,7 +86,7 @@ public class MultiTenantMiddlewareShould
         }
 
     [Fact]
-    public async void SetTenantAccessor()
+    public async Task SetTenantAccessor()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
