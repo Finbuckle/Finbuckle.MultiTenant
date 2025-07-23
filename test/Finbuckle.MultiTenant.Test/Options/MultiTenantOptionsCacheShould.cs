@@ -4,7 +4,7 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Xunit;

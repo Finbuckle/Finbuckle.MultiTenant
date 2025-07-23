@@ -19,5 +19,10 @@
             <PackageReference Include="Microsoft.Extensions.Http" Version="$(TfmMajVer).0.*"/>
             <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
-    </Target>    
+    </Target>
+
+    <ItemGroup>
+        <ProjectReference Include="../Finbuckle.MultiTenant.Abstractions/Finbuckle.MultiTenant.Abstractions.csproj"/>
+    </ItemGroup>
+    
 </Project>

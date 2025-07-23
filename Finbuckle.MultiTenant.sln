@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.EntityFrameworkCore.Test", "test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj", "{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Abstractions", "src/Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj", "{A893BA35-102B-46CD-B4EA-82FEF909D4DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -62,5 +68,6 @@ Global
 		{4B3A1C30-D42B-43F0-8541-4AB5B51CD05C} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
+		{A893BA35-102B-46CD-B4EA-82FEF909D4DF} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 	EndGlobalSection
 EndGlobal

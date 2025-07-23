@@ -4,7 +4,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

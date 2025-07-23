@@ -130,6 +130,9 @@
         "type": "Transitive",
         "resolved": "8.0.0",
         "contentHash": "bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g=="
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     },
     "net9.0": {
@@ -261,6 +264,9 @@
         "type": "Transitive",
         "resolved": "9.0.7",
         "contentHash": "ti/zD9BuuO50IqlvhWQs9GHxkCmoph5BHjGiWKdg2t6Or8XoyAfRJiKag+uvd/fpASnNklfsB01WpZ4fhAe0VQ=="
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     }
   }

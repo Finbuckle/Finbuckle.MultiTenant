@@ -2,7 +2,6 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 using Finbuckle.MultiTenant.Stores.EchoStore;
