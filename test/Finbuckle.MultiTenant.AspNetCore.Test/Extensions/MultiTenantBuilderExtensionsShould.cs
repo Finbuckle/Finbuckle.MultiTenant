@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using Constants = Finbuckle.MultiTenant.Internal.Constants;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Test.Extensions;
 

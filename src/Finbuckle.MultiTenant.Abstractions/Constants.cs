@@ -1,8 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-namespace Finbuckle.MultiTenant.Internal;
-
+namespace Finbuckle.MultiTenant.Abstractions;
+// TODO rethink
 internal static class Constants
 {
     public static readonly int TenantIdMaxLength = 64;

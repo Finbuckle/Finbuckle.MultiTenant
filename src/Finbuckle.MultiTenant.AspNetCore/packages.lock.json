@@ -192,6 +192,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions": "[9.2.2, )",
           "Microsoft.Extensions.Caching.Abstractions": "[8.0.*, )",
           "Microsoft.Extensions.Configuration": "[8.0.*, )",
           "Microsoft.Extensions.DependencyInjection": "[8.0.*, )",
@@ -200,6 +201,9 @@
           "Microsoft.Extensions.Options": "[8.0.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[8.0.*, )"
         }
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     },
     "net9.0": {
@@ -392,6 +396,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions": "[9.2.2, )",
           "Microsoft.Extensions.Caching.Abstractions": "[9.0.*, )",
           "Microsoft.Extensions.Configuration": "[9.0.*, )",
           "Microsoft.Extensions.DependencyInjection": "[9.0.*, )",
@@ -400,6 +405,9 @@
           "Microsoft.Extensions.Options": "[9.0.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.*, )"
         }
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     }
   }

@@ -4,7 +4,6 @@
 using System.Text;
 using System.Text.Json;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;

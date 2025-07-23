@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -77,7 +78,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         using var db = GetDbContext();
         var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing))?.FindProperty("TenantId");
 
-        Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
+        Assert.Equal(Abstractions.Constants.TenantIdMaxLength, prop!.GetMaxLength());
     }
 
     [Fact]

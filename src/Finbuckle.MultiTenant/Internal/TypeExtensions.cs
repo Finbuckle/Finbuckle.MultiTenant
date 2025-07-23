@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Reflection;
+using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant.Internal;
 
