@@ -58,6 +58,5 @@ or check out the code!
 
 ## Sample Projects
 
-A variety of sample projects are available in the `samples` directory. Note that may older samples have been removed as .NET
-versions are end-of-lifed by Microsoft, such as .NET Core 3.0, .NET 5, and .NET 6. These samples are still available in earlier
-tagged release commits if needed.
+A variety of sample projects are available in the [samples](https://github.com/Finbuckle/Finbuckle.
+MultiTenant/samples) directory.

@@ -151,7 +151,7 @@ more details.
 ## Existing Query Filters
 
 `IsMultiTenant` and the `[MultiTenant]` attribute use a query filter for data isolation and will automatically merge its
-query filter with an existing query filter is one is present. For that reason, if the type to be multi-tenant has an
+query filter with an existing query filter if one is present. For that reason, if the type to be multi-tenant has an
 existing query filter, `IsMultiTenant` and `ConfigureMultiTenant` should be called *after* the existing query filter is
 configured:
 
