@@ -115,8 +115,7 @@ more details:
 
 ## Samples
 
-A variety of sample projects are available in the [samples](https://github.com/Finbuckle/Finbuckle.
-MultiTenant/samples) directory.
+A variety of sample projects are available in the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/samples) directory.
 
 ## Compiling from Source
 
