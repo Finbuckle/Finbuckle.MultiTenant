@@ -2,6 +2,8 @@
 
 This folder contains simple examples of Finbuckle.MultiTenant and related packages in action.
 
+Samples are grouped by Finbuckle.MultiTenant version and .NET version.
+
 ## Where are the samples?
 
 Samples may not always be present in the main branch as they need to be updated to support later .NET versions. 
