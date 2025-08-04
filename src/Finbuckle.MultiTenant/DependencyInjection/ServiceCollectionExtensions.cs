@@ -62,64 +62,79 @@ public static class FinbuckleServiceCollectionExtensions
     // TODO: better document and extract
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
-        var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
-        if (existingService is null)
+        var existingServices = services.Where(s => s.ServiceType == typeof(TService)).ToList();
+        if (existingServices.Count == 0)
             throw new ArgumentException($"No service of type {typeof(TService).Name} found.");
 
         ServiceDescriptor? newService;
 
-        if (existingService.ImplementationType is not null)
+        foreach (var existingService in existingServices)
         {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner =
-                        (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
+            if (existingService.ImplementationType is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner =
+                            (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
 
-                    if (inner is null)
-                        throw new Exception(
-                            $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
+                        if (inner is null)
+                            throw new Exception(
+                                $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
 
-                    var parameters2 = new object[parameters.Length + 1];
-                    Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
-                    parameters2[0] = inner;
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
 
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
-                },
-                existingService.Lifetime);
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else if (existingService.ImplementationInstance is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner = (TService)existingService.ImplementationInstance;
+                        if (inner is null)
+                            throw new Exception(
+                                $"Unable to instantiate decorated type via implementation instance of type {existingService.ImplementationInstance.GetType().Name}.");
+                        
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
+                        
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else if (existingService.ImplementationFactory is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner = (TService)existingService.ImplementationFactory(sp);
+                        if (inner is null)
+                            throw new Exception(
+                                $"Unable to instantiate decorated type via implementation factory for type {existingService.ServiceType}.");
+
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
+                        
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else
+            {
+                throw new Exception(
+                    "Unable to instantiate decorated type.");
+            }
+
+            services.Remove(existingService);
+            services.Add(newService);
         }
-        else if (existingService.ImplementationInstance is not null)
-        {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner = (TService)existingService.ImplementationInstance;
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
-                },
-                existingService.Lifetime);
-        }
-        else if (existingService.ImplementationFactory is not null)
-        {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner = (TService)existingService.ImplementationFactory(sp);
-                    if (inner is null)
-                        throw new Exception(
-                            "Unable to instantiate decorated type via implementation factory.");
-
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
-                },
-                existingService.Lifetime);
-        }
-        else
-        {
-            throw new Exception(
-                "Unable to instantiate decorated type.");
-        }
-
-        services.Remove(existingService);
-        services.Add(newService);
 
         return true;
     }
