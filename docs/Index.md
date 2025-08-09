@@ -1,6 +1,6 @@
 [Introduction](Introduction)
 
-[What's New in v<span class="_version">9.2.2</span>](WhatsNew)
+[What's New in v<span class="_version">9.3.0</span>](WhatsNew)
 
 [Version History](History)
 
