@@ -141,7 +141,8 @@ app.MapStaticAssets()
 app.Run();
 ```
 
-Using the `ExcludeFromMultiTenantResolutionAttribute` attribute to configure the behavior of controllers and action methods.
+Using the `ExcludeFromMultiTenantResolutionAttribute` attribute to configure the behavior of controllers and action
+methods.
 
 ```csharp
 // Here --> [ExcludeFromMultiTenantResolution]
@@ -155,21 +156,20 @@ public class DashboardController : Controller
 }
 ```
 
-### Short Curcuiting
+### Short Circuiting
 
-If you would like to short circuit for any reason, ending the request handling process early from within the `MultiTenantMiddleware`.
-The `ShortCircuitWhenTenantNotResolved<TTenantInfo()` or `ShortCircuitWhen<TTenantInfo>()` methods can be called after
-`AddMultiTenant<TTenantInfo>()`.
+The `MultiTenantMiddleware` can be configured to short circuit a request pipeline when no tenant is found or when some
+custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo()` and `ShortCircuitWhen<TTenantInfo>()` as
+shown below will configure this behavior as necessary.
 
-DISCLAIMER: If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant, 
-then `ExcludeFromMultiTenantResolution` becomes a necessity, otherwise, these endpoints would never be reached.
+#### Short Circuit When Tenant Not resolved
 
-## Short Circuit When Tenant Not resolved
+Call `ShortCircuitWhenTenantNotResolved<TTenantInfo()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
+the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
+tenant was found.
 
-`MultiTenantOptions` provides convenient events, such as `OnTenantResolveCompleted`, giving you the flexibility to take action during resolution 
-when no tenant was found. However, these events have no inherit way to direct the `MultiTenantMiddleware` to take any specific actions.
-In the case you want to short circuit when a tenant is not found, use the `MultiTenantBuilder<TTenantInfo>` extension 
-`ShortCircuitWhenTenantNotResolved()`.
+> If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant,
+> then `ExcludeFromMultiTenantResolution` becomes a necessity, otherwise, these endpoints would never be reached.
 
 ```csharp
 // Simply short circuit the request, ending request handling.
@@ -185,7 +185,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .ShortCircuitWhenTenantNotResolved(new Uri("/tenant/notfound", UriKind.Relative));
 ```
 
-## Short Circuit When
+#### Short Circuit When a Custom Condition is Met
 
 If you find that you need to short circuit for other, more advanced reasons,
 use the `MultiTenantBuilder<TTenantInfo>` extension `ShortCircuitWhen()`.
