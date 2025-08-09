@@ -33,6 +33,7 @@ public class MultiTenantMiddlewareShould
 
             var itemsDict = new Dictionary<object, object?>();
             context.Setup(c => c.Items).Returns(itemsDict);
+            context.Setup(c => c.Features).Returns(new FeatureCollection());
 
             var mw = new MultiTenantMiddleware(_ => Task.CompletedTask);
 
