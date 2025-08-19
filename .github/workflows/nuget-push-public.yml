@@ -7,8 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+        
       - name: Create the package
         run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
+        
       - name: Publish the package to github
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
