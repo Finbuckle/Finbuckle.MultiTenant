@@ -1,6 +1,13 @@
 # Version History
 
 <!--_history-->
+## [8.1.7](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.6...v8.1.7) (2025-09-10)
+
+
+### Bug Fixes
+
+* update dependencies ([ae3aeb3](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ae3aeb3c0ef05db1664b60bc091713f72a06daf4))
+
 ## [8.1.6](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.5...v8.1.6) (2025-08-09)
 
 
