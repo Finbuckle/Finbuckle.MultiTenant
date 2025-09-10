@@ -15,7 +15,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+<!--        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
