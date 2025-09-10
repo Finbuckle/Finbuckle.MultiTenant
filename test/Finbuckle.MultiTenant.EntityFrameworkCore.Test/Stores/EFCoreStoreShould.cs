@@ -60,7 +60,7 @@ public class EfCoreStoreShould
     public void AddTenantIdLengthConstraint()
     {
             var prop = GetModelProperty("Id");
-            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
+            Assert.Equal(Abstractions.Constants.TenantIdMaxLength, prop!.GetMaxLength());
         }
 
     [Fact]

@@ -1,11 +1,14 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantIdentityDbContext;
+namespace Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class MultiTenantIdentityDbContextShould
 {
@@ -30,7 +33,7 @@ public class MultiTenantIdentityDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
+        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
     }
@@ -51,7 +54,7 @@ public class MultiTenantIdentityDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
+        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         foreach (var index in c.Model.FindEntityType(entityType)!.GetIndexes().Where(i => i.IsUnique))
         {
@@ -76,7 +79,7 @@ public class MultiTenantIdentityDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
+        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
     }
@@ -97,7 +100,7 @@ public class MultiTenantIdentityDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContextTUser, TenantInfo>(tenant1);
+        using var c = MultiTenantDbContext.Create<TestIdentityDbContextTUser, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
     }
@@ -119,7 +122,7 @@ public class MultiTenantIdentityDbContextShould
             Name = "abc"
         };
         using var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContextTUserTRole, TenantInfo>(tenant1);
+            MultiTenantDbContext.Create<TestIdentityDbContextTUserTRole, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
     }
@@ -140,8 +143,22 @@ public class MultiTenantIdentityDbContextShould
             Identifier = "abc",
             Name = "abc"
         };
-        using var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestIdentityDbContextAll, TenantInfo>(tenant1);
+        using var c = MultiTenantDbContext.Create<TestIdentityDbContextAll, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+    }
+    
+    [Fact]
+    public void CreateMultiTenantIdentityDbContext()
+    {
+        var tenant1 = new TenantInfo
+        {
+            Id = "abc",
+            Identifier = "abc",
+            Name = "abc"
+        };
+        var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
+
+        Assert.NotNull(c);
     }
 }

@@ -30,7 +30,7 @@ public class EFCoreStoreDbContext<TTenantInfo> : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
             modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
-            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id).HasMaxLength(Internal.Constants.TenantIdMaxLength);
+            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id).HasMaxLength(Abstractions.Constants.TenantIdMaxLength);
             modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
         }
 }

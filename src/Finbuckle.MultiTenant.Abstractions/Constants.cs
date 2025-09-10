@@ -1,11 +1,12 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-namespace Finbuckle.MultiTenant.Internal;
+namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
 /// Contains constant values for internal use.
 /// </summary>
+// TODO rethink
 internal static class Constants
 {
     /// <summary>
