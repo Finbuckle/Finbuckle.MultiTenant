@@ -1,21 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <TargetFramework>net10.0</TargetFramework>
         <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
         <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
     </PropertyGroup>
 
-    <Target Name="ReferenceFinbuckleDependencies" Condition=" '$(TargetFramework)' != '' " BeforeTargets="CollectPackageReferences">
-        <PropertyGroup>
-            <TfmMajVer>$(TargetFramework.Substring(3, 1))</TfmMajVer>
-        </PropertyGroup>
-
-        <ItemGroup>
-            <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(TfmMajVer).0.*"/>
-        </ItemGroup>
-    </Target>
-
     <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0-*"/>
+
         <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
     </ItemGroup>
 </Project>
