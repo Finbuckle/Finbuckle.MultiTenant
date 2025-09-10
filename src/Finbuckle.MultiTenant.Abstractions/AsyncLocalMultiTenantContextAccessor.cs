@@ -1,10 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Abstractions;
-
-namespace Finbuckle.MultiTenant.Internal;
-
+namespace Finbuckle.MultiTenant.Abstractions;
+// TODO rethink internal
 /// <summary>
 /// Provides access the current MultiTenantContext via an AsyncLocal variable.
 /// </summary>
@@ -23,7 +21,7 @@ internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantC
     }
 
     /// <inheritdoc />
-    IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => (IMultiTenantContext)MultiTenantContext;
+    IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
 
     IMultiTenantContext IMultiTenantContextSetter.MultiTenantContext
     {

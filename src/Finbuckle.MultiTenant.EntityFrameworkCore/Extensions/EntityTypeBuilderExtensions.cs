@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Linq.Expressions;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant;
@@ -34,13 +35,13 @@ public static class EntityTypeBuilderExtensions
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);
 
-        builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
+        builder.HasAnnotation(EntityFrameworkCore.Constants.MultiTenantAnnotationName, true);
 
         try
         {
             builder.Property<string>("TenantId")
                 .IsRequired()
-                .HasMaxLength(Internal.Constants.TenantIdMaxLength);
+                .HasMaxLength(Abstractions.Constants.TenantIdMaxLength);
         }
         catch (Exception ex)
         {

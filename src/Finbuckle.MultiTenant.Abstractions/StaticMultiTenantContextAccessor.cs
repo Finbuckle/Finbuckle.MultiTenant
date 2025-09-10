@@ -1,6 +1,6 @@
-using Finbuckle.MultiTenant.Abstractions;
+namespace Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Internal;
+// TODO rethink internal
 
 internal class StaticMultiTenantContextAccessor<TTenantInfo>(TTenantInfo? tenantInfo)
     : IMultiTenantContextAccessor<TTenantInfo>
