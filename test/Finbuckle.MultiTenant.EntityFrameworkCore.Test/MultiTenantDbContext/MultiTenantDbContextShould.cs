@@ -1,7 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -115,20 +115,6 @@ public class MultiTenantDbContextShould
             Name = "abc"
         };
         var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1);
-
-        Assert.NotNull(c);
-    }
-    
-    [Fact]
-    public void CreateMultiTenantIdentityDbContext()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        var c = EntityFrameworkCore.MultiTenantDbContext.Create<EntityFrameworkCore.MultiTenantIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
     }

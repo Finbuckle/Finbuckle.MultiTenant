@@ -3,7 +3,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

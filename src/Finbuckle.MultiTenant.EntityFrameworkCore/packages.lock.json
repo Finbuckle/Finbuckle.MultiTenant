@@ -2,16 +2,6 @@
   "version": 1,
   "dependencies": {
     "net8.0": {
-      "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
-        "type": "Direct",
-        "requested": "[8.0.*, )",
-        "resolved": "8.0.20",
-        "contentHash": "Fr4JDsKzzfLyi3vwfVM/bSr4eGvKqbrKgCVEokWUAm62GN1OzJ0ZW0osYyK62S8YphBcwJ0f+wVUXuMh32+a+g==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "8.0.20",
-          "Microsoft.Extensions.Identity.Stores": "8.0.20"
-        }
-      },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Direct",
         "requested": "[8.0.*, )",
@@ -20,30 +10,6 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "8.0.20",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
-        }
-      },
-      "Microsoft.Extensions.Identity.Stores": {
-        "type": "Direct",
-        "requested": "[8.0.*, )",
-        "resolved": "8.0.20",
-        "contentHash": "Dtgo2lMooc9ypZiqKPyYzHPNSy/HuGiCl49kk5BXroiHvA0400N3Wo1jo8fMteg2mdPA1Fl12iMsIuFZIBMK/A==",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Identity.Core": "8.0.20",
-          "Microsoft.Extensions.Logging": "8.0.1"
-        }
-      },
-      "Microsoft.AspNetCore.Cryptography.Internal": {
-        "type": "Transitive",
-        "resolved": "8.0.20",
-        "contentHash": "W2r5X9JRU7f9A0jblXJeIROSPZD7pZYp26/Ws/xcd/i5P2IN4TqlZHqrhDy8AKlkac3HOa67AUwn/AXmUFh+5g=="
-      },
-      "Microsoft.AspNetCore.Cryptography.KeyDerivation": {
-        "type": "Transitive",
-        "resolved": "8.0.20",
-        "contentHash": "6QulqfEt/BDJou1rNB5qqI0b0Lh08D0u45CfPgzjvHQscQSz3FTmsnTzsnBLAGwSfIYyKyRO4lE/5b/3MlmbFQ==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.Internal": "8.0.20"
         }
       },
       "Microsoft.EntityFrameworkCore": {
@@ -157,16 +123,6 @@
           "Microsoft.Extensions.Options": "8.0.2"
         }
       },
-      "Microsoft.Extensions.Identity.Core": {
-        "type": "Transitive",
-        "resolved": "8.0.20",
-        "contentHash": "xQxvgqMdcQRUG48uhBsGz0FSk4GrvmOmo5skBpmwMiX8BRpd9EzuU+bHTJvOuJ/pNvAU+11IkrQTflznHKYkhQ==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "8.0.20",
-          "Microsoft.Extensions.Logging": "8.0.1",
-          "Microsoft.Extensions.Options": "8.0.2"
-        }
-      },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
         "resolved": "8.0.1",
@@ -214,6 +170,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions": "[9.3.1, )",
           "Microsoft.Extensions.Caching.Abstractions": "[8.0.*, )",
           "Microsoft.Extensions.Configuration": "[8.0.*, )",
           "Microsoft.Extensions.DependencyInjection": "[8.0.*, )",
@@ -222,19 +179,12 @@
           "Microsoft.Extensions.Options": "[8.0.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[8.0.*, )"
         }
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     },
     "net9.0": {
-      "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
-        "type": "Direct",
-        "requested": "[9.0.*, )",
-        "resolved": "9.0.9",
-        "contentHash": "dks8XEL1RFT8BmytQCKq0ovWwOUb8cVImdCA1fH8+SQoMxU2HvtyG6KNeQfKAudny2YQjl8H812pkvdw6rEqdg==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "9.0.9",
-          "Microsoft.Extensions.Identity.Stores": "9.0.9"
-        }
-      },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Direct",
         "requested": "[9.0.*, )",
@@ -245,30 +195,6 @@
           "Microsoft.Extensions.Caching.Memory": "9.0.9",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
           "Microsoft.Extensions.Logging": "9.0.9"
-        }
-      },
-      "Microsoft.Extensions.Identity.Stores": {
-        "type": "Direct",
-        "requested": "[9.0.*, )",
-        "resolved": "9.0.9",
-        "contentHash": "d1VMuRB/YPElUS65jg9YqJtdXWr7aqllWDrQsX1yY57iOn5z3ClC11zXxygwYOfX+4IYGGn9t8BsryDYJEyvOQ==",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "9.0.9",
-          "Microsoft.Extensions.Identity.Core": "9.0.9",
-          "Microsoft.Extensions.Logging": "9.0.9"
-        }
-      },
-      "Microsoft.AspNetCore.Cryptography.Internal": {
-        "type": "Transitive",
-        "resolved": "9.0.9",
-        "contentHash": "1ZKxBYg9d+pQS+oBEpHzCPLlKMN/MmCcESLvadcScjovVynTa52Q/1N8B0pn6N+MaWjEYw+YazEwTOI3zYOx8A=="
-      },
-      "Microsoft.AspNetCore.Cryptography.KeyDerivation": {
-        "type": "Transitive",
-        "resolved": "9.0.9",
-        "contentHash": "iGru/4hTzcOYl6KQskvzyzYsGEbS7Rj+TfknIqDQZvgeGoxB61yEgypmomGz4pepBBFURkfnQLZJWaJtqlmy+g==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.Internal": "9.0.9"
         }
       },
       "Microsoft.EntityFrameworkCore": {
@@ -382,16 +308,6 @@
           "Microsoft.Extensions.Options": "9.0.9"
         }
       },
-      "Microsoft.Extensions.Identity.Core": {
-        "type": "Transitive",
-        "resolved": "9.0.9",
-        "contentHash": "SGLETUVrC16OJJ04cUtxLdxr6WzdSPd7XsMqJqMi96UL4DWPjfeZAyYNETA4qbvnJm1/tf1/xvel7xm5o2mQwQ==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "9.0.9",
-          "Microsoft.Extensions.Logging": "9.0.9",
-          "Microsoft.Extensions.Options": "9.0.9"
-        }
-      },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
         "resolved": "9.0.9",
@@ -439,6 +355,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions": "[9.3.1, )",
           "Microsoft.Extensions.Caching.Abstractions": "[9.0.*, )",
           "Microsoft.Extensions.Configuration": "[9.0.*, )",
           "Microsoft.Extensions.DependencyInjection": "[9.0.*, )",
@@ -447,6 +364,9 @@
           "Microsoft.Extensions.Options": "[9.0.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[9.0.*, )"
         }
+      },
+      "finbuckle.multitenant.abstractions": {
+        "type": "Project"
       }
     }
   }
