@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Entit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Abstractions", "src/Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj", "{A893BA35-102B-46CD-B4EA-82FEF909D4DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbuckle.MultiTenant.Identity.EntityFrameworkCore", "src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj", "{F2243E66-209C-490E-99A2-EE71DF5CEEFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test", "test\Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test\Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test.csproj", "{A673180E-8490-422E-977F-C4976E79C9BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +64,14 @@ Global
 		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A893BA35-102B-46CD-B4EA-82FEF909D4DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2243E66-209C-490E-99A2-EE71DF5CEEFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2243E66-209C-490E-99A2-EE71DF5CEEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2243E66-209C-490E-99A2-EE71DF5CEEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2243E66-209C-490E-99A2-EE71DF5CEEFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A673180E-8490-422E-977F-C4976E79C9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A673180E-8490-422E-977F-C4976E79C9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A673180E-8490-422E-977F-C4976E79C9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A673180E-8490-422E-977F-C4976E79C9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CEB62625-8CD8-459B-952F-932A213BD81D} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
@@ -69,5 +81,7 @@ Global
 		{9BA8381A-5E44-4571-9CF1-F4469ECEBB02} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
 		{E1A6EBD0-BBB1-4EC3-9318-2D3A55E6868A} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 		{A893BA35-102B-46CD-B4EA-82FEF909D4DF} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
+		{F2243E66-209C-490E-99A2-EE71DF5CEEFA} = {CCC3146F-320C-4E1D-8017-056C9DCB6B0C}
+		{A673180E-8490-422E-977F-C4976E79C9BD} = {DDDA7AB6-03C2-4499-BED3-E404CB6ADE69}
 	EndGlobalSection
 EndGlobal

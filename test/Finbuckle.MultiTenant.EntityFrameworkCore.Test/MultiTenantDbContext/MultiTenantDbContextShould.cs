@@ -120,20 +120,6 @@ public class MultiTenantDbContextShould
     }
     
     [Fact]
-    public void CreateMultiTenantIdentityDbContext()
-    {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
-        var c = EntityFrameworkCore.MultiTenantDbContext.Create<EntityFrameworkCore.MultiTenantIdentityDbContext, TenantInfo>(tenant1);
-
-        Assert.NotNull(c);
-    }
-    
-    [Fact]
     public void ThrowOnInvalidDbContext()
     {
         var tenant1 = new TenantInfo

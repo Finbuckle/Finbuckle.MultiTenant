@@ -2,11 +2,12 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore;
+namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
