@@ -124,7 +124,7 @@ public class MultiTenantMiddlewareShould
         }
         
     [Fact]
-    public async void NotSetTenantAccessorIfNoTenant()
+    public async Task NotSetTenantAccessorIfNoTenant()
     {
             var services = new ServiceCollection();
             services.AddMultiTenant<TenantInfo>().
