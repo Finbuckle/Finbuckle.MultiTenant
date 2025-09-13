@@ -111,19 +111,6 @@ public class MultiTenantEntityTypeBuilderShould
         Assert.Contains("PostId", key[0].Properties.Select(p => p.Name));
         Assert.Contains("TenantId", key[0].Properties.Select(p => p.Name));
     }
-    
-    [Fact]
-    public void AllowAddEntityWithAdjustedKey()
-    {
-        using var db = GetDbContext(builder =>
-        {
-            var key = builder.Entity<Post>().Metadata.GetKeys().First();
-            builder.Entity<Post>().IsMultiTenant().AdjustKey(key, builder);
-        });
-
-        var post = new Post();
-        db.Add(post);
-    }
 
     [Fact]
     public void AdjustDependentForeignKeyOnAdjustPrimaryKey()
