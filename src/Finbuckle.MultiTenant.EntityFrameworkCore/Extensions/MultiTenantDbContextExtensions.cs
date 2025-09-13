@@ -15,7 +15,7 @@ public static class MultiTenantDbContextExtensions
     /// <summary>
     /// Ensures a TenantId property is set when an entity is attached.
     /// </summary>
-    public static void EnforceMultiTenantOnAttach<TContext>(this TContext context)
+    public static void EnforceMultiTenantOnTracking<TContext>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext
     {
         // Configure event to handle newly tracked entities.

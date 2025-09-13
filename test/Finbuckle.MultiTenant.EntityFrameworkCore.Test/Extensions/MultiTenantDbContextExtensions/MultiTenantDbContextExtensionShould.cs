@@ -39,7 +39,7 @@ public class MultiTenantDbContextExtensionsShould
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
-                db.EnforceMultiTenantOnAttach();
+                db.EnforceMultiTenantOnTracking();
                 db.TenantNotSetMode = TenantNotSetMode.Throw;
 
                 var blog1 = new Blog { Title = "abc" };
@@ -54,7 +54,7 @@ public class MultiTenantDbContextExtensionsShould
                 db.Database.EnsureCreated();
                 
                 db.TenantNotSetMode = TenantNotSetMode.Overwrite;
-                db.EnforceMultiTenantOnAttach();
+                db.EnforceMultiTenantOnTracking();
                 var blog1 = new Blog { Title = "abc2" };
                 db.Blogs?.Add(blog1);
                 Assert.Equal(tenant1.Id, db.Entry(blog1).Property("TenantId").CurrentValue);
