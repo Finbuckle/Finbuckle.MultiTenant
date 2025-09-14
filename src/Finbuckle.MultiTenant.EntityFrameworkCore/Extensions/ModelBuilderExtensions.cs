@@ -14,15 +14,15 @@ public static class FinbuckleModelBuilderExtensions
     /// </summary>
     public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
     {
-            // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
-            foreach (var clrType in modelBuilder.Model.GetEntityTypes()
-                                                 .Where(et => et.ClrType.HasMultiTenantAttribute())
-                                                 .Select(et => et.ClrType))
-            {
-                modelBuilder.Entity(clrType)
-                            .IsMultiTenant();
-            }
-
-            return modelBuilder;
+        // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
+        foreach (var clrType in modelBuilder.Model.GetEntityTypes()
+                     .Where(et => et.ClrType.HasMultiTenantAttribute())
+                     .Select(et => et.ClrType))
+        {
+            modelBuilder.Entity(clrType)
+                .IsMultiTenant();
         }
+
+        return modelBuilder;
+    }
 }
