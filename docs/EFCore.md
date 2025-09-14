@@ -146,7 +146,7 @@ This approach is more flexible than using the `[MultiTenant]` attribute because 
 have the attribute, e.g. from another assembly.
 
 `IsMultiTenant()` returns an `MultiTenantEntityTypeBuilder` instance which enables further multi-tenant configuration of
-the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes] for
+the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes](#keys-and-indexes) for
 more details.
 
 ## Existing Query Filters
