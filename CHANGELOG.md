@@ -1,3 +1,9 @@
+## [9.4.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.3.1...v9.4.0) (2025-09-14)
+
+### Features
+
+* added EnforceMultiTenantOnTracking ([#1008](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1008)) ([6ea8fd3](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6ea8fd3ff85de36566b53c98d59fe998e821b116))
+
 ## [9.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.3.0...v9.3.1) (2025-09-10)
 
 ### Bug Fixes
