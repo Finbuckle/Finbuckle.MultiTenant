@@ -54,10 +54,11 @@ null or mismatched tenants.
 
 Finbuckle.MultiTenant provides two different ways to utilize this behavior in a database context class:
 
-1. Implement `IMultiTenantDbContext` and use the provided helper methods as
-   [described below](#adding-multitenant-functionality-to-an-existing-dbcontext), or
-2. Derive from `MultiTenantDbContext` which handles the details for
-   you, [also described below](#deriving-from-multitenantdbcontext).
+1. Implement `IMultiTenantDbContext` and use the provided helper methods as described in
+   [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext),
+   or
+2. Derive from `MultiTenantDbContext` which handles most of the details for
+   you as described in [Deriving from MultiTenantDbContext](#deriving-from-multitenantdbcontext).
 
 The first option is more complex, but provides enhanced flexibility and allows existing database context classes (which
 may derive from a base class) to utilize per-tenant data isolation. The second option is easier, but provides less
@@ -67,7 +68,7 @@ flexibility. These approaches are both explained in detail further below.
 
 When using a shared database context based on `IMultiTenantDbContext` it is simple extend into a hybrid approach simply
 by assigning some tenants to a separate shared database (or its own completely isolated database) via a tenant info
-connection string property as [described above](#separate-databases).
+connection string property as described above in [separate databases](#separate-databases).
 
 ## Configuring and Using a Shared Database
 
@@ -246,8 +247,9 @@ Now whenever this database context is used, it will only set and query records f
 
 ## Deriving from `MultiTenantDbContext`
 
-This approach is easier bit requires inheriting from `MultiTenantDbContext` which may not always be possible. It is
-simply a pre-configured implementation of `IMultiTenantDbContext` with the helper methods as described above in
+This approach is easier but requires inheriting from `MultiTenantDbContext` which may not always be possible if you
+already have a base class. `MultiTenantDbContext` a pre-configured implementation of `IMultiTenantDbContext` with the
+helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
 Start by adding the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
@@ -443,11 +445,8 @@ key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `I
 methods for this purpose:
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that
-  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
-* `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
-* `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
-* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
-
+  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well. 
+  This will also require the use of `EnforceMultiTenantOnTracking` as desbrived below in [EFCore Tracking](#efcore-tracking).
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
@@ -456,6 +455,19 @@ protected override void OnModelCreating(ModelBuilder builder)
     builder.Entity<MyEntityType>().IsMultiTenant().AdjustKey(key, builder).AdjustIndexes();
 }
 ```
+* `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
+* `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
+* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
+
+
+## EFCore Tracking
+
+When attaching an entity to tracking in EFCore using either `Add` or `Attach`, all primary keys are required 
+to be non-null. Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the 
+`EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext` on your db context. If no `TenantId` is 
+initially set then the current `TenantId` of the db context will be used. This applies to both explicit `TenantId` 
+properties and implicit `TenantId` shadow properties. It is recommended to call `EnforceMultiTenantOnTracking`
+in your db context constructor. Due to technical constraints derivign from `MultiTenant`
 
 ## Tenant Mismatch Mode
 
