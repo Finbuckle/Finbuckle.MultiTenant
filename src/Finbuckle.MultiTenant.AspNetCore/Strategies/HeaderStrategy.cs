@@ -7,15 +7,24 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from a request header.
+/// </summary>
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class HeaderStrategy : IMultiTenantStrategy
 {
     private readonly string _headerKey;
+    
+    /// <summary>
+    /// Initializes a new instance of HeaderStrategy.
+    /// </summary>
+    /// <param name="headerKey">The name of the header containing the tenant identifier.</param>
     public HeaderStrategy(string headerKey)
     {
             _headerKey = headerKey;
         }
 
+    /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
             if (context is not HttpContext httpContext)

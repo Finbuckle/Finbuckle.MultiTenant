@@ -21,7 +21,7 @@ public static class MultiTenantDbContextExtensions
         // Configure event to handle newly tracked entities.
         context.ChangeTracker.Tracking += (sender, args) =>
         {
-            // Honor TenantNotSetMode on tracking from attach multitenant entities.
+            // Honor TenantNotSetMode on tracking from attach multi-tenant entities.
             if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
                 args.Entry.Context is not IMultiTenantDbContext multiTenantDbContext) return;
             

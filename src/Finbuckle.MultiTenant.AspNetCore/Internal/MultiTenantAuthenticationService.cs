@@ -26,7 +26,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
 
     private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties? properties)
     {
-            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
+            // Add tenant identifier to the properties so on the callback we can use it to set the multi-tenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
             if (multiTenantContext?.TenantInfo != null)
             {

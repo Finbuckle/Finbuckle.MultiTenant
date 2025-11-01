@@ -22,7 +22,7 @@
 
     <PropertyGroup Label="Analysis rules">
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
-        <NoWarn>CS1591</NoWarn>
+<!--        <NoWarn>CS1591</NoWarn>-->
         <NoWarn>$(NoWarn);CA1848</NoWarn> <!-- For improved performance, use the LoggerMessage delegates -->
         <NoWarn>$(NoWarn);CA2201</NoWarn> <!-- Exception type System.Exception is not sufficiently specific -->
     </PropertyGroup>

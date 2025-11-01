@@ -20,7 +20,7 @@ public record TenantResolveCompletedContext<TTenantInfo>
     public required object Context { get; init; }
     
     /// <summary>
-    /// 
+    /// Returns true if a tenant was resolved.
     /// </summary>
     public bool IsResolved => MultiTenantContext.IsResolved;
 }

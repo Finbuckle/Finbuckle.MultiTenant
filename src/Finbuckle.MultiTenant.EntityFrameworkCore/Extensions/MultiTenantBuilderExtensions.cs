@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant;
 public static class MultiTenantBuilderExtensions
 {
     /// <summary>
-    /// Adds an EFCore based multitenant store to the application. Will also add the database context service unless it is already added.
+    /// Adds an EFCore based multi-tenant store to the application. Will also add the database context service unless it is already added.
     /// </summary>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once InconsistentNaming
