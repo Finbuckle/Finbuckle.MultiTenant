@@ -12,20 +12,29 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from the state parameter during remote authentication callbacks.
+/// </summary>
 public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
 {
     private readonly ILogger<RemoteAuthenticationCallbackStrategy> logger;
 
+    /// <inheritdoc />
     public int Priority
     {
         get => -900;
     }
 
+    /// <summary>
+    /// Initializes a new instance of RemoteAuthenticationCallbackStrategy.
+    /// </summary>
+    /// <param name="logger">The logger instance.</param>
     public RemoteAuthenticationCallbackStrategy(ILogger<RemoteAuthenticationCallbackStrategy> logger)
     {
         this.logger = logger;
     }
 
+    /// <inheritdoc />
     public virtual async Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)

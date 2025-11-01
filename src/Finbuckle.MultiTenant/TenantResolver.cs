@@ -14,19 +14,32 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>X
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options;
     private readonly ILoggerFactory? loggerFactory;
 
+    /// <summary>
+    /// Initializes a new instance of TenantResolver.
+    /// </summary>
+    /// <param name="strategies">The collection of strategies to use for tenant resolution.</param>
+    /// <param name="stores">The collection of stores to use for tenant resolution.</param>
+    /// <param name="options">The multi-tenant options.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
         IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options) :
         this(strategies, stores, options, null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of TenantResolver.
+    /// </summary>
+    /// <param name="strategies">The collection of strategies to use for tenant resolution.</param>
+    /// <param name="stores">The collection of stores to use for tenant resolution.</param>
+    /// <param name="options">The multi-tenant options.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
         IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options,
         ILoggerFactory? loggerFactory)

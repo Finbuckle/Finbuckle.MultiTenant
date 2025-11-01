@@ -38,8 +38,8 @@ public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<Identit
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// TUser is not multitenant by default.
-/// All other Identity entity types are multitenant by default.
+/// TUser is not multi-tenant by default.
+/// All other Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
 public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
@@ -67,8 +67,8 @@ public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityD
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// TUser and TRole are not multitenant by default.
-/// All other Identity entity types are multitenant by default.
+/// TUser and TRole are not multi-tenant by default.
+/// All other Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
@@ -103,7 +103,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
 /// An Identity database context that enforces tenant integrity on entity types
 /// marked with the MultiTenant annotation or attribute.
 /// <remarks>
-/// No Identity entity types are multitenant by default.
+/// No Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IMultiTenantDbContext
@@ -116,10 +116,13 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TUserToken : IdentityUserToken<TKey>
     where TKey : IEquatable<TKey>
 {
+    /// <inheritdoc />
     public ITenantInfo? TenantInfo { get; }
 
+    /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
+    /// <inheritdoc />
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
     /// <summary>

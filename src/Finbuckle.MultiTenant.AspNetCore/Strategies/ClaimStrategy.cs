@@ -9,16 +9,29 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from a claim in the user's identity.
+/// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
 public class ClaimStrategy : IMultiTenantStrategy
 {
     private readonly string _tenantKey;
     private readonly string? _authenticationScheme;
 
+    /// <summary>
+    /// Initializes a new instance of ClaimStrategy.
+    /// </summary>
+    /// <param name="template">The claim type containing the tenant identifier.</param>
     public ClaimStrategy(string template) : this(template, null)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of ClaimStrategy.
+    /// </summary>
+    /// <param name="template">The claim type containing the tenant identifier.</param>
+    /// <param name="authenticationScheme">The authentication scheme to use, or null for the default scheme.</param>
+    /// <exception cref="ArgumentException">Thrown when template is null or whitespace.</exception>
     public ClaimStrategy(string template, string? authenticationScheme)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(template);
@@ -27,6 +40,7 @@ public class ClaimStrategy : IMultiTenantStrategy
         _authenticationScheme = authenticationScheme;
     }
 
+    /// <inheritdoc />
     public async Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)

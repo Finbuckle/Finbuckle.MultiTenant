@@ -6,14 +6,21 @@ using Finbuckle.MultiTenant.Internal;
 
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Default implementation of ITenantInfo.
+/// </summary>
 public class TenantInfo : ITenantInfo
 {
     private string? id;
 
+    /// <summary>
+    /// Initializes a new instance of TenantInfo.
+    /// </summary>
     public TenantInfo()
     {
     }
 
+    /// <inheritdoc />
     public string? Id
     {
         get
@@ -33,6 +40,9 @@ public class TenantInfo : ITenantInfo
         }
     }
 
+    /// <inheritdoc />
     public string? Identifier { get; set; }
+    
+    /// <inheritdoc />
     public string? Name { get; set; }
 }

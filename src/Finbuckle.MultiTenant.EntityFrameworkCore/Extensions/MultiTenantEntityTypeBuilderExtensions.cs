@@ -7,12 +7,15 @@ using Microsoft.EntityFrameworkCore;
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Extension methods for configuring multi-tenant entity types.
+/// </summary>
 public static class MultiTenantEntityTypeBuilderExtensions
 {
     /// <summary>
     /// Adds TenantId to all unique indexes.
     /// </summary>
-    /// <param name="builder">Thet MultiTenantEntityTypeBuilder instance.</param>
+    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
     /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
     public static MultiTenantEntityTypeBuilder AdjustUniqueIndexes(this MultiTenantEntityTypeBuilder builder)
     {
@@ -33,7 +36,7 @@ public static class MultiTenantEntityTypeBuilderExtensions
     /// <summary>
     /// Adds TenantId to all indexes.
     /// </summary>
-    /// <param name="builder">Thet MultiTenantEntityTypeBuilder instance.</param>
+    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
     /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
     public static MultiTenantEntityTypeBuilder AdjustIndexes(this MultiTenantEntityTypeBuilder builder)
     {
@@ -50,11 +53,12 @@ public static class MultiTenantEntityTypeBuilderExtensions
         return builder;
     }
 
+    // TODO why is this internal?
     /// <summary>
     /// Adds TenantId to the primary and alternate keys and adds the TenantId property to any dependent types' foreign keys.
     /// </summary>
-    /// <param name="builder">Thet MultiTenantEntityTypeBuilder instance.</param>
-    /// <param name="modelBuilder">The modelBuilder for the database ontext.</param>
+    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
+    /// <param name="modelBuilder">The modelBuilder for the database context.</param>
     /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
     internal static MultiTenantEntityTypeBuilder AdjustKeys(this MultiTenantEntityTypeBuilder builder, ModelBuilder modelBuilder)
     {
@@ -63,7 +67,7 @@ public static class MultiTenantEntityTypeBuilderExtensions
         {
             builder.AdjustKey(key, modelBuilder);
         }
-
+    
         return builder;
     }
 }

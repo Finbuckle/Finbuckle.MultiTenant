@@ -7,11 +7,21 @@ using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 
+/// <summary>
+/// HTTP client for retrieving tenant information from a remote endpoint.
+/// </summary>
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IHttpClientFactory clientFactory;
     private readonly JsonSerializerOptions _defaultSerializerOptions;
 
+    /// <summary>
+    /// Initializes a new instance of HttpRemoteStoreClient.
+    /// </summary>
+    /// <param name="clientFactory">The HTTP client factory.</param>
+    /// <param name="serializerOptions">Optional JSON serializer options.</param>
+    /// <exception cref="ArgumentNullException">Thrown when clientFactory is null.</exception>
     public HttpRemoteStoreClient(IHttpClientFactory clientFactory, JsonSerializerOptions? serializerOptions = default)
     {
         this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
@@ -19,6 +29,12 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
         _defaultSerializerOptions = serializerOptions ?? new JsonSerializerOptions(JsonSerializerDefaults.Web);
     }
 
+    /// <summary>
+    /// Attempts to retrieve tenant information by identifier from the remote endpoint.
+    /// </summary>
+    /// <param name="endpointTemplate">The endpoint template containing the identifier token.</param>
+    /// <param name="identifier">The tenant identifier.</param>
+    /// <returns>The tenant information if found, otherwise null.</returns>
     public async Task<TTenantInfo?> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
@@ -34,6 +50,12 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
         return result;
     }
 
+    /// <summary>
+    /// Retrieves all tenants from the remote endpoint.
+    /// </summary>
+    /// <param name="endpointTemplate">The endpoint template.</param>
+    /// <returns>An enumerable of all tenant information.</returns>
+    /// <exception cref="NotImplementedException">Thrown when the remote endpoint returns a 404 status code.</exception>
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);

@@ -11,6 +11,10 @@ using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Internal;
 
+/// <summary>
+/// Multi-tenant aware authentication service that decorates the default authentication service.
+/// </summary>
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
     where TTenantInfo : class, ITenantInfo, new()
@@ -18,6 +22,12 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
     private readonly IAuthenticationService _inner;
     private readonly IOptionsMonitor<MultiTenantAuthenticationOptions> _multiTenantAuthenticationOptions;
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantAuthenticationService.
+    /// </summary>
+    /// <param name="inner">The inner authentication service to decorate.</param>
+    /// <param name="multiTenantAuthenticationOptions">The multi-tenant authentication options.</param>
+    /// <exception cref="ArgumentNullException">Thrown when inner is null.</exception>
     public MultiTenantAuthenticationService(IAuthenticationService inner, IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions)
     {
             this._inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
@@ -26,7 +36,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
 
     private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties? properties)
     {
-            // Add tenant identifier to the properties so on the callback we can use it to set the multitenant context.
+            // Add tenant identifier to the properties so on the callback we can use it to set the multi-tenant context.
             var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
             if (multiTenantContext?.TenantInfo != null)
             {
@@ -39,6 +49,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
     public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string? scheme)
         => _inner.AuthenticateAsync(context, scheme);
 
+    /// <inheritdoc />
     public async Task ChallengeAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         if (_multiTenantAuthenticationOptions.CurrentValue.SkipChallengeIfTenantNotResolved)
@@ -51,6 +62,7 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
         await _inner.ChallengeAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
     public async Task ForbidAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);

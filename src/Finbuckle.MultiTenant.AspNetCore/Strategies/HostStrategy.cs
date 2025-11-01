@@ -8,10 +8,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from the request host header using a template pattern.
+/// </summary>
 public sealed class HostStrategy : IMultiTenantStrategy
 {
     private readonly Regex regex;
 
+    /// <summary>
+    /// Initializes a new instance of HostStrategy with a template pattern.
+    /// </summary>
+    /// <param name="template">The template pattern for extracting the tenant identifier from the host. Use "__tenant__" as a placeholder for the identifier.</param>
+    /// <exception cref="MultiTenantException">Thrown when the template is invalid.</exception>
     public HostStrategy(string template)
     {
         // match whole domain if just "__tenant__".
@@ -63,6 +71,7 @@ public sealed class HostStrategy : IMultiTenantStrategy
         this.regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
     }
 
+    /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)
