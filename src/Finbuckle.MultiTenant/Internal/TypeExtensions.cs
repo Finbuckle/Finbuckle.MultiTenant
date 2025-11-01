@@ -5,8 +5,17 @@ using System.Reflection;
 
 namespace Finbuckle.MultiTenant.Internal;
 
+/// <summary>
+/// Extension methods for Type operations.
+/// </summary>
 internal static class TypeExtensions
 {
+    /// <summary>
+    /// Determines whether the source type implements or inherits from an unbound generic type.
+    /// </summary>
+    /// <param name="source">The source type to check.</param>
+    /// <param name="unboundGeneric">The unbound generic type to check against.</param>
+    /// <returns>True if the source type implements or inherits from the unbound generic type, otherwise false.</returns>
     public static bool ImplementsOrInheritsUnboundGeneric(this Type source, Type unboundGeneric)
     {
         if (unboundGeneric.IsInterface)

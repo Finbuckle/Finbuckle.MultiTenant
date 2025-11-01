@@ -19,17 +19,30 @@ public class MultiTenantMiddleware
     private readonly RequestDelegate next;
     private readonly ShortCircuitWhenOptions? options;
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantMiddleware.
+    /// </summary>
+    /// <param name="next">The next middleware in the pipeline.</param>
     public MultiTenantMiddleware(RequestDelegate next)
     {
             this.next = next;
         }
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantMiddleware with short-circuit options.
+    /// </summary>
+    /// <param name="next">The next middleware in the pipeline.</param>
+    /// <param name="options">Options for short-circuiting the middleware pipeline.</param>
     public MultiTenantMiddleware(RequestDelegate next, IOptions<ShortCircuitWhenOptions> options)
     {
             this.next = next;
             this.options = options.Value;
         }
 
+    /// <summary>
+    /// Invokes the middleware to resolve the tenant and continue the request pipeline.
+    /// </summary>
+    /// <param name="context">The HTTP context.</param>
     public async Task Invoke(HttpContext context)
     {
             if (context.GetEndpoint()?.Metadata.GetMetadata<IExcludeFromMultiTenantResolutionMetadata>() is { ExcludeFromResolution: true })

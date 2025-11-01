@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 
+/// <summary>
+/// Extension methods for configuring multi-tenant resolution on endpoints.
+/// </summary>
 public static class EndpointConventionBuilderExtensions
 {
     private static readonly ExcludeFromMultiTenantResolutionAttribute s_excludeFromMultiTenantResolutionAttribute = new();

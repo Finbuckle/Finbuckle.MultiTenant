@@ -6,17 +6,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 
+/// <summary>
+/// A multi-tenant store that uses Entity Framework Core for tenant storage.
+/// </summary>
+/// <typeparam name="TEFCoreStoreDbContext">The EFCoreStoreDbContext implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     internal readonly TEFCoreStoreDbContext dbContext;
 
+    /// <summary>
+    /// Initializes a new instance of EFCoreStore.
+    /// </summary>
+    /// <param name="dbContext">The EFCoreStoreDbContext instance.</param>
+    /// <exception cref="ArgumentNullException">Thrown when dbContext is null.</exception>
     public EFCoreStore(TEFCoreStoreDbContext dbContext)
     {
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
+    /// <inheritdoc />
     public virtual async Task<TTenantInfo?> TryGetAsync(string id)
     {
             return await dbContext.TenantInfo.AsNoTracking()
