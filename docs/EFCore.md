@@ -8,7 +8,7 @@ supports each of these models by associating a connection string with each tenan
 
 ## Separate Databases
 
-If each tenant uses a separate database then add a `ConnectionString` property to the app's `ITenantIxfnfo`
+If each tenant uses a separate database then add a `ConnectionString` property to the app's `ITenantInfo`
 implementation. and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
 by injecting a `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
 
@@ -151,21 +151,14 @@ more details.
 
 ## Existing Query Filters
 
-IsMultiTenant and the [MultiTenant] attribute use a query filter for data isolation and will automatically merge its
-query filter with an existing query filter is one is present. For that reason, if the type to be multi-tenant has an
-existing query filter, IsMultiTenant and ConfigureMultiTenant should be called after the existing query filter is
-configured.
-```
-protected override void OnModelCreating(ModelBuilder builder)
-{
-    // set a global query filter, e.g. to support soft delete
-    builder.Entity<MyEntityType>().HasQueryFilter(p => !p.IsDeleted);
+`IsMultiTenant` and the `[MultiTenant]` attribute use a named global query filter for data isolation and will not 
+impact any other named global query filters applied to the entity. See
+[using multiple query filters](https://learn.microsoft.com/en-us/ef/core/querying/filters#using-multiple-query-filters)
+in the EF Core documentation for more details.
 
-    // configure an entity type to be multi-tenant (will merge with existing call to HasQueryFilter)
-    builder.Entity<MyEntityType>().IsMultiTenant();
-}
-```
-
+> In earlier version of Finbuckle.MultiTenant an anonymous global filter query was used which required 
+> special consideration for combining with existing query filters. Since EF Core introduced named global query 
+> filters in .NET 10 these considerations are no longer relevant.
 
 ## Adding MultiTenant functionality to an existing DbContext
 
@@ -237,25 +230,6 @@ public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
 }
 ```
 
-If the derived database context overrides `OnModelCreating` is it recommended that the base class `OnModelCreating`
-method is called last so that the multi-tenant query filters are not overwritten.
-
-```
-public class BloggingDbContext : MultiTenantDbContext
-{
-...
-protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
-// set a global query filter, e.g. to support soft delete
-modelBuilder.Entity<Post>().HasQueryFilter(p => !p.IsDeleted);
-
-        // call the base library implementation AFTER the above
-        base.OnModelCreating(modelBuilder);
-    }
-...
-}
-```
-
 Now whenever this database context is used, it will only set and query records for the current tenant.
 
 ## Deriving from `MultiTenantDbContext`
@@ -301,9 +275,9 @@ Now whenever this database context is used it will only set and query records fo
 
 ## Binding the Tenant to the DbContext
 
-It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is
-immutable. Finbuckle.MultiTenant is designed with this in mind and `IMultiTenantDbContext` only has a getter for
-the `ITenantInfo` property. It is possible to define a setter on your own `IMultiTenantDbContext` implementation but
+It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is 
+immutable. Finbuckle.MultiTenant is designed with this in mind and `IMultiTenantDbContext` only has a getter for 
+the `ITenantInfo` property. It is possible to define a setter on your own `IMultiTenantDbContext` implementation but 
 doing so will make it difficult ensure data isolation and consistency.
 
 ## Dependency Injection Instantiation
@@ -379,8 +353,8 @@ altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) an
 
 > EF Core will require a non-null value when adding an entity that has `TenantId` as a part of the primary key.
 > If the `TenandId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
-> Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension
-> ethod of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
+> Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension 
+> method of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
 
 ```csharp
 Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
@@ -414,27 +388,28 @@ var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(y
 var yourBlogs = yourDbContext.Blogs.First(); 
 ```
 > The global query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or
-> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute>
+> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute> 
 > then all results are associated to the same tenant. See [global query filter limitations](https://learn.microsoft.com/en-us/ef/core/querying/filters#limitations)
 > in the EF Core documentation for more details.
 
 ## Query Without the Tenant Filter
 `IgnoreQueryFilters` can be used to bypass the filter for LINQ queries.
-See [disabling filters](https://learn.microsoft.com/en-us/ef/core/querying/filters?tabs=ef10#disabling-filters)
+Finbuckle.MultiTenant uses the `Finbuckle.MultiTenant.Abstractions.Constants.TenantToken` constant as the global 
+query filter name. See [disabling filters](https://learn.microsoft.com/en-us/ef/core/querying/filters?tabs=ef10#disabling-filters)
 in the EF Core documentation for more details.
 
 ```csharp
 // TenantBlogs will contain all blogs, regardless of tenant.
 var myTenantInfo = ...;
 var db = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-var tenantBlogs = db.Blogs.IgnoreQueryFilters().ToList(); 
+var tenantBlogs = db.Blogs.IgnoreQueryFilters([Finbuckle.MultiTenant.Abstractions.Constants.TenantToken][Finbuckle.MultiTenant.Abstractions.Constants.TenantToken]).ToList(); 
 ```
 
 ## Updating and Deleting Data
 
 Updated or deleted entities are checked to make sure they are associated with the `TenantInfo`. If an entity is
 associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`.
-This behavior can be altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) and
+This behavior can be altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) and 
 [TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext`.
 
 ```csharp
@@ -468,7 +443,7 @@ key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `I
 methods for this purpose:
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that
-  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
+  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well. 
   This will also require the use of `EnforceMultiTenantOnTracking` as desbrived below in [EFCore Tracking](#efcore-tracking).
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
@@ -484,10 +459,10 @@ protected override void OnModelCreating(ModelBuilder builder)
 
 ## EF Core Tracking
 
-When attaching an entity to tracking in EFCore using either `Add` or `Attach`, all primary keys are required
-to be non-null. Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the
-`EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext` on your db context. If no `TenantId` is
-initially set then the current `TenantId` of the db context will be used. This applies to both explicit `TenantId`
+When attaching an entity to tracking in EFCore using either `Add` or `Attach`, all primary keys are required 
+to be non-null. Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the 
+`EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext` on your db context. If no `TenantId` is 
+initially set then the current `TenantId` of the db context will be used. This applies to both explicit `TenantId` 
 properties and implicit `TenantId` shadow properties. It is recommended to call `EnforceMultiTenantOnTracking`
 in your db context constructor.
 
