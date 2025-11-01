@@ -82,7 +82,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     }
 
     [Fact]
-    public void SetGlobalFilterQuery()
+    public void SetNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
         var tenant1 = new TenantInfo
@@ -104,9 +104,9 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         db.TenantInfo = tenant2;
         Assert.Equal(0, db.MyMultiTenantThings!.Count());
     }
-
+    
     [Fact]
-    public void RespectExistingQueryFilter()
+    public void CanIgnoreNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
         var tenant1 = new TenantInfo
@@ -114,16 +114,20 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
             Id = "abc"
         };
 
-        using var db = GetDbContext(config =>
+        var tenant2 = new TenantInfo
         {
-            config.Entity<MyMultiTenantThing>().HasQueryFilter(e => e.Id == 1);
-            config.Entity<MyMultiTenantThing>().IsMultiTenant();
-        }, tenant1);
+            Id = "123"
+        };
+
+        using var db = GetDbContext(null, tenant1);
         db.Database.EnsureCreated();
         db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 1 });
-        db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 2 });
         db.SaveChanges();
 
-        Assert.Equal(1, db.MyMultiTenantThings!.Count());
+        db.TenantInfo = tenant2;
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 2 });
+        db.SaveChanges();
+        
+        Assert.Equal(2, db.MyMultiTenantThings!.IgnoreQueryFilters([Finbuckle.MultiTenant.Abstractions.Constants.TenantToken]).Count());
     }
 }
