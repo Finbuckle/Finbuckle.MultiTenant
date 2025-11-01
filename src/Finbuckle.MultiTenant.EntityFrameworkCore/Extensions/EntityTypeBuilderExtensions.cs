@@ -16,20 +16,16 @@ public static class EntityTypeBuilderExtensions
 {
     private class ExpressionVariableScope
     {
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
         public IMultiTenantDbContext? Context { get; }
     }
 
-    private static LambdaExpression? GetQueryFilter(this EntityTypeBuilder builder)
-    {
-        return builder.Metadata.GetQueryFilter();
-    }
-
     /// <summary>
-    /// Adds MultiTenant support for an entity. Call <see cref="IsMultiTenant" /> after
-    /// <see cref="EntityTypeBuilder.HasQueryFilter" /> to merge query filters.
+    /// Adds MultiTenant support for an entity via a named query filter.
     /// </summary>
     /// <param name="builder">The typed EntityTypeBuilder instance.</param>
     /// <returns>A MultiTenantEntityTypeBuilder instance.</returns>
+    /// <remarks>A string property named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
     public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
     {
         if (builder.Metadata.IsMultiTenant())
@@ -54,14 +50,6 @@ public static class EntityTypeBuilderExtensions
         // will need this ParameterExpression for next step and for final step
         var entityParamExp = Expression.Parameter(builder.Metadata.ClrType, "e");
 
-        var existingQueryFilter = builder.GetQueryFilter();
-
-        // override to match existing query parameter if applicable
-        if (existingQueryFilter != null)
-        {
-            entityParamExp = existingQueryFilter.Parameters.First();
-        }
-
         // build up expression tree for: EF.Property<string>(e, "TenantId")
         var tenantIdExp = Expression.Constant("TenantId", typeof(string));
         var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
@@ -78,18 +66,12 @@ public static class EntityTypeBuilderExtensions
         // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
         var predicate = Expression.Equal(leftExp, rightExp);
 
-        // combine with existing filter
-        if (existingQueryFilter != null)
-        {
-            predicate = Expression.AndAlso(existingQueryFilter.Body, predicate);
-        }
-
         // build the final expression tree
         var delegateType = Expression.GetDelegateType(builder.Metadata.ClrType, typeof(bool));
         var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);
 
         // set the filter
-        builder.HasQueryFilter(lambdaExp);
+        builder.HasQueryFilter(Abstractions.Constants.TenantToken, lambdaExp);
 
         return new MultiTenantEntityTypeBuilder(builder);
     }
