@@ -6,8 +6,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from the first segment of the request path.
+/// </summary>
 public class BasePathStrategy : IMultiTenantStrategy
 {
+    /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)

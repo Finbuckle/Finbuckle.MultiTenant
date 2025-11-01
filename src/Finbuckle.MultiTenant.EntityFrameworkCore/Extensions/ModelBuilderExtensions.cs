@@ -7,11 +7,16 @@ using Microsoft.EntityFrameworkCore;
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Extension methods for ModelBuilder.
+/// </summary>
 public static class FinbuckleModelBuilderExtensions
 {
     /// <summary>
     /// Configures any entity's with the [MultiTenant] attribute.
     /// </summary>
+    /// <param name="modelBuilder">The ModelBuilder instance.</param>
+    /// <returns>The ModelBuilder instance.</returns>
     public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
     {
         // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute

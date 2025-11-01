@@ -9,11 +9,20 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
-[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+/// <summary>
+/// Builder for configuring multi-tenant entity types.
+/// </summary>
 public class MultiTenantEntityTypeBuilder
 {
+    /// <summary>
+    /// Gets the underlying EntityTypeBuilder.
+    /// </summary>
     public EntityTypeBuilder Builder { get; }
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantEntityTypeBuilder.
+    /// </summary>
+    /// <param name="builder">The EntityTypeBuilder to wrap.</param>
     public MultiTenantEntityTypeBuilder(EntityTypeBuilder builder)
     {
             Builder = builder;

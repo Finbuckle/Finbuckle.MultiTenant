@@ -6,10 +6,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 
+/// <summary>
+/// A strategy that determines the tenant identifier from the session state.
+/// </summary>
 public class SessionStrategy : IMultiTenantStrategy
 {
     private readonly string tenantKey;
 
+    /// <summary>
+    /// Initializes a new instance of SessionStrategy.
+    /// </summary>
+    /// <param name="tenantKey">The session key containing the tenant identifier.</param>
+    /// <exception cref="ArgumentException">Thrown when tenantKey is null or whitespace.</exception>
     public SessionStrategy(string tenantKey)
     {
         if (string.IsNullOrWhiteSpace(tenantKey))
@@ -20,6 +28,7 @@ public class SessionStrategy : IMultiTenantStrategy
         this.tenantKey = tenantKey;
     }
 
+    /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
         if (context is not HttpContext httpContext)

@@ -59,7 +59,17 @@ public static class FinbuckleServiceCollectionExtensions
         return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
 
-    // TODO: better document and extract
+    
+    /// <summary>
+    /// Decorates an existing service registration with a new implementation that wraps the original.
+    /// </summary>
+    /// <typeparam name="TService">The service type to decorate.</typeparam>
+    /// <typeparam name="TImpl">The decorator implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="parameters">Additional parameters to pass to the decorator constructor after the inner service.</param>
+    /// <returns><c>true</c> if the service was successfully decorated.</returns>
+    /// <exception cref="ArgumentException">Thrown when no service of type <typeparamref name="TService"/> is found.</exception>
+    /// <exception cref="Exception">Thrown when the service cannot be instantiated.</exception>
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
         var existingServices = services.Where(s => s.ServiceType == typeof(TService)).ToList();
@@ -77,9 +87,9 @@ public static class FinbuckleServiceCollectionExtensions
                     {
                         TService inner =
                             (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
-
+ 
                         if (inner is null)
-                            throw new Exception(
+                            throw new ArgumentException(
                                 $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
 
                         var parameters2 = new object[parameters.Length + 1];
@@ -97,7 +107,7 @@ public static class FinbuckleServiceCollectionExtensions
                     {
                         TService inner = (TService)existingService.ImplementationInstance;
                         if (inner is null)
-                            throw new Exception(
+                            throw new ArgumentException(
                                 $"Unable to instantiate decorated type via implementation instance of type {existingService.ImplementationInstance.GetType().Name}.");
                         
                         var parameters2 = new object[parameters.Length + 1];
@@ -115,7 +125,7 @@ public static class FinbuckleServiceCollectionExtensions
                     {
                         TService inner = (TService)existingService.ImplementationFactory(sp);
                         if (inner is null)
-                            throw new Exception(
+                            throw new ArgumentException(
                                 $"Unable to instantiate decorated type via implementation factory for type {existingService.ServiceType}.");
 
                         var parameters2 = new object[parameters.Length + 1];
@@ -128,7 +138,7 @@ public static class FinbuckleServiceCollectionExtensions
             }
             else
             {
-                throw new Exception(
+                throw new  ArgumentException(
                     "Unable to instantiate decorated type.");
             }
 
@@ -269,6 +279,11 @@ public static class FinbuckleServiceCollectionExtensions
         return services.PostConfigurePerTenant(null, configureOptions);
     }
 
+    /// <summary>
+    /// Configures the required services for per-tenant options support.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     internal static void ConfigurePerTenantReqs<TOptions>(IServiceCollection services)
         where TOptions : class
     {

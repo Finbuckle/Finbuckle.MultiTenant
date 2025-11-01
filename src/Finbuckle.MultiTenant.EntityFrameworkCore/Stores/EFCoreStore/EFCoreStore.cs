@@ -35,16 +35,19 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
                 .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
+    /// <inheritdoc />
     public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
             return await dbContext.TenantInfo.AsNoTracking().ToListAsync().ConfigureAwait(false);
         }
 
+    /// <inheritdoc />
     public virtual async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
             return await dbContext.TenantInfo.Take(take).Skip(skip).AsNoTracking().ToListAsync().ConfigureAwait(false);
         }
 
+    /// <inheritdoc />
     public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
             return await dbContext.TenantInfo.AsNoTracking()
@@ -52,6 +55,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
                 .SingleOrDefaultAsync().ConfigureAwait(false);
         }
 
+    /// <inheritdoc />
     public virtual async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
             await dbContext.TenantInfo.AddAsync(tenantInfo).ConfigureAwait(false);
@@ -61,6 +65,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
             return result;
         }
 
+    /// <inheritdoc />
     public virtual async Task<bool> TryRemoveAsync(string identifier)
     {
             var existing = await dbContext.TenantInfo
@@ -76,6 +81,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
             return await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
         }
 
+    /// <inheritdoc />
     public virtual async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
     {
             dbContext.TenantInfo.Update(tenantInfo);

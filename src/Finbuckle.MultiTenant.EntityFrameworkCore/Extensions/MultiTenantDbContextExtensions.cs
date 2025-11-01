@@ -10,11 +10,16 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 // ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Extension methods for multi-tenant DbContext instances.
+/// </summary>
 public static class MultiTenantDbContextExtensions
 {
     /// <summary>
     /// Ensures a TenantId property is set when an entity is attached.
     /// </summary>
+    /// <typeparam name="TContext">The DbContext type.</typeparam>
+    /// <param name="context">The DbContext instance.</param>
     public static void EnforceMultiTenantOnTracking<TContext>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext
     {
@@ -48,11 +53,12 @@ public static class MultiTenantDbContextExtensions
             .Where(e => e.Metadata.IsMultiTenant()).ToList();
 
         // ensure tenant context is valid
-        if (changedMultiTenantEntities.Count != 0)
-        {
-            if (tenantInfo is null)
-                throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
-        }
+        if (changedMultiTenantEntities.Count == 0)
+            return;
+        
+        if (tenantInfo is null)
+            throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
+        
 
         // get list of all added entities with MultiTenant annotation
         var addedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Added).ToList();

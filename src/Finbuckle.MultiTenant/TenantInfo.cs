@@ -20,6 +20,7 @@ public class TenantInfo : ITenantInfo
     {
     }
 
+    /// <inheritdoc />
     public string? Id
     {
         get

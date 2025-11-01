@@ -5,5 +5,8 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// </summary>
 public interface IMultiTenantContextSetter
 {
+    /// <summary>
+    /// Sets the current MultiTenantContext.
+    /// </summary>
     IMultiTenantContext MultiTenantContext { set; }
 }

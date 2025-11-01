@@ -116,10 +116,13 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TUserToken : IdentityUserToken<TKey>
     where TKey : IEquatable<TKey>
 {
+    /// <inheritdoc />
     public ITenantInfo? TenantInfo { get; }
 
+    /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
 
+    /// <inheritdoc />
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
     /// <summary>

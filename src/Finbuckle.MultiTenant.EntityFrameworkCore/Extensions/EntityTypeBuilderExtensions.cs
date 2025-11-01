@@ -6,9 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Linq.Expressions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 
-// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Extension methods for configuring multi-tenant entity types.
+/// </summary>
 public static class EntityTypeBuilderExtensions
 {
     private class ExpressionVariableScope
