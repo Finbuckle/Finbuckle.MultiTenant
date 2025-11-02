@@ -24,7 +24,7 @@ public static class FinbuckleHttpContextExtensions
             if (httpContext.Items.TryGetValue(typeof(IMultiTenantContext), out var mtc) && mtc is not null)
                 return (IMultiTenantContext<TTenantInfo>)mtc;
             
-            mtc = new MultiTenantContext<TTenantInfo>();
+            mtc = new MultiTenantContext<TTenantInfo>(null);
             httpContext.Items[typeof(IMultiTenantContext)] = mtc;
 
             return (IMultiTenantContext<TTenantInfo>)mtc;
@@ -56,12 +56,8 @@ public static class FinbuckleHttpContextExtensions
             if (resetServiceProviderScope)
                 httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
 
-            var multiTenantContext = new MultiTenantContext<TTenantInfo>
-            {
-                TenantInfo = tenantInfo,
-                StrategyInfo = null,
-                StoreInfo = null
-            };
+            var multiTenantContext =
+                new MultiTenantContext<TTenantInfo>(tenantInfo: tenantInfo, strategyInfo: null, storeInfo: null);
 
             var setter = httpContext.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
             setter.MultiTenantContext = multiTenantContext;

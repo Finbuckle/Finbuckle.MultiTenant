@@ -38,11 +38,10 @@ public class MultiTenantAuthenticationSchemeProviderShould
                 Identifier = "tenant2"
             };
             
-            var mtc = new MultiTenantContext<TenantInfo>();
+            var mtc = new MultiTenantContext<TenantInfo>(tenant1);
             var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
             setter.MultiTenantContext = mtc;
 
-            mtc.TenantInfo = tenant1;
             var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>();
 
             var option = await schemeProvider.GetDefaultChallengeSchemeAsync();
@@ -50,7 +49,8 @@ public class MultiTenantAuthenticationSchemeProviderShould
             Assert.NotNull(option);
             Assert.Equal("tenant1Scheme", option.Name);
 
-            mtc.TenantInfo = tenant2;
+            mtc = new MultiTenantContext<TenantInfo>(tenant2);
+            setter.MultiTenantContext = mtc;
             option = await schemeProvider.GetDefaultChallengeSchemeAsync();
             
             Assert.NotNull(option);

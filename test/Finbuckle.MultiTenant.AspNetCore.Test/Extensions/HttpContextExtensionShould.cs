@@ -15,10 +15,7 @@ public class HttpContextExtensionShould
     public void GetExistingMultiTenantContext()
     {
             var ti = new TenantInfo { Id = "test" };
-            var mtc = new MultiTenantContext<TenantInfo>
-            {
-                TenantInfo = ti
-            };
+            var mtc = new MultiTenantContext<TenantInfo>(tenantInfo: ti);
 
             var httpContextMock = new Mock<HttpContext>();
             var itemsDict = new Dictionary<object, object?>
@@ -51,10 +48,7 @@ public class HttpContextExtensionShould
     public void ReturnTenantInfo()
     {
             var ti = new TenantInfo { Id = "test" };
-            var mtc = new MultiTenantContext<TenantInfo>
-            {
-                TenantInfo = ti
-            };
+            var mtc = new MultiTenantContext<TenantInfo>(tenantInfo: ti);
 
             var httpContextMock = new Mock<HttpContext>();
             var itemsDict = new Dictionary<object, object?>

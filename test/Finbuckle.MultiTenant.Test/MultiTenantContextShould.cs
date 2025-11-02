@@ -8,17 +8,14 @@ public class MultiTenantContextShould
     [Fact]
     public void ReturnFalseForIsResolvedIfTenantInfoIsNull()
     {
-        IMultiTenantContext<TenantInfo> context = new MultiTenantContext<TenantInfo>();
+        IMultiTenantContext<TenantInfo> context = new MultiTenantContext<TenantInfo>(null);
         Assert.False(context.IsResolved);
     }
         
     [Fact]
     public void ReturnTrueIsResolvedIfTenantInfoIsNotNull()
     {
-        var context = new MultiTenantContext<TenantInfo>
-        {
-            TenantInfo = new TenantInfo()
-        };
+        var context = new MultiTenantContext<TenantInfo>(tenantInfo: new TenantInfo());
 
         Assert.True(context.IsResolved);
     }
@@ -26,17 +23,14 @@ public class MultiTenantContextShould
     [Fact]
     public void ReturnFalseForIsResolvedIfTenantInfoIsNull_NonGeneric()
     {
-        IMultiTenantContext context = new MultiTenantContext<TenantInfo>();
+        IMultiTenantContext context = new MultiTenantContext<TenantInfo>(null);
         Assert.False(context.IsResolved);
     }
         
     [Fact]
     public void ReturnTrueIsResolvedIfTenantInfoIsNotNull_NonGeneric()
     {
-        var context = new MultiTenantContext<TenantInfo>
-        {
-            TenantInfo = new TenantInfo()
-        };
+        var context = new MultiTenantContext<TenantInfo>(tenantInfo: new TenantInfo());
 
         IMultiTenantContext iContext = context;
         Assert.True(iContext.IsResolved);
