@@ -9,17 +9,15 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        dotnet: ['8.0', '9.0']
+        dotnet: ['10.0']
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repo
-        uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+        uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: |
-            8
-            9
+          dotnet-version: 10
       - name: build
         run: dotnet build
       - name: test Finbuckle.MultiTenant
