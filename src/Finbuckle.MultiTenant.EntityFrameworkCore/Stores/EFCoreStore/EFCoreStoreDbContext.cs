@@ -19,7 +19,7 @@ public class EFCoreStoreDbContext<TTenantInfo> : DbContext
     /// <param name="options">The database context options.</param>
     public EFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-        }
+    }
 
     /// <summary>
     /// Gets the DbSet of tenant information.
@@ -30,7 +30,7 @@ public class EFCoreStoreDbContext<TTenantInfo> : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
             modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
-            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id).HasMaxLength(Abstractions.Constants.TenantIdMaxLength);
+            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id);
             modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
         }
 }
