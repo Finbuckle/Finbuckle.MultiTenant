@@ -26,10 +26,10 @@ public class MultiTenantOptionsCacheShould
     public void AddNamedOptionsForCurrentTenantOnlyOnAdd(string? name)
     {
         var ti = new TenantInfo { Id = "test-id-123" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
@@ -43,7 +43,7 @@ public class MultiTenantOptionsCacheShould
         Assert.False(result);
 
         // Change the tenant id and confirm options can be added again.
-        ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "diff" });
         result = cache.TryAdd(name, options);
         Assert.True(result);
     }
@@ -81,10 +81,10 @@ public class MultiTenantOptionsCacheShould
     public void GetOrAddNamedOptionForCurrentTenantOnly(string? name)
     {
         var ti = new TenantInfo { Id = "test-id-123"};
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
@@ -107,9 +107,7 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowsIfGetOrAddFactoryIsNull()
     {
-        var tc = new MultiTenantContext<TenantInfo>();
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null!));
@@ -118,10 +116,6 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowIfConstructorParamIsNull()
     {
-        var tc = new MultiTenantContext<TenantInfo>();
-        var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
-
         Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions>(null!));
     }
 
@@ -132,10 +126,10 @@ public class MultiTenantOptionsCacheShould
     public void RemoveNamedOptionsForCurrentTenantOnly(string? name)
     {
         var ti = new TenantInfo { Id = "test-id-123" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
@@ -176,10 +170,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearOptionsForCurrentTenantOnly()
     {
         var ti = new TenantInfo { Id = "test-id-123" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
@@ -217,10 +211,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearOptionsForTenantIdOnly()
     {
         var ti = new TenantInfo { Id = "test-id-123" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
@@ -256,10 +250,10 @@ public class MultiTenantOptionsCacheShould
     public void ClearAllOptionsForClearAll()
     {
         var ti = new TenantInfo { Id = "test-id-123" };
-        var tc = new MultiTenantContext<TenantInfo>();
-        tc.TenantInfo = ti;
+        var tc = new MultiTenantContext<TenantInfo>(ti);
         var tca = new AsyncLocalMultiTenantContextAccessor<TenantInfo>();
-        tca.MultiTenantContext = tc;
+        var tcs = (IMultiTenantContextSetter)tca;
+        tcs.MultiTenantContext = tc;
         var cache = new MultiTenantOptionsCache<TestOptions>(tca);
 
         var options = new TestOptions();
