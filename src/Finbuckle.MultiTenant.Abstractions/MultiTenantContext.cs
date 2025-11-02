@@ -10,18 +10,46 @@ namespace Finbuckle.MultiTenant.Abstractions;
 public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiTenantContext{TTenantInfo}"/> class
+    /// with the specified tenant information.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information (may be null if not resolved).</param>
+    public MultiTenantContext(TTenantInfo? tenantInfo)
+    {
+        TenantInfo = tenantInfo;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MultiTenantContext{TTenantInfo}"/> class
+    /// with the specified tenant information, strategy information, and store information.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information (may be null if not resolved).</param>
+    /// <param name="strategyInfo">The strategy that resolved the tenant (may be null).</param>
+    /// <param name="storeInfo">The store that provided the tenant information (may be null).</param>
+    public MultiTenantContext(TTenantInfo? tenantInfo, StrategyInfo? strategyInfo, StoreInfo<TTenantInfo>? storeInfo)
+    {
+        TenantInfo = tenantInfo;
+        StrategyInfo = strategyInfo;
+        StoreInfo = storeInfo;
+    }
+
     /// <inheritdoc />
-    public TTenantInfo? TenantInfo { get; set; }
+    public TTenantInfo? TenantInfo { get; init; }
 
     /// <inheritdoc />
     public bool IsResolved => TenantInfo != null;
 
     /// <inheritdoc />
-    public StrategyInfo? StrategyInfo { get; set; }
+    public StrategyInfo? StrategyInfo { get; init; }
 
     /// <inheritdoc />
-    public StoreInfo<TTenantInfo>? StoreInfo { get; set; }
+    public StoreInfo<TTenantInfo>? StoreInfo { get; init; }
 
     /// <inheritdoc />
-    ITenantInfo? IMultiTenantContext.TenantInfo => TenantInfo;
+    ITenantInfo? IMultiTenantContext.TenantInfo
+    {
+        get => TenantInfo;
+        init => TenantInfo = value as TTenantInfo;
+    }
 }

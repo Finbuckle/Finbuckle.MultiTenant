@@ -11,7 +11,7 @@ public interface IMultiTenantContext
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; }
+    ITenantInfo? TenantInfo { get; init; }
 
     /// <summary>
     /// True if a tenant has been resolved and TenantInfo is not null.
@@ -21,7 +21,7 @@ public interface IMultiTenantContext
     /// <summary>
     /// Information about the MultiTenant strategies for this context.
     /// </summary>
-    StrategyInfo? StrategyInfo { get; }
+    StrategyInfo? StrategyInfo { get; init; }
 }
 
 
@@ -36,10 +36,10 @@ public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    new TTenantInfo? TenantInfo { get; }
+    new TTenantInfo? TenantInfo { get; init; }
     
     /// <summary>
     /// Information about the MultiTenant stores for this context.
     /// </summary>
-    StoreInfo<TTenantInfo>? StoreInfo { get; set; }
+    StoreInfo<TTenantInfo>? StoreInfo { get; init; }
 }

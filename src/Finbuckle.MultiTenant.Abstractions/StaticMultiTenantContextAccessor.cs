@@ -9,5 +9,5 @@ internal class StaticMultiTenantContextAccessor<TTenantInfo>(TTenantInfo? tenant
     IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
 
     public IMultiTenantContext<TTenantInfo> MultiTenantContext { get; } =
-        new MultiTenantContext<TTenantInfo> { TenantInfo = tenantInfo };
+        new MultiTenantContext<TTenantInfo>(tenantInfo: tenantInfo);
 }

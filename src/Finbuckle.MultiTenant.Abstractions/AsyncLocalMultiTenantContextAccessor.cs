@@ -16,8 +16,8 @@ internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantC
     /// <inheritdoc />
     public IMultiTenantContext<TTenantInfo> MultiTenantContext
     {
-        get => AsyncLocalContext.Value ?? (AsyncLocalContext.Value = new MultiTenantContext<TTenantInfo>());
-        set => AsyncLocalContext.Value = value;
+        get => AsyncLocalContext.Value ?? (AsyncLocalContext.Value = new MultiTenantContext<TTenantInfo>(null));
+        private set => AsyncLocalContext.Value = value;
     }
 
     /// <inheritdoc />
