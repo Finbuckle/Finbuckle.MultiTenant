@@ -35,9 +35,7 @@ public static class EntityTypeBuilderExtensions
 
         try
         {
-            builder.Property<string>("TenantId")
-                .IsRequired()
-                .HasMaxLength(Abstractions.Constants.TenantIdMaxLength);
+            builder.Property<string>("TenantId").IsRequired();
         }
         catch (Exception ex)
         {

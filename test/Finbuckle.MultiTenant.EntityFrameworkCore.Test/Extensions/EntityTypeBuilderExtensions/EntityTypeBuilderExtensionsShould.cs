@@ -21,7 +21,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
 
     public void Dispose()
     {
-        _connection?.Dispose();
+        _connection.Dispose();
     }
 
     private TestDbContext GetDbContext(Action<ModelBuilder>? config = null, TenantInfo? tenant = null)
@@ -70,15 +70,6 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     {
         using var db = GetDbContext(b => b.Entity<MyThingWithIntTenantId>().IsMultiTenant());
         Assert.Throws<MultiTenantException>(() => db.Model);
-    }
-
-    [Fact]
-    public void SetsTenantIdStringMaxLength()
-    {
-        using var db = GetDbContext();
-        var prop = db.Model.FindEntityType(typeof(MyMultiTenantThing))?.FindProperty("TenantId");
-
-        Assert.Equal(Abstractions.Constants.TenantIdMaxLength, prop!.GetMaxLength());
     }
 
     [Fact]
