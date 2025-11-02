@@ -6,12 +6,10 @@ jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: |
-            8
-            9
+          dotnet-version: 10
       - name: Create the package
         run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
       - name: Publish the package to NuGet.org

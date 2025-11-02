@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch: [ main, 8.x ]
+        branch: [ main, 9.x, 8.x ]
     steps:
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9
+          dotnet-version: 10
       - name: Checkout Finbuckle.MultiTenant
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
