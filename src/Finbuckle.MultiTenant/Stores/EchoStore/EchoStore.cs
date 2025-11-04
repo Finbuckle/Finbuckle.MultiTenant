@@ -16,13 +16,13 @@ namespace Finbuckle.MultiTenant.Stores.EchoStore;
 public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
 {
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
         return await Task.FromResult(new TTenantInfo { Id = identifier, Identifier = identifier }).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
         return await Task.FromResult(new TTenantInfo { Id = id, Identifier = id }).ConfigureAwait(false);
     }
@@ -31,7 +31,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
@@ -40,7 +40,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
@@ -49,7 +49,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryRemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }

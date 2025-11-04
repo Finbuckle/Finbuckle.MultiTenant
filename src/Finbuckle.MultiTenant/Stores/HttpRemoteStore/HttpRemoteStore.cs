@@ -53,7 +53,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
@@ -62,7 +62,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<TTenantInfo?> TryGetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id)
     {
         throw new NotImplementedException();
     }
@@ -84,9 +84,9 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
-        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
+        var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
         return result;
     }
 
@@ -94,7 +94,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryRemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }
@@ -103,7 +103,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }

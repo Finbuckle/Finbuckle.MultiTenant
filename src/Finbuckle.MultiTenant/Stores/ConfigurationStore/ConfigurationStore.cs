@@ -77,13 +77,13 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -103,7 +103,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
         ArgumentNullException.ThrowIfNull(identifier);
 
@@ -119,7 +119,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryRemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }
@@ -128,7 +128,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
