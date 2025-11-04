@@ -3,18 +3,26 @@
 
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
-[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+/// <summary>
+/// Builder for configuring multi-tenant entity types.
+/// </summary>
 public class MultiTenantEntityTypeBuilder
 {
+    /// <summary>
+    /// Gets the underlying EntityTypeBuilder.
+    /// </summary>
     public EntityTypeBuilder Builder { get; }
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantEntityTypeBuilder.
+    /// </summary>
+    /// <param name="builder">The EntityTypeBuilder to wrap.</param>
     public MultiTenantEntityTypeBuilder(EntityTypeBuilder builder)
     {
             Builder = builder;
@@ -76,7 +84,13 @@ public class MultiTenantEntityTypeBuilder
                 fk.SetProperties(fkProps, newKey!);
             }
             
-            newKey?.AddAnnotations(annotations);
+            foreach (var annotation in annotations)
+            {
+                if (newKey?.FindAnnotation(annotation.Name) is null)
+                {
+                    newKey?.AddAnnotation(annotation.Name, annotation.Value);
+                }
+            }
 
             // remove key
             Builder.Metadata.RemoveKey(key);

@@ -2,7 +2,6 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 
 namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 
@@ -32,7 +31,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         _client = client ?? throw new ArgumentNullException(nameof(client));
         if (!endpointTemplate.Contains(DefaultEndpointTemplateIdentifierToken))
         {
-            if (endpointTemplate.EndsWith("/"))
+            if (endpointTemplate.EndsWith('/'))
                 endpointTemplate += DefaultEndpointTemplateIdentifierToken;
             else
                 endpointTemplate += $"/{DefaultEndpointTemplateIdentifierToken}";
@@ -54,7 +53,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
@@ -63,24 +62,31 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<TTenantInfo?> TryGetAsync(string id)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Not implemented in this implementation.
-    /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<TTenantInfo?> GetAsync(string id)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    /// <exception cref="NotImplementedException">When a not-found (404) status code is encountered</exception>
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        var result = await _client.TryGetByIdentifierAsync(endpointTemplate, identifier);
+        return await _client.GetAllAsync(endpointTemplate).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    {
+        var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
         return result;
     }
 
@@ -88,7 +94,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryRemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }
@@ -97,7 +103,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }

@@ -1,6 +1,155 @@
 # Version History
 
 <!--_history-->
+## [9.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.1...v9.4.2) (2025-11-01)
+
+### Bug Fixes
+
+* updated xml code comments and docs ([#1015](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1015)) ([4bfe15d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4bfe15d1c2e65935831c27525fdcf127a2048622))
+
+## [9.4.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.0...v9.4.1) (2025-10-16)
+
+### Bug Fixes
+
+* update dependencies ([#1014](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1014)) ([9bf4cff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9bf4cffed88309d0b8e03b62e1423670b97da42f))
+
+## [9.4.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.3.1...v9.4.0) (2025-09-14)
+
+### Features
+
+* added EnforceMultiTenantOnTracking ([#1008](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1008)) ([6ea8fd3](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/6ea8fd3ff85de36566b53c98d59fe998e821b116))
+
+## [9.3.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.3.0...v9.3.1) (2025-09-10)
+
+### Bug Fixes
+
+* update dependencies ([ad2cca7](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ad2cca7e8427278a4eb2a36c4f4801e61efa74a6))
+
+## [9.3.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.2.2...v9.3.0) (2025-08-09)
+
+### Features
+
+* Add a RedirectTo Uri to ShortCircuitWhenOptions, enabling the middleware to redirect the user when short circuiting. ([64ad8e2](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/64ad8e2851b670f37f6a7d2b1310e3715484d314))
+* Add ExcludeFromMultiTenantResolution() and ExcludeFromMultiTenantResolutionAttribute for endpoints. ([5cd9d3c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/5cd9d3c37ba85aaaadad231aa1eaf807f6625e26))
+* Add ShortCircuitWhen(Action<ShortCircuitWhenOptions> options) and ShortCircuitWhenTenantNotResolved() ([709b0de](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/709b0deda80ce66d8096b53d42b10b83b0bf5297))
+
+### Bug Fixes
+
+* support decorated multiple registered services of same type and fix activator bugs for instance and factory based services ([#994](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/994)) ([0d1b68c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d1b68c135052a206e52e6f2bd68f8b813f5d6b7))
+* update dependencies ([#995](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/995)) ([0e0440a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0e0440a9391de4be970e3a9648bcac408e841323))
+
+## [9.2.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.2.1...v9.2.2) (2025-07-10)
+
+### Bug Fixes
+
+* update dependencies ([#986](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/986)) ([1455f26](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1455f2619de4be3ad377f2b9cd8fdacf383fd355))
+
+## [9.2.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.2.0...v9.2.1) (2025-06-18)
+
+### Bug Fixes
+
+* update dependencies ([#982](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/982)) ([d40182a](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d40182a31d49dd43875e0148259819391c28f5a0))
+
+## [9.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.4...v9.2.0) (2025-06-03)
+
+### Features
+
+* add Context property to StoreResolveCompletedContext ([#976](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/976)) ([464a55c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/464a55c2ec490804642ccdfb050941fb6b9d3400))
+* add pagination support overload to IMultiTenantStore.GetAllAsync method ([#978](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/978)) ([b8e50a6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b8e50a65061cc5739fc810ceeefe34617753e43a))
+* add more multi-tenant dbcontext factories ([#980](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/980)) ([de67550](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/de67550eb7dae649b30de3fef6fee0b1ba9d5d46))
+
+### Bug Fixes
+
+* remove TenantId from the UserLogin primary key ([#979](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/979)) ([a09fb7b](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a09fb7b8451bba3164bc13c1009163238d05872d))
+
+## [9.1.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.3...v9.1.4) (2025-05-14)
+
+### Bug Fixes
+
+* update dependencies ([#974](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/974)) ([dcb8a73](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/dcb8a737b7a52be50a70f35ad6fd08d39ce77601))
+
+## [9.1.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.2...v9.1.3) (2025-04-09)
+
+### Bug Fixes
+
+* update dependencies ([#966](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/966)) ([eb95530](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/eb95530156f2554cafdb1d29521d724a75787dad))
+
+## [9.1.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.1...v9.1.2) (2025-03-20)
+
+### Bug Fixes
+
+* reenable deterministic builds ([#954](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/954)) ([0cd78b3](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0cd78b3ac917917dd58280733014a7589c05423a))
+
+## [9.1.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.1.0...v9.1.1) (2025-03-18)
+
+### Bug Fixes
+
+* fix cache store leaving orphan tenant on some update scenarios ([#946](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/946)) ([5edd9fe](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/5edd9fee3e59207b67884514322c8f115bf4a543))
+* update dependency versions ([#953](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/953)) ([67598c1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/67598c1489a38e83be1ca0779addb334319d8e7a))
+
+## [9.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.0.0...v9.1.0) (2025-03-12)
+
+### Features
+
+* add WithDelegateStrategy<TContext, TTenantInfo> ([#932](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/932)) ([a18a935](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a18a935ea397b4cbd9e52fdcee589212db9d0999))
+* add WithHttpContextStrategy ([#934](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/934)) ([e6aeb7c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e6aeb7c9c265d39eb4bec0d2be526f582f41f886))
+* better async pattern for class libraries ([#942](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/942)) ([8235462](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/82354625d24ced67228246885f9f326389209e9c))
+* improved perf for HostStrategy ([#936](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/936)) ([a70f7e0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a70f7e0f47eaf180e5f64f1bba61cae59086251a))
+
+### Bug Fixes
+
+* added new analyzers and multiple fixes  ([#937](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/937)) ([9d9b1e4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9d9b1e416929ebbd795c0eef3361cca7d6d238ce))
+* MultiTenantDbContext.Create should have non nullable TenantInfo ([#916](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/916)) ([9df0527](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9df0527841549e0dd6e2017cfff3ebc6f03b7e16))
+
+## [9.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v9.0.0) (2024-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
+* `MultiTenantDbContext` constructors accepting `ITenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
+* net6.0 and net7.0 are no longer supported targets.
+* dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
+
+### Features
+
+* add multitenant db factory method ([#894](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/894)) (
+  [ea216ff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ea216ffb37d241804899ab0f3cd5db1e9c6ae641))
+* better tenant resolution events ([#897](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/897)) ([956ca36](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/956ca36670aa8aed38afcbbbdd78f1b79d91287c))
+* dotnet 9 support ([#893](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/893)) ([4be1b88](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4be1b88fb7103223517d2cd8a16ea62c6d6204d5))
+* make builds deterministic and set latest GH actions ([#889](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/889)) ([d82f89d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d82f89da2f7a82bb302aaedfdb5c676cc7051273))
+
+## [8.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.0.0...v8.1.0) (2025-03-18)
+
+### Bug Fixes
+
+* fix cache store leaving orphan tenant on some update scenarios ([#949](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/949)) ([7929f00](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7929f00bc2eb8ef82ee01e431bc04ef3b63d6f0f))
+
+
+### Features
+
+* better async backported ([#951](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/951)) ([a204403](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a204403666794ea42c850ff5bfb736f1ced30e45))
+
+## [8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.2...v8.0.0) (2024-10-12)
+
+### ⚠ BREAKING CHANGES
+
+* This commit brings the release into alignment with the new version policy. See #887 for details.
+* Included strategies for ASP.NET Core would throw an exception if the passed context was not an `HttpContext` type. Now they will return null indicating no identifier was found.
+
+### Features
+
+* add GetAllAsync() support for HttpRemoteStore ([#848](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/848)) ([4208149](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4208149282eaee99e2c02a788a2653faaa24ef7a))
+* added the Echo Store. ([#807](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/807)) ([a3e5eee](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/a3e5eee64f0581c5f3d6abca7bb77cc56ef1d75c))
+* strategies return null on invalid context type ([#885](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/885)) ([9834575](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9834575c957fb5bd314cf0970e54a29384026d02))
+
+### Bug Fixes
+
+* BasePathStrategy no longer breaks the strategy chain ([#884](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/884)) ([3263eff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3263effae4638656aab827b24094a8e575ae19a0))
+* prevent duplicate key annotation in AdjustKey() ([#883](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/883)) ([f75ba2c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f75ba2c678079d2e956bf7d32b8e5aee0159e72b))
+* removed unused parameter from WithPerTenantRemoteAuthenticationConvention ([#886](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/886)) ([dd17ab5](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/dd17ab51825ec94f4ecfe704f42c6b0457562d98))
+
+
 ## [7.0.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v7.0.1...v7.0.2) (2024-08-03)
 
 

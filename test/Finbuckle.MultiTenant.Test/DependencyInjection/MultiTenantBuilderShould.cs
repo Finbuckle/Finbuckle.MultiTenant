@@ -258,12 +258,12 @@ public class MultiTenantBuilderShould
                 this._testParam = testParam;
             }
 
-        public Task<bool> TryAddAsync(TTenant tenantInfo)
+        public Task<bool> AddAsync(TTenant tenantInfo)
         {
                 throw new NotImplementedException();
             }
 
-        public Task<TTenant?> TryGetAsync(string id)
+        public Task<TTenant?> GetAsync(string id)
         {
                 throw new NotImplementedException();
             }
@@ -273,17 +273,22 @@ public class MultiTenantBuilderShould
                 throw new NotImplementedException();
             }
 
-        public Task<TTenant?> TryGetByIdentifierAsync(string identifier)
+        public Task<IEnumerable<TTenant>> GetAllAsync(int take, int skip)
         {
                 throw new NotImplementedException();
             }
 
-        public Task<bool> TryRemoveAsync(string identifier)
+        public Task<TTenant?> GetByIdentifierAsync(string identifier)
         {
                 throw new NotImplementedException();
             }
 
-        public Task<bool> TryUpdateAsync(TTenant tenantInfo)
+        public Task<bool> RemoveAsync(string identifier)
+        {
+                throw new NotImplementedException();
+            }
+
+        public Task<bool> UpdateAsync(TTenant tenantInfo)
         {
                 throw new NotImplementedException();
             }

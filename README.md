@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">7.0.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.2</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -6,38 +6,55 @@ Finbuckle.MultiTenant is an open-source multitenancy middleware library for .NET
 per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-**This release supports .NET 6, .NET 7, and .NET 8.**
+**This release supports .NET 9 and .NET 8.**
 
-Current publish feed release:  
-![Finbuckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
+## Open Source Support
 
 Table of Contents
 
-1. [What's New in v<span class="_version">7.0.2</span>](#whats-new)
-2. [Quick Start](#quick-start)
-3. [Documentation](#documentation)
-4. [Sample Projects](#sample-projects)
-5. [Build and Test Status](#build-and-test-status)
-6. [License](#license)
-7. [.NET Foundation](#net-foundation)
-8. [Code of Conduct](#code-of-conduct)
-9. [Community](#community)
-10. [Building from Source](#building-from-source)
-11. [Running Unit Tests](#running-unit-tests)
+1. [What's New in v<span class="_version">9.4.2</span>](#whats-new)
+2. [Open Source Support](#open-source-support)
+3. [Quick Start](#quick-start)
+4. [Documentation](#documentation)
+5. [Sample Projects](#sample-projects)
+6. [Build and Test Status](#build-and-test-status)
+7. [License](#license)
+8. [.NET Foundation](#net-foundation)
+9. [Code of Conduct](#code-of-conduct)
+10. [Community](#community)
+11. [Building from Source](#building-from-source)
+12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">7.0.2</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">9.4.2</span>
 
-> This section only lists release update details specific to v<span class="_version">7.0.2</span>. See
+> This section only lists release update details specific to v<span class="_version">9.4.2</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
-
 <!--_release-notes-->
-
 
 ### Bug Fixes
 
-* Preserve annotations when adjusting index ([#832](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/832)) ([e765340](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e765340a3c74268cadf191a55e9a5c082894c2bd))
-* strategy wrapper no longer throws on a null context, instead passing it to the actual strategy ([#863](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/863)) ([2b165c7](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/2b165c77db4f82244e33fe1823e865f30b2a3ea2))
+* updated xml code comments and docs ([#1015](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1015)) ([4bfe15d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4bfe15d1c2e65935831c27525fdcf127a2048622))
 <!--_release-notes-->
+
+## Open Source Support
+
+Your support helps keep the project going and is greatly appreciated!
+
+Finbuckle.MultiTenant is primarily supported by its [GitHub sponsors](https://github.com/sponsors/Finbuckle) and [contributors](https://github.com/Finbuckle/Finbuckle.MultiTenant/graphs/contributors).  
+
+Additional support is provided by the following organizations:
+
+<p><a href="https://www.digitalocean.com/">
+  <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" alt="Digital Ocean logo" height="40">
+</a></p>
+
+<p><a href="https://www.github.com/">
+  <img src="https://github.githubassets.com/assets/GitHub-Logo-ee398b662d42.png" alt="GitHub logo" height="40">
+</a></p>
+
+<p><a href="https://www.jetbrains.com/">
+  <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg" alt="Jetbrains logo" height="40">
+</a></p>
 
 ## Quick Start
 
@@ -108,8 +125,8 @@ ways.
 `app.UseMultiTenant()`
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
-settings. Be sure to call it before other middleware which will use per-tenant functionality,
-e.g. `UseAuthentication()`.
+settings. Be sure to call it before other middleware which will use per-tenant functionality, e.g.
+`UseAuthentication()`.
 
 ### Basic Usage
 
@@ -137,8 +154,7 @@ See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/Configu
 ## Documentation
 
 The library builds on this basic functionality to provide a variety of higher level features. See
-the [documentation](https://www.finbuckle.com/multitenant/docs) for
-more details:
+the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
 
 * [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
 * [Per-tenant Authentication](https://www.finbuckle.com/MultiTenant/Docs/Authentication)

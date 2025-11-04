@@ -1,7 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Generic;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantDbContextExtensions;
@@ -13,7 +13,7 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 
     public TestDbContext(TenantInfo tenantInfo,
         DbContextOptions options) :
-        base(tenantInfo, options)
+        base(new StaticMultiTenantContextAccessor<TenantInfo>(tenantInfo), options)
     {
     }
 }

@@ -71,7 +71,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <summary>
     /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.AuthenticateAsync(HttpContext, string)"/>.
     /// This is typically specified via <see cref="AuthenticationOptions.DefaultAuthenticateScheme"/>.
-    /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
+    /// Otherwise, this will fall back to <see cref="AuthenticationOptions.DefaultScheme"/>.
     /// </summary>
     /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.AuthenticateAsync(HttpContext, string)"/> or null if not found.</returns>
     public virtual Task<AuthenticationScheme?> GetDefaultAuthenticateSchemeAsync()
@@ -82,7 +82,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <summary>
     /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.ChallengeAsync(HttpContext, string, AuthenticationProperties)"/>.
     /// This is typically specified via <see cref="AuthenticationOptions.DefaultChallengeScheme"/>.
-    /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
+    /// Otherwise, this will fall back to <see cref="AuthenticationOptions.DefaultScheme"/>.
     /// </summary>
     /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ChallengeAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
     public virtual Task<AuthenticationScheme?> GetDefaultChallengeSchemeAsync()
@@ -93,7 +93,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <summary>
     /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.ForbidAsync(HttpContext, string, AuthenticationProperties)"/>.
     /// This is typically specified via <see cref="AuthenticationOptions.DefaultForbidScheme"/>.
-    /// Otherwise, this will fallback to <see cref="GetDefaultChallengeSchemeAsync"/> .
+    /// Otherwise, this will fall back to <see cref="GetDefaultChallengeSchemeAsync"/> .
     /// </summary>
     /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.ForbidAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
     public virtual Task<AuthenticationScheme?> GetDefaultForbidSchemeAsync()
@@ -104,7 +104,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <summary>
     /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.SignInAsync(HttpContext, string, System.Security.Claims.ClaimsPrincipal, AuthenticationProperties)"/>.
     /// This is typically specified via <see cref="AuthenticationOptions.DefaultSignInScheme"/>.
-    /// Otherwise, this will fallback to <see cref="AuthenticationOptions.DefaultScheme"/>.
+    /// Otherwise, this will fall back to <see cref="AuthenticationOptions.DefaultScheme"/>.
     /// </summary>
     /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignInAsync(HttpContext, string, System.Security.Claims.ClaimsPrincipal, AuthenticationProperties)"/> or null if not found.</returns>
     public virtual Task<AuthenticationScheme?> GetDefaultSignInSchemeAsync()
@@ -115,7 +115,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <summary>
     /// Returns the scheme for this tenant that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/>.
     /// This is typically specified via <see cref="AuthenticationOptions.DefaultSignOutScheme"/>.
-    /// Otherwise this will fallback to <see cref="GetDefaultSignInSchemeAsync"/> if that supports sign out.
+    /// Otherwise, this will fall back to <see cref="GetDefaultSignInSchemeAsync"/> if that supports sign out.
     /// </summary>
     /// <returns>The scheme that will be used by default for <see cref="IAuthenticationService.SignOutAsync(HttpContext, string, AuthenticationProperties)"/> or null if not found.</returns>
     public virtual Task<AuthenticationScheme?> GetDefaultSignOutSchemeAsync()
@@ -134,7 +134,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
 
         if (_inner != null)
         {
-            scheme = await _inner.GetSchemeAsync(name);
+            scheme = await _inner.GetSchemeAsync(name).ConfigureAwait(false);
         }
 
         if (scheme == null)
@@ -198,6 +198,10 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         }
     }
 
+    /// <summary>
+    /// Returns all registered authentication schemes for this tenant.
+    /// </summary>
+    /// <returns>All registered authentication schemes.</returns>
     public virtual Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
         => Task.FromResult<IEnumerable<AuthenticationScheme>>(_schemes.Values);
 }

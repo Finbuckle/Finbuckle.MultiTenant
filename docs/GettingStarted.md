@@ -16,10 +16,9 @@ $ dotnet add package Finbuckle.MultiTenant.AspNetCore
 
 ## Basic Configuration
 
-Finbuckle.MultiTenant is simple to get started with. Below is a sample app that configured to use the subdomain as the
-tenant identifier and the
-app's [configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) (most likely from
-a `appsettings.json` file)' as the source of tenant details.
+Finbuckle.MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant
+identifier and the app's [configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) (
+most likely from an `appsettings.json` file) as the source of tenant details.
 
 ```csharp
 using Finbuckle.MultiTenant;
@@ -51,9 +50,8 @@ This line registers the base services and designates `TenantInfo` as the class t
 runtime.
 
 The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` and holds basic
-information about
-the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but a custom
-implementation can be used if more properties are needed.
+information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but
+a custom implementation can be used if more properties are needed.
 
 See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
 
@@ -78,8 +76,8 @@ ways.
 `app.UseMultiTenant()`
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
-settings. Be sure to call it before other middleware which will use per-tenant
-functionality, such as `UseAuthentication()`.
+settings. Be sure to call it before other middleware which will use per-tenant functionality, such as
+`UseAuthentication()`.
 
 ## Basic Usage
 
@@ -100,8 +98,8 @@ if(tenantInfo != null)
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `ITenantInfo` instance and the typed instance are also available using
-the `IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
+The `ITenantInfo` instance and the typed instance are also available using the
+`IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
@@ -117,10 +115,7 @@ more details:
 
 ## Samples
 
-A variety of sample projects are available in the `samples` directory. Be sure to read the information on the index page
-of each sample and the code comments in the `Startup` class. Note that may older samples have been removed as .NET
-versions are end-of-lifed by Microsoft, such as .NET Core 3.0 and .NET 5. These samples are still available in earlier
-tagged release commits if needed.
+A variety of sample projects are available in the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
 
 ## Compiling from Source
 

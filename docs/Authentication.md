@@ -11,10 +11,6 @@ Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
-See
-the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
-for a demonstration of the features discussed in this topic.
-
 The sections below assume Finbuckle.MultiTenant is installed and configured. See
 [Getting Started](GettingStarted) for details.
 
@@ -154,7 +150,7 @@ Internally `WithPerTenantAuthentication()` makes use of
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
 `ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
-configureations:
+configurations:
 
 ```csharp 
 builder.Services.AddMultiTenant<TenantInfo>()

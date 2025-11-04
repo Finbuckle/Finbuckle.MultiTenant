@@ -3,7 +3,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,12 +20,13 @@ public static class FinbuckleServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
-        Action<MultiTenantOptions> config)
+        Action<MultiTenantOptions<TTenantInfo>> config)
         where TTenantInfo : class, ITenantInfo, new()
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
@@ -41,7 +41,7 @@ public static class FinbuckleServiceCollectionExtensions
         services.AddSingleton<IMultiTenantContextSetter>(sp =>
             (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
-        services.Configure<MultiTenantOptions>(options => options.TenantInfoType = typeof(TTenantInfo));
+        services.Configure<MultiTenantOptions<TTenantInfo>>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
 
         return new MultiTenantBuilder<TTenantInfo>(services);
@@ -58,67 +58,92 @@ public static class FinbuckleServiceCollectionExtensions
         return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
 
-    // TODO: better document and extract
+    
+    /// <summary>
+    /// Decorates an existing service registration with a new implementation that wraps the original.
+    /// </summary>
+    /// <typeparam name="TService">The service type to decorate.</typeparam>
+    /// <typeparam name="TImpl">The decorator implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="parameters">Additional parameters to pass to the decorator constructor after the inner service.</param>
+    /// <returns><c>true</c> if the service was successfully decorated.</returns>
+    /// <exception cref="ArgumentException">Thrown when no service of type <typeparamref name="TService"/> is found.</exception>
+    /// <exception cref="Exception">Thrown when the service cannot be instantiated.</exception>
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
-        var existingService = services.SingleOrDefault(s => s.ServiceType == typeof(TService));
-        if (existingService is null)
+        var existingServices = services.Where(s => s.ServiceType == typeof(TService)).ToList();
+        if (existingServices.Count == 0)
             throw new ArgumentException($"No service of type {typeof(TService).Name} found.");
 
         ServiceDescriptor? newService;
 
-        if (existingService.ImplementationType is not null)
+        foreach (var existingService in existingServices)
         {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner =
-                        (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
+            if (existingService.ImplementationType is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner =
+                            (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
+ 
+                        if (inner is null)
+                            throw new ArgumentException(
+                                $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
 
-                    if (inner is null)
-                        throw new Exception(
-                            $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
 
-                    var parameters2 = new object[parameters.Length + 1];
-                    Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
-                    parameters2[0] = inner;
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else if (existingService.ImplementationInstance is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner = (TService)existingService.ImplementationInstance;
+                        if (inner is null)
+                            throw new ArgumentException(
+                                $"Unable to instantiate decorated type via implementation instance of type {existingService.ImplementationInstance.GetType().Name}.");
+                        
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
+                        
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else if (existingService.ImplementationFactory is not null)
+            {
+                newService = new ServiceDescriptor(existingService.ServiceType,
+                    sp =>
+                    {
+                        TService inner = (TService)existingService.ImplementationFactory(sp);
+                        if (inner is null)
+                            throw new ArgumentException(
+                                $"Unable to instantiate decorated type via implementation factory for type {existingService.ServiceType}.");
 
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
-                },
-                existingService.Lifetime);
+                        var parameters2 = new object[parameters.Length + 1];
+                        Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
+                        parameters2[0] = inner;
+                        
+                        return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
+                    },
+                    existingService.Lifetime);
+            }
+            else
+            {
+                throw new  ArgumentException(
+                    "Unable to instantiate decorated type.");
+            }
+
+            services.Remove(existingService);
+            services.Add(newService);
         }
-        else if (existingService.ImplementationInstance is not null)
-        {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner = (TService)existingService.ImplementationInstance;
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
-                },
-                existingService.Lifetime);
-        }
-        else if (existingService.ImplementationFactory is not null)
-        {
-            newService = new ServiceDescriptor(existingService.ServiceType,
-                sp =>
-                {
-                    TService inner = (TService)existingService.ImplementationFactory(sp);
-                    if (inner is null)
-                        throw new Exception(
-                            "Unable to instantiate decorated type via implementation factory.");
-
-                    return ActivatorUtilities.CreateInstance<TImpl>(sp, inner, parameters)!;
-                },
-                existingService.Lifetime);
-        }
-        else
-        {
-            throw new Exception(
-                "Unable to instantiate decorated type.");
-        }
-
-        services.Remove(existingService);
-        services.Add(newService);
 
         return true;
     }
@@ -253,10 +278,15 @@ public static class FinbuckleServiceCollectionExtensions
         return services.PostConfigurePerTenant(null, configureOptions);
     }
 
+    /// <summary>
+    /// Configures the required services for per-tenant options support.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     internal static void ConfigurePerTenantReqs<TOptions>(IServiceCollection services)
         where TOptions : class
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
+        ArgumentNullException.ThrowIfNull(services);
 
         // Required infrastructure.
         services.AddOptions();
@@ -269,10 +299,8 @@ public static class FinbuckleServiceCollectionExtensions
 
         MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
         {
-            var cache = (IOptionsMonitorCache<TOptions>)ActivatorUtilities.CreateInstance(sp,
-                typeof(MultiTenantOptionsCache<TOptions>));
-            return (MultiTenantOptionsManager<TOptions>)
-                ActivatorUtilities.CreateInstance(sp, typeof(MultiTenantOptionsManager<TOptions>), cache);
+            IOptionsMonitorCache<TOptions> cache = ActivatorUtilities.CreateInstance<MultiTenantOptionsCache<TOptions>>(sp);
+            return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp, cache);
         }
     }
 }

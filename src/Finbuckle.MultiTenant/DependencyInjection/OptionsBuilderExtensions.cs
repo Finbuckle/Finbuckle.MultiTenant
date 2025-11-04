@@ -8,17 +8,27 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
+/// <summary>
+/// Extension methods for configuring options on a per-tenant basis.
+/// </summary>
 public static class OptionsBuilderExtensions
 {
+    /// <summary>
+    /// Configures options on a per-tenant basis.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -36,13 +46,22 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures options on a per-tenant basis with one dependency.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep">The dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -61,6 +80,16 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures options on a per-tenant basis with two dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep1, TDep2, TTenantInfo> configureOptions)
         where TOptions : class
@@ -68,7 +97,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -88,6 +117,17 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures options on a per-tenant basis with three dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TDep3">The third dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TTenantInfo> configureOptions)
@@ -97,7 +137,7 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -118,6 +158,18 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Configures options on a per-tenant basis with four dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TDep3">The third dependency type.</typeparam>
+    /// <typeparam name="TDep4">The fourth dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo> configureOptions)
@@ -128,7 +180,7 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -187,12 +239,20 @@ public static class OptionsBuilderExtensions
     //     return optionsBuilder;
     // }
 
+    /// <summary>
+    /// Post-configures options on a per-tenant basis.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -210,13 +270,22 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures options on a per-tenant basis with one dependency.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep">The dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -235,6 +304,16 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures options on a per-tenant basis with two dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep1, TDep2, TTenantInfo> configureOptions)
         where TOptions : class
@@ -242,7 +321,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -262,6 +341,17 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures options on a per-tenant basis with three dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TDep3">The third dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TTenantInfo> configureOptions)
@@ -271,7 +361,7 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
@@ -292,6 +382,18 @@ public static class OptionsBuilderExtensions
         return optionsBuilder;
     }
 
+    /// <summary>
+    /// Post-configures options on a per-tenant basis with four dependencies.
+    /// </summary>
+    /// <typeparam name="TOptions">The options type to be configured.</typeparam>
+    /// <typeparam name="TDep1">The first dependency type.</typeparam>
+    /// <typeparam name="TDep2">The second dependency type.</typeparam>
+    /// <typeparam name="TDep3">The third dependency type.</typeparam>
+    /// <typeparam name="TDep4">The fourth dependency type.</typeparam>
+    /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
+    /// <param name="optionsBuilder">The options builder instance.</param>
+    /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
+    /// <returns>The options builder for chaining.</returns>
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder,
         Action<TOptions, TDep1, TDep2, TDep3, TDep4, TTenantInfo> configureOptions)
@@ -302,7 +404,7 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : class, ITenantInfo, new()
     {
-        if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
         FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 

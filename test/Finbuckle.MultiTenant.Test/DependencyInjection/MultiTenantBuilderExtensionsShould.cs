@@ -4,6 +4,7 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
+using Finbuckle.MultiTenant.Stores.EchoStore;
 using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Finbuckle.MultiTenant.Strategies;
@@ -83,12 +84,12 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("initech");
+        var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
 
-        tc = await store.TryGetByIdentifierAsync("lol");
+        tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -112,12 +113,12 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("initech");
+        var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
 
-        tc = await store.TryGetByIdentifierAsync("lol");
+        tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -147,16 +148,36 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<InMemoryStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("lol");
+        var tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
 
         // Case sensitive test.
-        tc = await store.TryGetByIdentifierAsync("LOL");
+        tc = await store.GetByIdentifierAsync("LOL");
         Assert.Null(tc);
     }
 
+    [Fact]
+    public async Task AddEchoStore()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithEchoStore();
+        var sp = services.BuildServiceProvider();
+            
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        Assert.IsType<EchoStore<TenantInfo>>(store);
+
+        var tc = await store.GetByIdentifierAsync("initech");
+        Assert.Equal("initech", tc!.Id);
+        Assert.Equal("initech", tc.Identifier);
+
+        tc = await store.GetByIdentifierAsync("lol");
+        Assert.Equal("lol", tc!.Id);
+        Assert.Equal("lol", tc.Identifier);
+    }
+    
     [Fact]
     public void AddDelegateStrategy()
     {
@@ -167,6 +188,31 @@ public class MultiTenantBuilderExtensionsShould
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<DelegateStrategy>(strategy);
+    }
+    
+    [Fact]
+    public void AddTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult(context.ToString())!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<DelegateStrategy>(strategy);
+    }
+    
+    [Fact]
+    public async Task ReturnNullForWrongTypeSendToTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult("Shouldn't ever get here")!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var identifier = await strategy.GetIdentifierAsync(new object());
+        Assert.Null(identifier);
     }
 
     [Fact]

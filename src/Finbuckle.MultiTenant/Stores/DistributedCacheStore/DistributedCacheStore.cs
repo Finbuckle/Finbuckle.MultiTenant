@@ -11,7 +11,8 @@ namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 /// Basic store that uses an IDistributedCache instance as its backing. Note that GetAllAsync is not implemented.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
+    where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly IDistributedCache cache;
     private readonly string keyPrefix;
@@ -32,28 +33,29 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
         var bytes = JsonSerializer.Serialize(tenantInfo);
 
-        await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options);
-        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options);
+        await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, options).ConfigureAwait(false);
+        await cache.SetStringAsync($"{keyPrefix}identifier__{tenantInfo.Identifier}", bytes, options)
+            .ConfigureAwait(false);
 
         return true;
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
-        var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}");
+        var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}").ConfigureAwait(false);
         if (bytes == null)
             return null;
 
         var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
         // Refresh the identifier version to keep things synced
-        await cache.RefreshAsync($"{keyPrefix}identifier__{result?.Identifier}");
+        await cache.RefreshAsync($"{keyPrefix}identifier__{result?.Identifier}").ConfigureAwait(false);
 
         return result;
     }
@@ -67,38 +69,55 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}");
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    {
+        var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}").ConfigureAwait(false);
         if (bytes == null)
             return null;
 
         var result = JsonSerializer.Deserialize<TTenantInfo>(bytes);
 
         // Refresh the identifier version to keep things synced
-        await cache.RefreshAsync($"{keyPrefix}id__{result?.Id}");
+        await cache.RefreshAsync($"{keyPrefix}id__{result?.Id}").ConfigureAwait(false);
 
         return result;
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryRemoveAsync(string identifier)
+    public async Task<bool> RemoveAsync(string identifier)
     {
-        var result = await TryGetByIdentifierAsync(identifier);
+        var result = await GetByIdentifierAsync(identifier).ConfigureAwait(false);
         if (result == null)
             return false;
 
-        await cache.RemoveAsync($"{keyPrefix}id__{result.Id}");
-        await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}");
+        await cache.RemoveAsync($"{keyPrefix}id__{result.Id}").ConfigureAwait(false);
+        await cache.RemoveAsync($"{keyPrefix}identifier__{result.Identifier}").ConfigureAwait(false);
 
         return true;
     }
 
     /// <inheritdoc />
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
-        // Same as adding for distributed cache.
-        return TryAddAsync(tenantInfo);
+        if (tenantInfo.Id is null)
+            return false;
+        
+        var current = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
+
+        if (current is null)
+            return false;
+
+        return await RemoveAsync(current.Identifier!).ConfigureAwait(false) &&
+               await AddAsync(tenantInfo).ConfigureAwait(false);
     }
 }

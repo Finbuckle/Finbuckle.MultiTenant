@@ -1,10 +1,9 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
@@ -22,9 +21,75 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <inheritdoc />
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
-    protected MultiTenantDbContext(ITenantInfo? tenantInfo)
+    /// <summary>
+    /// Creates a new instance of a DbContext that accepts an ITenantInfo instance.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information to bind to the context.</param>
+    /// <typeparam name="TContext">The TContext implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <returns>The newly created DbContext instance.</returns>
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
+        where TContext : DbContext
+        where TTenantInfo : class, ITenantInfo, new()
+    => Create<TContext, TTenantInfo>(tenantInfo, []);
+    
+    /// <summary>
+    /// Creates a new instance of a DbContext that accepts an ITenantInfo instance and optional dependencies.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information to bind to the context.</param>
+    /// <param name="args">Additional dependencies for the DbContext constructor.</param>
+    /// <typeparam name="TContext">The TContext implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <returns>The newly created DbContext instance.</returns>
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, params object[] args)
+        where TContext : DbContext
+        where TTenantInfo : class, ITenantInfo, new()
     {
-        TenantInfo = tenantInfo;
+        try
+        {
+            var mca = new StaticMultiTenantContextAccessor<TTenantInfo>(tenantInfo);
+
+            args ??= [];
+            object?[] argsList = [mca, ..args];
+            
+            var context = (TContext)Activator.CreateInstance(typeof(TContext), argsList)!;
+            return context;
+        }
+        catch (MissingMethodException e)
+        {
+            throw new ArgumentException(
+                "The provided DbContext type does not have a constructor that accepts the required parameters.", e);
+        }
+    }
+
+    /// <summary>
+    /// Creates a new instance of a DbContext that accepts an ITenantInfo instance, a service provider, and optional dependencies.
+    /// </summary>
+    /// <param name="tenantInfo">The tenant information to bind to the context.</param>
+    /// <param name="serviceProvider">The IServiceProvider used to resolve DbContext constructor dependencies.</param>
+    /// <param name="args">Additional dependencies for the DbContext constructor.</param>
+    /// <typeparam name="TContext">The TContext implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <returns>The newly created DbContext instance.</returns>
+    public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, IServiceProvider serviceProvider, params object[] args)
+        where TContext : DbContext
+        where TTenantInfo : class, ITenantInfo, new()
+    {
+        try
+        {
+            var mca = new StaticMultiTenantContextAccessor<TTenantInfo>(tenantInfo);
+
+            args ??= [];
+            object[] argsList = [mca, ..args];
+            
+            var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, argsList)!;
+            return context;
+        }
+        catch (MissingMethodException e)
+        {
+            throw new ArgumentException(
+                "The provided DbContext type does not have a constructor that accepts the required parameters.", e);
+        }
     }
 
     /// <summary>
@@ -36,17 +101,13 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
 
-    protected MultiTenantDbContext(ITenantInfo? tenantInfo, DbContextOptions options) : base(options)
-    {
-        TenantInfo = tenantInfo;
-    }
-
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
     /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
     /// <param name="options">The database options instance.</param>
-    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
+    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) :
+        base(options)
     {
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
@@ -69,6 +130,6 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
         CancellationToken cancellationToken = default(CancellationToken))
     {
         this.EnforceMultiTenant();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
     }
 }

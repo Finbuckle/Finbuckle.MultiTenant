@@ -1,11 +1,13 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using System.Text;
+using System.Text.Json;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Internal;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores;
@@ -13,10 +15,10 @@ namespace Finbuckle.MultiTenant.Test.Stores;
 public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 {
     [Fact]
-    public void ThrownOnGetAllTenantsFromStoreAsync()
+    public async Task ThrowOnGetAllTenantsFromStoreAsync()
     {
         var store = CreateTestStore();
-        Assert.Throws<NotImplementedException>(() => store.GetAllAsync().Wait());
+        await Assert.ThrowsAsync<NotImplementedException>(async () => await store.GetAllAsync());
     }
 
     [Fact]
@@ -24,11 +26,11 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var r = await store.TryRemoveAsync("lol");
+        var r = await store.RemoveAsync("lol");
         Assert.True(r);
 
-        var t1 = await store.TryGetAsync("lol-id");
-        var t2 = await store.TryGetByIdentifierAsync("lol");
+        var t1 = await store.GetAsync("lol-id");
+        var t2 = await store.GetByIdentifierAsync("lol");
 
         Assert.Null(t1);
         Assert.Null(t2);
@@ -39,18 +41,18 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var r = await store.TryRemoveAsync("DoesNotExist");
+        var r = await store.RemoveAsync("DoesNotExist");
 
         Assert.False(r);
     }
 
     [Fact]
-    public async Task AddDualEntriesOnAddOrUpdate()
+    public async Task AddDualEntriesOnAdd()
     {
         var store = CreateTestStore();
 
-        var t2 = await store.TryGetByIdentifierAsync("lol");
-        var t1 = await store.TryGetAsync("lol-id");
+        var t2 = await store.GetByIdentifierAsync("lol");
+        var t1 = await store.GetAsync("lol-id");
 
         Assert.NotNull(t1);
         Assert.NotNull(t2);
@@ -61,32 +63,69 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     }
 
     [Fact]
-    public async Task RefreshDualEntriesOnAddOrUpdate()
+    public async Task RefreshDualEntriesOnTryGet()
     {
-        var store = CreateTestStore();
-        Thread.Sleep(2000);
-        var t1 = await store.TryGetAsync("lol-id");
-        Thread.Sleep(2000);
-        var t2 = await store.TryGetByIdentifierAsync("lol");
+        var cache = new Mock<IDistributedCache>();
+        cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
+                { Id = "lol-id", Identifier = "lol" })));
+        
+        var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        Assert.NotNull(t1);
-        Assert.NotNull(t2);
-        Assert.Equal("lol-id", t1.Id);
-        Assert.Equal("lol-id", t2.Id);
-        Assert.Equal("lol", t1.Identifier);
-        Assert.Equal("lol", t2.Identifier);
+        var t1 = await store.GetAsync("lol-id");
+        cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
 
     [Fact]
-    public async Task ExpireDualEntriesAfterTimespan()
+    public async Task RefreshDualEntriesOnTryGetByIdentifier()
     {
-        var store = CreateTestStore();
-        Thread.Sleep(3100);
-        var t1 = await store.TryGetAsync("lol-id");
-        var t2 = await store.TryGetByIdentifierAsync("lol");
+        var cache = new Mock<IDistributedCache>();
+        cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
+                { Id = "lol-id", Identifier = "lol" })));
+        
+        var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        Assert.Null(t1);
-        Assert.Null(t2);
+        var t1 = await store.GetByIdentifierAsync("lol-id");
+        cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
+    }
+    
+    [Fact]
+    public async Task SetSlidingExpirationOnAdd()
+    {
+        var cache = new Mock<IDistributedCache>();
+        var options = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) };
+
+        cache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
+                It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
+            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((key, value, opts, token) =>
+            {
+                Assert.Equal(options.SlidingExpiration, opts.SlidingExpiration);
+            })
+            .Returns(Task.CompletedTask);
+
+        var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
+
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
+    }
+    
+    [Fact]
+    public async Task SetSlidingExpirationOnUpdate()
+    {
+        var cache = new Mock<IDistributedCache>();
+        var options = new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) };
+
+        cache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
+                It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
+            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((key, value, opts, token) =>
+            {
+                Assert.Equal(options.SlidingExpiration, opts.SlidingExpiration);
+            })
+            .Returns(Task.CompletedTask);
+
+        var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
+
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
@@ -97,7 +136,8 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         services.AddOptions().AddDistributedMemoryCache();
         var sp = services.BuildServiceProvider();
 
-        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(), Constants.TenantToken, TimeSpan.FromSeconds(3));
+        var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(),
+            Constants.TenantToken, TimeSpan.MaxValue);
 
         return PopulateTestStore(store);
     }

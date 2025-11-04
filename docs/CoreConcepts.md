@@ -29,7 +29,7 @@ when needed via the tenant `Id`.
 
 The `MultiTenantContext<TTenantInfo>` contains information about the current tenant.
 
-* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from depdency injection.
+* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from dependency injection.
 * Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
   determined, and from where its information was retrieved.
 * Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`

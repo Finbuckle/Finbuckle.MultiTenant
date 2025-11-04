@@ -39,10 +39,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <exception cref="MultiTenantException"></exception>
     public ConfigurationStore(IConfiguration configuration, string sectionName)
     {
-        if (configuration is null)
-        {
-            throw new ArgumentNullException(nameof(configuration));
-        }
+        ArgumentNullException.ThrowIfNull(configuration);
 
         if (string.IsNullOrEmpty(sectionName))
         {
@@ -80,49 +77,49 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
-        if (id is null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
-        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value);
+        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>());
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        if (identifier is null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    {
+        ArgumentNullException.ThrowIfNull(identifier);
 
         if (tenantMap is null)
         {
             return null;
         }
 
-        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null);
+        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryRemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string identifier)
     {
         throw new NotImplementedException();
     }
@@ -131,7 +128,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         throw new NotImplementedException();
     }

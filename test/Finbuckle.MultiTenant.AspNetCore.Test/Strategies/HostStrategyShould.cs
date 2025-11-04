@@ -1,7 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -38,7 +38,7 @@ public class HostStrategyShould
     [InlineData("example.ok.test", "*.__tenant__.?.?", "example")] // 3rd last segment
     [InlineData("w.example.ok.test", "*.?.__tenant__.?.?", "example")] // 3rd last of 4+ segments
     [InlineData("example.com", "__tenant__", "example.com")] // match entire domain (2.1)
-    public async void ReturnExpectedIdentifier(string host, string template, string? expected)
+    public async Task ReturnExpectedIdentifier(string host, string template, string? expected)
     {
         var httpContext = CreateHttpContextMock(host);
         var strategy = new HostStrategy(template);
@@ -69,11 +69,11 @@ public class HostStrategyShould
     }
 
     [Fact]
-    public async void ThrowIfContextIsNotHttpContext()
+    public async Task ReturnNullIfContextIsNotHttpContext()
     {
-        var context = new Object();
+        var context = new object();
         var strategy = new HostStrategy("__tenant__.*");
 
-        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+        Assert.Null(await strategy.GetIdentifierAsync(context));
     }
 }
