@@ -32,8 +32,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
             Identifier = "lol",
             Name = "lol"
         };
-        store.TryAddAsync(ti1).Wait();
-        store.TryAddAsync(ti2).Wait();
+        store.AddAsync(ti1).Wait();
+        store.AddAsync(ti2).Wait();
 
         return store;
     }
@@ -42,15 +42,15 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     public async Task GetTenantInfoFromStoreCaseInsensitiveByDefault()
     {
         var store = CreateTestStore();
-        Assert.Equal("initech", (await store.TryGetByIdentifierAsync("iNitEch"))?.Identifier);
+        Assert.Equal("initech", (await store.GetByIdentifierAsync("iNitEch"))?.Identifier);
     }
 
     [Fact]
     public async Task GetTenantInfoFromStoreCaseSensitive()
     {
         var store = CreateCaseSensitiveTestStore();
-        Assert.Equal("initech", (await store.TryGetByIdentifierAsync("initech"))?.Identifier);
-        Assert.Null(await store.TryGetByIdentifierAsync("iNitEch"));
+        Assert.Equal("initech", (await store.GetByIdentifierAsync("initech"))?.Identifier);
+        Assert.Null(await store.GetByIdentifierAsync("iNitEch"));
     }
 
     [Fact]
@@ -69,8 +69,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
             Identifier = "iNiTEch",
             Name = "Initech"
         };
-        Assert.False(await store.TryAddAsync(ti1));
-        Assert.True(await store.TryAddAsync(ti2));
+        Assert.False(await store.AddAsync(ti1));
+        Assert.True(await store.AddAsync(ti2));
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
             Name = "NullTenant"
         };
 
-        Assert.False(await store.TryAddAsync(ti));
+        Assert.False(await store.AddAsync(ti));
     }
 
     [Fact]

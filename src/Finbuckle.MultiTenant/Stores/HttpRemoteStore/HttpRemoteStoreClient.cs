@@ -35,7 +35,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
     /// <param name="endpointTemplate">The endpoint template containing the identifier token.</param>
     /// <param name="identifier">The tenant identifier.</param>
     /// <returns>The tenant information if found, otherwise null.</returns>
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string endpointTemplate, string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string endpointTemplate, string identifier)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken, identifier);
@@ -54,7 +54,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITena
     /// Retrieves all tenants from the remote endpoint.
     /// </summary>
     /// <param name="endpointTemplate">The endpoint template.</param>
-    /// <returns>An enumerable of all tenant information.</returns>
+    /// <returns>An IEnumerable of all tenant information.</returns>
     /// <exception cref="NotImplementedException">Thrown when the remote endpoint returns a 404 status code.</exception>
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate)
     {

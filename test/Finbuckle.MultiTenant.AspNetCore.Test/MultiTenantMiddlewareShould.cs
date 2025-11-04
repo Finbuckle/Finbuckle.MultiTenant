@@ -26,7 +26,7 @@ public class MultiTenantMiddlewareShould
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-            await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+            await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -54,7 +54,7 @@ public class MultiTenantMiddlewareShould
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-            await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+            await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -96,7 +96,7 @@ public class MultiTenantMiddlewareShould
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-            await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+            await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -132,7 +132,7 @@ public class MultiTenantMiddlewareShould
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-            await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+            await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -168,7 +168,7 @@ public class MultiTenantMiddlewareShould
                 WithInMemoryStore();
             var sp = services.BuildServiceProvider();
             var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-            await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+            await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
             var context = new Mock<HttpContext>();
             context.Setup(c => c.RequestServices).Returns(sp);
@@ -211,7 +211,7 @@ public class MultiTenantMiddlewareShould
             WithInMemoryStore();
         var sp = services.BuildServiceProvider();
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        await store.TryAddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+        await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
         context.Setup(c => c.RequestServices).Returns(sp);

@@ -46,14 +46,14 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
         var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
         return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
         _tenantMap.TryGetValue(identifier, out var result);
 
@@ -76,7 +76,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         var result = tenantInfo.Identifier != null && _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
@@ -84,7 +84,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryRemoveAsync(string identifier)
+    public async Task<bool> RemoveAsync(string identifier)
     {
         var result = _tenantMap.TryRemove(identifier, out var _);
 
@@ -92,9 +92,9 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
-        var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id).ConfigureAwait(false) : null;
+        var existingTenantInfo = tenantInfo.Id != null ? await GetAsync(tenantInfo.Id).ConfigureAwait(false) : null;
 
         if (existingTenantInfo?.Identifier != null)
         {
