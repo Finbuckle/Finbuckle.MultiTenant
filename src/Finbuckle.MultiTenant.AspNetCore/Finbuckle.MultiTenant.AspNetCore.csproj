@@ -3,7 +3,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <Title>Finbuckle.MultiTenant.AspNetCore</Title>
         <Description>ASP.NET Core support for Finbuckle.MultiTenant.</Description>
-    </PropertyGroup>=
+    </PropertyGroup>
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
