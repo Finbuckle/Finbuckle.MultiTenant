@@ -46,7 +46,7 @@ public class SessionStrategyShould
                 });
 
                 var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-                store.TryAddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
+                store.AddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
             });
     }
 

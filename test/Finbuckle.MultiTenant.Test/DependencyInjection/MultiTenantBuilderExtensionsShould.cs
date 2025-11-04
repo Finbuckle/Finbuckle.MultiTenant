@@ -84,12 +84,12 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("initech");
+        var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
 
-        tc = await store.TryGetByIdentifierAsync("lol");
+        tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -113,12 +113,12 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<ConfigurationStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("initech");
+        var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
         Assert.Equal("Initech", tc.Name);
 
-        tc = await store.TryGetByIdentifierAsync("lol");
+        tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
@@ -148,13 +148,13 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<InMemoryStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("lol");
+        var tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
         Assert.Equal("LOL", tc.Name);
 
         // Case sensitive test.
-        tc = await store.TryGetByIdentifierAsync("LOL");
+        tc = await store.GetByIdentifierAsync("LOL");
         Assert.Null(tc);
     }
 
@@ -169,11 +169,11 @@ public class MultiTenantBuilderExtensionsShould
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<EchoStore<TenantInfo>>(store);
 
-        var tc = await store.TryGetByIdentifierAsync("initech");
+        var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
 
-        tc = await store.TryGetByIdentifierAsync("lol");
+        tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
     }

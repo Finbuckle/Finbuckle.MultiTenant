@@ -26,11 +26,11 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var r = await store.TryRemoveAsync("lol");
+        var r = await store.RemoveAsync("lol");
         Assert.True(r);
 
-        var t1 = await store.TryGetAsync("lol-id");
-        var t2 = await store.TryGetByIdentifierAsync("lol");
+        var t1 = await store.GetAsync("lol-id");
+        var t2 = await store.GetByIdentifierAsync("lol");
 
         Assert.Null(t1);
         Assert.Null(t2);
@@ -41,7 +41,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var r = await store.TryRemoveAsync("DoesNotExist");
+        var r = await store.RemoveAsync("DoesNotExist");
 
         Assert.False(r);
     }
@@ -51,8 +51,8 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var t2 = await store.TryGetByIdentifierAsync("lol");
-        var t1 = await store.TryGetAsync("lol-id");
+        var t2 = await store.GetByIdentifierAsync("lol");
+        var t1 = await store.GetAsync("lol-id");
 
         Assert.NotNull(t1);
         Assert.NotNull(t2);
@@ -72,7 +72,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        var t1 = await store.TryGetAsync("lol-id");
+        var t1 = await store.GetAsync("lol-id");
         cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
 
@@ -86,7 +86,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        var t1 = await store.TryGetByIdentifierAsync("lol-id");
+        var t1 = await store.GetByIdentifierAsync("lol-id");
         cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
     
@@ -106,7 +106,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.TryAddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
     }
     
     [Fact]
@@ -125,7 +125,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.TryAddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs

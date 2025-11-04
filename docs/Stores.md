@@ -19,18 +19,18 @@ The examples in this documentation use the `TenantInfo` basic implementation.
 
 If the provided MultiTenant stores are not suitable then a custom store can be created by
 implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type
-parameter passed to `AddMultiTenant<TTenantInfo>` at compile time. The implementation must
-define `TryAddAsync`, `TryUpdateAsync`
-, `TryRemoveAsync`, `TryGetByIdentifierAsync`, `TryGetAsync`, and `GetAllAsync` methods. `TryGetByIdentifierAsync`
-and `TryGetAsync` should return null if there is no suitable tenant match.
+parameter passed to `AddMultiTenant<TTenantInfo>` at compile time. The interface defines `AddAsync`, `UpdateAsync`,
+`RemoveAsync`, `GetByIdentifierAsync`, `GetAsync`, and `GetAllAsync` methods. `GetByIdentifierAsync`
+and `GetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>`
 after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
-dependency
-injection along with any passed parameters to construct the implementation instance. An alternative overload accepts
-a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service
-lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a
-wrapper providing basic logging and exception handling.
+dependency injection along with any passed parameters to construct the implementation instance. Alternative overload 
+accept a service lifetime, a factory method, and/or other parameters for more customization. The library internally
+decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a wrapper providing basic logging and exception handling.
+
+> Custom store implementations should contains minimal logging or validation logic. These are handled via the 
+> wrapper store used during runtime for consistency.
 
 ```csharp
 // register a custom store with the templated method
@@ -99,7 +99,7 @@ app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/
 the underlying store. Most of the sample projects use this store for simplicity. This store is case-insensitive when
 retrieving tenant information by tenant identifier.
 
-This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw
+This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
 a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes,
 e.g. `appsettings.json` is updated, then the MultiTenant store will reflect the change.
 
@@ -208,7 +208,7 @@ passed to `AddMultiTenant<TTenantInfo>`.
 
 Any non-200 response code results in a null `TenantInfo`.
 
-This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw
+This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
 a `NotImplementedException`.
 
 Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo>` uri template string must be passed to the
@@ -250,15 +250,14 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant
 
-Uses the ASP.NET
-Core [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed)
+Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed)
 mechanism. The distributed cache can use Redis, SQl Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported. The store does not interact with any other stores by default.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 Each tenant info instance is actually stored twice in the cache, once using the Tenant ID as the key and another using
-the Tenant Identifier as the key. Calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will keep these dual
+the Tenant Identifier as the key. Calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will keep these dual
 cache entries synced.
 
 This store does not implement `GetAllAsync`.
@@ -285,7 +284,7 @@ The Echo Store serves as a simple, read-only store that directly returns a new t
 without any additional settings. It's particularly suited for applications that require a simple, immediate method for tenant identification without the need for persistence, such as during testing phases or in environments where tenant information is static and predefined elsewhere.
 
 
-This store is read-only and calls to `TryAddAsync`, `TryUpdateAsync`, and `TryRemoveAsync` will throw
+This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
 a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync` will also throw an Exception.
 
 Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.

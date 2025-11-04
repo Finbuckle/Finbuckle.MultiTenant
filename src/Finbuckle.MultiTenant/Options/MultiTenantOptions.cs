@@ -15,7 +15,7 @@ public class MultiTenantOptions<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <summary>
     /// Gets or sets the type of ITenantInfo implementation.
     /// </summary>
-    public Type? TenantInfoType { get; internal set; }
+    public required Type TenantInfoType { get; set; }
     
     /// <summary>
     /// Gets or sets the list of identifiers that should be ignored during tenant resolution.
