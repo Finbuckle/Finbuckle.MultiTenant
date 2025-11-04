@@ -33,7 +33,7 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         var options = new DistributedCacheEntryOptions { SlidingExpiration = slidingExpiration };
         var bytes = JsonSerializer.Serialize(tenantInfo);
@@ -46,7 +46,7 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
         var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}").ConfigureAwait(false);
         if (bytes == null)
@@ -79,7 +79,7 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
         var bytes = await cache.GetStringAsync($"{keyPrefix}identifier__{identifier}").ConfigureAwait(false);
         if (bytes == null)
@@ -94,9 +94,9 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryRemoveAsync(string identifier)
+    public async Task<bool> RemoveAsync(string identifier)
     {
-        var result = await TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
+        var result = await GetByIdentifierAsync(identifier).ConfigureAwait(false);
         if (result == null)
             return false;
 
@@ -107,17 +107,17 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
         if (tenantInfo.Id is null)
             return false;
         
-        var current = await TryGetAsync(tenantInfo.Id).ConfigureAwait(false);
+        var current = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
 
         if (current is null)
             return false;
 
-        return await TryRemoveAsync(current.Identifier!).ConfigureAwait(false) &&
-               await TryAddAsync(tenantInfo).ConfigureAwait(false);
+        return await RemoveAsync(current.Identifier!).ConfigureAwait(false) &&
+               await AddAsync(tenantInfo).ConfigureAwait(false);
     }
 }

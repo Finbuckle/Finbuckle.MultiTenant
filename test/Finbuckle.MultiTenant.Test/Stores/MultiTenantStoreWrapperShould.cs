@@ -47,7 +47,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var e = Assert.Throws<AggregateException>(() => store.TryGetAsync(null!).Result);
+        var e = Assert.Throws<AggregateException>(() => store.GetAsync(null!).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -68,7 +68,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var e = Assert.Throws<AggregateException>(() => store.TryGetByIdentifierAsync(null!).Result);
+        var e = Assert.Throws<AggregateException>(() => store.GetByIdentifierAsync(null!).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -82,7 +82,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     public void ThrowWhenAddingIfTenantInfoIsNull()
     {
         var store = CreateTestStore();
-        var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(null!).Result);
+        var e = Assert.Throws<AggregateException>(() => store.AddAsync(null!).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -90,7 +90,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     public void ThrowWhenAddingIfTenantInfoIdIsNull()
     {
         var store = CreateTestStore();
-        var e = Assert.Throws<AggregateException>(() => store.TryAddAsync(new TenantInfo()).Result);
+        var e = Assert.Throws<AggregateException>(() => store.AddAsync(new TenantInfo()).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -99,7 +99,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
         var e = Assert.Throws<AggregateException>(() =>
-            store.TryAddAsync(new TenantInfo() { Id = "initech-id" }).Result);
+            store.AddAsync(new TenantInfo() { Id = "initech-id" }).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -108,7 +108,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
         // Try to add with duplicate identifier.
-        Assert.False(await store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" }));
+        Assert.False(await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" }));
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
         // Try to add with duplicate identifier.
-        Assert.False(await store.TryAddAsync(new TenantInfo { Id = "initech-id2", Identifier = "initech" }));
+        Assert.False(await store.AddAsync(new TenantInfo { Id = "initech-id2", Identifier = "initech" }));
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var e = await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryUpdateAsync(null!));
+        var e = await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.UpdateAsync(null!));
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var e = await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryUpdateAsync(new TenantInfo()));
+        var e = await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.UpdateAsync(new TenantInfo()));
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     {
         var store = CreateTestStore();
 
-        var result = await store.TryUpdateAsync(new TenantInfo { Id = "not-found" });
+        var result = await store.UpdateAsync(new TenantInfo { Id = "not-found" });
         Assert.False(result);
     }
 
@@ -154,7 +154,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     public void ThrowWhenRemovingIfTenantIdentifierIsNull()
     {
         var store = CreateTestStore();
-        var e = Assert.Throws<AggregateException>(() => store.TryRemoveAsync(null!).Result);
+        var e = Assert.Throws<AggregateException>(() => store.RemoveAsync(null!).Result);
         Assert.IsType<ArgumentNullException>(e.InnerException);
     }
 
@@ -162,7 +162,7 @@ public class MultiTenantStoreWrapperShould : MultiTenantStoreTestBase
     public async Task ReturnFalseWhenRemovingIfTenantInfoNotFound()
     {
         var store = CreateTestStore();
-        Assert.False(await store.TryRemoveAsync("not-there-identifier"));
+        Assert.False(await store.RemoveAsync("not-there-identifier"));
     }
 
     [Fact]

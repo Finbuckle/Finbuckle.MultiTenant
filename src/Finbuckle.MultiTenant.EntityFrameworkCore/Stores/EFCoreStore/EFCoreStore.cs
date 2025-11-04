@@ -28,7 +28,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         }
 
     /// <inheritdoc />
-    public virtual async Task<TTenantInfo?> TryGetAsync(string id)
+    public virtual async Task<TTenantInfo?> GetAsync(string id)
     {
             return await dbContext.TenantInfo.AsNoTracking()
                 .Where(ti => ti.Id == id)
@@ -48,7 +48,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         }
 
     /// <inheritdoc />
-    public virtual async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public virtual async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
             return await dbContext.TenantInfo.AsNoTracking()
                 .Where(ti => ti.Identifier == identifier)
@@ -56,7 +56,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         }
 
     /// <inheritdoc />
-    public virtual async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public virtual async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
             await dbContext.TenantInfo.AddAsync(tenantInfo).ConfigureAwait(false);
             var result = await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;
@@ -66,7 +66,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         }
 
     /// <inheritdoc />
-    public virtual async Task<bool> TryRemoveAsync(string identifier)
+    public virtual async Task<bool> RemoveAsync(string identifier)
     {
             var existing = await dbContext.TenantInfo
                 .Where(ti => ti.Identifier == identifier)
@@ -82,7 +82,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
         }
 
     /// <inheritdoc />
-    public virtual async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public virtual async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
             dbContext.TenantInfo.Update(tenantInfo);
             var result = await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0;

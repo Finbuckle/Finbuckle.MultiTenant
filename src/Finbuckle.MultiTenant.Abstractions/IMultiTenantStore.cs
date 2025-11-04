@@ -14,37 +14,35 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// </summary>
     /// <param name="tenantInfo">New TTenantInfo instance to add.</param>
     /// <returns>True if successfully added</returns>
-    Task<bool> TryAddAsync(TTenantInfo tenantInfo);
+    Task<bool> AddAsync(TTenantInfo tenantInfo);
 
     /// <summary>
     /// Try to update the TTenantInfo in the store.
     /// </summary>
     /// <param name="tenantInfo">Existing TTenantInfo instance to update.</param>
     /// <returns>True if successfully updated.</returns>
-    Task<bool> TryUpdateAsync(TTenantInfo tenantInfo);
+    Task<bool> UpdateAsync(TTenantInfo tenantInfo);
 
     /// <summary>
     /// Try to remove the TTenantInfo from the store.
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to remove.</param>
     /// <returns>True if successfully removed.</returns>
-    Task<bool> TryRemoveAsync(string identifier);
+    Task<bool> RemoveAsync(string identifier);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given identifier.
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to retrieve.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    ///  TODO make obsolete
-    Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier);
+    Task<TTenantInfo?> GetByIdentifierAsync(string identifier);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given tenant Id.
     /// </summary>
     /// <param name="id">TenantId for the tenant to retrieve.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    ///  TODO make obsolete
-    Task<TTenantInfo?> TryGetAsync(string id);
+    Task<TTenantInfo?> GetAsync(string id);
 
 
     /// <summary>
@@ -54,10 +52,10 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     Task<IEnumerable<TTenantInfo>> GetAllAsync();
 
     /// <summary>
-    /// Retrieve all the TTenantInfo's from the store.
+    /// Retrieve a subset of the TTenantInfo's from the store.
     /// </summary>
     /// <param name="take">Number of elements to take from the list.</param>
     /// <param name="skip">Number of elements to skip from the list.</param>
-    /// <returns></returns>
+    /// <returns>An IEnumerable of applicable tenants in the store.</returns>
     Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip);
 }

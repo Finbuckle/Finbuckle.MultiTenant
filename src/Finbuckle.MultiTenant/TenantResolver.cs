@@ -91,7 +91,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 var storeLogger = loggerFactory?.CreateLogger(store.GetType()) ?? NullLogger.Instance;
 
                 var wrappedStore = new MultiTenantStoreWrapper<TTenantInfo>(store, storeLogger);
-                var tenantInfo = await wrappedStore.TryGetByIdentifierAsync(identifier).ConfigureAwait(false);
+                var tenantInfo = await wrappedStore.GetByIdentifierAsync(identifier).ConfigureAwait(false);
 
                 var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
                     { Context = context, Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
