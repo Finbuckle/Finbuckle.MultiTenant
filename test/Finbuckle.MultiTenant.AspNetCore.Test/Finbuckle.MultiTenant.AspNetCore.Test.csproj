@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0-*"/>
         
         <ProjectReference Include="../../src/Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj"/>
     </ItemGroup>

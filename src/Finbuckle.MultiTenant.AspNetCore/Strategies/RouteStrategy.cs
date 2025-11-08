@@ -20,25 +20,25 @@ public class RouteStrategy : IMultiTenantStrategy
     /// <exception cref="ArgumentException">Thrown when tenantParam is null or whitespace.</exception>
     public RouteStrategy(string tenantParam)
     {
-            if (string.IsNullOrWhiteSpace(tenantParam))
-            {
-                throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace", nameof(tenantParam));
-            }
-
-            this.TenantParam = tenantParam;
+        if (string.IsNullOrWhiteSpace(tenantParam))
+        {
+            throw new ArgumentException($"\"{nameof(tenantParam)}\" must not be null or whitespace",
+                nameof(tenantParam));
         }
+
+        this.TenantParam = tenantParam;
+    }
 
     /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
+        if (context is not HttpContext httpContext)
+            return Task.FromResult<string?>(null);
 
-            if (context is not HttpContext httpContext)
-                return Task.FromResult<string?>(null);
+        httpContext.Request.RouteValues.TryGetValue(TenantParam, out var identifier);
 
-            httpContext.Request.RouteValues.TryGetValue(TenantParam, out var identifier);
-
-            return Task.FromResult(identifier as string);
-        }
+        return Task.FromResult(identifier as string);
+    }
 }
 
 // #endif
