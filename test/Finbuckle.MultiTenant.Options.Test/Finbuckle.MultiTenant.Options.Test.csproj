@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.Options\Finbuckle.MultiTenant.Options.csproj" />
+      <ProjectReference Include="..\..\src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,12 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.Options;
+namespace Finbuckle.MultiTenant.Options.Test;
 
 public class MultiTenantOptionsManagerShould
 {
