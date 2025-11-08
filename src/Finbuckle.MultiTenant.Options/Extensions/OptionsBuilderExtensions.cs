@@ -8,7 +8,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Options.Extensions;
 
 /// <summary>
 /// Extension methods for configuring options on a per-tenant basis.
