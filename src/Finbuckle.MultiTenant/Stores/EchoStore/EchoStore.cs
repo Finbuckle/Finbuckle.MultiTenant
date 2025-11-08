@@ -1,8 +1,6 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-// ReSharper disable once CheckNamespace
-
 using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant.Stores.EchoStore;
