@@ -5,8 +5,8 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Direct",
         "requested": "[10.0.0-*, )",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "B6r+qBY7Ey0zHRTktnPEIuvwlytXNSajqevIO1e04bTbiyK/itwDKln1Z5AnwULh81e2u7cmxQTHnpBvRlIOxw==",
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "qv9OuLIPB4/A9muyneWmSN/7WmX5drxbVEb21NfvOEr/IqO0WjGgrLiSjXPF13IVhkdatFoi4SVEKOqv0An5LA==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         }
@@ -69,7 +69,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[9.3.1, )"
+          "Finbuckle.MultiTenant.Abstractions": "[9.4.2, )"
         }
       },
       "finbuckle.multitenant.abstractions": {
