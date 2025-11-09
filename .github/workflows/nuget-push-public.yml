@@ -5,6 +5,8 @@ on: [workflow_dispatch]
 jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
@@ -12,7 +14,12 @@ jobs:
           dotnet-version: 10
       - name: Create the package
         run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: Publish the package to NuGet.org
         env:
-          NUGET_KEY: ${{secrets.NUGET_KEY}}
+          NUGET_KEY: ${{steps.nuget-login.outputs.NUGET_API_KEY}}
         run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
