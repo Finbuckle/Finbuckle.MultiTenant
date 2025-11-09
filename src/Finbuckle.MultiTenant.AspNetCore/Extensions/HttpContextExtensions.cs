@@ -5,8 +5,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 
 /// <summary>
 /// Finbuckle.MultiTenant.AspNetCore extensions to HttpContext.

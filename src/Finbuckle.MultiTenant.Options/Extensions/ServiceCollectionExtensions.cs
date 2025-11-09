@@ -3,7 +3,6 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options.Extensions;

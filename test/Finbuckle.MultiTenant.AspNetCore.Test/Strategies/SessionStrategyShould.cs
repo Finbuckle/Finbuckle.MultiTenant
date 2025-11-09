@@ -1,55 +1,30 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using System.Runtime.InteropServices;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
+using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Test.Strategies;
 
 public class SessionStrategyShould
 {
-    private static IWebHostBuilder GetTestHostBuilder(string identifier, string sessionKey)
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void ThrowIfInvalidSessionKey(string? key)
     {
-        return new WebHostBuilder()
-            .ConfigureServices(services =>
-            {
-                services.AddDistributedMemoryCache();
-                services.AddSession(options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromSeconds(10);
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                });
-
-                services.AddMultiTenant<TenantInfo>()
-                    .WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, sessionKey)
-                    .WithInMemoryStore();
-                services.AddMvc();
-            })
-            .Configure(app =>
-            {
-                app.UseSession();
-                app.UseMultiTenant();
-                app.Run(async context =>
-                {
-                    context.Session.SetString(sessionKey, identifier);
-                    if (context.GetMultiTenantContext<TenantInfo>()?.TenantInfo != null)
-                    {
-                        await context.Response.WriteAsync(context.GetMultiTenantContext<TenantInfo>()!.TenantInfo!.Id!);
-                    }
-                });
-
-                var store = app.ApplicationServices.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-                store.AddAsync(new TenantInfo { Id = identifier, Identifier = identifier }).Wait();
-            });
+        Assert.Throws<ArgumentException>(() => new SessionStrategy(key!));
     }
-
+    
     [Fact]
     public async Task ReturnNullIfContextIsNotHttpContext()
     {
@@ -62,16 +37,58 @@ public class SessionStrategyShould
     [Fact]
     public async Task ReturnNullIfNoSessionValue()
     {
-        var hostBuilder = GetTestHostBuilder("test_tenant", "__tenant__");
+        var sessionData = new Dictionary<string, string>();
+        var mockSession = new Mock<ISession>();
+        mockSession
+            .Setup(s => s.TryGetValue(It.IsAny<string>(), out It.Ref<byte[]>.IsAny!))
+            .Returns((string key, out byte[] value) =>
+            {
+                if (sessionData.TryGetValue(key, out var str))
+                {
+                    value = System.Text.Encoding.UTF8.GetBytes(str);
+                    return true;
+                }
 
-        using var server = new TestServer(hostBuilder);
-        var client = server.CreateClient();
-        var response = await client.GetStringAsync("/test_tenant");
-        Assert.Equal("", response);
+                value = null;
+                return false;
+            });
+        
+        var mockContext = new Mock<HttpContext>();
+        mockContext.Setup(c => c.Session).Returns(mockSession.Object);
+        
+        var strategy = new SessionStrategy("__tenant__");
+        
+        Assert.Null(await strategy.GetIdentifierAsync(mockContext.Object));
     }
 
-    // TODO: Figure out how to test this
-    // public async Task ReturnIdentifierIfSessionValue()
-    // {
-    // }
+    [Theory]
+    [InlineData("__tenant__", "tenant", null)]
+    [InlineData("__tenant__", "__tenant__", "initech")]
+    public async Task ReturnIdentifierIfSessionValue(string tenantSessionKey, string sessionKey, string expected)
+    {
+        var sessionData = new Dictionary<string, string>();
+        sessionData[sessionKey] = expected;
+        
+        var mockSession = new Mock<ISession>();
+        mockSession
+            .Setup(s => s.TryGetValue(It.IsAny<string>(), out It.Ref<byte[]>.IsAny!))
+            .Returns((string key, out byte[] value) =>
+            {
+                if (sessionData.TryGetValue(key, out var str))
+                {
+                    value = System.Text.Encoding.UTF8.GetBytes(str);
+                    return true;
+                }
+
+                value = null;
+                return false;
+            });
+        
+        var mockContext = new Mock<HttpContext>();
+        mockContext.Setup(c => c.Session).Returns(mockSession.Object);
+        
+        var strategy = new SessionStrategy(tenantSessionKey);
+        
+        Assert.Equal(expected, await strategy.GetIdentifierAsync(mockContext.Object));
+    }
 }

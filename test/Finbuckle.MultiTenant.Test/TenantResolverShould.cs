@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Events;
+using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Finbuckle.MultiTenant.Stores.InMemoryStore;
 using Finbuckle.MultiTenant.Strategies;
