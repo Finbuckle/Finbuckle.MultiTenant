@@ -52,12 +52,12 @@ public static class MultiTenantEntityTypeBuilderExtensions
     }
 
     // TODO why was this internal?
-    /// <summary>
-    /// Adds TenantId to the primary and alternate keys and adds the TenantId property to any dependent types' foreign keys.
-    /// </summary>
-    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
-    /// <param name="modelBuilder">The modelBuilder for the database context.</param>
-    /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
+    // <summary>
+    // Adds TenantId to the primary and alternate keys and adds the TenantId property to any dependent types' foreign keys.
+    // </summary>
+    // <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
+    // <param name="modelBuilder">The modelBuilder for the database context.</param>
+    // <returns>The MultiTenantEntityTypeBuilder instance.</returns>
     // internal static MultiTenantEntityTypeBuilder AdjustKeys(this MultiTenantEntityTypeBuilder builder, ModelBuilder modelBuilder)
     // {
     //     var keys = builder.Builder.Metadata.GetKeys();
