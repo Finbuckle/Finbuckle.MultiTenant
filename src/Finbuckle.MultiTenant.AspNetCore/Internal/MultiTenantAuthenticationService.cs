@@ -18,7 +18,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Internal;
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     private readonly IAuthenticationService _inner;
     private readonly IOptionsMonitor<MultiTenantAuthenticationOptions> _multiTenantAuthenticationOptions;

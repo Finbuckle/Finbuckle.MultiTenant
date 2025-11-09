@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
@@ -29,12 +30,7 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
@@ -50,12 +46,7 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserToken<string>))]
     public void AdjustUniqueIndexes(Type entityType)
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         foreach (var index in c.Model.FindEntityType(entityType)!.GetIndexes().Where(i => i.IsUnique))
@@ -75,12 +66,7 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserToken<string>), true)]
     public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType, bool isMultiTenant)
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
@@ -96,12 +82,7 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserToken<string>), true)]
     public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType, bool isMultiTenant)
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContextTUser, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
@@ -117,12 +98,7 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserToken<string>), true)]
     public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType, bool isMultiTenant)
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c =
             MultiTenantDbContext.Create<TestIdentityDbContextTUserTRole, TenantInfo>(tenant1);
 
@@ -139,12 +115,7 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserToken<string>), false)]
     public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType, bool isMultiTenant)
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContextAll, TenantInfo>(tenant1);
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
@@ -153,12 +124,7 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void CreateMultiTenantIdentityDbContext()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);

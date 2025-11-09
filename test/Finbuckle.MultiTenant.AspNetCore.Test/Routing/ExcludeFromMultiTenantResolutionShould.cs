@@ -1,14 +1,4 @@
-﻿using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.AspNetCore.Strategies;
-using Finbuckle.MultiTenant.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Xunit;
-
-namespace Finbuckle.MultiTenant.AspNetCore.Test.Routing;
+﻿namespace Finbuckle.MultiTenant.AspNetCore.Test.Routing;
 
 public class ExcludeFromMultiTenantResolutionShould
 {

@@ -1,15 +1,9 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Runtime.InteropServices;
-using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using System.Text;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
-using Finbuckle.MultiTenant.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
@@ -24,13 +18,13 @@ public class SessionStrategyShould
     {
         Assert.Throws<ArgumentException>(() => new SessionStrategy(key!));
     }
-    
+
     [Fact]
     public async Task ReturnNullIfContextIsNotHttpContext()
     {
         var context = new object();
         var strategy = new SessionStrategy("__tenant__");
-        
+
         Assert.Null(await strategy.GetIdentifierAsync(context));
     }
 
@@ -45,19 +39,19 @@ public class SessionStrategyShould
             {
                 if (sessionData.TryGetValue(key, out var str))
                 {
-                    value = System.Text.Encoding.UTF8.GetBytes(str);
+                    value = Encoding.UTF8.GetBytes(str);
                     return true;
                 }
 
                 value = null;
                 return false;
             });
-        
+
         var mockContext = new Mock<HttpContext>();
         mockContext.Setup(c => c.Session).Returns(mockSession.Object);
-        
+
         var strategy = new SessionStrategy("__tenant__");
-        
+
         Assert.Null(await strategy.GetIdentifierAsync(mockContext.Object));
     }
 
@@ -68,7 +62,7 @@ public class SessionStrategyShould
     {
         var sessionData = new Dictionary<string, string>();
         sessionData[sessionKey] = expected;
-        
+
         var mockSession = new Mock<ISession>();
         mockSession
             .Setup(s => s.TryGetValue(It.IsAny<string>(), out It.Ref<byte[]>.IsAny!))
@@ -76,19 +70,19 @@ public class SessionStrategyShould
             {
                 if (sessionData.TryGetValue(key, out var str))
                 {
-                    value = System.Text.Encoding.UTF8.GetBytes(str);
+                    value = Encoding.UTF8.GetBytes(str);
                     return true;
                 }
 
                 value = null;
                 return false;
             });
-        
+
         var mockContext = new Mock<HttpContext>();
         mockContext.Setup(c => c.Session).Returns(mockSession.Object);
-        
+
         var strategy = new SessionStrategy(tenantSessionKey);
-        
+
         Assert.Equal(expected, await strategy.GetIdentifierAsync(mockContext.Object));
     }
 }

@@ -25,7 +25,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -55,7 +55,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.ConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -72,7 +72,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.ConfigurePerTenant(null, configureOptions);
     }
@@ -90,7 +90,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -120,7 +120,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.PostConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -137,7 +137,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.PostConfigurePerTenant(null, configureOptions);
     }

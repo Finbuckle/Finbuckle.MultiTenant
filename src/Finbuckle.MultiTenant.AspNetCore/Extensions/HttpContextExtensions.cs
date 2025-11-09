@@ -18,7 +18,7 @@ public static class FinbuckleHttpContextExtensions
     /// <param name="httpContext">The HttpContext instance.</param>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
             if (httpContext.Items.TryGetValue(typeof(IMultiTenantContext), out var mtc) && mtc is not null)
                 return (IMultiTenantContext<TTenantInfo>)mtc;
@@ -35,7 +35,7 @@ public static class FinbuckleHttpContextExtensions
     /// <param name="httpContext">The HttpContext instance.</param>
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     public static TTenantInfo? GetTenantInfo<TTenantInfo>(this HttpContext httpContext)
-        where TTenantInfo : class, ITenantInfo, new() =>
+        where TTenantInfo : TenantInfo =>
         httpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo;
 
         
@@ -50,7 +50,7 @@ public static class FinbuckleHttpContextExtensions
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     public static void SetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo,
         bool resetServiceProviderScope)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
             if (resetServiceProviderScope)
                 httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;

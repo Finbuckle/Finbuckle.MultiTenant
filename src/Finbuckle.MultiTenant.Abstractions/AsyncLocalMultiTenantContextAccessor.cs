@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
     IMultiTenantContextAccessor<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     private static readonly AsyncLocal<IMultiTenantContext<TTenantInfo>> AsyncLocalContext = new();
 

@@ -16,7 +16,7 @@ namespace Finbuckle.MultiTenant;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     private readonly IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options;
     private readonly ILoggerFactory? loggerFactory;
@@ -102,8 +102,8 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
 
                 if (tenantInfo != null)
                 {
-                    var storeInfo = new StoreInfo<TTenantInfo> { Store = store, StoreType = store.GetType() };
-                    var strategyInfo = new StrategyInfo { Strategy = strategy, StrategyType = strategy.GetType() };
+                    var storeInfo = new StoreInfo<TTenantInfo> { Store = store };
+                    var strategyInfo = new StrategyInfo { Strategy = strategy };
                     mtc = new MultiTenantContext<TTenantInfo>(tenantInfo, strategyInfo, storeInfo);
                 }
 

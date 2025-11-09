@@ -2,6 +2,8 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -13,7 +15,7 @@ namespace Finbuckle.MultiTenant.Stores.ConfigurationStore;
 /// implemented. If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
     private readonly IConfigurationSection section;
@@ -60,14 +62,16 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     {
         var newMap = new ConcurrentDictionary<string, TTenantInfo>(StringComparer.OrdinalIgnoreCase);
         var tenants = section.GetSection("Tenants").GetChildren();
-
+        var defaults = section.GetSection("Defaults");
+        
         foreach(var tenantSection in tenants)
         {
-            var newTenant = section.GetSection("Defaults").Get<TTenantInfo>(options => options.BindNonPublicProperties = true) ?? new TTenantInfo();
+            var newTenant = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
+                
+            defaults.Bind(newTenant, options => options.BindNonPublicProperties = true);
             tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-
-            // Throws an ArgumentNullException if the identifier is null.
-            newMap.TryAdd(newTenant.Identifier!, newTenant);
+            
+            newMap.TryAdd(newTenant.Identifier, newTenant);
         }
 
         tenantMap = newMap;

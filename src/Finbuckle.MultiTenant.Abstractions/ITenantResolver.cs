@@ -26,7 +26,7 @@ public interface ITenantResolver
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public interface ITenantResolver<TTenantInfo> : ITenantResolver
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Performs tenant resolution within the given context.

@@ -87,12 +87,10 @@ public class MultiTenantBuilderExtensionsShould
         var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
 
         tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
     }
 
     [Fact]
@@ -116,12 +114,10 @@ public class MultiTenantBuilderExtensionsShould
         var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
         Assert.Equal("initech", tc.Identifier);
-        Assert.Equal("Initech", tc.Name);
 
         tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol-id", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
     }
 
     [Fact]
@@ -141,7 +137,7 @@ public class MultiTenantBuilderExtensionsShould
         builder.WithInMemoryStore(options =>
         {
             options.IsCaseSensitive = true;
-            options.Tenants.Add(new TenantInfo{ Id = "lol", Identifier = "lol", Name = "LOL"});
+            options.Tenants.Add(new TenantInfo(Id: "lol", Identifier: "lol"));
         });
         var sp = services.BuildServiceProvider();
 
@@ -151,7 +147,6 @@ public class MultiTenantBuilderExtensionsShould
         var tc = await store.GetByIdentifierAsync("lol");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
-        Assert.Equal("LOL", tc.Name);
 
         // Case sensitive test.
         tc = await store.GetByIdentifierAsync("LOL");
@@ -207,7 +202,7 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult("Shouldn't ever get here")!);
+        builder.WithDelegateStrategy<int, TenantInfo>(_ => Task.FromResult("Shouldn't ever get here")!);
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
