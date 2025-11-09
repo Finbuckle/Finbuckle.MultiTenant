@@ -6,7 +6,7 @@ using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.DependencyInjection;
+namespace Finbuckle.MultiTenant.Test.Extensions;
 
 public class MultiTenantBuilderShould
 {

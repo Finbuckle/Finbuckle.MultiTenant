@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Contains constant values for Finbuckle.MultiTenant.
 /// </summary>
-internal static class Constants
+public static class Constants
 {
     /// <summary>
     /// The token placeholder for tenant in templates.

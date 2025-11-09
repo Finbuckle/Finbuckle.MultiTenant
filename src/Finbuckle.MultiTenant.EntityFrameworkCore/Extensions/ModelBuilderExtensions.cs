@@ -1,11 +1,10 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Finbuckle.MultiTenant.Internal;
+using Finbuckle.MultiTenant.Abstractions.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
 /// Extension methods for ModelBuilder.

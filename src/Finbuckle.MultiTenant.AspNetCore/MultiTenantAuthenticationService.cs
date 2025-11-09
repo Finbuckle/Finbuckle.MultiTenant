@@ -1,7 +1,6 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
@@ -10,14 +9,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Internal;
+namespace Finbuckle.MultiTenant.AspNetCore;
 
 /// <summary>
 /// Multi-tenant aware authentication service that decorates the default authentication service.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
     where TTenantInfo : TenantInfo
 {
     private readonly IAuthenticationService _inner;
@@ -47,6 +45,8 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
             }
     }
 
+
+    /// <inheritdoc />
     public Task<AuthenticateResult> AuthenticateAsync(HttpContext context, string? scheme)
         => _inner.AuthenticateAsync(context, scheme);
 
@@ -70,12 +70,14 @@ internal class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationSe
         await _inner.ForbidAsync(context, scheme, properties).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
     public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
         await _inner.SignInAsync(context, scheme, principal, properties).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
     public async Task SignOutAsync(HttpContext context, string? scheme, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);

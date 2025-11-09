@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Internal;
+namespace Finbuckle.MultiTenant.AspNetCore;
 
 /// <summary>
 /// Middleware for resolving the MultiTenantContext and storing it in HttpContext.

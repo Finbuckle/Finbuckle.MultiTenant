@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 /// <summary>
 /// Options for configuring the InMemoryStore.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class InMemoryStoreOptions<TTenantInfo>
     where TTenantInfo : TenantInfo
 {

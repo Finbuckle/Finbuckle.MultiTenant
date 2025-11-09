@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
     /// <inheritdoc />
+    // internal set for testing
     public TenantInfo? TenantInfo { get; internal set; }
 
     /// <inheritdoc />
@@ -26,7 +28,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
         where TContext : DbContext
@@ -39,7 +41,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <param name="args">Additional dependencies for the DbContext constructor.</param>
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, params object[] args)
         where TContext : DbContext
@@ -69,7 +71,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <param name="serviceProvider">The IServiceProvider used to resolve DbContext constructor dependencies.</param>
     /// <param name="args">Additional dependencies for the DbContext constructor.</param>
     /// <typeparam name="TContext">The TContext implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, IServiceProvider serviceProvider, params object[] args)
         where TContext : DbContext

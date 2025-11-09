@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>

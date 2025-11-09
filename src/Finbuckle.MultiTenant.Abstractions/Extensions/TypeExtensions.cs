@@ -2,14 +2,13 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Reflection;
-using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Internal;
+namespace Finbuckle.MultiTenant.Abstractions.Extensions;
 
 /// <summary>
 /// Extension methods for Type operations.
 /// </summary>
-internal static class TypeExtensions
+public static class TypeExtensions
 {
     /// <summary>
     /// Determines whether the source type implements or inherits from an unbound generic type.
@@ -44,7 +43,12 @@ internal static class TypeExtensions
         return false;
     }
 
-    internal static bool HasMultiTenantAttribute(this Type type)
+    /// <summary>
+    /// Determines whether the specified type has the MultiTenant attribute.
+    /// </summary>
+    /// <param name="type">The type to check.</param>
+    /// <returns>True if the type has the MultiTenant attribute; otherwise, false.</returns>
+    public static bool HasMultiTenantAttribute(this Type type)
     {
         return type.GetCustomAttribute<MultiTenantAttribute>() != null;
     }
