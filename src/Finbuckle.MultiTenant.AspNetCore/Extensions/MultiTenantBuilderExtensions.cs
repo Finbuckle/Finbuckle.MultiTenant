@@ -260,7 +260,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo => WithBasePathStrategy(builder,
-        configureOptions => { configureOptions.RebaseAspNetCorePathBase = true; });
+        configureOptions => { configureOptions.RebaseAspNetCorePathBase = false; });
 
     /// <summary>
     /// Adds and configures a BasePathStrategy to the application.
