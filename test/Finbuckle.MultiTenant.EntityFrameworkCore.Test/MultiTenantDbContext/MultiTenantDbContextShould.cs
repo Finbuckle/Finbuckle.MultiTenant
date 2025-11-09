@@ -29,12 +29,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
         var c = new TestBlogDbContext(mca);
 
@@ -44,12 +39,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithTwoParamCtor()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
         var c = new TestBlogDbContext(mca, new DbContextOptions<TestBlogDbContext>());
 
@@ -59,12 +49,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithCreateDbOptions()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c =
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new DbContextOptions<TestBlogDbContext>());
 
@@ -74,12 +59,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithCreateDependencies()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c =
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object());
 
@@ -94,12 +74,7 @@ public class MultiTenantDbContextShould
         services.AddTransient<object>(sp => 42);
         var sp = services.BuildServiceProvider();
         
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c =
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, sp);
 
@@ -109,12 +84,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithCreateNoOptions()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
@@ -123,12 +93,7 @@ public class MultiTenantDbContextShould
     [Fact]
     public void ThrowOnInvalidDbContext()
     {
-        var tenant1 = new TenantInfo
-        {
-            Id = "abc",
-            Identifier = "abc",
-            Name = "abc"
-        };
+        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
         Assert.Throws<ArgumentException>(() => EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
     }

@@ -49,8 +49,7 @@ public class EfCoreStoreShould
         var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
         return PopulateTestStore(store);
     }
-
-    // ReSharper disable once RedundantOverriddenMember
+    
     protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         return base.PopulateTestStore(store);
@@ -104,12 +103,7 @@ public class EfCoreStoreShould
     public async Task NotTrackContextOnAdd()
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-        var tenant = new TenantInfo
-        {
-            Id = "test-id",
-            Identifier = "test-identifier",
-            Name = "test"
-        };
+        var tenant = new TenantInfo(Id: "test-id", Identifier: "test-identifier", Name: "test");
         await store.AddAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -121,7 +115,7 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant!.Name = "new name";
+        tenant = tenant! with { Name = "new name" };
         await store.UpdateAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -133,8 +127,8 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant!.Name = "new name";
-        await store.RemoveAsync(tenant.Id!);
+        tenant = tenant! with { Name = "new name" };
+        await store.RemoveAsync(tenant.Id);
 
         var entity = store.dbContext.Entry(tenant);
         Assert.Equal(EntityState.Detached, entity.State);

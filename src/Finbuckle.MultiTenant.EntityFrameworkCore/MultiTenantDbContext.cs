@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
     /// <inheritdoc />
-    public ITenantInfo? TenantInfo { get; internal set; }
+    public TenantInfo? TenantInfo { get; internal set; }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -30,7 +30,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
         where TContext : DbContext
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     => Create<TContext, TTenantInfo>(tenantInfo, []);
     
     /// <summary>
@@ -43,7 +43,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, params object[] args)
         where TContext : DbContext
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         try
         {
@@ -73,7 +73,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <returns>The newly created DbContext instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, IServiceProvider serviceProvider, params object[] args)
         where TContext : DbContext
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         try
         {
@@ -82,7 +82,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
             args ??= [];
             object[] argsList = [mca, ..args];
             
-            var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, argsList)!;
+            var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, argsList);
             return context;
         }
         catch (MissingMethodException e)

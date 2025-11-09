@@ -18,7 +18,7 @@ The sections below assume Finbuckle.MultiTenant is installed and configured. See
 
 The `WithPerTenantAuthentication()` method can be called after
 `AddMultiTenant<TTenantInfo>()` and uses conventions to configure common authentication
-options based on public properties of the `ITenantInfo` type parameter.
+options based on public properties of the `TenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
 
@@ -28,26 +28,26 @@ The following happens when `WithPerTenantAuthentication()` is called:
   which matches the current requests tenant. Existing validation events are
   preserved.
 
-The following also happens if the `ItenantInfo` implementation has the appropriate property:
+The following also happens if the `TenantInfo` derived class has the appropriate property:
 
 - The default challenge scheme is set to the `ChallengeScheme` property
-  of the `ITenantInfo` implementation.
+  of the `TenantInfo` derived class.
 - 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
-  of the `ITenantInfo` implementation.
+  of the `TenantInfo` derived class.
 - 'LogoutPath' for cookie authentication is set to the `CookieLogoutPath`
-  property of the `ITenantInfo` implementation.
+  property of the `TenantInfo` derived class.
 - 'AccessDeniedPath' for cookie authentication is set to the
-  `CookieAccessDeniedPath` property of the `ITenantInfo` implementation.
+  `CookieAccessDeniedPath` property of the `TenantInfo` derived class.
 - Several internal services are registered to support remote authentication such
   as OAuth 2.0 and OpenID Connect.
 - `Authority` for OpenID connect authentication is set to the
-  `OpenIdConnectAuthority` property of the `ITenantInfo` implementation.
+  `OpenIdConnectAuthority` property of the `TenantInfo` derived class.
 - `ClientId` for OpenID connect authentication is set to the
-  `OpenIdConnectClientId` property of the `ITenantInfo` implementation.
+  `OpenIdConnectClientId` property of the `TenantInfo` derived class.
 - `ClientSecret` for OpenID connect authentication is set to the
-  `OpenIdConnectClientSecret` property of the `ITenantInfo` implementation.
+  `OpenIdConnectClientSecret` property of the `TenantInfo` derived class.
 
-If the `ITenantInfo` implementation lacks one of these properties there is no
+If the `TenantInfo` derived class lacks one of these properties there is no
 impact on the respective authentication property.
 
 The cookie sign-in and validation events ensure that a tenant sign-in does not
@@ -149,7 +149,7 @@ Internally `WithPerTenantAuthentication()` makes use of
 
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
-`ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
+`TenantInfo` derived class and configure the option per-tenant. Any options configured will overwrite earlier
 configurations:
 
 ```csharp 

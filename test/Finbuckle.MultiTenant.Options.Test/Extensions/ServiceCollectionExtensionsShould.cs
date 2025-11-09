@@ -28,7 +28,7 @@ public class ServiceCollectionExtensionsShould
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>).ToList();
 
         Assert.Single(config);
         Assert.Equal("name1",
@@ -46,7 +46,7 @@ public class ServiceCollectionExtensionsShould
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>).ToList();
 
         Assert.Single(config);
         Assert.Equal(Microsoft.Extensions.Options.Options.DefaultName,
@@ -64,7 +64,7 @@ public class ServiceCollectionExtensionsShould
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>).ToList();
 
         Assert.Single(config);
         Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>)c)

@@ -8,12 +8,12 @@ supports each of these models by associating a connection string with each tenan
 
 ## Separate Databases
 
-If each tenant uses a separate database then add a `ConnectionString` property to the app's `ITenantInfo`
+If each tenant uses a separate database then add a `ConnectionString` property to the app's `TenantInfo`
 implementation. and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
 by injecting a `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
 
 ```csharp
-public class AppTenantInfo : ITenantInfo
+public class AppTenantInfo : TenantInfo
 {
     public string Id { get; set; }
     public string Identifier { get; set; }
@@ -23,7 +23,7 @@ public class AppTenantInfo : ITenantInfo
 
 public class MyAppDbContext : DbContext
 {
-   // AppTenantInfo is the app's custom implementation of ITenantInfo which 
+   // AppTenantInfo is the app's custom implementation of TenantInfo which 
    private AppTenantInfo TenantInfo { get; set; }
 
    public MyAppDbContext(IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor)
@@ -178,7 +178,7 @@ will have the information needed to provide proper data isolation.
 public class MyDbContext : DbContext, IMultiTenantDbContext
 {
     ...
-    public ITenantInfo TenantInfo { get; }
+    public TenantInfo TenantInfo { get; }
     public TenantMismatchMode TenantMismatchMode { get; }
     public TenantNotSetMode TenantNotSetMode { get; }
     ...
@@ -262,9 +262,9 @@ public class BloggingDbContext : MultiTenantDbContext
     }
     
     // these constructors are useful for testing or other use cases where depdenency injection is not used
-    public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
+    public BloggingDbContext(TenantInfo tenantInfo) : base(tenantInfo) { }
 
-    public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
+    public BloggingDbContext(TenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
         base(tenantInfo, options) { }
 
     public DbSet<Blog> Blogs { get; set; }
@@ -277,7 +277,7 @@ Now whenever this database context is used it will only set and query records fo
 
 It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is 
 immutable. Finbuckle.MultiTenant is designed with this in mind and `IMultiTenantDbContext` only has a getter for 
-the `ITenantInfo` property. It is possible to define a setter on your own `IMultiTenantDbContext` implementation but 
+the `TenantInfo` property. It is possible to define a setter on your own `IMultiTenantDbContext` implementation but 
 doing so will make it difficult ensure data isolation and consistency.
 
 ## Dependency Injection Instantiation
@@ -341,7 +341,7 @@ challenging. By default, for things like migrations and command line tools Entit
 instance of the context using dependency injection, however usually no valid tenant exists in these cases and DI fails.
 For this reason it is recommended to use
 a [design time factory](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation#from-a-design-time-factory)
-wherein a dummy `ITenantInfo` with the desired connection string and passed to the database context creation factory
+wherein a dummy `TenantInfo` with the desired connection string and passed to the database context creation factory
 as described above.
 
 ## Adding Data

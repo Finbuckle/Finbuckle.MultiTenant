@@ -32,7 +32,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhen<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<ShortCircuitWhenOptions> configureOptions)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         builder.Services.Configure(configureOptions);
 
@@ -48,7 +48,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhenTenantNotResolved<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return builder.ShortCircuitWhen(config =>
         {
@@ -66,7 +66,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhenTenantNotResolved<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Uri redirectTo)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return builder.ShortCircuitWhen(config =>
         {
@@ -82,7 +82,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return WithPerTenantAuthentication(builder, _ => { });
     }
@@ -97,7 +97,7 @@ public static class MultiTenantBuilderExtensions
     // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         builder.WithPerTenantAuthenticationCore(config);
         builder.WithPerTenantAuthenticationConventions();
@@ -113,7 +113,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         // Set events to set and validate tenant for each cookie based authentication principal.
         builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
@@ -198,7 +198,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationCore<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions>? config =
             null)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         config ??= _ => { };
         builder.Services.Configure(config);
@@ -225,7 +225,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
 
     /// <summary>
@@ -237,7 +237,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);
 
     /// <summary>
@@ -247,7 +247,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return builder.WithStrategy<RemoteAuthenticationCallbackStrategy>(ServiceLifetime.Singleton);
     }
@@ -259,7 +259,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The same MultiTenantBuilder passed into the method.></returns>
     public static MultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new() => WithBasePathStrategy(builder,
+        where TTenantInfo : TenantInfo => WithBasePathStrategy(builder,
         configureOptions => { configureOptions.RebaseAspNetCorePathBase = false; });
 
     /// <summary>
@@ -269,7 +269,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The same MultiTenantBuilder passed into the method.></returns>
     public static MultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<BasePathStrategyOptions> configureOptions)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         builder.Services.Configure(configureOptions);
         builder.Services.Configure<MultiTenantOptions<TTenantInfo>>(options =>
@@ -303,7 +303,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithRouteStrategy(Constants.TenantToken);
 
     /// <summary>
@@ -315,7 +315,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantParam)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         if (string.IsNullOrWhiteSpace(tenantParam))
         {
@@ -332,7 +332,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithHostStrategy($"{Constants.TenantToken}.*");
 
     /// <summary>
@@ -344,7 +344,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string template)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         if (string.IsNullOrWhiteSpace(template))
         {
@@ -360,7 +360,7 @@ public static class MultiTenantBuilderExtensions
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
+        this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : TenantInfo
     {
         return builder.WithClaimStrategy(Constants.TenantToken);
     }
@@ -375,7 +375,7 @@ public static class MultiTenantBuilderExtensions
     // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         BypassSessionPrincipalValidation(builder);
         return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
@@ -391,7 +391,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         BypassSessionPrincipalValidation(builder);
         return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
@@ -406,14 +406,14 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHttpContextStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Func<HttpContext, Task<string?>> doStrategy)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return builder.WithDelegateStrategy<HttpContext, TTenantInfo>(doStrategy);
     }
 
     private static void BypassSessionPrincipalValidation<TTenantInfo>(
         MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
         {
@@ -434,7 +434,7 @@ public static class MultiTenantBuilderExtensions
     /// </summary>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : class, ITenantInfo, new()
+        this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : TenantInfo
     {
         return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
     }
@@ -447,7 +447,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, tenantKey);
     }

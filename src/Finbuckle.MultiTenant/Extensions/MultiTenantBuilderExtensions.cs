@@ -25,7 +25,7 @@ public static class MultiTenantBuilderExtensions
     /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
 
 
@@ -37,7 +37,7 @@ public static class MultiTenantBuilderExtensions
     /// <param name="slidingExpiration">The timespan for a cache entry's sliding expiration.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         var storeParams = slidingExpiration is null ? new object[] { Constants.TenantToken } : new object[] { Constants.TenantToken, slidingExpiration };
 
@@ -52,7 +52,7 @@ public static class MultiTenantBuilderExtensions
     /// <param name="endpointTemplate">The endpoint URI template.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder, string endpointTemplate)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithHttpRemoteStore(endpointTemplate, null);
 
     /// <summary>
@@ -65,7 +65,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHttpRemoteStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         string endpointTemplate,
-        Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : class, ITenantInfo, new()
+        Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : TenantInfo
     {
         var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         clientConfig?.Invoke(httpClientBuilder);
@@ -82,7 +82,7 @@ public static class MultiTenantBuilderExtensions
     /// <param name="builder">The builder instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
     /// <summary>
@@ -96,7 +96,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         IConfiguration configuration,
         string sectionName)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton, configuration, sectionName);
 
     /// <summary>
@@ -106,7 +106,7 @@ public static class MultiTenantBuilderExtensions
     /// <param name="builder">The builder instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithInMemoryStore(_ => {});
 
     /// <summary>
@@ -118,7 +118,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         Action<InMemoryStoreOptions<TTenantInfo>> config)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(config);
 
@@ -135,7 +135,7 @@ public static class MultiTenantBuilderExtensions
     /// <param name="builder">The builder instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithEchoStore<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
         => builder.WithStore<EchoStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
     /// <summary>
@@ -147,7 +147,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithStaticStrategy<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         string identifier)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         if (string.IsNullOrWhiteSpace(identifier))
         {
@@ -166,7 +166,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         Func<object, Task<string?>> doStrategy)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(doStrategy);
 
@@ -183,7 +183,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TContext, TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder,
         Func<TContext, Task<string?>> doStrategy)
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(doStrategy, nameof(doStrategy));
 

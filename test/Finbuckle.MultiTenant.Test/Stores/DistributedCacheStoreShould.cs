@@ -67,12 +67,12 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var cache = new Mock<IDistributedCache>();
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
-                { Id = "lol-id", Identifier = "lol" })));
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
+                Identifier: "lol"))));
         
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        var t1 = await store.GetAsync("lol-id");
+        await store.GetAsync("lol-id");
         cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
 
@@ -81,12 +81,12 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var cache = new Mock<IDistributedCache>();
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
-                { Id = "lol-id", Identifier = "lol" })));
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
+                Identifier: "lol"))));
         
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        var t1 = await store.GetByIdentifierAsync("lol-id");
+        await store.GetByIdentifierAsync("lol-id");
         cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
     
@@ -98,7 +98,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         cache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
                 It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
-            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((key, value, opts, token) =>
+            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((_, _, opts, _) =>
             {
                 Assert.Equal(options.SlidingExpiration, opts.SlidingExpiration);
             })
@@ -106,7 +106,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
+        await store.AddAsync(new TenantInfo(Id: "test-id", Identifier: "test"));
     }
     
     [Fact]
@@ -117,7 +117,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         cache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
                 It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
-            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((key, value, opts, token) =>
+            .Callback<string, byte[], DistributedCacheEntryOptions, CancellationToken>((_, _, opts, _) =>
             {
                 Assert.Equal(options.SlidingExpiration, opts.SlidingExpiration);
             })
@@ -125,7 +125,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test", Name = "Test Tenant" });
+        await store.AddAsync(new TenantInfo(Id: "test-id", Identifier: "test"));
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs

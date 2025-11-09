@@ -1,6 +1,7 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using System.Runtime.CompilerServices;
 using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant.Stores.EchoStore;
@@ -11,18 +12,24 @@ namespace Finbuckle.MultiTenant.Stores.EchoStore;
 /// If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <inheritdoc />
     public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
-        return await Task.FromResult(new TTenantInfo { Id = identifier, Identifier = identifier }).ConfigureAwait(false);
+        var tenantInfo = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
+        tenantInfo = tenantInfo with { Id = identifier, Identifier = identifier };
+        
+        // Ensure TTenantInfo has a parameterless constructor.
+        return await Task.FromResult(tenantInfo).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> GetAsync(string id)
     {
-        return await Task.FromResult(new TTenantInfo { Id = id, Identifier = id }).ConfigureAwait(false);
+        var tenantInfo = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
+        tenantInfo = tenantInfo with { Id = id, Identifier = id };
+        return await Task.FromResult(tenantInfo).ConfigureAwait(false);
     }
     
     /// <summary>

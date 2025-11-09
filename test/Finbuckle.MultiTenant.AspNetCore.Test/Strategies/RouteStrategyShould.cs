@@ -24,7 +24,7 @@ public class RouteStrategyShould
         mockContext.Setup(c => c.Request.RouteValues).Returns(routeData);
 
         var strategy = new RouteStrategy(identifier);
-        
+
         Assert.Equal(expected, await strategy.GetIdentifierAsync(mockContext.Object));
     }
 
@@ -45,7 +45,7 @@ public class RouteStrategyShould
         mockContext.Setup(c => c.Request.RouteValues).Returns(routeData);
 
         var strategy = new RouteStrategy("__tenant__");
-        
+
         Assert.Null(await strategy.GetIdentifierAsync(mockContext.Object));
     }
 

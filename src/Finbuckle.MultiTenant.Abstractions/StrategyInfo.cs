@@ -11,10 +11,10 @@ public class StrategyInfo
     /// <summary>
     /// Gets or sets the type of the strategy used.
     /// </summary>
-    public Type? StrategyType { get; internal set; }
+    public Type? StrategyType => Strategy?.GetType();
     
     /// <summary>
     /// Gets or sets the strategy instance used.
     /// </summary>
-    public IMultiTenantStrategy? Strategy { get; internal set; }
+    public IMultiTenantStrategy? Strategy { get; init; }
 }

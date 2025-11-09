@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     // ReSharper disable once StaticMemberInGenericType
     // (also used on HttpRemoteStoreClient)

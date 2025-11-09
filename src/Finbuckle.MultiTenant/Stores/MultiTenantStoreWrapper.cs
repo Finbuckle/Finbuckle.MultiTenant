@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Multitenant store decorator that handles exception handling and logging.
 /// </summary>
 public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     // ReSharper disable once MemberCanBePrivate.Global
     /// <summary>

@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable

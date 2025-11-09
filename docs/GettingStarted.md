@@ -49,11 +49,11 @@ That's all that is needed to get going. Let's break down each line:
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` and holds basic
-information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but
-a custom implementation can be used if more properties are needed.
+The type parameter for `AddMultiTenant<TTenantInfo>` must be an instance of `TenantInfo` or a derived class and holds
+basic information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic
+implementation record, but a derived record can be used if more properties are needed.
 
-See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
+See [Core Concepts](CoreConcepts) for more information on `TenantInfo`.
 
 `.WithHostStrategy()`
 
@@ -98,7 +98,7 @@ if(tenantInfo != null)
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `ITenantInfo` instance and the typed instance are also available using the
+The `TenantInfo` instance and the typed instance are also available using the
 `IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
@@ -115,7 +115,8 @@ more details:
 
 ## Samples
 
-A variety of sample projects are available in the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
+A variety of sample projects are available in
+the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
 
 ## Compiling from Source
 

@@ -28,12 +28,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantNotSetMode.Throw, should act as Overwrite when adding
             using (var db = new TestDbContext(tenant1, _options))
@@ -73,12 +68,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantNotSetMode.Throw, should act as Overwrite when adding
             using (var db = new TestDbContext(tenant1, _options))
@@ -118,12 +108,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -179,12 +164,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantNotSetMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -231,12 +211,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -300,12 +275,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantNotSetMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
@@ -353,12 +323,7 @@ public class MultiTenantDbContextExtensionsShould
         try
         {
             _connection.Open();
-            var tenant1 = new TenantInfo
-            {
-                Id = "abc",
-                Identifier = "abc",
-                Name = "abc"
-            };
+            var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
             // TenantMismatchMode.Throw
             using (var db = new TestDbContext(tenant1, _options))
