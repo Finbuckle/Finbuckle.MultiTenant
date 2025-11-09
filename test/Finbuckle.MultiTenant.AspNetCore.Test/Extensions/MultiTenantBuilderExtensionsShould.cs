@@ -575,7 +575,7 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void AddBasePathStrategyDefaultRebaseFalse()
+    public void AddBasePathStrategyDefaultRebaseDefaultTrue()
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
@@ -586,7 +586,7 @@ public class MultiTenantBuilderExtensionsShould
         Assert.IsType<BasePathStrategy>(strategy);
 
         var options = sp.GetRequiredService<IOptions<BasePathStrategyOptions>>();
-        Assert.False(options.Value.RebaseAspNetCorePathBase);
+        Assert.True(options.Value.RebaseAspNetCorePathBase);
     }
 
     [Fact]
