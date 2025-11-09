@@ -89,7 +89,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo(Id: id, Identifier: identifier, Name: "LOL"));
+            options.Tenants.Add(new TenantInfo(Id: id!, Identifier: identifier!, Name: "LOL"));
         });
         var sp = services.BuildServiceProvider();
 

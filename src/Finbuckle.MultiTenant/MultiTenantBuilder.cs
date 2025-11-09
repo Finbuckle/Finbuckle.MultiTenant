@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant;
 
-// TODO: factor TTenantInfo into WithStore only
-
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>

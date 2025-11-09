@@ -2,7 +2,7 @@
 
 public class ExcludeFromMultiTenantResolutionShould
 {
-    // TODO: rethink this winsce webhostbuilder is obsolete
+    // TODO: rethink this since webhostbuilder is obsolete
     // private const string EndpointStringResponse = "No tenant available.";
     //
     // [Theory]
