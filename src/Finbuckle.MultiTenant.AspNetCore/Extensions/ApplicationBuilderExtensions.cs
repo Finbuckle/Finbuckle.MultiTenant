@@ -4,8 +4,7 @@
 using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Microsoft.AspNetCore.Builder;
 
-//ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 
 /// <summary>
 /// Extension methods for using Finbuckle.MultiTenant.AspNetCore.

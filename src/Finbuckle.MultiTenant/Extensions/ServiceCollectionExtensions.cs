@@ -5,8 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Extensions;
 
 /// <summary>
 /// IServiceCollection extension methods for Finbuckle.MultiTenant.

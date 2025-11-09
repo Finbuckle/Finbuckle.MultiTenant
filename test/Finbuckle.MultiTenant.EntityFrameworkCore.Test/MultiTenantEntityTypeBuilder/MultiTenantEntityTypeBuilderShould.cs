@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Collections;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
