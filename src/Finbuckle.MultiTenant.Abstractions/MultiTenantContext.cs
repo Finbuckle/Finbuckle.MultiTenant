@@ -35,7 +35,11 @@ public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public TTenantInfo? TenantInfo { get; init; }
+    public TTenantInfo? TenantInfo
+    {
+        get => (TTenantInfo?)field?.Clone();
+        init => field = (TTenantInfo?)value?.Clone();
+    }
 
     /// <inheritdoc />
     public bool IsResolved => TenantInfo != null;

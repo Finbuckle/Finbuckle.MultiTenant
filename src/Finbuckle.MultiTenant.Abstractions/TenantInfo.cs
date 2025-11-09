@@ -25,4 +25,15 @@ public class TenantInfo : ITenantInfo
     
     /// <inheritdoc />
     public string? Name { get; set; }
+
+    /// <inheritdoc />
+    public object Clone()
+    {
+        return new TenantInfo()
+        {
+            Id = this.Id,
+            Identifier = this.Identifier,
+            Name = this.Name
+        };
+    }
 }

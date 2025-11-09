@@ -61,7 +61,7 @@ public class HttpContextExtensionShould
 
             var returnedTi = httpContextMock.Object.GetTenantInfo<TenantInfo>();
             
-            Assert.Same(ti, returnedTi);
+            Assert.Equivalent(ti, returnedTi);
         }
 
     [Fact]
@@ -93,7 +93,7 @@ public class HttpContextExtensionShould
             context.SetTenantInfo(ti2, false);
             var ti = context.GetTenantInfo<TenantInfo>();
             
-            Assert.Same(ti2, ti);
+            Assert.Equivalent(ti2, ti);
         }
 
     [Fact]

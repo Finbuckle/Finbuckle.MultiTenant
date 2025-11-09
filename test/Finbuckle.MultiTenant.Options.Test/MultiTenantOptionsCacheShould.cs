@@ -99,6 +99,7 @@ public class MultiTenantOptionsCacheShould
 
         // Confirm different tenant on same object is an add (ie it didn't exist there).
         ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         result = cache.GetOrAdd(name, () => options2);
         Assert.Same(options2, result);
     }
@@ -139,6 +140,7 @@ public class MultiTenantOptionsCacheShould
 
         // Add under a different tenant.
         ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         result = cache.TryAdd(name, options);
         Assert.True(result);
         result = cache.TryAdd("diffName", options);
@@ -183,11 +185,13 @@ public class MultiTenantOptionsCacheShould
 
         // Add under a different tenant.
         ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         result = cache.TryAdd("", options);
         Assert.True(result);
 
         // Clear options on first tenant.
         ti.Id = "test-id-123";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         cache.Clear();
 
         // Assert options cleared on this tenant.
@@ -224,6 +228,7 @@ public class MultiTenantOptionsCacheShould
 
         // Add under a different tenant.
         ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         result = cache.TryAdd("", options);
         Assert.True(result);
 
@@ -263,6 +268,7 @@ public class MultiTenantOptionsCacheShould
 
         // Add under a different tenant.
         ti.Id = "diff_id";
+        tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
         result = cache.TryAdd("", options);
         Assert.True(result);
 

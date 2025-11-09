@@ -10,6 +10,7 @@ public interface IMultiTenantContext
 {
     /// <summary>
     /// Information about the tenant for this context.
+    /// <remarks>This property gets and inits a copy of the ITenantInfo.</remarks>
     /// </summary>
     ITenantInfo? TenantInfo { get; init; }
 
@@ -24,8 +25,6 @@ public interface IMultiTenantContext
     StrategyInfo? StrategyInfo { get; init; }
 }
 
-
-
 /// <summary>
 /// Generic interface for the multi-tenant context.
 /// </summary>
@@ -35,6 +34,7 @@ public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
 {
     /// <summary>
     /// Information about the tenant for this context.
+    /// <remarks>This property gets and inits a copy of the TTenantInfo.</remarks>
     /// </summary>
     new TTenantInfo? TenantInfo { get; init; }
     

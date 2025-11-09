@@ -32,6 +32,8 @@ The `MultiTenantContext<TTenantInfo>` contains information about the current ten
 * Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from dependency injection.
 * Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
   determined, and from where its information was retrieved.
+* **Copies** the `TenantInfo` when getting to avoid accidental changes to the stored tenant information.
+* **Copies** the `TenantInfo` when setting to avoid accidental changes to the stored tenant information.
 * Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`
   object. The implementation used with ASP.NET Core middleware has read only properties. The `HttpContext` extension
   method `TrySetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.

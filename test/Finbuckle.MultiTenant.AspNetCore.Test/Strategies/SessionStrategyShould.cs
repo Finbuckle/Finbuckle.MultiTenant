@@ -1,15 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Runtime.InteropServices;
-using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
-using Finbuckle.MultiTenant.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 

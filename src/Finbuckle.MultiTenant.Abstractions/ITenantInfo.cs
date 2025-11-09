@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Interface for basic tenant information.
 /// </summary>
-public interface ITenantInfo
+public interface ITenantInfo : ICloneable
 {
     
     /// <summary>

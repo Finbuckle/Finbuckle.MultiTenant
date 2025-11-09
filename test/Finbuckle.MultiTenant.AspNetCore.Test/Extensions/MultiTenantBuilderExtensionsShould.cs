@@ -36,6 +36,24 @@ public class MultiTenantBuilderExtensionsShould
         public string? OpenIdConnectAuthority { get; set; }
         public string? OpenIdConnectClientId { get; set; }
         public string? OpenIdConnectClientSecret { get; set; }
+        
+        public object Clone()
+        {
+            return new TestTenantInfo
+            {
+                Id = this.Id,
+                Identifier = this.Identifier,
+                Name = this.Name,
+                ConnectionString = this.ConnectionString,
+                ChallengeScheme = this.ChallengeScheme,
+                CookieLoginPath = this.CookieLoginPath,
+                CookieLogoutPath = this.CookieLogoutPath,
+                CookieAccessDeniedPath = this.CookieAccessDeniedPath,
+                OpenIdConnectAuthority = this.OpenIdConnectAuthority,
+                OpenIdConnectClientId = this.OpenIdConnectClientId,
+                OpenIdConnectClientSecret = this.OpenIdConnectClientSecret
+            };
+        }
     }
 
     [Fact]
