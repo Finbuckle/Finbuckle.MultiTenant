@@ -242,7 +242,7 @@ public class MultiTenantBuilderShould
         }
 
     private class TestStore<TTenant> : IMultiTenantStore<TTenant>
-        where TTenant : class, ITenantInfo, new()
+        where TTenant : TenantInfo
     {
         // ReSharper disable once NotAccessedField.Local
         private readonly bool _testParam;

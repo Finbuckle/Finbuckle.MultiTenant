@@ -107,7 +107,7 @@
 ### ⚠ BREAKING CHANGES
 
 * `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
-* `MultiTenantDbContext` constructors accepting `ITenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
+* `MultiTenantDbContext` constructors accepting `TenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
 * net6.0 and net7.0 are no longer supported targets.
 * dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
 
@@ -175,7 +175,7 @@
   constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
 * Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
   Finbuckle.MultiTenant.Abstractions namespace.
-* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
+* Connection string is removed from TenantInfo and the default TenantInfo implementation.
 * Added support for OptionsBuilder API and more efficient per-tenant options overall.
 * WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
 * Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
@@ -188,7 +188,7 @@
 * MultiTenantDbContext and MultiTenantIdentityDbContext support for IMultiTenantContextAccessor DI ([9015085](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/901508563af4fa872a0dc3930ff3b8315777b912))
 * namespace cleaned up ([b354838](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b354838a90741626c47ea4f109c49f7fe2ca5b3d))
 * refactor DI and improve nullability ([eca24bf](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/eca24bfa0c314f95794b235141cff42059cf3fcf))
-* remove ConnectionString from ITenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
+* remove ConnectionString from TenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
 
 
 ### Bug Fixes
@@ -444,7 +444,7 @@
 
 ### Changes
 
-- Customizable `TenantInfo`. Implement `ITenantInfo` as needed or use the basic `TenantInfo` implementation. Should work with most strategies and stores. This was a major overhaul to the library. See docs for more information.
+- Customizable `TenantInfo`. Implement `TenantInfo` as needed or use the basic `TenantInfo` derived class. Should work with most strategies and stores. This was a major overhaul to the library. See docs for more information.
 - Changed NuGet structure: use `Finbuckle.MultiTenant.AspNetCore` for web apps and if needed add `Finbuckle.MultiTenant.EntityFrameworkCore`.
 - `WithPerTenantAuthentication` - Adds support for common per-tenant authentication scenarios. See docs for full details.
 - Multiple strategies and stores can be registered. They will run in the order registered and the first tenant returned by a strategy/store combination is used.

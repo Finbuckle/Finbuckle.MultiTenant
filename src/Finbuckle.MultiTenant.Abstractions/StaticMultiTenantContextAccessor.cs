@@ -4,7 +4,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 
 internal class StaticMultiTenantContextAccessor<TTenantInfo>(TTenantInfo? tenantInfo)
     : IMultiTenantContextAccessor<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
 

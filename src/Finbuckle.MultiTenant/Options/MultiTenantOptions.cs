@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant;
 /// Options for multi-tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class MultiTenantOptions<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Gets or sets the type of ITenantInfo implementation.

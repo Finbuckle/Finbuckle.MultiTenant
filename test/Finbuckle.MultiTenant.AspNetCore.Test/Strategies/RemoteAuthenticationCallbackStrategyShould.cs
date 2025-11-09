@@ -16,7 +16,7 @@ public class RemoteAuthenticationCallbackStrategyShould
         var strategy = new RemoteAuthenticationCallbackStrategy(null!);
         Assert.Equal(-900, strategy.Priority);
     }
-    
+
     [Fact]
     public async Task ReturnNullIfContextIsNotHttpContext()
     {

@@ -26,7 +26,7 @@ public static class OptionsBuilderExtensions
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -59,7 +59,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -95,7 +95,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -135,7 +135,7 @@ public static class OptionsBuilderExtensions
         where TDep1 : class
         where TDep2 : class
         where TDep3 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -178,7 +178,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -212,7 +212,7 @@ public static class OptionsBuilderExtensions
     //     where TDep3 : class
     //     where TDep4 : class
     //     where TDep5 : class
-    //     where TTenantInfo : class, ITenantInfo, new()
+    //     where TTenantInfo : TenantInfo
     // {
     //     if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
     //
@@ -250,7 +250,7 @@ public static class OptionsBuilderExtensions
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -283,7 +283,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -319,7 +319,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -359,7 +359,7 @@ public static class OptionsBuilderExtensions
         where TDep1 : class
         where TDep2 : class
         where TDep3 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -402,7 +402,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -437,7 +437,7 @@ public static class OptionsBuilderExtensions
     //     where TDep3 : class
     //     where TDep4 : class
     //     where TDep5 : class
-    //     where TTenantInfo : class, ITenantInfo, new()
+    //     where TTenantInfo : TenantInfo
     // {
     //     if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
     //

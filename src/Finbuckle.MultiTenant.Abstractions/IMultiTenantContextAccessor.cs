@@ -19,7 +19,7 @@ public interface IMultiTenantContextAccessor
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public interface IMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Gets the current MultiTenantContext.

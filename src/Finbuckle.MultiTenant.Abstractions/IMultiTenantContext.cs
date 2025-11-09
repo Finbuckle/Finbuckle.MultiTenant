@@ -11,7 +11,7 @@ public interface IMultiTenantContext
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; init; }
+    TenantInfo? TenantInfo { get; init; }
 
     /// <summary>
     /// True if a tenant has been resolved and TenantInfo is not null.
@@ -31,7 +31,7 @@ public interface IMultiTenantContext
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Information about the tenant for this context.

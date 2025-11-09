@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     private readonly IDistributedCache cache;
     private readonly string keyPrefix;
@@ -117,7 +117,7 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
         if (current is null)
             return false;
 
-        return await RemoveAsync(current.Identifier!).ConfigureAwait(false) &&
+        return await RemoveAsync(current.Identifier).ConfigureAwait(false) &&
                await AddAsync(tenantInfo).ConfigureAwait(false);
     }
 }

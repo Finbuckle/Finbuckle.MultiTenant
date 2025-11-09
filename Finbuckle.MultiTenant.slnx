@@ -9,9 +9,10 @@
     <Project Path="src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/test/">
-    <Project Path="test\Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test\Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test.csproj" Type="Classic C#" />
+    <Project Path="test\Finbuckle.MultiTenant.Abstractions.Test\Finbuckle.MultiTenant.Abstractions.Test.csproj" Type="Classic C#" />
     <Project Path="test\Finbuckle.MultiTenant.AspNetCore.Test\Finbuckle.MultiTenant.AspNetCore.Test.csproj" Type="Classic C#" />
     <Project Path="test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj" Type="Classic C#" />
+    <Project Path="test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test.csproj" Type="Classic C#" />
     <Project Path="test\Finbuckle.MultiTenant.Options.Test\Finbuckle.MultiTenant.Options.Test.csproj" Type="Classic C#" />
     <Project Path="test\Finbuckle.MultiTenant.Test\Finbuckle.MultiTenant.Test.csproj" Type="Classic C#" />
   </Folder>

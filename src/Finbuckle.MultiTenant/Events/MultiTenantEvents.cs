@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.Events;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class MultiTenantEvents<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Called after each MultiTenantStrategy has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.

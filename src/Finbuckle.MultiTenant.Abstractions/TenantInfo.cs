@@ -1,28 +1,15 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Abstractions;
-
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Default implementation of ITenantInfo.
+/// Default implementation of TenantInfo.
 /// </summary>
-public class TenantInfo : ITenantInfo
+/// <param name="Id">A unique identifier for the tenant. Typically used as the primary key.</param>
+/// <param name="Identifier">A externally-facing identifier used for tenant resolution.</param>
+/// <param name="Name">A friendly name for the tenant.</param>
+public record TenantInfo(string Id, string Identifier, string? Name = null)
 {
-    /// <summary>
-    /// Initializes a new instance of TenantInfo.
-    /// </summary>
-    public TenantInfo()
-    {
-    }
-
-    /// <inheritdoc />
-    public string? Id { get; set; }
-
-    /// <inheritdoc />
-    public string? Identifier { get; set; }
     
-    /// <inheritdoc />
-    public string? Name { get; set; }
 }

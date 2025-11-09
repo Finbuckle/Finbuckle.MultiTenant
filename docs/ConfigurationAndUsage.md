@@ -227,7 +227,7 @@ There are several ways an app can see the current tenant:
   useful in advanced scenarios and should be used with caution. Prefer using the `HttpContext` extension method
   `TrySetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
 
-> Prior versions of Finbuckle.MultiTenant also exposed `IMultiTenantContext`, `ITenantInfo`, and their implementations
+> Prior versions of Finbuckle.MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
 > via dependency injection. This was removed as these are not actual services, similar to
 > how [HttpContext is not a service](https://github.com/dotnet/aspnetcore/issues/47996#issuecomment-1529364233) and not
 > available directly via dependency injection.

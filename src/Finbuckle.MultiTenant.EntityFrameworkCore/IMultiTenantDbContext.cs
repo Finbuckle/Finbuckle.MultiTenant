@@ -13,7 +13,7 @@ public interface IMultiTenantDbContext
     /// <summary>
     /// Gets the current tenant information for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; }
+    TenantInfo? TenantInfo { get; }
     
     /// <summary>
     /// Gets the mode used to handle entities where TenantId does not match the current tenant.

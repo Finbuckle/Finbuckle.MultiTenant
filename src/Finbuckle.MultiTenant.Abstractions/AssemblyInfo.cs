@@ -10,3 +10,4 @@ using System.Runtime.CompilerServices;
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore.Test")]
 [assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Options.Test")]
+[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Abstractions.Test")]

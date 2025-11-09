@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
 public class InMemoryStoreOptions<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Gets or sets whether tenant identifier lookups are case-sensitive.

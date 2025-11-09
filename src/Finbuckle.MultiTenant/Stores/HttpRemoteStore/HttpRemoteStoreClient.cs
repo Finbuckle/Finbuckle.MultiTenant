@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 /// HTTP client for retrieving tenant information from a remote endpoint.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
 {
     private readonly IHttpClientFactory clientFactory;
     private readonly JsonSerializerOptions _defaultSerializerOptions;

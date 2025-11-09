@@ -19,7 +19,7 @@ public static class MultiTenantBuilderExtensions
     // ReSharper disable once InconsistentNaming
     public static MultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
         where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         builder.Services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
         return builder.WithStore<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
