@@ -1,11 +1,9 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-// ReSharper disable once CheckNamespace
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
 /// Extension methods for configuring multi-tenant entity types.

@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

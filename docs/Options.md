@@ -1,5 +1,7 @@
 # Per-Tenant Options
 
+> Add the Finbuckle.MultiTenant.Options package to your project to use this functionality.
+
 Finbuckle.MultiTenant is designed to emphasize using per-tenant options in an app to drive per-tenant behavior. This
 approach allows app logic to be written having to add tenant-dependent or tenant-specific logic to the code.
 
@@ -83,11 +85,15 @@ This sections assumes a standard web application builder is configured and Finbu
 a `TTenantInfo` type of `TenantInfo`.
 See [Getting Started](GettingStarted) for details.
 
+Make sure to add the `Finbuckle.MultiTenant.Options` package to your project.
+
 To configure options per tenant, the standard `Configure` method variants on the service collection now all
 have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at
 runtime the delegate will be called with the current tenant details.
 
 ```csharp
+using namespace Finbuckle.MultiTenant.Options.Extensions;
+
 // configure options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {

@@ -3,9 +3,9 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-// ReSharper disable once CheckNamespace
 namespace Finbuckle.MultiTenant;
 
 /// <summary>

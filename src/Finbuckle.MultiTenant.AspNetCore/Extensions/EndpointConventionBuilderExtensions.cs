@@ -1,4 +1,7 @@
-﻿using Finbuckle.MultiTenant.AspNetCore.Routing;
+﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more information.
+
+using Finbuckle.MultiTenant.AspNetCore.Routing;
 using Microsoft.AspNetCore.Builder;
 
 namespace Finbuckle.MultiTenant.AspNetCore.Extensions;

@@ -2,8 +2,10 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
+using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;

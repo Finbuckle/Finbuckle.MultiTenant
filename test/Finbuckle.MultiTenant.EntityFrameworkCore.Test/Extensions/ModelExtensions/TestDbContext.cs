@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Diagnostics.CodeAnalysis;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelExtensions;
