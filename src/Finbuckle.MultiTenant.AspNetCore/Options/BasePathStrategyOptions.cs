@@ -8,8 +8,9 @@ namespace Finbuckle.MultiTenant.AspNetCore.Options;
 /// </summary>
 public class BasePathStrategyOptions
 {
+    // TODO make this default to true in next major release
     /// <summary>
     /// Gets or sets whether to rebase the ASP.NET Core PathBase after tenant resolution.
     /// </summary>
-    public bool RebaseAspNetCorePathBase { get; set; } = true;
+    public bool RebaseAspNetCorePathBase { get; set; }
 }
