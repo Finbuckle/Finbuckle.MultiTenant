@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Events;
+using Finbuckle.MultiTenant.Options;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     where TTenantInfo : TenantInfo
 {

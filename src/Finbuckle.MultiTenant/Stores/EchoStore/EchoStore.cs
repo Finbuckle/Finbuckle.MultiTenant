@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant.Stores.EchoStore;
 /// Note that add, update, and remove functionality is not implemented.
 /// If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <inheritdoc />

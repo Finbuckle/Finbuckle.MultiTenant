@@ -16,7 +16,7 @@ public static class FinbuckleHttpContextExtensions
     /// Returns the current MultiTenantContext.
     /// </summary>
     /// <param name="httpContext">The HttpContext instance.</param>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : TenantInfo
     {
@@ -33,7 +33,7 @@ public static class FinbuckleHttpContextExtensions
     /// Returns the current generic TTenantInfo instance or null if there is none.
     /// </summary>
     /// <param name="httpContext">The HttpContext instance.</param>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     public static TTenantInfo? GetTenantInfo<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : TenantInfo =>
         httpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo;
@@ -47,7 +47,7 @@ public static class FinbuckleHttpContextExtensions
     /// <param name="httpContext">The HttpContext instance.</param>
     /// <param name="tenantInfo">The tenant info instance to set as current.</param>
     /// <param name="resetServiceProviderScope">Creates a new service provider scope if true.</param>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     public static void SetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo,
         bool resetServiceProviderScope)
         where TTenantInfo : TenantInfo

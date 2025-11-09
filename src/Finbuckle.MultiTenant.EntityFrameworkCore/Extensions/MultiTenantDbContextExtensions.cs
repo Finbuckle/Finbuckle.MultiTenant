@@ -2,11 +2,9 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.EntityFrameworkCore;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
 /// Extension methods for multi-tenant DbContext instances.

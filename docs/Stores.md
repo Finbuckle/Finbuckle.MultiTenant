@@ -7,9 +7,9 @@ provides the current tenant information to an app.
 Finbuckle.MultiTenant supports several "out-of-the-box" stores for resolving the tenant. Custom stores can be created by
 implementing `IMultiTenantStore`.
 
-## Custom ITenantInfo Support
+## Custom TenantInfo Support
 
-MultiTenant stores support custom `ITenantInfo` implementations. but complex implementations may require special
+MultiTenant stores support custom `TenantInfo` derived classs. but complex implementations may require special
 handling. For best results ensure the class works well with the underlying store approach--e.g. that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
@@ -120,7 +120,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
 automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
-of `ITenantInfo` properties are mapped from the JSON automatically.
+of `TenantInfo` properties are mapped from the JSON automatically.
 
 ```json
 {
@@ -152,31 +152,16 @@ of `ITenantInfo` properties are mapped from the JSON automatically.
 
 Uses an Entity Framework Core database context as the backing store.
 
-This store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
+Case sensitivity is determined by the underlying EF Core database provider.
 
-The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from
-the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/EFCoreStoreSample)
-.
+The database context must derive from `EFCoreStoreDbContext`. Note that `TTenantInfo` is a record type and EF Core
+does not support tracking for record types. The `EFCoreStore` carefuly avoids tracking issues, but if an app uses the
+`EFCoreStoreDbContext` directly it should be aware of these issues.
 
-The database context used with the EFCore store must derive from `EFCoreStoreDbContext`, but other entities can be
-added:
-
-```csharp
-public class MultiTenantStoreDbContext : EFCoreStoreDbContext<TenantInfo>
-{
-  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-  {
-      // Use InMemory, but could be MsSql, Sqlite, MySql, etc...
-      optionsBuilder.UseInMemoryDatabase("EfCoreStoreSampleConnectionString");
-      base.OnConfiguring(optionsBuilder);
-  }
-}
-```
-
-This database context is not itself multi-tenant, but rather it globally contains the details of each tenant.
+This database context is not itself multi-tenant, but rather contains the details of all tenants.
 It will often be a standalone database separate from any tenant database(s) and will have its own connection string.
 
-Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext,ITenantInfo>` after `AddMultiTenant<TTenantInfo>` and
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext,TenantInfo>` after `AddMultiTenant<TTenantInfo>` and
 provide types for the store's database context generic parameter:
 
 ```csharp
@@ -184,10 +169,6 @@ provide types for the store's database context generic parameter:
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
-
-In addition to the `IMultiTenantStore` interface methods, the database context can be used to modify data in the 
-same way
-Entity Framework Core works with any database context which can offer richer functionality.
 
 ## Http Remote Store
 

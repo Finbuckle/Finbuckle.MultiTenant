@@ -43,7 +43,7 @@ public class SessionStrategyShould
                     return true;
                 }
 
-                value = null;
+                value = null!;
                 return false;
             });
 
@@ -58,10 +58,11 @@ public class SessionStrategyShould
     [Theory]
     [InlineData("__tenant__", "tenant", null)]
     [InlineData("__tenant__", "__tenant__", "initech")]
-    public async Task ReturnIdentifierIfSessionValue(string tenantSessionKey, string sessionKey, string expected)
+    public async Task ReturnIdentifierIfSessionValue(string tenantSessionKey, string sessionKey, string? expected)
     {
         var sessionData = new Dictionary<string, string>();
-        sessionData[sessionKey] = expected;
+        if(expected != null)
+            sessionData[sessionKey] = expected;
 
         var mockSession = new Mock<ISession>();
         mockSession
@@ -74,7 +75,7 @@ public class SessionStrategyShould
                     return true;
                 }
 
-                value = null;
+                value = null!;
                 return false;
             });
 

@@ -16,4 +16,8 @@
 
         <ProjectReference Include="../Finbuckle.MultiTenant.Abstractions/Finbuckle.MultiTenant.Abstractions.csproj"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Internal\" />
+    </ItemGroup>
 </Project>

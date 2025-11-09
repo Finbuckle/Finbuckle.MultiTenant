@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.Stores.ConfigurationStore;
 using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 using Finbuckle.MultiTenant.Stores.EchoStore;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Test.DependencyInjection;
+namespace Finbuckle.MultiTenant.Test.Extensions;
 
 public class MultiTenantBuilderExtensionsShould
 {

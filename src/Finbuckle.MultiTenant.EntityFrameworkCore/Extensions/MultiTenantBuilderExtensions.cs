@@ -5,7 +5,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
 /// Provides builder methods for Finbuckle.MultiTenant services and configuration.

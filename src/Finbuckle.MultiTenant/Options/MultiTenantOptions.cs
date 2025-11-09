@@ -4,16 +4,16 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Events;
 
-namespace Finbuckle.MultiTenant;
+namespace Finbuckle.MultiTenant.Options;
 
 /// <summary>
 /// Options for multi-tenant resolution.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>
-    /// Gets or sets the type of ITenantInfo implementation.
+    /// Gets or sets the type of TenantInfo derived.
     /// </summary>
     public required Type TenantInfoType { get; set; }
     
