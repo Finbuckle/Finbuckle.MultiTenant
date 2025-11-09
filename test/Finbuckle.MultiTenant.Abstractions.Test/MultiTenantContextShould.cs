@@ -10,7 +10,7 @@ public class MultiTenantContextShould
         var tenantInfo = new TenantInfo(Id: "tenant1", Identifier: "tenant1", Name: "Tenant 1");
         var context = new MultiTenantContext<TenantInfo>(tenantInfo);
 
-        var returnedTenantInfo = context.TenantInfo;
+        var returnedTenantInfo = context.TenantInfo!;
 
         Assert.Equal(tenantInfo.Id, returnedTenantInfo.Id);
         Assert.Equal(tenantInfo.Identifier, returnedTenantInfo.Identifier);

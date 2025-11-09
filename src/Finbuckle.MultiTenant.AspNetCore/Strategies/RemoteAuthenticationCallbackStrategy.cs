@@ -44,7 +44,7 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
         foreach (var scheme in (await schemes.GetRequestHandlerSchemesAsync().ConfigureAwait(false)).Where(s =>
                      typeof(IAuthenticationRequestHandler).IsAssignableFrom(s.HandlerType)))
         {
-            // TODO verify this comment (still true as of net9.0)
+            // TODO verify this comment (still true as of net10.0)
             // Unfortunately we can't rely on the ShouldHandleAsync method since OpenId Connect handler doesn't use it.
             // Instead we'll get the paths to check from the options.
             var optionsType = scheme.HandlerType.GetProperty("Options")?.PropertyType;
