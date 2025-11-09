@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Contains contextual MultiTenant information.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     where TTenantInfo : TenantInfo
 {

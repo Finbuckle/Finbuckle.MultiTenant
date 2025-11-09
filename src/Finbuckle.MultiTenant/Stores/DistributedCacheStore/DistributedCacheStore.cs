@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
 /// <summary>
 /// Basic store that uses an IDistributedCache instance as its backing. Note that GetAllAsync is not implemented.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : TenantInfo
 {

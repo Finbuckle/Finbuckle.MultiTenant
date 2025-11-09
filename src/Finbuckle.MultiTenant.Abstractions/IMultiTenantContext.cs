@@ -29,7 +29,7 @@ public interface IMultiTenantContext
 /// <summary>
 /// Generic interface for the multi-tenant context.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
     where TTenantInfo : TenantInfo
 {

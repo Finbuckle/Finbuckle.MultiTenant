@@ -24,7 +24,7 @@ public interface ITenantResolver
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public interface ITenantResolver<TTenantInfo> : ITenantResolver
     where TTenantInfo : TenantInfo
 {

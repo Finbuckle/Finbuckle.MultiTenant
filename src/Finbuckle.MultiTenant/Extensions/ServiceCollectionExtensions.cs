@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.Extensions;
@@ -16,7 +17,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>

@@ -16,7 +16,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -47,7 +47,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure a particular type of options.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -64,7 +64,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure all instances of a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -81,7 +81,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -112,7 +112,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -129,7 +129,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure all instances of a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>

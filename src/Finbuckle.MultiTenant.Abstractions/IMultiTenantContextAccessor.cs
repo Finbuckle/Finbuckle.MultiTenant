@@ -17,7 +17,7 @@ public interface IMultiTenantContextAccessor
 /// <summary>
 /// Provides access the current MultiTenantContext.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public interface IMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor
     where TTenantInfo : TenantInfo
 {

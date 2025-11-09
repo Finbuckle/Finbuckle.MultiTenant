@@ -9,12 +9,11 @@ namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
 /// Basic store that can only retrieve tenant via HTTP calls. Note that add, update, and remove functionality is not
 /// implemented. Any changes to the tenant store must occur on the server.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
-    // ReSharper disable once StaticMemberInGenericType
-    // (also used on HttpRemoteStoreClient)
+    // internal for testing
     internal static readonly string DefaultEndpointTemplateIdentifierToken = $"{{{Constants.TenantToken}}}";
     private readonly HttpRemoteStoreClient<TTenantInfo> _client;
     private readonly string endpointTemplate;

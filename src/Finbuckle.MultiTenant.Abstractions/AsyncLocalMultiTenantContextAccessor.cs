@@ -2,12 +2,12 @@
 // Refer to the solution LICENSE file for more information.
 
 namespace Finbuckle.MultiTenant.Abstractions;
-// TODO rethink internal
+
 /// <summary>
 /// Provides access the current MultiTenantContext via an AsyncLocal variable.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-internal class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+public class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
     IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : TenantInfo
 {

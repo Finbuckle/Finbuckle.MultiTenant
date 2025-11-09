@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore.Internal;
+namespace Finbuckle.MultiTenant.AspNetCore;
 
 /// <summary>
 /// Implements <see cref="IAuthenticationSchemeProvider"/>.
 /// </summary>
-// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
 {
     private readonly IAuthenticationSchemeProvider _inner;

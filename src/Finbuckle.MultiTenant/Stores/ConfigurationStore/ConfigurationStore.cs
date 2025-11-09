@@ -3,7 +3,6 @@
 
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
@@ -14,7 +13,7 @@ namespace Finbuckle.MultiTenant.Stores.ConfigurationStore;
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not
 /// implemented. If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
