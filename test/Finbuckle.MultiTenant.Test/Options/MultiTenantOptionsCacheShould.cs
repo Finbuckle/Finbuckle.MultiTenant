@@ -5,10 +5,11 @@ using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace Finbuckle.MultiTenant.Options.Test;
+namespace Finbuckle.MultiTenant.Test.Options;
 
 public class MultiTenantOptionsCacheShould
 {
