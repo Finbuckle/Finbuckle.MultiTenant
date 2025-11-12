@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0-*"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.*"/>
        
         <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
         <ProjectReference Include="../Finbuckle.MultiTenant.Options/Finbuckle.MultiTenant.Options.csproj"/>
