@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0-*"/>
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.0-*"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.*"/>
+        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.*"/>
         
         <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj"/>
     </ItemGroup>
