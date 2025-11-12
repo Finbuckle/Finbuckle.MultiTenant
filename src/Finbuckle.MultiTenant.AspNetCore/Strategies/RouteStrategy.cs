@@ -26,7 +26,7 @@ public class RouteStrategy : IMultiTenantStrategy
                 nameof(tenantParam));
         }
 
-        this.TenantParam = tenantParam;
+        TenantParam = tenantParam;
     }
 
     /// <inheritdoc />

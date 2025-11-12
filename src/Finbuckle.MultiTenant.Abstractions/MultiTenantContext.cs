@@ -11,7 +11,7 @@ public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
     // internal for testing purposes
-    internal readonly TTenantInfo? _tenantInfo = null!;
+    internal readonly TTenantInfo? _tenantInfo;
     
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiTenantContext{TTenantInfo}"/> class

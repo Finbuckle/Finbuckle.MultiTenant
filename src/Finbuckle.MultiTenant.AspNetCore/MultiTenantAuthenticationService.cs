@@ -29,8 +29,8 @@ public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationServ
     /// <exception cref="ArgumentNullException">Thrown when inner is null.</exception>
     public MultiTenantAuthenticationService(IAuthenticationService inner, IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions)
     {
-            this._inner = inner ?? throw new System.ArgumentNullException(nameof(inner));
-            this._multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
+            _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            _multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
         }
 
     private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties? properties)

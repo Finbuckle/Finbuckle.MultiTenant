@@ -83,7 +83,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
 
         using var db = GetDbContext(null, tenant1);
         db.Database.EnsureCreated();
-        db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 1 });
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
         db.SaveChanges();
 
         Assert.Equal(1, db.MyMultiTenantThings!.Count());
@@ -101,13 +101,13 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
 
         using var db = GetDbContext(null, tenant1);
         db.Database.EnsureCreated();
-        db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 1 });
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
         db.SaveChanges();
 
         db.TenantInfo = tenant2;
-        db.MyMultiTenantThings?.Add(new MyMultiTenantThing() { Id = 2 });
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 2 });
         db.SaveChanges();
         
-        Assert.Equal(2, db.MyMultiTenantThings!.IgnoreQueryFilters([Finbuckle.MultiTenant.Abstractions.Constants.TenantToken]).Count());
+        Assert.Equal(2, db.MyMultiTenantThings!.IgnoreQueryFilters([Abstractions.Constants.TenantToken]).Count());
     }
 }

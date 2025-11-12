@@ -62,7 +62,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
     {
         var mtc = new MultiTenantContext<TTenantInfo>(null);
-        var tenantResolverLogger = loggerFactory?.CreateLogger(this.GetType()) ?? NullLogger.Instance;
+        var tenantResolverLogger = loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance;
 
         foreach (var strategy in Strategies)
         {
