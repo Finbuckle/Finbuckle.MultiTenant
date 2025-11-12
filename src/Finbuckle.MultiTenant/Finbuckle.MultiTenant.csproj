@@ -8,16 +8,12 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.*"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.*"/>
-        
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0-*"/>
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.*"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.*"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.*"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.*"/>
 
         <ProjectReference Include="../Finbuckle.MultiTenant.Abstractions/Finbuckle.MultiTenant.Abstractions.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Internal\" />
     </ItemGroup>
 </Project>
