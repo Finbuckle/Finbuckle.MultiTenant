@@ -122,7 +122,6 @@ public static class MultiTenantBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(config);
 
-        // ReSharper disable once RedundantTypeArgumentsOfMethod
         builder.Services.Configure<InMemoryStoreOptions<TTenantInfo>>(config);
 
         return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
@@ -154,7 +153,7 @@ public static class MultiTenantBuilderExtensions
             throw new ArgumentNullException(nameof(identifier), "Invalid value for \"identifier\"");
         }
 
-        return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, new object[] { identifier });
+        return builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, identifier);
     }
 
     /// <summary>
@@ -170,7 +169,7 @@ public static class MultiTenantBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(doStrategy);
 
-        return builder.WithStrategy<DelegateStrategy>(ServiceLifetime.Singleton, new object[] { doStrategy });
+        return builder.WithStrategy<DelegateStrategy>(ServiceLifetime.Singleton, doStrategy);
     }
     
     /// <summary>
@@ -185,7 +184,7 @@ public static class MultiTenantBuilderExtensions
         Func<TContext, Task<string?>> doStrategy)
         where TTenantInfo : TenantInfo
     {
-        ArgumentNullException.ThrowIfNull(doStrategy, nameof(doStrategy));
+        ArgumentNullException.ThrowIfNull(doStrategy);
 
         Func<object, Task<string?>> wrapStrategy = context =>
         {

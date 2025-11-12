@@ -23,7 +23,7 @@ public class StaticStrategy : IMultiTenantStrategy
     /// <param name="identifier">The tenant identifier to return.</param>
     public StaticStrategy(string identifier)
     {
-        this.Identifier = identifier;
+        Identifier = identifier;
     }
 
     /// <inheritdoc />

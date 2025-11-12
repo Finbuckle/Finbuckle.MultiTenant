@@ -30,7 +30,7 @@ public static class EntityTypeBuilderExtensions
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);
 
-        builder.HasAnnotation(EntityFrameworkCore.Constants.MultiTenantAnnotationName, true);
+        builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
 
         try
         {

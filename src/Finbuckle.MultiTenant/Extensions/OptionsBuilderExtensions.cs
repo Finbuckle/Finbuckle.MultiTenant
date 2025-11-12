@@ -8,7 +8,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.Options.Extensions;
+namespace Finbuckle.MultiTenant.Extensions;
 
 /// <summary>
 /// Extension methods for configuring options on a per-tenant basis.
@@ -30,7 +30,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
             new ConfigureNamedOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -63,7 +63,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
             new ConfigureNamedOptions<TOptions, TDep, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -99,7 +99,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
             new ConfigureNamedOptions<TOptions, TDep1, TDep2, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -139,7 +139,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
             new ConfigureNamedOptions<TOptions, TDep1, TDep2, TDep3, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -182,7 +182,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IConfigureOptions<TOptions>>(sp =>
             new ConfigureNamedOptions<TOptions, TDep1, TDep2, TDep3, TDep4, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -254,7 +254,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
             new PostConfigureOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -287,7 +287,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
             new PostConfigureOptions<TOptions, TDep, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -323,7 +323,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
             new PostConfigureOptions<TOptions, TDep1, TDep2, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -363,7 +363,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
             new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, IMultiTenantContextAccessor<TTenantInfo>>(
@@ -406,7 +406,7 @@ public static class OptionsBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
-        FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
+        ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
 
         optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
             new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, TDep4, IMultiTenantContextAccessor<TTenantInfo>>(
