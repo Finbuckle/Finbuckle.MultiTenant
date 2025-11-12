@@ -255,7 +255,7 @@ public class MultiTenantBuilderShould
         // Needed to test param injection
         public TestStore(bool testParam)
         {
-                this._testParam = testParam;
+                _testParam = testParam;
             }
 
         public Task<bool> AddAsync(TTenant tenantInfo)

@@ -14,7 +14,7 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
     public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) :
         base(new StaticMultiTenantContextAccessor<TenantInfo>(new TenantInfo(Id: "dummy", "")), options)
     {
-        this._config = config;
+        _config = config;
     }
 
     public DbSet<Blog>? Blogs { get; set; }

@@ -67,7 +67,7 @@ public sealed class HostStrategy : IMultiTenantStrategy
             template = template.Replace(Constants.TenantToken, @"(?<identifier>[^\.]+)");
         }
 
-        this.regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+        regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
     }
 
     /// <inheritdoc />
@@ -78,7 +78,7 @@ public sealed class HostStrategy : IMultiTenantStrategy
 
         var host = httpContext.Request.Host;
 
-        if (host.HasValue == false)
+        if (!host.HasValue)
             return Task.FromResult<string?>(null);
 
         string? identifier = null;

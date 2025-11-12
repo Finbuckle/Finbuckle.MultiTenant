@@ -26,7 +26,7 @@ public class MultiTenantStrategyWrapper : IMultiTenantStrategy
     /// <exception cref="ArgumentNullException">Thrown when strategy or logger is null.</exception>
     public MultiTenantStrategyWrapper(IMultiTenantStrategy strategy, ILogger logger)
     {
-        this.Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
+        Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 

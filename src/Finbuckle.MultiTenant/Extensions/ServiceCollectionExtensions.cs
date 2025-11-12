@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Diagnostics.CodeAnalysis;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,8 +12,7 @@ namespace Finbuckle.MultiTenant.Extensions;
 /// <summary>
 /// IServiceCollection extension methods for Finbuckle.MultiTenant.
 /// </summary>
-[SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
-public static class FinbuckleServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
@@ -23,14 +21,13 @@ public static class FinbuckleServiceCollectionExtensions
     /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
     /// <returns>A new instance of MultiTenantBuilder.</returns>
-    // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions<TTenantInfo>> config)
         where TTenantInfo : TenantInfo
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(
-            sp => (ITenantResolver)sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
+            sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
         services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
             AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
@@ -74,10 +71,9 @@ public static class FinbuckleServiceCollectionExtensions
         if (existingServices.Count == 0)
             throw new ArgumentException($"No service of type {typeof(TService).Name} found.");
 
-        ServiceDescriptor? newService;
-
         foreach (var existingService in existingServices)
         {
+            ServiceDescriptor? newService;
             if (existingService.ImplementationType is not null)
             {
                 newService = new ServiceDescriptor(existingService.ServiceType,
@@ -151,7 +147,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -160,7 +156,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -170,7 +166,7 @@ public static class FinbuckleServiceCollectionExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -182,7 +178,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure a particular type of options.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -190,7 +186,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.ConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -199,7 +195,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers an action used to configure all instances of a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -207,7 +203,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.ConfigurePerTenant(null, configureOptions);
     }
@@ -216,7 +212,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -225,7 +221,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -235,7 +231,7 @@ public static class FinbuckleServiceCollectionExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -247,7 +243,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -255,7 +251,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.PostConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -264,7 +260,7 @@ public static class FinbuckleServiceCollectionExtensions
     /// Registers a post configure action used to configure all instances of a particular type of options per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
+    /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -272,7 +268,7 @@ public static class FinbuckleServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : class, ITenantInfo, new()
+        where TTenantInfo : TenantInfo
     {
         return services.PostConfigurePerTenant(null, configureOptions);
     }
