@@ -7,30 +7,30 @@ using Microsoft.EntityFrameworkCore;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 
 /// <summary>
-/// A DbContext specialized for storing tenant information in Entity Framework Core.
+/// A <see cref="DbContext"/> specialized for storing tenant information in Entity Framework Core.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class EFCoreStoreDbContext<TTenantInfo> : DbContext
     where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Initializes a new instance of EFCoreStoreDbContext.
     /// </summary>
-    /// <param name="options">The database context options.</param>
+    /// <param name="options">The <see cref="DbContextOptions"/> instance.</param>
     public EFCoreStoreDbContext(DbContextOptions options) : base(options)
     {
     }
 
     /// <summary>
-    /// Gets the DbSet of tenant information.
+    /// Gets the <see cref="DbSet{TEntity}"/> of tenant information.
     /// </summary>
     public DbSet<TTenantInfo> TenantInfo => Set<TTenantInfo>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
-            modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id);
-            modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
-        }
+        modelBuilder.Entity<TTenantInfo>().HasKey(ti => ti.Id);
+        modelBuilder.Entity<TTenantInfo>().Property(ti => ti.Id);
+        modelBuilder.Entity<TTenantInfo>().HasIndex(ti => ti.Identifier).IsUnique();
+    }
 }

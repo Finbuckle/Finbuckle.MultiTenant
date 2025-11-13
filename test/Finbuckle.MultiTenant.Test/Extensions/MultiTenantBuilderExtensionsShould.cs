@@ -161,7 +161,7 @@ public class MultiTenantBuilderExtensionsShould
         var builder = new MultiTenantBuilder<TenantInfo>(services);
         builder.WithEchoStore();
         var sp = services.BuildServiceProvider();
-            
+
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<EchoStore<TenantInfo>>(store);
 
@@ -173,7 +173,7 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
     }
-    
+
     [Fact]
     public void AddDelegateStrategy()
     {
@@ -185,7 +185,7 @@ public class MultiTenantBuilderExtensionsShould
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<DelegateStrategy>(strategy);
     }
-    
+
     [Fact]
     public void AddTypedDelegateStrategy()
     {
@@ -197,7 +197,7 @@ public class MultiTenantBuilderExtensionsShould
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
         Assert.IsType<DelegateStrategy>(strategy);
     }
-    
+
     [Fact]
     public async Task ReturnNullForWrongTypeSendToTypedDelegateStrategy()
     {

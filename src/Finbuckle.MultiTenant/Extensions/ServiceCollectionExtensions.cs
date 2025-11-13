@@ -10,30 +10,29 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant.Extensions;
 
 /// <summary>
-/// IServiceCollection extension methods for Finbuckle.MultiTenant.
+/// <see cref="IServiceCollection"/> extension methods for Finbuckle.MultiTenant.
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="services">The <c>IServiceCollection</c> instance the extension method applies to.</param>
-    /// <param name="config">An action to configure the MultiTenantOptions instance.</param>
-    /// <returns>A new instance of MultiTenantBuilder.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
+    /// <param name="config">An action to configure the <see cref="MultiTenantOptions{TTenantInfo}"/> instance.</param>
+    /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions<TTenantInfo>> config)
         where TTenantInfo : TenantInfo
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
-        services.AddScoped<ITenantResolver>(
-            sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
+        services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
         services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
             AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
         services.AddSingleton<IMultiTenantContextAccessor>(sp =>
             sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
-        
+
         services.AddSingleton<IMultiTenantContextSetter>(sp =>
             (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
@@ -46,15 +45,16 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <param name="services">The IServiceCollection instance the extension method applies to.</param>
-    /// <returns>An new instance of MultiTenantBuilder.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
+    /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
         where TTenantInfo : TenantInfo
     {
         return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
 
-    
+
     /// <summary>
     /// Decorates an existing service registration with a new implementation that wraps the original.
     /// </summary>
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
                     {
                         TService inner =
                             (TService)ActivatorUtilities.CreateInstance(sp, existingService.ImplementationType);
- 
+
                         if (inner is null)
                             throw new ArgumentException(
                                 $"Unable to instantiate decorated type via implementation type {existingService.ImplementationType.Name}.");
@@ -103,11 +103,11 @@ public static class ServiceCollectionExtensions
                         if (inner is null)
                             throw new ArgumentException(
                                 $"Unable to instantiate decorated type via implementation instance of type {existingService.ImplementationInstance.GetType().Name}.");
-                        
+
                         var parameters2 = new object[parameters.Length + 1];
                         Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
                         parameters2[0] = inner;
-                        
+
                         return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                     },
                     existingService.Lifetime);
@@ -125,14 +125,14 @@ public static class ServiceCollectionExtensions
                         var parameters2 = new object[parameters.Length + 1];
                         Array.Copy(parameters, 0, parameters2, 1, parameters.Length);
                         parameters2[0] = inner;
-                        
+
                         return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                     },
                     existingService.Lifetime);
             }
             else
             {
-                throw new  ArgumentException(
+                throw new ArgumentException(
                     "Unable to instantiate decorated type.");
             }
 
@@ -294,7 +294,8 @@ public static class ServiceCollectionExtensions
 
         MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
         {
-            IOptionsMonitorCache<TOptions> cache = ActivatorUtilities.CreateInstance<MultiTenantOptionsCache<TOptions>>(sp);
+            IOptionsMonitorCache<TOptions> cache =
+                ActivatorUtilities.CreateInstance<MultiTenantOptionsCache<TOptions>>(sp);
             return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp, cache);
         }
     }

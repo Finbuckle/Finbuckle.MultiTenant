@@ -23,12 +23,12 @@ public static class MultiTenantBuilderExtensions
 {
     /// <summary>
     /// Configures a callback that determines when endpoints should be short circuited
-    /// during MultiTenant resolution.
+    /// during multi-tenant resolution.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="configureOptions">The short circuit options to configure.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhen<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<ShortCircuitWhenOptions> configureOptions)
         where TTenantInfo : TenantInfo
@@ -39,30 +39,27 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Configures endpoints to be short circuited during MultiTenant resolution when
-    /// no Tenant was resolved.
+    /// Configures endpoints to be short circuited during multi-tenant resolution when
+    /// no tenant was resolved.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> instance.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhenTenantNotResolved<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
     {
-        return builder.ShortCircuitWhen(config =>
-        {
-            config.Predicate = context => !context.IsResolved;
-        });
+        return builder.ShortCircuitWhen(config => { config.Predicate = context => !context.IsResolved; });
     }
 
     /// <summary>
-    /// Configures endpoints to be short circuited during MultiTenant resolution when
-    /// no Tenant was resolved.
+    /// Configures endpoints to be short circuited during multi-tenant resolution when
+    /// no tenant was resolved.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="redirectTo">A <see cref="Uri"/> to redirect the request to, if short circuited.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> ShortCircuitWhenTenantNotResolved<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Uri redirectTo)
         where TTenantInfo : TenantInfo
@@ -77,8 +74,9 @@ public static class MultiTenantBuilderExtensions
     /// <summary>
     /// Configures authentication options to enable per-tenant behavior.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
@@ -89,10 +87,10 @@ public static class MultiTenantBuilderExtensions
     /// <summary>
     /// Configures per-tenant authentication behavior.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="config">Authentication options config.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthentication<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions> config)
@@ -108,8 +106,9 @@ public static class MultiTenantBuilderExtensions
     /// <summary>
     /// Configures conventional functionality for per-tenant authentication.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationConventions<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
@@ -190,10 +189,10 @@ public static class MultiTenantBuilderExtensions
     /// <summary>
     /// Configures core functionality for per-tenant authentication.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
-    /// <param name="config">Authentication options config</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="config">Authentication options config.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithPerTenantAuthenticationCore<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<MultiTenantAuthenticationOptions>? config =
             null)
@@ -217,33 +216,34 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a SessionStrategy to the application.
+    /// Adds and configures a <see cref="SessionStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
         => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
 
     /// <summary>
-    /// Adds and configures a SessionStrategy to the application.
+    /// Adds and configures a <see cref="SessionStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantKey">The session key to use.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithSessionStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
         where TTenantInfo : TenantInfo
         => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);
 
     /// <summary>
-    /// Adds and configures a RemoteAuthenticationCallbackStrategy to the application.
+    /// Adds and configures a <see cref="RemoteAuthenticationCallbackStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRemoteAuthenticationCallbackStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
@@ -252,20 +252,23 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a BasePathStrategy to the application.
+    /// Adds and configures a <see cref="BasePathStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The same MultiTenantBuilder passed into the method.></returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo => WithBasePathStrategy(builder,
         configureOptions => { configureOptions.RebaseAspNetCorePathBase = true; });
 
     /// <summary>
-    /// Adds and configures a BasePathStrategy to the application.
+    /// Adds and configures a <see cref="BasePathStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The same MultiTenantBuilder passed into the method.></returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="configureOptions">Action to configure the <see cref="BasePathStrategyOptions"/>.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithBasePathStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Action<BasePathStrategyOptions> configureOptions)
         where TTenantInfo : TenantInfo
@@ -276,12 +279,14 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
             options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType == typeof(BasePathStrategy) &&
+                if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType ==
+                    typeof(BasePathStrategy) &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)
                 {
-                    httpContext.Request.Path.StartsWithSegments($"/{resolutionCompletedContext.MultiTenantContext.TenantInfo?.Identifier}",
+                    httpContext.Request.Path.StartsWithSegments(
+                        $"/{resolutionCompletedContext.MultiTenantContext.TenantInfo?.Identifier}",
                         out var matched, out var
                             newPath);
                     httpContext.Request.PathBase = httpContext.Request.PathBase.Add(matched);
@@ -296,22 +301,23 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a RouteStrategy with a route parameter Constants.TenantToken to the application.
+    /// Adds and configures a <see cref="RouteStrategy"/> with a route parameter <see cref="Abstractions.Constants.TenantToken"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
         => builder.WithRouteStrategy(Constants.TenantToken);
 
     /// <summary>
-    /// Adds and configures a RouteStrategy to the application.
+    /// Adds and configures a <see cref="RouteStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantParam)
         where TTenantInfo : TenantInfo
@@ -325,22 +331,23 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a HostStrategy with template "__tenant__.*" to the application.
+    /// Adds and configures a <see cref="HostStrategy"/> with template "__tenant__.*" to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
         => builder.WithHostStrategy($"{Constants.TenantToken}.*");
 
     /// <summary>
-    /// Adds and configures a HostStrategy to the application.
+    /// Adds and configures a <see cref="HostStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="template">The template for determining the tenant identifier in the host.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHostStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string template)
         where TTenantInfo : TenantInfo
@@ -354,10 +361,11 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a ClaimStrategy for claim name "__tenant__" to the application. Uses the default authentication handler scheme.
+    /// Adds and configures a <see cref="ClaimStrategy"/> for claim name "__tenant__" to the application. Uses the default authentication handler scheme.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : TenantInfo
     {
@@ -365,12 +373,12 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a ClaimStrategy to the application. Uses the default authentication handler scheme.
+    /// Adds and configures a <see cref="ClaimStrategy"/> to the application. Uses the default authentication handler scheme.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
@@ -381,13 +389,13 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a ClaimStrategy to the application.
+    /// Adds and configures a <see cref="ClaimStrategy"/> to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantKey">Claim name for determining the tenant identifier.</param>
     /// <param name="authenticationScheme">The authentication scheme to check for claims.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithClaimStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey, string authenticationScheme)
         where TTenantInfo : TenantInfo
@@ -395,14 +403,14 @@ public static class MultiTenantBuilderExtensions
         BypassSessionPrincipalValidation(builder);
         return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
     }
-    
+
     /// <summary>
-    /// Adds and configures an HttpContext delegate strategy to the application.
+    /// Adds and configures an <see cref="HttpContext"/> delegate strategy to the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="doStrategy">The delegate to execute to determine the tenant identifier.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHttpContextStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, Func<HttpContext, Task<string?>> doStrategy)
         where TTenantInfo : TenantInfo
@@ -429,9 +437,11 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a HeaderStrategy with using HTTP header key "__tenant__" to the application.
+    /// Adds and configures a <see cref="HeaderStrategy"/> using HTTP header key "__tenant__" to the application.
     /// </summary>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder) where TTenantInfo : TenantInfo
     {
@@ -439,11 +449,12 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a HeaderStrategy to the application with a custom HTTP header key.
+    /// Adds and configures a <see cref="HeaderStrategy"/> to the application with a custom HTTP header key.
     /// </summary>
-    /// <param name="builder">MultiTenantBuilder instance.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantKey">The HTTP header key for determining the tenant identifier in the request.</param>
-    /// <returns>The <see cref="MultiTenantBuilder&lt;TTenantInfo&gt;"/> so that additional calls can be chained.</returns>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithHeaderStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder, string tenantKey)
         where TTenantInfo : TenantInfo

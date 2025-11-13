@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
@@ -73,17 +73,18 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
 
             var strategyResolveCompletedContext = new StrategyResolveCompletedContext
                 { Context = context, Strategy = strategy, Identifier = identifier };
-            await options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext).ConfigureAwait(false);
+            await options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext)
+                .ConfigureAwait(false);
             if (identifier is not null && strategyResolveCompletedContext.Identifier is null)
                 tenantResolverLogger.LogDebug("OnStrategyResolveCompleted set non-null Identifier to null");
             identifier = strategyResolveCompletedContext.Identifier;
-            
+
             if (options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
-                tenantResolverLogger.LogDebug("Ignored identifier: {Identifier}", identifier);               
+                tenantResolverLogger.LogDebug("Ignored identifier: {Identifier}", identifier);
                 identifier = null;
             }
-            
+
             if (identifier == null)
                 continue;
 
@@ -95,8 +96,12 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 var tenantInfo = await wrappedStore.GetByIdentifierAsync(identifier).ConfigureAwait(false);
 
                 var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
-                    { Context = context, Store = store, Strategy = strategy, Identifier = identifier, TenantInfo = tenantInfo };
-                await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext).ConfigureAwait(false);
+                {
+                    Context = context, Store = store, Strategy = strategy, Identifier = identifier,
+                    TenantInfo = tenantInfo
+                };
+                await options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext)
+                    .ConfigureAwait(false);
                 if (tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
                     tenantResolverLogger.LogDebug("OnStoreResolveCompleted set non-null TenantInfo to null");
                 tenantInfo = storeResolveCompletedContext.TenantInfo;

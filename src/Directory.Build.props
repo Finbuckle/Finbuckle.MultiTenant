@@ -26,7 +26,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/" />
-        <None Include="../../NUGET_README.md" Pack="true" PackagePath="/" />
+        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
+        <None Include="../../NUGET_README.md" Pack="true" PackagePath="/"/>
     </ItemGroup>
 </Project>

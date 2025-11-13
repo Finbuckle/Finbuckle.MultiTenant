@@ -29,7 +29,7 @@ public class DelegateStrategyShould
 
         Assert.Equal(identifier, result);
     }
-        
+
     [Fact]
     public async Task BeAbleToReturnNull()
     {

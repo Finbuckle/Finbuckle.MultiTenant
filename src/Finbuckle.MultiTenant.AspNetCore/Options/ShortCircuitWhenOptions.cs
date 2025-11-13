@@ -14,10 +14,7 @@ public class ShortCircuitWhenOptions
     /// </summary>
     public Func<IMultiTenantContext, bool>? Predicate
     {
-        get
-        {
-            return _predicate;
-        }
+        get { return _predicate; }
         set
         {
             ArgumentNullException.ThrowIfNull(value);

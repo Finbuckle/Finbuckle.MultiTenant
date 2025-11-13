@@ -2,7 +2,7 @@
   "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
     "Tenants": [
       {
-        "Id":  "initech-id",
+        "Id": "initech-id",
         "Identifier": "initech",
         "Name": "Initech",
         "ConnectionString": "Datasource=sample.db"

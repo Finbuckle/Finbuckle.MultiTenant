@@ -12,11 +12,11 @@ public interface ITenantResolver
     /// Performs tenant resolution within the given context.
     /// </summary>
     /// <param name="context">The context for tenant resolution.</param>
-    /// <returns>The MultiTenantContext.</returns>
+    /// <returns>The <see cref="IMultiTenantContext"/>.</returns>
     Task<IMultiTenantContext> ResolveAsync(object context);
-    
+
     /// <summary>
-    /// Contains a list of MultiTenant strategies used for tenant resolution.
+    /// Contains a list of <see cref="IMultiTenantStrategy"/> instances used for tenant resolution.
     /// </summary>
     public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
 }
@@ -24,7 +24,7 @@ public interface ITenantResolver
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public interface ITenantResolver<TTenantInfo> : ITenantResolver
     where TTenantInfo : TenantInfo
 {
@@ -32,11 +32,11 @@ public interface ITenantResolver<TTenantInfo> : ITenantResolver
     /// Performs tenant resolution within the given context.
     /// </summary>
     /// <param name="context">The context for tenant resolution.</param>
-    /// <returns>The MultiTenantContext.</returns>
+    /// <returns>The <see cref="IMultiTenantContext{TTenantInfo}"/>.</returns>
     new Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context);
-    
+
     /// <summary>
-    /// Contains a list of MultiTenant stores used for tenant resolution.
+    /// Contains a list of <see cref="IMultiTenantStore{TTenantInfo}"/> instances used for tenant resolution.
     /// </summary>
     public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
 }

@@ -119,7 +119,7 @@ public class MultiTenantIdentityDbContextShould
 
         Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
     }
-    
+
     [Fact]
     public void CreateMultiTenantIdentityDbContext()
     {

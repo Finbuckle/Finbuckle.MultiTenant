@@ -8,19 +8,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test;
 
-public class TestIdentityDbContextAll : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
+public class TestIdentityDbContextAll : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string,
+    IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>,
+    IdentityUserToken<string>>
 {
-    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
+        multiTenantContextAccessor)
     {
     }
 
-    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) :
+        base(multiTenantContextAccessor, options)
     {
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-            optionsBuilder.UseSqlite("DataSource=:memory:");
-            base.OnConfiguring(optionsBuilder);
-        }
+        optionsBuilder.UseSqlite("DataSource=:memory:");
+        base.OnConfiguring(optionsBuilder);
+    }
 }
