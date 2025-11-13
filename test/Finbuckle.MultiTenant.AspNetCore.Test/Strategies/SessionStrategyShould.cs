@@ -61,7 +61,7 @@ public class SessionStrategyShould
     public async Task ReturnIdentifierIfSessionValue(string tenantSessionKey, string sessionKey, string? expected)
     {
         var sessionData = new Dictionary<string, string>();
-        if(expected != null)
+        if (expected != null)
             sessionData[sessionKey] = expected;
 
         var mockSession = new Mock<ISession>();

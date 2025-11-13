@@ -6,9 +6,9 @@ using Finbuckle.MultiTenant.Abstractions;
 namespace Finbuckle.MultiTenant.Events;
 
 /// <summary>
-/// Context for when a MultiTenantStore has attempted to look up a tenant identifier.
+/// Context for when a <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to look up a tenant identifier.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class StoreResolveCompletedContext<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
@@ -18,25 +18,25 @@ public class StoreResolveCompletedContext<TTenantInfo>
     public object? Context { get; set; }
 
     /// <summary>
-    /// The MultiTenantStore instance that was run.
+    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that was run.
     /// </summary>
     public required IMultiTenantStore<TTenantInfo> Store { get; init; }
-    
+
     /// <summary>
-    /// The MultiTenantStrategy instance that was run.
+    /// The <see cref="IMultiTenantStrategy"/> instance that was run.
     /// </summary>
     public required IMultiTenantStrategy Strategy { get; init; }
-    
+
     /// <summary>
     /// The identifier used for tenant resolution by the store.
     /// </summary>
     public required string Identifier { get; init; }
-    
+
     /// <summary>
-    /// The resolved TenantInfo. Setting to null will cause the next store to run
+    /// The resolved <see cref="TenantInfo"/>. Setting to null will cause the next store to run.
     /// </summary>
     public TTenantInfo? TenantInfo { get; set; }
-    
+
     /// <summary>
     /// Returns true if a tenant was found.
     /// </summary>

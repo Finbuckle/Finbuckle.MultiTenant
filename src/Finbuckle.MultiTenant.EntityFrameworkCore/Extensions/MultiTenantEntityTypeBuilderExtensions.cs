@@ -11,8 +11,8 @@ public static class MultiTenantEntityTypeBuilderExtensions
     /// <summary>
     /// Adds TenantId to all unique indexes.
     /// </summary>
-    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
-    /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
+    /// <param name="builder">The <see cref="MultiTenantEntityTypeBuilder"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
     public static MultiTenantEntityTypeBuilder AdjustUniqueIndexes(this MultiTenantEntityTypeBuilder builder)
     {
         // Update any unique constraints to include TenantId (unless they already do)
@@ -32,8 +32,8 @@ public static class MultiTenantEntityTypeBuilderExtensions
     /// <summary>
     /// Adds TenantId to all indexes.
     /// </summary>
-    /// <param name="builder">The MultiTenantEntityTypeBuilder instance.</param>
-    /// <returns>The MultiTenantEntityTypeBuilder instance.</returns>
+    /// <param name="builder">The <see cref="MultiTenantEntityTypeBuilder"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
     public static MultiTenantEntityTypeBuilder AdjustIndexes(this MultiTenantEntityTypeBuilder builder)
     {
         // Update any unique constraints to include TenantId (unless they already do)

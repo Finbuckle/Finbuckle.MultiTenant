@@ -111,7 +111,7 @@ public class DistributedCacheStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         if (tenantInfo.Id is null)
             return false;
-        
+
         var current = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
 
         if (current is null)

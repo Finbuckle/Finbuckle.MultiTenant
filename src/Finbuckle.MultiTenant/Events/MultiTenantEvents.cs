@@ -8,22 +8,25 @@ namespace Finbuckle.MultiTenant.Events;
 /// <summary>
 /// Events for successful and failed tenant resolution.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class MultiTenantEvents<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
     /// <summary>
-    /// Called after each MultiTenantStrategy has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.
+    /// Called after each <see cref="IMultiTenantStrategy"/> has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.
     /// </summary>
-    public Func<StrategyResolveCompletedContext, Task> OnStrategyResolveCompleted { get; set; } = context => Task.CompletedTask;
+    public Func<StrategyResolveCompletedContext, Task> OnStrategyResolveCompleted { get; set; } =
+        context => Task.CompletedTask;
 
     /// <summary>
-    /// Called after each MultiTenantStore has attempted to find the tenant identifier. The resulting TenantInfo can be modified if desired or set to null to advance to the next store.
+    /// Called after each <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to advance to the next store.
     /// </summary>
-    public Func<StoreResolveCompletedContext<TTenantInfo>, Task> OnStoreResolveCompleted { get; set; } = context => Task.CompletedTask;
-    
+    public Func<StoreResolveCompletedContext<TTenantInfo>, Task> OnStoreResolveCompleted { get; set; } =
+        context => Task.CompletedTask;
+
     /// <summary>
-    /// Called after tenant resolution has completed for all strategies and stores. The resulting MultiTenantContext can be modified if desired.
+    /// Called after tenant resolution has completed for all strategies and stores. The resulting <see cref="MultiTenantContext{TTenantInfo}"/> can be modified if desired.
     /// </summary>
-    public Func<TenantResolveCompletedContext<TTenantInfo>, Task> OnTenantResolveCompleted { get; set; } = context => Task.CompletedTask;
+    public Func<TenantResolveCompletedContext<TTenantInfo>, Task> OnTenantResolveCompleted { get; set; } =
+        context => Task.CompletedTask;
 }

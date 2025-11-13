@@ -38,7 +38,8 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
     public async Task<TTenantInfo?> GetByIdentifierAsync(string endpointTemplate, string identifier)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
-        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken, identifier);
+        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
+            identifier);
         var response = await client.GetAsync(uri).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
@@ -59,7 +60,8 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
-        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken, string.Empty);
+        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
+            string.Empty);
         var response = await client.GetAsync(uri).ConfigureAwait(false);
 
 

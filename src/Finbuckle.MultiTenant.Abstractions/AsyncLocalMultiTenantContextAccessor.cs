@@ -4,9 +4,9 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Provides access the current MultiTenantContext via an AsyncLocal variable.
+/// Provides access to the current <see cref="IMultiTenantContext{TTenantInfo}"/> via an <see cref="AsyncLocal{T}"/> variable.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
     IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : TenantInfo

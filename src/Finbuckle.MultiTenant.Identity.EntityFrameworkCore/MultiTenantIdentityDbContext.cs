@@ -19,15 +19,17 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
 {
     /// <inheritdoc />
-    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
+        multiTenantContextAccessor)
     {
     }
 
     /// <inheritdoc />
-    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-    
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -40,23 +42,26 @@ public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<Identit
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// TUser is not multi-tenant by default.
+/// <typeparamref name="TUser"/> is not multi-tenant by default.
 /// All other Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
+/// <typeparam name="TUser">The <see cref="IdentityUser"/> derived type.</typeparam>
 public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
     where TUser : IdentityUser
 {
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
+        multiTenantContextAccessor)
     {
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-    
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -69,25 +74,32 @@ public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityD
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// TUser and TRole are not multi-tenant by default.
+/// <typeparamref name="TUser"/> and <typeparamref name="TRole"/> are not multi-tenant by default.
 /// All other Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
-public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>, IdentityUserToken<TKey>>
+/// <typeparam name="TUser">The <see cref="IdentityUser{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TRole">The <see cref="IdentityRole{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TKey">The key type.</typeparam>
+public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey
+    , IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>,
+    IdentityUserToken<TKey>>
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
     where TKey : IEquatable<TKey>
 {
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
+        multiTenantContextAccessor)
     {
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
+    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-    
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -103,12 +115,22 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
 
 /// <summary>
 /// An Identity database context that enforces tenant integrity on entity types
-/// marked with the MultiTenant annotation or attribute.
+/// marked with the <see cref="MultiTenantAttribute"/> annotation or attribute.
 /// <remarks>
 /// No Identity entity types are multi-tenant by default.
 /// </remarks>
 /// </summary>
-public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>, IMultiTenantDbContext
+/// <typeparam name="TUser">The <see cref="IdentityUser{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TRole">The <see cref="IdentityRole{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TKey">The key type.</typeparam>
+/// <typeparam name="TUserClaim">The <see cref="IdentityUserClaim{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TUserRole">The <see cref="IdentityUserRole{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TUserLogin">The <see cref="IdentityUserLogin{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TRoleClaim">The <see cref="IdentityRoleClaim{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TUserToken">The <see cref="IdentityUserToken{TKey}"/> derived type.</typeparam>
+public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim,
+    TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>,
+    IMultiTenantDbContext
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
     where TUserClaim : IdentityUserClaim<TKey>
@@ -130,18 +152,19 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
+    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
     protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
-    
+
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The MultiTenantContextAccessor instance used to bind the context instance to a tenant.</param>
-    /// <param name="options">The database options instance.</param>
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(options)
+    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
+    /// <param name="options">The <see cref="DbContextOptions"/> instance.</param>
+    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
+        DbContextOptions options) : base(options)
     {
         TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
