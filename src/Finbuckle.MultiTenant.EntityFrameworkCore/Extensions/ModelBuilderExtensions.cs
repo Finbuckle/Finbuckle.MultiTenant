@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 public static class FinbuckleModelBuilderExtensions
 {
     /// <summary>
-    /// Configures any entity types with the <see cref="MultiTenantAttribute"/> attribute.
+    /// Configures any entity types with the <see cref="Abstractions.MultiTenantAttribute"/> attribute.
     /// </summary>
     /// <param name="modelBuilder">The <see cref="ModelBuilder"/> instance.</param>
     /// <returns>The <see cref="ModelBuilder"/> instance.</returns>

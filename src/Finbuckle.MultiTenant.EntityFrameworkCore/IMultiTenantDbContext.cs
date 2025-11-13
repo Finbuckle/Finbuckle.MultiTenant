@@ -1,4 +1,4 @@
-﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
+﻿﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
@@ -6,7 +6,7 @@ using Finbuckle.MultiTenant.Abstractions;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
 /// <summary>
-/// Interface for a <see cref="DbContext"/> that supports multi-tenancy.
+/// Interface for a <see cref="Microsoft.EntityFrameworkCore.DbContext"/> that supports multi-tenancy.
 /// </summary>
 public interface IMultiTenantDbContext
 {

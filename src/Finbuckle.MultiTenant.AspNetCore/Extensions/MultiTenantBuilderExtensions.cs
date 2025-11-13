@@ -301,7 +301,7 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds and configures a <see cref="RouteStrategy"/> with a route parameter <see cref="Constants.TenantToken"/> to the application.
+    /// Adds and configures a <see cref="RouteStrategy"/> with a route parameter <see cref="Abstractions.Constants.TenantToken"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
