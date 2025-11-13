@@ -4,7 +4,7 @@
 using System.Runtime.CompilerServices;
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Stores.EchoStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that simply returns a tenant based on the identifier without any additional settings.

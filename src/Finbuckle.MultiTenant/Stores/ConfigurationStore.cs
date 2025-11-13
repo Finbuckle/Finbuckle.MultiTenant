@@ -7,7 +7,7 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 
-namespace Finbuckle.MultiTenant.Stores.ConfigurationStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not

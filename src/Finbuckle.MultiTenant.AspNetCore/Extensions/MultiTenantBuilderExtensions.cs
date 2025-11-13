@@ -2,10 +2,10 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Authentication;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
 using Finbuckle.MultiTenant.Extensions;
-using Finbuckle.MultiTenant.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;

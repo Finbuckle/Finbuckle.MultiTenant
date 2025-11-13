@@ -2,11 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Stores.ConfigurationStore;
-using Finbuckle.MultiTenant.Stores.DistributedCacheStore;
-using Finbuckle.MultiTenant.Stores.EchoStore;
-using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
-using Finbuckle.MultiTenant.Stores.InMemoryStore;
+using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

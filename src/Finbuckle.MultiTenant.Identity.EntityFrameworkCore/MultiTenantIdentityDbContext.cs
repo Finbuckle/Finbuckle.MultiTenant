@@ -47,7 +47,7 @@ public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<Identit
 /// </remarks>
 /// </summary>
 /// <typeparam name="TUser">The <see cref="IdentityUser"/> derived type.</typeparam>
-public abstract class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
+public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<TUser, IdentityRole, string>
     where TUser : IdentityUser
 {
     /// <inheritdoc />

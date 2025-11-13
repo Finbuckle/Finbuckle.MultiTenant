@@ -2,7 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 using Finbuckle.MultiTenant.Test.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

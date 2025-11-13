@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that keeps tenants in memory.

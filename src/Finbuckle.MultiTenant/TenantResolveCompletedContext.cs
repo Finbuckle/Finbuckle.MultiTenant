@@ -1,6 +1,6 @@
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Events;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Context for when tenant resolution has completed.

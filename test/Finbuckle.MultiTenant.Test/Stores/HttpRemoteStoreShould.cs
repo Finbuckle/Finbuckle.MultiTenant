@@ -4,7 +4,7 @@
 using System.Net;
 using System.Reflection;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Stores.HttpRemoteStore;
+using Finbuckle.MultiTenant.Stores;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
