@@ -30,7 +30,7 @@ public class ClaimStrategy : IMultiTenantStrategy
     /// </summary>
     /// <param name="template">The claim type containing the tenant identifier.</param>
     /// <param name="authenticationScheme">The authentication scheme to use, or null for the default scheme.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="template"/> is null or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when template is null or whitespace.</exception>
     public ClaimStrategy(string template, string? authenticationScheme)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(template);
@@ -57,8 +57,7 @@ public class ClaimStrategy : IMultiTenantStrategy
         else
         {
             authScheme =
-                (await schemeProvider.GetAllSchemesAsync().ConfigureAwait(false)).FirstOrDefault(x =>
-                    x.Name == _authenticationScheme);
+                (await schemeProvider.GetAllSchemesAsync().ConfigureAwait(false)).FirstOrDefault(x => x.Name == _authenticationScheme);
         }
 
         if (authScheme is null)

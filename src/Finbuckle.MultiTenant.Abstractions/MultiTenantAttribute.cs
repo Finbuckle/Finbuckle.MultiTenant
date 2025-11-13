@@ -9,4 +9,5 @@ namespace Finbuckle.MultiTenant.Abstractions;
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class MultiTenantAttribute : Attribute
 {
+
 }

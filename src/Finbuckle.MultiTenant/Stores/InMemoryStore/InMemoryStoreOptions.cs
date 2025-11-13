@@ -6,9 +6,9 @@ using Finbuckle.MultiTenant.Abstractions;
 namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 
 /// <summary>
-/// Options for configuring the <see cref="InMemoryStore{TTenantInfo}"/>.
+/// Options for configuring the InMemoryStore.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class InMemoryStoreOptions<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
@@ -16,7 +16,7 @@ public class InMemoryStoreOptions<TTenantInfo>
     /// Gets or sets whether tenant identifier lookups are case-sensitive.
     /// </summary>
     public bool IsCaseSensitive { get; set; }
-
+    
     /// <summary>
     /// Gets or sets the list of tenants to store in memory.
     /// </summary>

@@ -13,12 +13,12 @@ public enum TenantMismatchMode
     /// Throw an exception when a mismatch is detected.
     /// </summary>
     Throw,
-
+    
     /// <summary>
     /// Ignore the mismatch and save the entity as-is.
     /// </summary>
     Ignore,
-
+    
     /// <summary>
     /// Overwrite the entity's TenantId with the current tenant's Id.
     /// </summary>
@@ -35,7 +35,7 @@ public enum TenantNotSetMode
     /// Throw an exception when TenantId is not set.
     /// </summary>
     Throw,
-
+    
     /// <summary>
     /// Overwrite the entity's TenantId with the current tenant's Id.
     /// </summary>

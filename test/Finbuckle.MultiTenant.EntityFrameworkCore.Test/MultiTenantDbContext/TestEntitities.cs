@@ -15,13 +15,11 @@ public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext
     {
     }
 
-    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(
-        multiTenantContextAccessor, options)
+    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-
-    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, object dependency) : base(
-        multiTenantContextAccessor)
+    
+    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, object dependency) : base(multiTenantContextAccessor)
     {
     }
 }

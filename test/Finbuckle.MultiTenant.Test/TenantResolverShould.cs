@@ -153,7 +153,7 @@ public class TenantResolverShould
         Assert.Equal(typeof(StaticStrategy), resolvedContext.MultiTenantContext.StrategyInfo!.StrategyType);
         Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.MultiTenantContext.StoreInfo!.StoreType);
     }
-
+    
     [Fact]
     public async Task CallOnTenantResolveCompletedIfFailure()
     {
@@ -178,7 +178,7 @@ public class TenantResolverShould
         Assert.NotNull(resolvedContext);
         Assert.False(resolvedContext.IsResolved);
     }
-
+    
     [Fact]
     public async Task CallOnStrategyResolveCompletedPerStrategy()
     {
@@ -203,7 +203,7 @@ public class TenantResolverShould
 
         Assert.Equal(2, numCalls);
     }
-
+    
     [Fact]
     public async Task CallOnStoreResolveCompletedPerStore()
     {

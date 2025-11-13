@@ -16,7 +16,7 @@ public class DelegateStrategy : IMultiTenantStrategy
     /// Initializes a new instance of DelegateStrategy.
     /// </summary>
     /// <param name="doStrategy">The delegate function that returns the tenant identifier.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="doStrategy"/> is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when doStrategy is null.</exception>
     public DelegateStrategy(Func<object, Task<string?>> doStrategy)
     {
         _doStrategy = doStrategy ?? throw new ArgumentNullException(nameof(doStrategy));

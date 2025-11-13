@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Strategies;
 public class MultiTenantStrategyWrapper : IMultiTenantStrategy
 {
     /// <summary>
-    /// Gets the internal <see cref="IMultiTenantStrategy"/> instance.
+    /// Gets the internal IMultiTenantStrategy instance.
     /// </summary>
     public IMultiTenantStrategy Strategy { get; }
 
@@ -21,9 +21,9 @@ public class MultiTenantStrategyWrapper : IMultiTenantStrategy
     /// <summary>
     /// Initializes a new instance of MultiTenantStrategyWrapper.
     /// </summary>
-    /// <param name="strategy">The <see cref="IMultiTenantStrategy"/> instance to wrap.</param>
+    /// <param name="strategy">The IMultiTenantStrategy instance to wrap.</param>
     /// <param name="logger">The logger instance.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="strategy"/> or <paramref name="logger"/> is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when strategy or logger is null.</exception>
     public MultiTenantStrategyWrapper(IMultiTenantStrategy strategy, ILogger logger)
     {
         Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
@@ -45,7 +45,7 @@ public class MultiTenantStrategyWrapper : IMultiTenantStrategy
             throw new MultiTenantException($"Exception in {Strategy.GetType()}.GetIdentifierAsync.", e);
         }
 
-        if (identifier != null)
+        if(identifier != null)
         {
             if (logger.IsEnabled(LogLevel.Debug))
             {

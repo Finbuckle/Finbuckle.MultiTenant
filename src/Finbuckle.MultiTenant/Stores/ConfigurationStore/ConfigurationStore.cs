@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.Stores.ConfigurationStore;
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not
 /// implemented. If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
@@ -24,7 +24,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <summary>
     /// Constructor for ConfigurationStore. Uses a section name of "Finbuckle:MultiTenant:Stores:ConfigurationStore".
     /// </summary>
-    /// <param name="configuration"><see cref="IConfiguration"/> instance containing tenant information.</param>
+    /// <param name="configuration">IConfiguration instance containing tenant information.</param>
     public ConfigurationStore(IConfiguration configuration) : this(configuration, DefaultSectionName)
     {
     }
@@ -33,23 +33,22 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <summary>
     /// Constructor for ConfigurationStore.
     /// </summary>
-    /// <param name="configuration"><see cref="IConfiguration"/> instance containing tenant information.</param>
+    /// <param name="configuration">IConfiguration instance containing tenant information.</param>
     /// <param name="sectionName">Name of the section within the configuration containing tenant information.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration"/> is null.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="sectionName"/> is null or empty.</exception>
-    /// <exception cref="MultiTenantException">Thrown when the section name is invalid.</exception>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="MultiTenantException"></exception>
     public ConfigurationStore(IConfiguration configuration, string sectionName)
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
         if (string.IsNullOrEmpty(sectionName))
         {
-            throw new ArgumentException("Section name provided to the Configuration Store is null or empty.",
-                nameof(sectionName));
+            throw new ArgumentException("Section name provided to the Configuration Store is null or empty.", nameof(sectionName));
         }
 
         section = configuration.GetSection(sectionName);
-        if (!section.Exists())
+        if(!section.Exists())
         {
             throw new MultiTenantException("Section name provided to the Configuration Store is invalid.");
         }
@@ -63,14 +62,14 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
         var newMap = new ConcurrentDictionary<string, TTenantInfo>(StringComparer.OrdinalIgnoreCase);
         var tenants = section.GetSection("Tenants").GetChildren();
         var defaults = section.GetSection("Defaults");
-
-        foreach (var tenantSection in tenants)
+        
+        foreach(var tenantSection in tenants)
         {
             var newTenant = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
-
+                
             defaults.Bind(newTenant, options => options.BindNonPublicProperties = true);
             tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-
+            
             newMap.TryAdd(newTenant.Identifier, newTenant);
         }
 
@@ -91,23 +90,19 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value)
-            .ConfigureAwait(false);
+        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>())
-            .ConfigureAwait(false);
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        return await Task
-            .FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>())
-            .ConfigureAwait(false);
+        return await Task.FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>()).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -120,8 +115,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
             return null;
         }
 
-        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null)
-            .ConfigureAwait(false);
+        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null).ConfigureAwait(false);
     }
 
     /// <summary>

@@ -67,8 +67,7 @@ public sealed class HostStrategy : IMultiTenantStrategy
             template = template.Replace(Constants.TenantToken, @"(?<identifier>[^\.]+)");
         }
 
-        regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled,
-            TimeSpan.FromMilliseconds(100));
+        regex = new Regex($"^{template}$", RegexOptions.ExplicitCapture | RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
     }
 
     /// <inheritdoc />

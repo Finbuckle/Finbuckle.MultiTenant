@@ -4,25 +4,25 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Provides access to the current <see cref="IMultiTenantContext"/>.
+/// Provides access the current MultiTenantContext.
 /// </summary>
 public interface IMultiTenantContextAccessor
 {
     /// <summary>
-    /// Gets the current <see cref="IMultiTenantContext"/>.
+    /// Gets the current MultiTenantContext.
     /// </summary>
     IMultiTenantContext MultiTenantContext { get; }
 }
 
 /// <summary>
-/// Provides access to the current <see cref="IMultiTenantContext{TTenantInfo}"/>.
+/// Provides access the current MultiTenantContext.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public interface IMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextAccessor
     where TTenantInfo : TenantInfo
 {
     /// <summary>
-    /// Gets the current <see cref="IMultiTenantContext{TTenantInfo}"/>.
+    /// Gets the current MultiTenantContext.
     /// </summary>
     new IMultiTenantContext<TTenantInfo> MultiTenantContext { get; }
 }

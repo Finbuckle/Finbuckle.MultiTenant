@@ -13,20 +13,15 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 public static class MultiTenantBuilderExtensions
 {
     /// <summary>
-    /// Adds an <see cref="EFCoreStore{TEFCoreStoreDbContext,TTenantInfo}"/> based multi-tenant store to the application. Will also add the database context service unless it is already added.
+    /// Adds an EFCore based multi-tenant store to the application. Will also add the database context service unless it is already added.
     /// </summary>
-    /// <typeparam name="TEFCoreStoreDbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo}"/> derived type.</typeparam>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
-    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</returns>
+    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once InconsistentNaming
-    public static MultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder)
+    public static MultiTenantBuilder<TTenantInfo> WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>(this MultiTenantBuilder<TTenantInfo> builder)
         where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
         where TTenantInfo : TenantInfo
     {
-        builder.Services
-            .AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
+        builder.Services.AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.
         return builder.WithStore<EFCoreStore<TEFCoreStoreDbContext, TTenantInfo>>(ServiceLifetime.Scoped);
     }
 }

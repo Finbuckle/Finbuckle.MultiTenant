@@ -16,9 +16,12 @@ public class MultiTenantDbContextShould
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>();
-        services.AddDbContext<TestBlogDbContext>(options => { options.UseSqlite("DataSource=:memory:"); });
+        services.AddDbContext<TestBlogDbContext>(options =>
+        {
+            options.UseSqlite("DataSource=:memory:");
+        });
         var scope = services.BuildServiceProvider().CreateScope();
-
+            
         var context = scope.ServiceProvider.GetService<TestBlogDbContext>();
         Assert.NotNull(context);
     }
@@ -42,18 +45,17 @@ public class MultiTenantDbContextShould
 
         Assert.NotNull(c);
     }
-
+    
     [Fact]
     public void WorkWithCreateDbOptions()
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1,
-                new DbContextOptions<TestBlogDbContext>());
+            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new DbContextOptions<TestBlogDbContext>());
 
         Assert.NotNull(c);
     }
-
+    
     [Fact]
     public void WorkWithCreateDependencies()
     {
@@ -63,7 +65,7 @@ public class MultiTenantDbContextShould
 
         Assert.NotNull(c);
     }
-
+    
     [Fact]
     public void WorkWithCreateServiceProvider()
     {
@@ -71,14 +73,14 @@ public class MultiTenantDbContextShould
         var services = new ServiceCollection();
         services.AddTransient<object>(sp => 42);
         var sp = services.BuildServiceProvider();
-
+        
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c =
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, sp);
 
         Assert.NotNull(c);
     }
-
+    
     [Fact]
     public void WorkWithCreateNoOptions()
     {
@@ -87,13 +89,12 @@ public class MultiTenantDbContextShould
 
         Assert.NotNull(c);
     }
-
+    
     [Fact]
     public void ThrowOnInvalidDbContext()
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
 
-        Assert.Throws<ArgumentException>(() =>
-            EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
+        Assert.Throws<ArgumentException>(() => EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
     }
 }

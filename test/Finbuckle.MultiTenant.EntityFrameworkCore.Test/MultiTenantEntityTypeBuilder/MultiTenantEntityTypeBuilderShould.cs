@@ -34,7 +34,7 @@ public class MultiTenantEntityTypeBuilderShould
             var origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
             builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
         });
-
+        
         var index = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().First();
         Assert.Contains("BlogId", index!.Properties.Select(p => p.Name));
         Assert.Contains("TenantId", index.Properties.Select(p => p.Name));
@@ -52,9 +52,9 @@ public class MultiTenantEntityTypeBuilderShould
             var origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
             builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
         });
-
+        
         var index = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().First();
-
+        
         Assert.Equal("CustomIndexName", index!.Name);
         Assert.Equal("CustomIndexDbName", index.GetDatabaseName());
     }
@@ -70,7 +70,7 @@ public class MultiTenantEntityTypeBuilderShould
             foreach (var index in builder.Entity<Blog>().Metadata.GetIndexes().ToList())
                 builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
         });
-
+        
         var index = db.Model.FindEntityType(typeof(Blog))?
             .GetIndexes()
             .Single(i => i.Properties.Select(p => p.Name).Contains("BlogId"));
@@ -122,7 +122,7 @@ public class MultiTenantEntityTypeBuilderShould
 
             builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
         });
-
+        
         var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
 
         Assert.Single((IEnumerable)key!);
@@ -161,7 +161,7 @@ public class MultiTenantEntityTypeBuilderShould
                 .HasPrincipalKey(b => b.Url);
             builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
         });
-
+        
         var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
 
         Assert.Single((IEnumerable)key!);

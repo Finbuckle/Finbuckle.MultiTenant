@@ -17,7 +17,7 @@ public class RouteStrategy : IMultiTenantStrategy
     /// Initializes a new instance of RouteStrategy.
     /// </summary>
     /// <param name="tenantParam">The name of the route parameter containing the tenant identifier.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="tenantParam"/> is null or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when tenantParam is null or whitespace.</exception>
     public RouteStrategy(string tenantParam)
     {
         if (string.IsNullOrWhiteSpace(tenantParam))

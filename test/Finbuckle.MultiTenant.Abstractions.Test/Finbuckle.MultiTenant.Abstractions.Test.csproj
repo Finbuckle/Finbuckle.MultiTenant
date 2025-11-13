@@ -5,9 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj"/>
+      <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

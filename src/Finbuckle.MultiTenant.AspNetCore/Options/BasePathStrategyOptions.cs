@@ -4,7 +4,7 @@
 namespace Finbuckle.MultiTenant.AspNetCore.Options;
 
 /// <summary>
-/// Options for configuring the <see cref="Strategies.BasePathStrategy"/>.
+/// Options for configuring the BasePathStrategy.
 /// </summary>
 public class BasePathStrategyOptions
 {

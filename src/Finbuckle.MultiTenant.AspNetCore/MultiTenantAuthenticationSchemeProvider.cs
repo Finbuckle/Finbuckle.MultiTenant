@@ -23,8 +23,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// </summary>
     /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
     /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
-    public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner,
-        IOptions<AuthenticationOptions> options)
+    public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options)
         : this(inner, options, new Dictionary<string, AuthenticationScheme>(StringComparer.Ordinal))
     {
     }
@@ -36,8 +35,7 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
     /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
     /// <param name="schemes">The dictionary used to store authentication schemes.</param>
-    public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner,
-        IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
+    public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner, IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
     {
         _inner = inner;
         _optionsProvider = options;
@@ -161,19 +159,16 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         {
             throw new InvalidOperationException("Scheme already exists: " + scheme.Name);
         }
-
         lock (_lock)
         {
             if (_schemes.ContainsKey(scheme.Name))
             {
                 throw new InvalidOperationException("Scheme already exists: " + scheme.Name);
             }
-
             if (typeof(IAuthenticationRequestHandler).IsAssignableFrom(scheme.HandlerType))
             {
                 _requestHandlers.Add(scheme);
             }
-
             _schemes[scheme.Name] = scheme;
         }
     }
@@ -188,7 +183,6 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
         {
             return;
         }
-
         lock (_lock)
         {
             if (_schemes.TryGetValue(name, out var scheme))

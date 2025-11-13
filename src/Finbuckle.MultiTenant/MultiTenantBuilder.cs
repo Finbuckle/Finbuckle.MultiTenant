@@ -9,40 +9,40 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>
-    /// Gets or sets the <see cref="IServiceCollection"/> instance used by the builder.
+    /// Gets or sets the IServiceCollection instance used by the builder.
     /// </summary>
     public IServiceCollection Services { get; set; }
 
     /// <summary>
-    /// Constructs a new instance of MultiTenantBuilder.
+    /// Construction a new instance of FinbuckleMultiTenantBuilder.
     /// </summary>
-    /// <param name="services">An <see cref="IServiceCollection"/> instance to be used by the builder.</param>
+    /// <param name="services">An IServiceCollection instance to be used by the builder.</param>
     public MultiTenantBuilder(IServiceCollection services)
     {
         Services = services;
     }
 
     /// <summary>
-    /// Adds and configures an <see cref="IMultiTenantStore{TTenantInfo}"/> to the application using default dependency injection.
-    /// </summary>
+    /// Adds and configures an IMultiTenantStore to the application using default dependency injection.
+    /// </summary>>
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
-    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
         params object[] parameters)
         where TStore : IMultiTenantStore<TTenantInfo>
         => WithStore<TStore>(lifetime, sp => ActivatorUtilities.CreateInstance<TStore>(sp, parameters));
 
     /// <summary>
-    /// Adds and configures an <see cref="IMultiTenantStore{TTenantInfo}"/> to the application using a factory method.
+    /// Adds and configures an IMultiTenantStore to the application using a factory method.
     /// </summary>
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="factory">A delegate that will create and configure the store.</param>
-    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
     public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStore> factory)
@@ -58,21 +58,21 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : TenantInfo
     }
 
     /// <summary>
-    /// Adds and configures an <see cref="IMultiTenantStrategy"/> to the application using default dependency injection.
+    /// Adds and configures an IMultiTenantStrategy to the application using default dependency injection.
     /// </summary>
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
-    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         params object[] parameters) where TStrategy : IMultiTenantStrategy
         => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<TStrategy>(sp, parameters));
 
     /// <summary>
-    /// Adds and configures an <see cref="IMultiTenantStrategy"/> to the application using a factory method.
+    /// Adds and configures an IMultiTenantStrategy to the application using a factory method.
     /// </summary>
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="factory">A delegate that will create and configure the strategy.</param>
-    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStrategy> factory)
         where TStrategy : IMultiTenantStrategy

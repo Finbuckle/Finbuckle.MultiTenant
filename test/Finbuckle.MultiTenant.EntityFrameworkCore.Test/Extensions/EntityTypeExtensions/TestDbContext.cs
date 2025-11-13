@@ -11,22 +11,21 @@ public class TestDbContext : DbContext
     // ReSharper disable once MemberHidesStaticFromOuterClass
     // ReSharper disable once UnusedMember.Local
     DbSet<MyMultiTenantThing>? MyMultiTenantThing { get; set; }
-
     // ReSharper disable once MemberHidesStaticFromOuterClass
     // ReSharper disable once UnusedMember.Local
     DbSet<MyThing>? MyThing { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("DataSource=:memory:");
-        base.OnConfiguring(optionsBuilder);
-    }
+            optionsBuilder.UseSqlite("DataSource=:memory:");
+            base.OnConfiguring(optionsBuilder);
+        }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
-        modelBuilder.Entity<MyMultiTenantChildThing>();
-    }
+            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+            modelBuilder.Entity<MyMultiTenantChildThing>();
+        }
 }
 
 public class MyThing
@@ -41,4 +40,5 @@ public class MyMultiTenantThing
 
 public class MyMultiTenantChildThing : MyMultiTenantThing
 {
+
 }
