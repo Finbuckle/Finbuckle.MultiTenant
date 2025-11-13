@@ -2,11 +2,8 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Events;
 using Finbuckle.MultiTenant.Extensions;
-using Finbuckle.MultiTenant.Options;
-using Finbuckle.MultiTenant.Stores.ConfigurationStore;
-using Finbuckle.MultiTenant.Stores.InMemoryStore;
+using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,7 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Events;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Events for successful and failed tenant resolution.

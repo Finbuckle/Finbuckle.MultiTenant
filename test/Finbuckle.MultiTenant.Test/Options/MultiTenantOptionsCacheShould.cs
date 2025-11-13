@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.Test.Options;
 
 public class MultiTenantOptionsCacheShould
 {
-    internal class TestOptions
+    public class TestOptions
     {
         [Required]
         public string? DefaultConnectionString { get; set; }

@@ -1,7 +1,7 @@
 ﻿// Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-namespace Finbuckle.MultiTenant.AspNetCore.Options;
+namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 
 /// <summary>
 /// Options for configuring multi-tenant authentication behavior.

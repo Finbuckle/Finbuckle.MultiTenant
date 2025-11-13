@@ -2,9 +2,8 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Events;
 
-namespace Finbuckle.MultiTenant.Options;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Options for multi-tenant resolution.

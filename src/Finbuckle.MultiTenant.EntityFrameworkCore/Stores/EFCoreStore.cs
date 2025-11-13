@@ -4,7 +4,7 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
+namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 
 /// <summary>
 /// A multi-tenant store that uses Entity Framework Core for tenant storage.
