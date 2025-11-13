@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Extensions;
 
-public class ServiceCollectionExtensionsShould
+public abstract class ServiceCollectionExtensionsShould
 {
     [Fact]
     public void RegisterITenantResolverInDi()
@@ -77,7 +77,7 @@ public class ServiceCollectionExtensionsShould
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
     }
 
-    public class TestOptions
+    public abstract class TestOptions
     {
         public string? Prop1 { get; set; }
     }

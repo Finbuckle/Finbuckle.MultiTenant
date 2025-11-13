@@ -2,15 +2,14 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Events;
 
-namespace Finbuckle.MultiTenant.Options;
+namespace Finbuckle.MultiTenant;
 
 /// <summary>
 /// Options for multi-tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-public class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
+public abstract class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Gets or sets the type of <see cref="TenantInfo"/> derived.

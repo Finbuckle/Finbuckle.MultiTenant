@@ -5,7 +5,7 @@ using System.Text.Json;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Finbuckle.MultiTenant.Stores.DistributedCacheStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that uses an IDistributedCache instance as its backing. Note that GetAllAsync is not implemented.

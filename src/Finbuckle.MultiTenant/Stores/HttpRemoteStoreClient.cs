@@ -5,7 +5,7 @@ using System.Net;
 using System.Text.Json;
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// HTTP client for retrieving tenant information from a remote endpoint.

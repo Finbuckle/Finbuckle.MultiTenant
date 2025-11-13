@@ -40,7 +40,7 @@ public class Blog
     public List<Post>? Posts { get; set; }
 }
 
-public class Post
+public abstract class Post
 {
     public int PostId { get; set; }
     public string? Title { get; set; }

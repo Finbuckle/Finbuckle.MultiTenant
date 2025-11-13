@@ -3,7 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Stores.HttpRemoteStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that can only retrieve tenant via HTTP calls. Note that add, update, and remove functionality is not

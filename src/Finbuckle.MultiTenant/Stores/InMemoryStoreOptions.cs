@@ -3,7 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 
-namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
+namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Options for configuring the <see cref="InMemoryStore{TTenantInfo}"/>.

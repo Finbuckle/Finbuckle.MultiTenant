@@ -29,7 +29,7 @@ public class Blog
 }
 
 [MultiTenant]
-public class Post
+public abstract class Post
 {
     public int PostId { get; set; }
     public string? Title { get; set; }
