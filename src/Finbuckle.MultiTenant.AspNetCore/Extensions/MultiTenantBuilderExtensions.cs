@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -309,7 +310,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : TenantInfo
-        => builder.WithRouteStrategy(Constants.TenantToken);
+        => builder.WithRouteStrategy(Constants.TenantToken, true);
 
     /// <summary>
     /// Adds and configures a <see cref="RouteStrategy"/> to the application.
@@ -317,14 +318,21 @@ public static class MultiTenantBuilderExtensions
     /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
     /// <param name="builder"><see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="tenantParam">The name of the route parameter used to determine the tenant identifier.</param>
+    /// <param name="useTenantAmbientRouteValue">If true, promotes the tenant route value from ambient to explicit values when generating links.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithRouteStrategy<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder, string tenantParam)
+        this MultiTenantBuilder<TTenantInfo> builder, string tenantParam, bool useTenantAmbientRouteValue)
         where TTenantInfo : TenantInfo
     {
         if (string.IsNullOrWhiteSpace(tenantParam))
         {
             throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
+        }
+        
+        if(useTenantAmbientRouteValue)
+        {
+            // Decorate LinkGenerator to promote tenant route value from ambient to explicit values.
+            builder.Services.DecorateService<LinkGenerator, MultiTenantAmbientValueLinkGenerator>(new List<string>{tenantParam});
         }
 
         return builder.WithStrategy<RouteStrategy>(ServiceLifetime.Singleton, tenantParam);
