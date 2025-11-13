@@ -73,8 +73,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         });
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() =>
-            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        Assert.Throws<MultiTenantException>(() => new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
     }
 
     [Theory]
@@ -94,8 +93,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         });
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() =>
-            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        Assert.Throws<MultiTenantException>(() => new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs

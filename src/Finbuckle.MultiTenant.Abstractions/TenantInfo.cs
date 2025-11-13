@@ -11,4 +11,5 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <param name="Name">A friendly name for the tenant.</param>
 public record TenantInfo(string Id, string Identifier, string? Name = null)
 {
+    
 }

@@ -14,14 +14,14 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     where TOptions : class
 {
     private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
-
+    
     private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new();
 
     /// <summary>
     /// Constructs a new instance of MultiTenantOptionsCache.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The multi-tenant context accessor.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="multiTenantContextAccessor"/> is null.</exception>
+    /// <param name="multiTenantContextAccessor"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
         this.multiTenantContextAccessor = multiTenantContextAccessor ??

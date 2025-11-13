@@ -18,7 +18,7 @@ public class MultiTenantOptionsCacheShould
         [Required]
         public string? DefaultConnectionString { get; set; }
     }
-
+        
     [Theory]
     [InlineData("")]
     [InlineData(null)]
@@ -150,11 +150,11 @@ public class MultiTenantOptionsCacheShould
         // Remove named options for current tenant.
         result = cache.TryRemove(name);
         Assert.True(result);
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
-            .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.
+            GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
 
         // Assert named options removed and other options on tenant left as-is.
@@ -164,8 +164,7 @@ public class MultiTenantOptionsCacheShould
         // Assert other tenant not affected.
         ti = ti with { Id = "test-id-123" };
         tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
         Assert.True(tenantInternalCache!.ContainsKey(name ?? Microsoft.Extensions.Options.Options.DefaultName));
     }
@@ -198,19 +197,18 @@ public class MultiTenantOptionsCacheShould
         cache.Clear();
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
-            .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.
+            GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
         Assert.True(tenantInternalCache!.IsEmpty);
 
         // Assert options still exist on other tenant.
         ti = ti with { Id = "diff_id" };
         tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
         Assert.False(tenantInternalCache!.IsEmpty);
     }
@@ -241,17 +239,16 @@ public class MultiTenantOptionsCacheShould
         cache.Clear("test-id-123");
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
-            .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.
+            GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache["test-id-123"]);
         Assert.True(tenantInternalCache!.IsEmpty);
 
         // Assert options still exist on other tenant.
-        tenantInternalCache = tenantCache?["diff_id"].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        tenantInternalCache = tenantCache?["diff_id"].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache["diff_id"]);
         Assert.False(tenantInternalCache!.IsEmpty);
     }
@@ -282,19 +279,18 @@ public class MultiTenantOptionsCacheShould
         cache.ClearAll();
 
         // Assert options cleared on this tenant.
-        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
-            .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
+        var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType().
+            GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.
+            GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
         Assert.True(tenantInternalCache!.IsEmpty);
 
         // Assert options cleared on other tenant.
         ti = ti with { Id = "diff_id" };
         tcs.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
-            .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
+        tenantInternalCache = tenantCache?[ti.Id].GetType().GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache[ti.Id]);
         Assert.True(tenantInternalCache!.IsEmpty);
     }

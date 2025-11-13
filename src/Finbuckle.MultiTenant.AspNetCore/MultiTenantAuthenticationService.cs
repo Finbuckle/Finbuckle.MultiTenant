@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.AspNetCore;
 /// <summary>
 /// Multi-tenant aware authentication service that decorates the default authentication service.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
 public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
     where TTenantInfo : TenantInfo
 {
@@ -26,24 +26,23 @@ public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationServ
     /// </summary>
     /// <param name="inner">The inner authentication service to decorate.</param>
     /// <param name="multiTenantAuthenticationOptions">The multi-tenant authentication options.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="inner"/> is null.</exception>
-    public MultiTenantAuthenticationService(IAuthenticationService inner,
-        IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions)
+    /// <exception cref="ArgumentNullException">Thrown when inner is null.</exception>
+    public MultiTenantAuthenticationService(IAuthenticationService inner, IOptionsMonitor<MultiTenantAuthenticationOptions> multiTenantAuthenticationOptions)
     {
-        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-        _multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
-    }
+            _inner = inner ?? throw new ArgumentNullException(nameof(inner));
+            _multiTenantAuthenticationOptions = multiTenantAuthenticationOptions;
+        }
 
     private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties? properties)
     {
-        // Add tenant identifier to the properties so on the callback we can use it to set the multi-tenant context.
-        var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
-        if (multiTenantContext?.TenantInfo != null)
-        {
-            properties ??= new AuthenticationProperties();
-            if (!properties.Items.ContainsKey(Constants.TenantToken))
-                properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
-        }
+            // Add tenant identifier to the properties so on the callback we can use it to set the multi-tenant context.
+            var multiTenantContext = context.GetMultiTenantContext<TTenantInfo>();
+            if (multiTenantContext?.TenantInfo != null)
+            {
+                properties ??= new AuthenticationProperties();
+                if(!properties.Items.ContainsKey(Constants.TenantToken))
+                    properties.Items.Add(Constants.TenantToken, multiTenantContext.TenantInfo.Identifier);
+            }
     }
 
 
@@ -72,8 +71,7 @@ public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationServ
     }
 
     /// <inheritdoc />
-    public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal,
-        AuthenticationProperties? properties)
+    public async Task SignInAsync(HttpContext context, string? scheme, ClaimsPrincipal principal, AuthenticationProperties? properties)
     {
         AddTenantIdentifierToProperties(context, ref properties);
         await _inner.SignInAsync(context, scheme, principal, properties).ConfigureAwait(false);

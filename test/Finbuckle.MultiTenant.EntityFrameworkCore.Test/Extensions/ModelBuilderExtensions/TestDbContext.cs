@@ -14,14 +14,14 @@ public class TestDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("DataSource=:memory:");
-        base.OnConfiguring(optionsBuilder);
-    }
+            optionsBuilder.UseSqlite("DataSource=:memory:");
+            base.OnConfiguring(optionsBuilder);
+        }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureMultiTenant();
-    }
+            modelBuilder.ConfigureMultiTenant();
+        }
 }
 
 [MultiTenant]

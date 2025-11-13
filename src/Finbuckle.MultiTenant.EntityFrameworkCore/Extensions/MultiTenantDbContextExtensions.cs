@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
-/// Extension methods for multi-tenant <see cref="DbContext"/> instances.
+/// Extension methods for multi-tenant DbContext instances.
 /// </summary>
 public static class MultiTenantDbContextExtensions
 {
     /// <summary>
     /// Ensures a TenantId property is set when an entity is attached.
     /// </summary>
-    /// <typeparam name="TContext">The <see cref="DbContext"/> type.</typeparam>
-    /// <param name="context">The <see cref="DbContext"/> instance.</param>
+    /// <typeparam name="TContext">The DbContext type.</typeparam>
+    /// <param name="context">The DbContext instance.</param>
     public static void EnforceMultiTenantOnTracking<TContext>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext
     {
@@ -25,19 +25,17 @@ public static class MultiTenantDbContextExtensions
             // Honor TenantNotSetMode on tracking from attach multi-tenant entities.
             if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
                 args.Entry.Context is not IMultiTenantDbContext multiTenantDbContext) return;
-
+            
             if (multiTenantDbContext.TenantInfo is null)
                 throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
-
+            
             args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
         };
     }
 
     /// <summary>
-    /// Checks the TenantId on entities during SaveChanges and SaveChangesAsync taking into account <see cref="TenantNotSetMode"/> and <see cref="TenantMismatchMode"/>.
+    /// Checks the TenantId on entities during SaveChanges and SaveChangesAsync taking into account TenantNotSetMode and TenantMismatchMode.
     /// </summary>
-    /// <typeparam name="TContext">The <see cref="DbContext"/> type.</typeparam>
-    /// <param name="context">The <see cref="DbContext"/> instance.</param>
     public static void EnforceMultiTenant<TContext>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext
     {
@@ -53,10 +51,10 @@ public static class MultiTenantDbContextExtensions
         // ensure tenant context is valid
         if (changedMultiTenantEntities.Count == 0)
             return;
-
+        
         if (tenantInfo is null)
             throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
-
+        
 
         // get list of all added entities with MultiTenant annotation
         var addedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Added).ToList();

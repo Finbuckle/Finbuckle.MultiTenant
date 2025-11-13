@@ -4,7 +4,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// A static multi-tenant context accessor that always returns the same tenant info.
 /// </summary>
 /// <param name="tenantInfo">The tenant info to return.</param>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The type of tenant info.</typeparam>
 public class StaticMultiTenantContextAccessor<TTenantInfo>(TTenantInfo? tenantInfo)
     : IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : TenantInfo

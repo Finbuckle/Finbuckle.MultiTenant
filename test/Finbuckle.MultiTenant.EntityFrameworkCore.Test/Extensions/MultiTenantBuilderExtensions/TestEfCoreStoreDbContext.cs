@@ -11,5 +11,5 @@ public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
 {
     public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
     {
-    }
+        }
 }
