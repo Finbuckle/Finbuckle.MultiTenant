@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant.Options;
 
 /// <summary>
-/// Implementation of IOptions and IOptionsSnapshot that uses dependency injection for its private cache.
+/// Implementation of <see cref="IOptions{TOptions}"/> and <see cref="IOptionsSnapshot{TOptions}"/> that uses dependency injection for its private cache.
 /// </summary>
 /// <typeparam name="TOptions">The type of options being configured.</typeparam>
 public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> where TOptions : class

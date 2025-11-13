@@ -19,7 +19,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     {
         var tenantInfo = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
         tenantInfo = tenantInfo with { Id = identifier, Identifier = identifier };
-        
+
         // Ensure TTenantInfo has a parameterless constructor.
         return await Task.FromResult(tenantInfo).ConfigureAwait(false);
     }
@@ -31,7 +31,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
         tenantInfo = tenantInfo with { Id = id, Identifier = id };
         return await Task.FromResult(tenantInfo).ConfigureAwait(false);
     }
-    
+
     /// <summary>
     /// Not implemented in this implementation.
     /// </summary>

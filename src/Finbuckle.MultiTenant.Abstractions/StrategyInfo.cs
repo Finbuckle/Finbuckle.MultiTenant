@@ -12,7 +12,7 @@ public class StrategyInfo
     /// Gets or sets the type of the strategy used.
     /// </summary>
     public Type? StrategyType => Strategy?.GetType();
-    
+
     /// <summary>
     /// Gets or sets the strategy instance used.
     /// </summary>

@@ -90,7 +90,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         db.TenantInfo = tenant2;
         Assert.Equal(0, db.MyMultiTenantThings!.Count());
     }
-    
+
     [Fact]
     public void CanIgnoreNamedFilterQuery()
     {
@@ -107,7 +107,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         db.TenantInfo = tenant2;
         db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 2 });
         db.SaveChanges();
-        
+
         Assert.Equal(2, db.MyMultiTenantThings!.IgnoreQueryFilters([Abstractions.Constants.TenantToken]).Count());
     }
 }

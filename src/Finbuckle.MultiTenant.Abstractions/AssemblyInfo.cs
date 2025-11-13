@@ -3,4 +3,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.Abstractions.Test")]
+[assembly: InternalsVisibleTo("Finbuckle.MultiTenant.Abstractions.Test")]

@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
-/// Extension methods for ModelBuilder.
+/// Extension methods for <see cref="ModelBuilder"/>.
 /// </summary>
 public static class FinbuckleModelBuilderExtensions
 {
     /// <summary>
-    /// Configures any entity's with the [MultiTenant] attribute.
+    /// Configures any entity types with the <see cref="Abstractions.MultiTenantAttribute"/> attribute.
     /// </summary>
-    /// <param name="modelBuilder">The ModelBuilder instance.</param>
-    /// <returns>The ModelBuilder instance.</returns>
+    /// <param name="modelBuilder">The <see cref="ModelBuilder"/> instance.</param>
+    /// <returns>The <see cref="ModelBuilder"/> instance.</returns>
     public static ModelBuilder ConfigureMultiTenant(this ModelBuilder modelBuilder)
     {
         // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute

@@ -11,7 +11,8 @@ namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 /// </summary>
 public static class EndpointConventionBuilderExtensions
 {
-    private static readonly ExcludeFromMultiTenantResolutionAttribute s_excludeFromMultiTenantResolutionAttribute = new();
+    private static readonly ExcludeFromMultiTenantResolutionAttribute s_excludeFromMultiTenantResolutionAttribute =
+        new();
 
     /// <summary>
     /// Adds the <see cref="IExcludeFromMultiTenantResolutionMetadata"/> to <see cref="EndpointBuilder.Metadata"/> 
@@ -19,7 +20,8 @@ public static class EndpointConventionBuilderExtensions
     /// </summary>
     /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-    public static TBuilder ExcludeFromMultiTenantResolution<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
+    public static TBuilder ExcludeFromMultiTenantResolution<TBuilder>(this TBuilder builder)
+        where TBuilder : IEndpointConventionBuilder
         => builder.WithMetadata(s_excludeFromMultiTenantResolutionAttribute);
 
     /// <summary>

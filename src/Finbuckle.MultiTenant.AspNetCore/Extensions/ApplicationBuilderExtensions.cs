@@ -13,8 +13,8 @@ public static class FinbuckleMultiTenantApplicationBuilderExtensions
     /// <summary>
     /// Use Finbuckle.MultiTenant middleware in processing the request.
     /// </summary>
-    /// <param name="builder">The <c>IApplicationBuilder</c> instance the extension method applies to.</param>
-    /// <returns>The same IApplicationBuilder passed into the method.</returns>
+    /// <param name="builder">The <see cref="IApplicationBuilder"/> instance the extension method applies to.</param>
+    /// <returns>The same <see cref="IApplicationBuilder"/> passed into the method.</returns>
     public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder)
         => builder.UseMiddleware<MultiTenantMiddleware>();
 }

@@ -22,7 +22,7 @@ public class MultiTenantDbContextExtensionsShould
             .UseSqlite(_connection)
             .Options;
     }
-    
+
     [Fact]
     public void HandleTenantNotSetWhenAttaching()
     {
@@ -49,7 +49,7 @@ public class MultiTenantDbContextExtensionsShould
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
-                
+
                 db.TenantNotSetMode = TenantNotSetMode.Overwrite;
                 db.EnforceMultiTenantOnTracking();
                 var blog1 = new Blog { Title = "abc2" };

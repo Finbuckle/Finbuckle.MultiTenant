@@ -10,35 +10,36 @@ namespace Finbuckle.MultiTenant.Stores.InMemoryStore;
 /// <summary>
 /// Basic store that keeps tenants in memory.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
+
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly InMemoryStoreOptions<TTenantInfo> _options;
 
     /// <summary>
     /// Constructor for InMemoryStore.
     /// </summary>
-    /// <param name="options">InMemoryStoreOptions instance for desired behavior.</param>
-    /// <exception cref="MultiTenantException"></exception>
+    /// <param name="options"><see cref="InMemoryStoreOptions{TTenantInfo}"/> instance for desired behavior.</param>
+    /// <exception cref="MultiTenantException">Thrown when tenant configuration is invalid.</exception>
     public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
     {
         _options = options.Value;
 
         var stringComparer = StringComparer.OrdinalIgnoreCase;
-        if(_options.IsCaseSensitive)
+        if (_options.IsCaseSensitive)
             stringComparer = StringComparer.Ordinal;
 
         _tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
-        foreach(var tenant in _options.Tenants)
+        foreach (var tenant in _options.Tenants)
         {
-            if(String.IsNullOrWhiteSpace(tenant.Id))
+            if (String.IsNullOrWhiteSpace(tenant.Id))
                 throw new MultiTenantException("Missing tenant id in options.");
-            if(String.IsNullOrWhiteSpace(tenant.Identifier))
+            if (String.IsNullOrWhiteSpace(tenant.Identifier))
                 throw new MultiTenantException("Missing tenant identifier in options.");
-            if(_tenantMap.ContainsKey(tenant.Identifier))
+            if (_tenantMap.ContainsKey(tenant.Identifier))
                 throw new MultiTenantException("Duplicate tenant identifier in options.");
 
             _tenantMap.TryAdd(tenant.Identifier, tenant);
@@ -98,7 +99,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
 
         if (existingTenantInfo?.Identifier != null)
         {
-            var result =  _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
+            var result = _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
             return await Task.FromResult(result).ConfigureAwait(false);
         }
 
