@@ -5,7 +5,6 @@ using System.Security.Claims;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Authentication;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.AspNetCore.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

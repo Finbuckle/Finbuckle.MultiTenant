@@ -27,7 +27,7 @@ public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext
 }
 
 [MultiTenant]
-public abstract class Blog
+public class Blog
 {
     public int BlogId { get; set; }
     public string? Title { get; set; }
@@ -35,7 +35,7 @@ public abstract class Blog
 }
 
 [MultiTenant]
-public abstract class Post
+public class Post
 {
     public int PostId { get; set; }
     public string? Title { get; set; }

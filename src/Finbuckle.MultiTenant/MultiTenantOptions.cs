@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant;
 /// Options for multi-tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-public abstract class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
+public class MultiTenantOptions<TTenantInfo> where TTenantInfo : TenantInfo
 {
     /// <summary>
     /// Gets or sets the type of <see cref="TenantInfo"/> derived.

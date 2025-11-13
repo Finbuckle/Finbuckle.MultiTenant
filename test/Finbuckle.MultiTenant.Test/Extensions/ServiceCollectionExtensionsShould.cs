@@ -3,14 +3,13 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Extensions;
-using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Extensions;
 
-public abstract class ServiceCollectionExtensionsShould
+public class ServiceCollectionExtensionsShould
 {
     [Fact]
     public void RegisterITenantResolverInDi()
@@ -77,7 +76,7 @@ public abstract class ServiceCollectionExtensionsShould
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
     }
 
-    public abstract class TestOptions
+    public class TestOptions
     {
         public string? Prop1 { get; set; }
     }

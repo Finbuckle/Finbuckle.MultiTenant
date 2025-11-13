@@ -51,7 +51,7 @@ public class MyMultiTenantThing
 }
 
 [MultiTenant]
-public abstract class MyMultiTenantThingWithAttribute
+public class MyMultiTenantThingWithAttribute
 {
     public int Id { get; set; }
 }
@@ -62,7 +62,7 @@ public class MyThingWithTenantId
     public string? TenantId { get; set; }
 }
 
-public abstract class MyThingWithIntTenantId
+public class MyThingWithIntTenantId
 {
     public int Id { get; set; }
     public int TenantId { get; set; }
