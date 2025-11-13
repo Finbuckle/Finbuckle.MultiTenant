@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -653,8 +654,10 @@ public class MultiTenantBuilderExtensionsShould
     public void AddRouteStrategy()
     {
         var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddRouting();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithRouteStrategy("routeParam");
+        builder.WithRouteStrategy();
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
@@ -667,8 +670,60 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
         Assert.Throws<ArgumentException>(()
-            => builder.WithRouteStrategy(null!));
+            => builder.WithRouteStrategy(null!, false));
     }
+
+    [Fact]
+    public void AddRouteStrategyWithTenantAmbientRouteValue_DecoratesLinkGenerator()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddRouting();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithRouteStrategy("routeParam", useTenantAmbientRouteValue: true);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<RouteStrategy>(strategy);
+
+        var linkGenerator = sp.GetRequiredService<LinkGenerator>();
+        Assert.IsType<MultiTenantAmbientValueLinkGenerator>(linkGenerator);
+    }
+
+    [Fact]
+    public void AddRouteStrategyWithoutTenantAmbientRouteValue_DoesNotDecorateLinkGenerator()
+    {
+        var services = new ServiceCollection();
+        services.AddRouting();
+        services.AddLogging();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithRouteStrategy("routeParam", useTenantAmbientRouteValue: false);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<RouteStrategy>(strategy);
+
+        var linkGenerator = sp.GetRequiredService<LinkGenerator>();
+        Assert.IsNotType<MultiTenantAmbientValueLinkGenerator>(linkGenerator);
+    }
+
+    [Fact]
+    public void AddRouteStrategyDefault_DecoratesLinkGeneratorByDefault()
+    {
+        var services = new ServiceCollection();
+        services.AddRouting();
+        services.AddLogging();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithRouteStrategy(); // Uses default overload which sets useTenantAmbientRouteValue to true
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        Assert.IsType<RouteStrategy>(strategy);
+
+        var linkGenerator = sp.GetRequiredService<LinkGenerator>();
+        Assert.IsType<MultiTenantAmbientValueLinkGenerator>(linkGenerator);
+    }
+
 
     private record TestTenantInfo(string Id, string Identifier) : TenantInfo(Id, Identifier)
     {
