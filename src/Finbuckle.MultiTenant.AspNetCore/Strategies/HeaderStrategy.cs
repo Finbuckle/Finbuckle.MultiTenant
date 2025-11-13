@@ -14,22 +14,22 @@ namespace Finbuckle.MultiTenant.AspNetCore.Strategies;
 public class HeaderStrategy : IMultiTenantStrategy
 {
     private readonly string _headerKey;
-    
+
     /// <summary>
     /// Initializes a new instance of HeaderStrategy.
     /// </summary>
     /// <param name="headerKey">The name of the header containing the tenant identifier.</param>
     public HeaderStrategy(string headerKey)
     {
-            _headerKey = headerKey;
-        }
+        _headerKey = headerKey;
+    }
 
     /// <inheritdoc />
     public Task<string?> GetIdentifierAsync(object context)
     {
-            if (context is not HttpContext httpContext)
-                return Task.FromResult<string?>(null);
+        if (context is not HttpContext httpContext)
+            return Task.FromResult<string?>(null);
 
-            return Task.FromResult(httpContext?.Request.Headers[_headerKey].FirstOrDefault());
-        }
+        return Task.FromResult(httpContext?.Request.Headers[_headerKey].FirstOrDefault());
+    }
 }

@@ -11,14 +11,14 @@ public class ModelExtensionsShould
     [Fact]
     public void ReturnMultiTenantTypes()
     {
-            using var db = new TestDbContext();
-            Assert.Contains(typeof(MyMultiTenantThing), db.Model.GetMultiTenantEntityTypes().Select(et => et.ClrType));
-        }
+        using var db = new TestDbContext();
+        Assert.Contains(typeof(MyMultiTenantThing), db.Model.GetMultiTenantEntityTypes().Select(et => et.ClrType));
+    }
 
     [Fact]
     public void NotReturnNonMultiTenantTypes()
     {
-            using var db = new TestDbContext();
-            Assert.DoesNotContain(typeof(MyThing), db.Model.GetMultiTenantEntityTypes().Select(et => et.ClrType));
-        }
+        using var db = new TestDbContext();
+        Assert.DoesNotContain(typeof(MyThing), db.Model.GetMultiTenantEntityTypes().Select(et => et.ClrType));
+    }
 }

@@ -9,8 +9,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 /// <summary>
 /// A multi-tenant store that uses Entity Framework Core for tenant storage.
 /// </summary>
-/// <typeparam name="TEFCoreStoreDbContext">The EFCoreStoreDbContext implementation type.</typeparam>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
+/// <typeparam name="TEFCoreStoreDbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo}"/> implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
     where TTenantInfo : TenantInfo
@@ -21,8 +21,8 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     /// <summary>
     /// Initializes a new instance of EFCoreStore.
     /// </summary>
-    /// <param name="dbContext">The EFCoreStoreDbContext instance.</param>
-    /// <exception cref="ArgumentNullException">Thrown when dbContext is null.</exception>
+    /// <param name="dbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo}"/> instance.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext"/> is null.</exception>
     public EFCoreStore(TEFCoreStoreDbContext dbContext)
     {
         this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));

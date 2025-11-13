@@ -5,7 +5,7 @@
     },
     "Tenants": [
       {
-        "Id":  "initech-id",
+        "Id": "initech-id",
         "Identifier": "initech",
         "Name": "Initech"
       },
