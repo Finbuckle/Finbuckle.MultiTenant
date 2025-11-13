@@ -17,13 +17,13 @@ public class MultiTenantContextShould
         Assert.Equal(tenantInfo.Name, returnedTenantInfo.Name);
         Assert.NotSame(tenantInfo, returnedTenantInfo);
     }
-    
+
     [Fact]
     public void AssignCopyTenantInfoOnSet()
     {
         var tenantInfo = new TenantInfo(Id: "tenant1", Identifier: "tenant1", Name: "Tenant 1");
         var context = new MultiTenantContext<TenantInfo>(tenantInfo);
-        
+
         Assert.Equal(tenantInfo.Id, context._tenantInfo!.Id);
         Assert.Equal(tenantInfo.Identifier, context._tenantInfo.Identifier);
         Assert.Equal(tenantInfo.Name, context._tenantInfo.Name);
