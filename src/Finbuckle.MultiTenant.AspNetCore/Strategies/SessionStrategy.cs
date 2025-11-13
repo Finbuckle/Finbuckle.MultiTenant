@@ -17,12 +17,12 @@ public class SessionStrategy : IMultiTenantStrategy
     /// Initializes a new instance of SessionStrategy.
     /// </summary>
     /// <param name="tenantKey">The session key containing the tenant identifier.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="tenantKey"/> is null or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when tenantKey is null or whitespace.</exception>
     public SessionStrategy(string tenantKey)
     {
         if (string.IsNullOrWhiteSpace(tenantKey))
         {
-            throw new ArgumentException("Tenant key must not be null or whitespace.", nameof(tenantKey));
+            throw new ArgumentException("message", nameof(tenantKey));
         }
 
         this.tenantKey = tenantKey;

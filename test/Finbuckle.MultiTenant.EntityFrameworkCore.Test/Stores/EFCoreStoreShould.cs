@@ -49,7 +49,7 @@ public class EfCoreStoreShould
         var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
         return PopulateTestStore(store);
     }
-
+    
     protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         return base.PopulateTestStore(store);

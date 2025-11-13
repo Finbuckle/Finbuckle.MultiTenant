@@ -69,7 +69,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
                 Identifier: "lol"))));
-
+        
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
         await store.GetAsync("lol-id");
@@ -83,13 +83,13 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
                 Identifier: "lol"))));
-
+        
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
         await store.GetByIdentifierAsync("lol-id");
         cache.Verify(c => c.RefreshAsync(It.IsAny<string>(), CancellationToken.None), Times.Once);
     }
-
+    
     [Fact]
     public async Task SetSlidingExpirationOnAdd()
     {
@@ -108,7 +108,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         await store.AddAsync(new TenantInfo(Id: "test-id", Identifier: "test"));
     }
-
+    
     [Fact]
     public async Task SetSlidingExpirationOnUpdate()
     {

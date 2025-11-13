@@ -7,26 +7,25 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
-/// Multi-tenant store decorator that handles exception handling and logging.
+/// Multitenant store decorator that handles exception handling and logging.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : TenantInfo
 {
     // ReSharper disable once MemberCanBePrivate.Global
     /// <summary>
-    /// The internal <see cref="IMultiTenantStore{TTenantInfo}"/> instance.
+    /// The internal IMultiTenantStore instance.
     /// </summary>
     public IMultiTenantStore<TTenantInfo> Store { get; }
 
     private readonly ILogger _logger;
 
     /// <summary>
-    /// Constructor for MultiTenantStoreWrapper.
+    /// Constructor for MultiTenantStoreWrapper
     /// </summary>
-    /// <param name="store"><see cref="IMultiTenantStore{TTenantInfo}"/> instance to wrap.</param>
+    /// <param name="store">IMultiTenantStore instance to wrap.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="store"/> or <paramref name="logger"/> is null.</exception>
+    /// <exception cref="ArgumentNullException"></exception>
     public MultiTenantStoreWrapper(IMultiTenantStore<TTenantInfo> store, ILogger logger)
     {
         Store = store ?? throw new ArgumentNullException(nameof(store));
@@ -210,8 +209,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
         }
         else
         {
-            _logger.LogDebug($"{nameof(RemoveAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"",
-                identifier);
+            _logger.LogDebug($"{nameof(RemoveAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"", identifier);
         }
 
         return result;

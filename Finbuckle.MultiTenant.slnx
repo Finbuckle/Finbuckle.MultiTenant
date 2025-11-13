@@ -1,26 +1,17 @@
 ﻿<Solution>
-    <Folder Name="/samples/"/>
-    <Folder Name="/src/">
-        <Project Path="src/Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj" Type="C#"/>
-        <Project Path="src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" Type="C#"/>
-        <Project Path="src\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj"
-                 Type="C#"/>
-        <Project
-                Path="src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj"
-                Type="C#"/>
-        <Project Path="src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" Type="C#"/>
-    </Folder>
-    <Folder Name="/test/">
-        <Project Path="test\Finbuckle.MultiTenant.Abstractions.Test\Finbuckle.MultiTenant.Abstractions.Test.csproj"
-                 Type="C#"/>
-        <Project Path="test\Finbuckle.MultiTenant.AspNetCore.Test\Finbuckle.MultiTenant.AspNetCore.Test.csproj"
-                 Type="C#"/>
-        <Project
-                Path="test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj"
-                Type="C#"/>
-        <Project
-                Path="test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test.csproj"
-                Type="C#"/>
-        <Project Path="test\Finbuckle.MultiTenant.Test\Finbuckle.MultiTenant.Test.csproj" Type="C#"/>
-    </Folder>
+  <Folder Name="/samples/" />
+  <Folder Name="/src/">
+    <Project Path="src/Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj" Type="C#" />
+    <Project Path="src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" Type="C#" />
+    <Project Path="src\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj" Type="C#" />
+    <Project Path="src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj" Type="C#" />
+    <Project Path="src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" Type="C#" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test\Finbuckle.MultiTenant.Abstractions.Test\Finbuckle.MultiTenant.Abstractions.Test.csproj" Type="C#" />
+    <Project Path="test\Finbuckle.MultiTenant.AspNetCore.Test\Finbuckle.MultiTenant.AspNetCore.Test.csproj" Type="C#" />
+    <Project Path="test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj" Type="C#" />
+    <Project Path="test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test.csproj" Type="C#" />
+    <Project Path="test\Finbuckle.MultiTenant.Test\Finbuckle.MultiTenant.Test.csproj" Type="C#" />
+  </Folder>
 </Solution>
