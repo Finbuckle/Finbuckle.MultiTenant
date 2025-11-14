@@ -724,7 +724,6 @@ public class MultiTenantBuilderExtensionsShould
         Assert.IsType<MultiTenantAmbientValueLinkGenerator>(linkGenerator);
     }
 
-
     private record TestTenantInfo(string Id, string Identifier) : TenantInfo(Id, Identifier)
     {
         public string? ChallengeScheme { get; set; }

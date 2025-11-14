@@ -6,6 +6,15 @@ string which is used to create a `TenantInfo` object with information from the [
 Finbuckle.MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be
 created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 
+> Not sure which one to pick? As a rule of thumb:
+> 
+> - Use **Host** when tenants live on subdomains.
+> - Use **Base Path** when tenants are the first path segment.
+> - Use **Route** when explicit route parameters control tenants.
+> - Use **Header** or **Claim** when upstream infrastructure (APIM, IdP) stamps the tenant.
+> - Use **Delegate** when you need custom code without a full implementation.
+> - Chain strategies in priority order to provide graceful fallbacks.
+
 ## IMultiTenantStrategy and Custom Strategies
 
 All MultiTenant strategies derive from `IMultiTenantStrategy` and must implement the `GetIdentifierAsync` method.
@@ -84,9 +93,9 @@ builder.Services.AddMultiTenant<TenantInfo>()
         httpContext.Request.Query.TryGetValue("tenant", out StringValues tenantIdentifier);
         
         if (tenantIdentifier is null)
-            return Task.FromValue<string?>(null);
+            return Task.FromResult<string?>(null);
         
-        return Task.FromValue(tenantIdentifier.ToString());
+        return Task.FromResult(tenantIdentifier.ToString());
     })...
 ```
 
@@ -205,9 +214,13 @@ tenant without invoking the expensive strategy.
 
 Uses the `__tenant__` route parameter (or a specified route parameter) to determine the tenant. For example, a request
 to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}`
-would use "initech" as the identifier when resolving the tenant. The `__tenant__` parameter can be placed anywhere in
+would use "initech" as the identifier when resolving the tenant. The tenant parameter can be placed anywhere in
 the route path configuration. If explicitly calling `UseRouting` in your app pipeline make sure to place it
 before `WithRouteStrategy`.
+
+By default the route parameter name is `__tenant__`, but a custom name can also be used via an overload. Also by by
+default the strategy adds the tenant route value as an ambient value when generating links. This behavior can 
+be disabled via an overload as well.
 
 Configure by calling `WithRouteStrategy` after `AddMultiTenant<TTenantInfo>`. A custom route parameter can also be
 configured:
@@ -217,13 +230,30 @@ configured:
 builder.Services.AddMultiTenant<TenantInfo>()
   .WithRouteStrategy()...
     
-// or set a different route parameter name of "MyTenantRouteParam"
+// or set a different route parameter name of "MyTenantRouteParam" and do not add the tenant as an ambient route value
 builder.Services.AddMultiTenant<TenantInfo>()
-  .WithRouteStrategy("MyTenantRouteParam")...
+  .WithRouteStrategy("MyTenantRouteParam", false)...
 
 // UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy used
 app.UseRouting();
 app.UseMultiTenant();
+```
+
+### Ambient Route Value Promotion (Link Generation)
+
+When you call `WithRouteStrategy("paramName", useTenantAmbientRouteValue: true)`, Finbuckle wraps ASP.NET Core's
+`LinkGenerator` so that the tenant route value is always treated as an explicit value when generating URLs.
+
+Practically, this means links created by MVC, Razor Pages, minimal APIs, and tag helpers will include the tenant route
+value even when it would otherwise only be present as an ambient value from the current request.
+
+Use `useTenantAmbientRouteValue: true` when you want generated URLs to consistently include the tenant segment; set it
+to `false` if you prefer the default ASP.NET Core behavior and are managing tenant route values yourself.
+
+```csharp
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithRouteStrategy("tenant", useTenantAmbientRouteValue: true)
+    .WithConfigurationStore();
 ```
 
 ## Host Strategy

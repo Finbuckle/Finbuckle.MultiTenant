@@ -1,12 +1,11 @@
 # Core Concepts
 
 The library uses standard .NET Core conventions and most of the internal details are abstracted away from app code.
-However, there are a few important specifics to be aware of. The items below make up the foundation of the library
+However, there are a few important specifics to be aware of. The items below make up the foundation of the library.
 
 ## `TenantInfo`
 
-A `TenantInfo` record instance contains information about a tenant. Often this will be the "current" tenant in the 
-context an
+A `TenantInfo` record instance contains information about a tenant. Often this will be the "current" tenant in the context an
 app. These instances' type use or inherit from `TenantInfo` which defines properties
 for `Id`, `Identifier`, `Name`. When calling `AddMultiTenant<TTenantInfo>` the type passed into the
 type parameter defines the `TenantInfo` derived class used throughout the library and app. TenantInfo instances are
@@ -23,8 +22,8 @@ properties as needed. It is recommended to keep these
 classes lightweight since they are often queried. Keep heavier associated data in an external area that can be pulled in
 when needed via the tenant `Id`.
 
-> Previous versions of `TenantInfo` included a connection string property. If needed this
-> simply add it to your custom `TenantInfo` derived class.
+> Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
+> `TenantInfo` derived class.
 
 ## `MultiTenantContext<TTenantInfo>`
 

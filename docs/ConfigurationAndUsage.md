@@ -51,7 +51,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used
+Adds and configures an IMultiTenantStrategy to the application. Multiple strategies can be configured and each will be used
 in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
@@ -66,13 +66,15 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 - `WithSessionStrategy`
 - `WithStaticStrategy`
 
+> Need fallbacks? Chain several strategies and more than one store; the resolver will keep trying strategies in order and run through the configured stores until a `TenantInfo` is found.
+
 ### WithPerTenantAuthentication
 
 Configures support for per-tenant authentication. See [Per-Tenant Authentication](Authentication) for more details.
 
 ## Per-Tenant Options
 
-Finbuckle.MultiTenant id designed to integrate with the
+Finbuckle.MultiTenant is designed to integrate with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also
 the [ASP.NET Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)) and
 lets apps customize options distinctly for each tenant. See [Per-Tenant Options](Options) for more details.
@@ -111,7 +113,7 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
 
 ## ASP.NET Core Features
 
-Some additional features are avaiable to tailor the middleware to your specific needs.
+Some additional features are available to tailor the middleware to your specific needs.
 
 ### Exclude Endpoints From Tenant Resolution
 

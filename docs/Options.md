@@ -25,6 +25,9 @@ Per-tenant options will work with *any* options class when using `IOptions<TOpti
 or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes an app's own code *and*
 code internal to ASP.NET Core or other libraries that use the Options pattern.
 
+> ⚠️ Avoid storing an options instance in a static field or singleton. Always resolve options from the provided accessor
+> so the tenant-specific cache can refresh correctly.
+
 A potential issue arises when code internally stores or caches options values from
 an `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instance. This is usually
 unnecessary because the options are already cached within the .NET options infrastructure, and in these cases the
@@ -74,7 +77,7 @@ public MyController : Controller
 }
 
 // or with a service provider
-httpContext.RequestServices.GetServices<IOptionsSnaption<MyOptions>();
+httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>();
 ```
 
 With standard options each tenant would get see the same exact options.
@@ -92,7 +95,8 @@ have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` dele
 runtime the delegate will be called with the current tenant details.
 
 ```csharp
-using namespace Finbuckle.MultiTenant.Options.Extensions;
+using Finbuckle.MultiTenant.Options.OptionsBuilderExtensions;
+using Finbuckle.MultiTenant.Options.ServiceCollectionExtensions;
 
 // configure options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>

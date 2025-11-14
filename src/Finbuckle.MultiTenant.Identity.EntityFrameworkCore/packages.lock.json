@@ -222,7 +222,7 @@
           "Microsoft.Extensions.DependencyInjection": "[10.0.*, )",
           "Microsoft.Extensions.Http": "[10.0.*, )",
           "Microsoft.Extensions.Logging": "[10.0.*, )",
-          "Microsoft.Extensions.Options": "[10.0.0-*, )",
+          "Microsoft.Extensions.Options": "[10.0.*, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.*, )"
         }
       },

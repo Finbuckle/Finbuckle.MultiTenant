@@ -9,8 +9,8 @@ implementing `IMultiTenantStore`.
 
 ## Custom TenantInfo Support
 
-MultiTenant stores support custom `TenantInfo` derived classs. but complex implementations may require special
-handling. For best results ensure the class works well with the underlying store approach--e.g. that it can be
+MultiTenant stores support custom `TenantInfo` derived classes, but complex implementations may require special
+handling. For best results ensure the class works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
 The examples in this documentation use the `TenantInfo` basic implementation.
@@ -25,11 +25,11 @@ and `GetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>`
 after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
-dependency injection along with any passed parameters to construct the implementation instance. Alternative overload 
+dependency injection along with any passed parameters to construct the implementation instance. Alternative overloads
 accept a service lifetime, a factory method, and/or other parameters for more customization. The library internally
-decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a wrapper providing basic logging and exception handling.
+decorates any `IMultiTenantStore<TTenantInfo>` at runtime with a wrapper providing basic logging and exception handling.
 
-> Custom store implementations should contains minimal logging or validation logic. These are handled via the 
+> Custom store implementations should contain minimal logging or validation logic. These are handled via the 
 > wrapper store used during runtime for consistency.
 
 ```csharp
@@ -51,10 +51,17 @@ store to be checked multiple times during tenant resolution.
 ## Accessing the Store at Runtime
 
 MultiTenant stores are registered in the dependency injection system under the
-`IMultiTenantStore<TenantInfo>` service type.
+`IMultiTenantStore<TTenantInfo>` service type.
 
-If multiple stores are registered a specific one can be retrieving an
-`IEnumerable<IMultiTenantStore<TenantInfo>>` and filtering to the specific implementation type:
+If multiple stores are registered a specific one can be retrieved by requesting an
+`IEnumerable<IMultiTenantStore<TTenantInfo>>` and filtering to the specific implementation type:
+
+```csharp
+public MyService(IEnumerable<IMultiTenantStore<TenantInfo>> stores)
+{
+    _configurationStore = stores.OfType<ConfigurationStore<TenantInfo>>().Single();
+}
+```
 
 ## Getting All Tenants from Store
 
