@@ -6,13 +6,15 @@ the library.
 
 ## Installation
 
-First, install the Finbuckle.MultiTenant.AspNetCore NuGet package:
-
-.NET Core CLI
+Finbuckle.MultiTenant is split into focused NuGet packages so you only reference what you need. For a typical ASP.NET
+Core app install **Finbuckle.MultiTenant.AspNetCore**:
 
 ```bash
-$ dotnet add package Finbuckle.MultiTenant.AspNetCore
+dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
+
+If you prefer the Package Manager UI or `paket`, add the same package reference there—no special build steps are
+required.
 
 ## Basic Configuration
 
@@ -68,6 +70,22 @@ This line tells the app that information for all tenants are in the `appsettings
 If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the
 current request.
 
+A minimal configuration entry looks like this:
+
+```json
+{
+  "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
+    "Tenants": [
+      {
+        "Id": "93f330717e5d4f039cd05da312d559cc",
+        "Identifier": "initech",
+        "Name": "Initech"
+      }
+    ]
+  }
+}
+```
+
 See [Stores](Stores) for more information.
 
 Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
@@ -77,7 +95,7 @@ ways.
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
 settings. Be sure to call it before other middleware which will use per-tenant functionality, such as
-`UseAuthentication()`.
+`UseAuthentication()` or `UseAuthorization()` so those components see the resolved tenant.
 
 ## Basic Usage
 
@@ -99,7 +117,7 @@ The type of the `TenantInfo` property depends on the type passed when calling `A
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
 The `TenantInfo` instance and the typed instance are also available using the
-`IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
+`IMultiTenantContextAccessor<TTenantInfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
@@ -123,12 +141,9 @@ the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/sampl
 From the command line clone the git repository, `cd` into the new directory, and compile with `dotnet build`.
 
 ```bash
-$ git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
-$ cd Finbuckle.MultiTenant
-Cloning into 'Finbuckle.MultiTenant'...
-<output omitted>
-$ cd Finbuckle.MultiTenant
-$ dotnet build
+git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
+cd Finbuckle.MultiTenant
+dotnet build
 ```
 
 ## Running Unit Tests
@@ -136,5 +151,5 @@ $ dotnet build
 Run the unit tests from the command line with `dotnet test` from the solution directory.
 
 ```bash
-$ dotnet test
+dotnet test
 ```

@@ -47,7 +47,7 @@ id.
 
 ## Identity Options
 
-Identity options can be configured for the `IdentityOptions` class as described in (Per-Tenant Options). Any option that
+Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options). Any option that
 internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as described above. If in doubt check the
 Identity source code to be sure.
 
@@ -56,7 +56,7 @@ current tenant, i.e. per-tenant options are not required for this.
 
 ## Authentication
 
-ASP.NET Core Identity cookies for authentication. It uses
+ASP.NET Core Identity uses cookies for authentication. It uses
 a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration),
 but under the hood standard ASP.NET Core authentication is used.
 
@@ -78,7 +78,7 @@ relies on several types which are passed to the database context as generic para
 - `TUserRole`
 
 Default entity types exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used
-as the generic parameters. The default for `TKey` is `string`. Apps can provide their own entity types for any of these
+as the generic parameters. The default for `TKey` is `string`. Your app can provide its own entity types for any of these
 by using alternative forms of the database context which take varying number of generic type parameters. Simple
 use-cases derive from `IdentityDbContext` types which require only a few generic parameters and plug in the default
 entity types for the rest.
@@ -87,17 +87,17 @@ Deriving an Identity database context from `MultiTenantIdentityDbContext` will u
 and `string` for `TKey`. All entity types will be configured as multi-tenant.
 
 Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the
-rest. `TUser` will not be configured as multi-tenant by default, and it is up to the programmer to do so as described
+rest. `TUser` will not be configured as multi-tenant by default, and it is up to you to do so as described
 above. All other entity types will be configured as multi-tenant.
 
 Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters
 for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as
-multi-tenant by default, and it is up to the programmer to do so as described above if desired. All other entity types
+multi-tenant by default, and it is up to you to do so as described above if desired. All other entity types
 will be configured as multi-tenant.
 
 Deriving
 from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will
-only use provided parameters. No entity types will be configured as multi-tenant, and it is up to the programmer to do
+only use provided parameters. No entity types will be configured as multi-tenant, and it is up to you to do
 so as described above if desired.
 
 When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]`
