@@ -2,8 +2,8 @@
 
 > Add the Finbuckle.MultiTenant.Options package to your project to use this functionality.
 
-Finbuckle.MultiTenant is designed to emphasize using per-tenant options in an app to drive per-tenant behavior. This
-approach allows app logic to be written having to add tenant-dependent or tenant-specific logic to the code.
+Finbuckle.MultiTenant is designed to emphasize using per-tenant options in your app to drive per-tenant behavior. This
+approach allows your app logic to be written without having to add tenant-dependent or tenant-specific logic directly to the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -22,7 +22,7 @@ the `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOpt
 `Get(string name)` method.
 
 Per-tenant options will work with *any* options class when using `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`,
-or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes an app's own code *and*
+or `IOptionsMonitor<TOptions>` with dependency injection or service resolution. This includes your own code *and*
 code internal to ASP.NET Core or other libraries that use the Options pattern.
 
 > ⚠️ Avoid storing an options instance in a static field or singleton. Always resolve options from the provided accessor
@@ -84,7 +84,7 @@ With standard options each tenant would get see the same exact options.
 
 ## Customizing Options Per Tenant
 
-This sections assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
+This section assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
 a `TTenantInfo` type of `TenantInfo`.
 See [Getting Started](GettingStarted) for details.
 

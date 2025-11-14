@@ -2,7 +2,7 @@
 
 A MultiTenant store is responsible for retrieving information about a tenant based on an identifier string determined
 by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which
-provides the current tenant information to an app.
+provides the current tenant information to your app.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" stores for resolving the tenant. Custom stores can be created by
 implementing `IMultiTenantStore`.
@@ -162,7 +162,7 @@ Uses an Entity Framework Core database context as the backing store.
 Case sensitivity is determined by the underlying EF Core database provider.
 
 The database context must derive from `EFCoreStoreDbContext`. Note that `TTenantInfo` is a record type and EF Core
-does not support tracking for record types. The `EFCoreStore` carefuly avoids tracking issues, but if an app uses the
+does not support tracking for record types. The `EFCoreStore` carefully avoids tracking issues, but if your app uses the
 `EFCoreStoreDbContext` directly it should be aware of these issues.
 
 This database context is not itself multi-tenant, but rather contains the details of all tenants.

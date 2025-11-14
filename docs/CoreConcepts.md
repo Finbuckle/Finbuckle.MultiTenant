@@ -11,13 +11,13 @@ for `Id`, `Identifier`, `Name`. When calling `AddMultiTenant<TTenantInfo>` the t
 type parameter defines the `TenantInfo` derived class used throughout the library and app. TenantInfo instances are
 intended to be immutable and the `with` expression should be used to create modified copies.
 
-* `Id` is a unique id for a tenant in the app and should never change.
-* `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for the app (i.e. no
+* `Id` is a unique id for a tenant in your app and should never change.
+* `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for your app (i.e. no
   crazy symbols in a web app where the identifier will be part of the URL). Unlike `Id`, `Identifier` can be changed if
   necessary.
 * `Name` is a display name for the tenant.
 
-`TenantInfo` is a base implementation. An app can and should define a custom `TenantInfo` and add custom 
+`TenantInfo` is a base implementation. Your app can and should define a custom `TenantInfo` and add custom 
 properties as needed. It is recommended to keep these
 classes lightweight since they are often queried. Keep heavier associated data in an external area that can be pulled in
 when needed via the tenant `Id`.

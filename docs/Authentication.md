@@ -191,7 +191,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default cookie authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default cookie authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>

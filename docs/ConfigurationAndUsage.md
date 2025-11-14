@@ -4,7 +4,7 @@
 
 Finbuckle.MultiTenant uses the standard application builder pattern for its configuration. In addition to adding the
 services, configuration for one or more [MultiTenant Stores](Stores) and [MultiTenant Strategies](Strategies) are
-required. A typical configuration for an ASP.NET Core application might look like this:
+required. A typical configuration for your ASP.NET Core app might look like this:
 
 ```csharp
 using Finbuckle.MultiTenant;
@@ -39,7 +39,7 @@ chaining method calls.
 
 ### WithStore Variants
 
-Adds and configures an IMultiTenantStore to the application. Only the last store configured will be used.
+Adds and configures an IMultiTenantStore for your app. Only the last store configured will be used.
 See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
@@ -51,7 +51,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an IMultiTenantStrategy to the application. Multiple strategies can be configured and each will be used
+Adds and configures an IMultiTenantStrategy for your app. Multiple strategies can be configured and each will be used
 in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
@@ -83,7 +83,7 @@ lets apps customize options distinctly for each tenant. See [Per-Tenant Options]
 
 Finbuckle.MultiTenant will perform tenant resolution using the context, strategies, and stores as configured.
 
-The context will determine on the type of app. For an ASP.NET Core web app the context is the `HttpContext` for each
+The context will depend on the type of app. For an ASP.NET Core web app the context is the `HttpContext` for each
 request and a tenant will be resolved for each request. For other types of apps the context will be different. For
 example, a console app might resolve the tenant once at startup or a background service monitoring a queue might resolve
 the tenant for each message it receives.
@@ -215,7 +215,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 ## Getting the Current Tenant
 
-There are several ways an app can see the current tenant:
+There are several ways your app can see the current tenant:
 
 ### Dependency Injection
 
