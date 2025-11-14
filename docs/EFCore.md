@@ -48,7 +48,7 @@ its own complexity in operating and maintaining a larger number of database inst
 
 In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data
 belonging to other tenants. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where"
-clauses all over an app. Internally a shadow `TenantId` property is added (or and existing is used if already present)
+clauses all over your app. Internally a shadow `TenantId` property is added (or an existing one is used if already present)
 to multi-tenant entity types and managed as the database context is used. It also performs validation and related options for handling
 null or mismatched tenants.
 

@@ -7,6 +7,10 @@ for a different tenant (e.g. a different path when using the route strategy),
 will not leak the previous login session into the tenant. This feature also
 avoids the need to create separate authentication schemes for each tenant.
 
+> Tip: If you explicitly need a unique cookie per tenant (for example so that switching tenants keeps both sessions
+> signed in), see the [other authentication options](#other-authentication-options) section for a per-tenant cookie name
+> example.
+
 Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
@@ -124,8 +128,8 @@ work.
         "Name": "ACME",
         "ChallengeScheme": "OpenIdConnect",
         "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
-        "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
-        "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+        "OpenIdConnectClientId": "<acme-client-id>",
+        "OpenIdConnectClientSecret": "<acme-client-secret>"
       },
       {
         "Id": "4ee609d6da0342e682012232566cff0e",
@@ -133,8 +137,8 @@ work.
         "Name": "Initech",
         "ChallengeScheme": "OpenIdConnect",
         "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
-        "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
-        "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+        "OpenIdConnectClientId": "<initech-client-id>",
+        "OpenIdConnectClientSecret": "<initech-client-secret>"
       }
     ]
   }
@@ -187,11 +191,11 @@ builder.Services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default cookie authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default cookie authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
   {
-    options.Cookie.Name = "SignInCookie-" + tenantInfo.Id;
+    options.Cookie.Name = $"SignInCookie-{tenantInfo.Identifier}";
   });
 ```

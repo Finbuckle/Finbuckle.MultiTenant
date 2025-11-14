@@ -2,15 +2,15 @@
 
 A MultiTenant store is responsible for retrieving information about a tenant based on an identifier string determined
 by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which
-provides the current tenant information to an app.
+provides the current tenant information to your app.
 
 Finbuckle.MultiTenant supports several "out-of-the-box" stores for resolving the tenant. Custom stores can be created by
 implementing `IMultiTenantStore`.
 
 ## Custom TenantInfo Support
 
-MultiTenant stores support custom `TenantInfo` derived classs. but complex implementations may require special
-handling. For best results ensure the class works well with the underlying store approach--e.g. that it can be
+MultiTenant stores support custom `TenantInfo` derived classes, but complex implementations may require special
+handling. For best results ensure the class works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
 The examples in this documentation use the `TenantInfo` basic implementation.
@@ -25,11 +25,11 @@ and `GetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>`
 after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
-dependency injection along with any passed parameters to construct the implementation instance. Alternative overload 
+dependency injection along with any passed parameters to construct the implementation instance. Alternative overloads
 accept a service lifetime, a factory method, and/or other parameters for more customization. The library internally
-decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a wrapper providing basic logging and exception handling.
+decorates any `IMultiTenantStore<TTenantInfo>` at runtime with a wrapper providing basic logging and exception handling.
 
-> Custom store implementations should contains minimal logging or validation logic. These are handled via the 
+> Custom store implementations should contain minimal logging or validation logic. These are handled via the 
 > wrapper store used during runtime for consistency.
 
 ```csharp
@@ -51,10 +51,17 @@ store to be checked multiple times during tenant resolution.
 ## Accessing the Store at Runtime
 
 MultiTenant stores are registered in the dependency injection system under the
-`IMultiTenantStore<TenantInfo>` service type.
+`IMultiTenantStore<TTenantInfo>` service type.
 
-If multiple stores are registered a specific one can be retrieving an
-`IEnumerable<IMultiTenantStore<TenantInfo>>` and filtering to the specific implementation type:
+If multiple stores are registered a specific one can be retrieved by requesting an
+`IEnumerable<IMultiTenantStore<TTenantInfo>>` and filtering to the specific implementation type:
+
+```csharp
+public MyService(IEnumerable<IMultiTenantStore<TenantInfo>> stores)
+{
+    _configurationStore = stores.OfType<ConfigurationStore<TenantInfo>>().Single();
+}
+```
 
 ## Getting All Tenants from Store
 
@@ -155,7 +162,7 @@ Uses an Entity Framework Core database context as the backing store.
 Case sensitivity is determined by the underlying EF Core database provider.
 
 The database context must derive from `EFCoreStoreDbContext`. Note that `TTenantInfo` is a record type and EF Core
-does not support tracking for record types. The `EFCoreStore` carefuly avoids tracking issues, but if an app uses the
+does not support tracking for record types. The `EFCoreStore` carefully avoids tracking issues, but if your app uses the
 `EFCoreStoreDbContext` directly it should be aware of these issues.
 
 This database context is not itself multi-tenant, but rather contains the details of all tenants.
