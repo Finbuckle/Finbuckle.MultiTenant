@@ -6,7 +6,7 @@ Finbuckle.MultiTenant is an open-source multitenancy middleware library for .NET
 per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-**This release supports .NET 9 and .NET 8.**
+**This release supports .NET 10.**
 
 ## Open Source Support
 
