@@ -15,6 +15,7 @@ public class TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, 
     public DbSet<MyThingWithTenantId>? MyThingsWithTenantIds { get; set; }
     public DbSet<MyThingWithIntTenantId>? MyThingsWithIntTenantId { get; set; }
     public DbSet<MyMultiTenantThingWithAttribute>? MyMultiTenantThingsWithAttribute { get; set; }
+    public DbSet<MyNonMultiTenantThing>? MyNonMultiTenantThings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,6 +47,11 @@ public class DynamicModelCacheKeyFactory : IModelCacheKeyFactory
 }
 
 public class MyMultiTenantThing
+{
+    public int Id { get; set; }
+}
+
+public class MyNonMultiTenantThing
 {
     public int Id { get; set; }
 }
