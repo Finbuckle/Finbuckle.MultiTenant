@@ -1,0 +1,16 @@
+@WebApiSample_HostAddress = http://localhost:5271
+
+GET {{WebApiSample_HostAddress}}/acme/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{WebApiSample_HostAddress}}/globex/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{WebApiSample_HostAddress}}/parisian/weatherforecast/
+Accept: application/json
+
+###
