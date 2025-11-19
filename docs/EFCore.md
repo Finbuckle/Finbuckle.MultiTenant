@@ -83,8 +83,9 @@ There are two ways to designate an entity type as multi-tenant:
 1. apply the `[MultiTenant]` data attribute
 2. use the fluent API entity type builder extension method `IsMultiTenant`
 
-Entity types not designated via one of these methods are not isolated per-tenant all instances are shared across all
-tenants.
+Entity types not designated via one of these methods are not isolated per-tenant; all instances are shared across all
+tenants. You can also explicitly mark an entity type as non-multi-tenant using the `IsNotMultiTenant()` fluent API
+method, which is useful for overriding the `[MultiTenant]` attribute or for clearly documenting shared entities.
 
 ## Using the `[MultiTenant]` attribute
 
@@ -148,6 +149,37 @@ have the attribute, e.g. from another assembly.
 `IsMultiTenant()` returns an `MultiTenantEntityTypeBuilder` instance which enables further multi-tenant configuration of
 the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes](#keys-and-indexes) for
 more details.
+
+### Excluding Entities from Multi-Tenancy
+
+In some scenarios, you may need to explicitly mark an entity as non-multi-tenant, even in a multi-tenant database context.
+The fluent API extension method `IsNotMultiTenant` can be used to exclude specific entity types from tenant isolation:
+
+```csharp
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    // Configure an entity type to be explicitly non-multi-tenant.
+    builder.Entity<SharedConfiguration>().IsNotMultiTenant();
+    builder.Entity<GlobalSetting>().IsNotMultiTenant();
+}
+```
+
+This is useful when you have entities that should be shared across all tenants in a shared database scenario. For example:
+- System-wide configuration settings
+- Shared reference data (e.g., countries, states, currencies)
+- Global audit logs
+- Cross-tenant reports or analytics
+
+Entities marked with `IsNotMultiTenant()`:
+- Will not have a `TenantId` property added (shadow or otherwise)
+- Will not be filtered by tenant in queries
+- Will be accessible to all tenants
+- If previously configured with `IsMultiTenant()`, the tenant query filter will be removed
+
+This method is particularly useful when:
+1. You have a mix of tenant-specific and shared entities in the same database context
+2. You need to override the `[MultiTenant]` attribute on an entity type from another assembly
+3. You want to explicitly document which entities are intentionally shared across tenants
 
 ## Existing Query Filters
 

@@ -20,6 +20,26 @@ public static class EntityTypeBuilderExtensions
     }
 
     /// <summary>
+    /// Marks an entity as non-multi-tenant, removing any tenant-based query filters.
+    /// </summary>
+    /// <param name="builder">The <see cref="EntityTypeBuilder"/> instance.</param>
+    /// <returns>The same <see cref="EntityTypeBuilder"/> instance for method chaining.</returns>
+    /// <remarks>
+    /// This method is useful for excluding specific entities from tenant isolation in a multi-tenant context.
+    /// It sets the multi-tenant annotation to false and removes the tenant query filter if it exists.
+    /// </remarks>
+    public static EntityTypeBuilder IsNotMultiTenant(this EntityTypeBuilder builder)
+    {
+        builder.HasAnnotation(Constants.MultiTenantAnnotationName, false);
+        //remove the named query filter if it exists
+        var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
+        if(existingFilter is not null)
+            builder.Metadata.SetQueryFilter(Abstractions.Constants.TenantToken, null);
+        
+        return builder;
+    }
+    
+    /// <summary>
     /// Adds multi-tenant support for an entity via a named query filter.
     /// </summary>
     /// <param name="builder">The typed <see cref="EntityTypeBuilder"/> instance.</param>
