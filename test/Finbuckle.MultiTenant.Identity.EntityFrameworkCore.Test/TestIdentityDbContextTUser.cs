@@ -2,11 +2,10 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test;
+namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class TestIdentityDbContextTUser : MultiTenantIdentityDbContext<IdentityUser>
 {
