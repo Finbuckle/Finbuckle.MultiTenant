@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// All Identity entity types are multi-tenant by default.
+/// All Identity entity types are multi-tenant by default and have the tenant ID added to the unique index.
 /// </remarks>
 /// </summary>
 public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
@@ -29,21 +29,12 @@ public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<Identit
         DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-
-    /// <inheritdoc />
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
-
-        builder.Entity<IdentityUser>().IsMultiTenant().AdjustUniqueIndexes();
-    }
 }
 
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// <typeparamref name="TUser"/> is not multi-tenant by default.
-/// All other Identity entity types are multi-tenant by default.
+/// All Identity entity types are multi-tenant by default and have the tenant ID added to the unique index.
 /// </remarks>
 /// </summary>
 /// <typeparam name="TUser">The <see cref="IdentityUser"/> derived type.</typeparam>
@@ -61,28 +52,19 @@ public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<
         DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-
-    /// <inheritdoc />
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
-
-        builder.Entity<IdentityRole>().IsMultiTenant().AdjustUniqueIndexes();
-    }
 }
 
 /// <summary>
 /// An Identity database context that enforces tenant integrity on multi-tenant entity types.
 /// <remarks>
-/// <typeparamref name="TUser"/> and <typeparamref name="TRole"/> are not multi-tenant by default.
-/// All other Identity entity types are multi-tenant by default.
+/// All Identity entity types are multi-tenant by default and have the tenant ID added to the unique index.
 /// </remarks>
 /// </summary>
 /// <typeparam name="TUser">The <see cref="IdentityUser{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TRole">The <see cref="IdentityRole{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TKey">The key type.</typeparam>
-public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole, TKey
-    , IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>,
+public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole,
+    TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>,
     IdentityUserToken<TKey>>
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
@@ -99,25 +81,13 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
         DbContextOptions options) : base(multiTenantContextAccessor, options)
     {
     }
-
-    /// <inheritdoc />
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        base.OnModelCreating(builder);
-
-        builder.Entity<IdentityUserClaim<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-        builder.Entity<IdentityUserRole<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-        builder.Entity<IdentityUserLogin<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-        builder.Entity<IdentityRoleClaim<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-        builder.Entity<IdentityUserToken<TKey>>().IsMultiTenant().AdjustUniqueIndexes();
-    }
 }
 
 /// <summary>
 /// An Identity database context that enforces tenant integrity on entity types
 /// marked with the <see cref="MultiTenantAttribute"/> annotation or attribute.
 /// <remarks>
-/// No Identity entity types are multi-tenant by default.
+/// All Identity entity types are multi-tenant by default and have the tenant ID added to the unique index.
 /// </remarks>
 /// </summary>
 /// <typeparam name="TUser">The <see cref="IdentityUser{TKey}"/> derived type.</typeparam>
@@ -173,6 +143,14 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        
+        builder.Entity<TUser>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TRole>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TUserClaim>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TUserRole>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TUserLogin>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TRoleClaim>().IsMultiTenant().AdjustUniqueIndexes();
+        builder.Entity<TUserToken>().IsMultiTenant().AdjustUniqueIndexes();
         builder.ConfigureMultiTenant();
     }
 
