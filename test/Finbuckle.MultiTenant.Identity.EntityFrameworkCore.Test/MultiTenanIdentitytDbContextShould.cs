@@ -7,13 +7,34 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Finbucke.MultiTenant.Identity.EntityFrameworkCore.Test;
+namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class MultiTenantIdentityDbContextShould
 {
+    private TContext CreateDbContextViaDi<TContext>(int schemaVersion = 3) where TContext : DbContext
+    {
+        var services = new ServiceCollection();
+        services.AddOptions();
+        services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion,0));
+        services.AddMultiTenant<TenantInfo>();
+        // override the generic accessor with a static one bound to a test tenant
+        var tenant = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
+        services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new StaticMultiTenantContextAccessor<TenantInfo>(tenant));
+        services.AddDbContext<TContext>(o =>
+        {
+            o.UseSqlite("DataSource=:memory:");
+            o.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
+        });
+        var sp = services.BuildServiceProvider();
+        var scope = sp.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<TContext>();
+    }
+
     [Fact]
     public void WorkWithDependencyInjection()
     {
@@ -29,12 +50,13 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
-
+        var c = CreateDbContextViaDi<TestIdentityDbContext>();
         Assert.NotNull(c);
     }
 
+    // Replace schema-parameterized tests with split tests
+
+    // Default schema (2): AdjustUniqueIndexes
     [Theory]
     [InlineData(typeof(IdentityUser))]
     [InlineData(typeof(IdentityRole))]
@@ -43,18 +65,25 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserLogin<string>))]
     [InlineData(typeof(IdentityRoleClaim<string>))]
     [InlineData(typeof(IdentityUserToken<string>))]
-    public void AdjustUniqueIndexes(Type entityType)
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void AdjustUniqueIndexes_DefaultSchema(Type entityType)
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
-
-        foreach (var index in c.Model.FindEntityType(entityType)!.GetIndexes().Where(i => i.IsUnique))
+        var c = CreateDbContextViaDi<TestIdentityDbContext>(2);
+        var et = c.Model.FindEntityType(entityType);
+        if (entityType == typeof(IdentityUserPasskey<string>))
         {
-            var props = index.Properties.Select(p => p.Name);
-            Assert.Contains("TenantId", props);
+            // Passkey may be absent; if present, should NOT include TenantId in unique indexes
+            if (et == null) return;
+            var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
+            Assert.DoesNotContain("TenantId", uniqueProps);
+            return;
         }
+        Assert.NotNull(et);
+        foreach (var idx in et.GetIndexes().Where(i => i.IsUnique))
+            Assert.Contains("TenantId", idx.Properties.Select(p => p.Name));
     }
 
+    // Schema 3: AdjustUniqueIndexes
     [Theory]
     [InlineData(typeof(IdentityUser))]
     [InlineData(typeof(IdentityRole))]
@@ -63,14 +92,17 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserLogin<string>))]
     [InlineData(typeof(IdentityRoleClaim<string>))]
     [InlineData(typeof(IdentityUserToken<string>))]
-    public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType)
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void AdjustUniqueIndexes_Schema3(Type entityType)
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
-
-        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
+        var c = CreateDbContextViaDi<TestIdentityDbContext>(3);
+        var et = c.Model.FindEntityType(entityType);
+        Assert.NotNull(et);
+        foreach (var idx in et.GetIndexes().Where(i => i.IsUnique))
+            Assert.Contains("TenantId", idx.Properties.Select(p => p.Name));
     }
 
+    // Default schema (2): SetMultiTenantOnIdentityDbContextVariant_None
     [Theory]
     [InlineData(typeof(IdentityUser))]
     [InlineData(typeof(IdentityRole))]
@@ -79,14 +111,24 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserLogin<string>))]
     [InlineData(typeof(IdentityRoleClaim<string>))]
     [InlineData(typeof(IdentityUserToken<string>))]
-    public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType)
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_None_DefaultSchema(Type entityType)
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c = MultiTenantDbContext.Create<TestIdentityDbContextTUser, TenantInfo>(tenant1);
-
-        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
+        var c = CreateDbContextViaDi<TestIdentityDbContext>(2);
+        var et = c.Model.FindEntityType(entityType);
+        if (entityType == typeof(IdentityUserPasskey<string>))
+        {
+            if (et == null) return;
+            Assert.False(et.IsMultiTenant());
+            var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
+            Assert.DoesNotContain("TenantId", uniqueProps);
+            return;
+        }
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
     }
 
+    // Schema 3: SetMultiTenantOnIdentityDbContextVariant_None
     [Theory]
     [InlineData(typeof(IdentityUser))]
     [InlineData(typeof(IdentityRole))]
@@ -95,15 +137,16 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserLogin<string>))]
     [InlineData(typeof(IdentityRoleClaim<string>))]
     [InlineData(typeof(IdentityUserToken<string>))]
-    public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType)
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_None_Schema3(Type entityType)
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c =
-            MultiTenantDbContext.Create<TestIdentityDbContextTUserTRole, TenantInfo>(tenant1);
-
-        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
+        var c = CreateDbContextViaDi<TestIdentityDbContext>(3);
+        var et = c.Model.FindEntityType(entityType);
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
     }
 
+    // Default schema (2): SetMultiTenantOnIdentityDbContextVariant_TUser
     [Theory]
     [InlineData(typeof(IdentityUser))]
     [InlineData(typeof(IdentityRole))]
@@ -112,16 +155,131 @@ public class MultiTenantIdentityDbContextShould
     [InlineData(typeof(IdentityUserLogin<string>))]
     [InlineData(typeof(IdentityRoleClaim<string>))]
     [InlineData(typeof(IdentityUserToken<string>))]
-    public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType)
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser_DefaultSchema(Type entityType)
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
-        using var c = MultiTenantDbContext.Create<TestIdentityDbContextAll, TenantInfo>(tenant1);
+        var c = CreateDbContextViaDi<TestIdentityDbContextTUser>(2);
+        var et = c.Model.FindEntityType(entityType);
+        if (entityType == typeof(IdentityUserPasskey<string>))
+        {
+            if (et == null) return;
+            Assert.False(et.IsMultiTenant());
+            var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
+            Assert.DoesNotContain("TenantId", uniqueProps);
+            return;
+        }
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
+    }
 
-        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
+    // Schema 3: SetMultiTenantOnIdentityDbContextVariant_TUser
+    [Theory]
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser_Schema3(Type entityType)
+    {
+        var c = CreateDbContextViaDi<TestIdentityDbContextTUser>(3);
+        var et = c.Model.FindEntityType(entityType);
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
+    }
+
+    // Default schema (2): SetMultiTenantOnIdentityDbContextVariant_TUser_TRole
+    [Theory]
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole_DefaultSchema(Type entityType)
+    {
+        var c = CreateDbContextViaDi<TestIdentityDbContextTUserTRole>(2);
+        var et = c.Model.FindEntityType(entityType);
+        if (entityType == typeof(IdentityUserPasskey<string>))
+        {
+            if (et == null) return;
+            Assert.False(et.IsMultiTenant());
+            var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
+            Assert.DoesNotContain("TenantId", uniqueProps);
+            return;
+        }
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
+    }
+
+    // Schema 3: SetMultiTenantOnIdentityDbContextVariant_TUser_TRole
+    [Theory]
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole_Schema3(Type entityType)
+    {
+        var c = CreateDbContextViaDi<TestIdentityDbContextTUserTRole>(3);
+        var et = c.Model.FindEntityType(entityType);
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
+    }
+
+    // Default schema (2): SetMultiTenantOnIdentityDbContextVariant_All
+    [Theory]
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_All_DefaultSchema(Type entityType)
+    {
+        var c = CreateDbContextViaDi<TestIdentityDbContextAll>(2);
+        var et = c.Model.FindEntityType(entityType);
+        if (entityType == typeof(IdentityUserPasskey<string>))
+        {
+            if (et == null) return;
+            Assert.False(et.IsMultiTenant());
+            var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
+            Assert.DoesNotContain("TenantId", uniqueProps);
+            return;
+        }
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
+    }
+
+    // Schema 3: SetMultiTenantOnIdentityDbContextVariant_All
+    [Theory]
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    [InlineData(typeof(IdentityUserPasskey<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_All_Schema3(Type entityType)
+    {
+        var c = CreateDbContextViaDi<TestIdentityDbContextAll>(3);
+        var et = c.Model.FindEntityType(entityType);
+        Assert.NotNull(et);
+        Assert.True(et.IsMultiTenant());
     }
 
     [Fact]
-    public void CreateMultiTenantIdentityDbContext()
+    public void CreateMultiTenantIdentityDbContextWithFactory()
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
