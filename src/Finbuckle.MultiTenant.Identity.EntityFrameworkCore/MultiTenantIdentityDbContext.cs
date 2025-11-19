@@ -65,7 +65,7 @@ public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<
 /// <typeparam name="TKey">The key type.</typeparam>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTenantIdentityDbContext<TUser, TRole,
     TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>,
-    IdentityUserToken<TKey>>
+    IdentityUserToken<TKey>, IdentityUserPasskey<TKey>>
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
     where TKey : IEquatable<TKey>
@@ -84,8 +84,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
 }
 
 /// <summary>
-/// An Identity database context that enforces tenant integrity on entity types
-/// marked with the <see cref="MultiTenantAttribute"/> annotation or attribute.
+/// An Identity database context that enforces tenant integrity on multi-tenant entity types
 /// <remarks>
 /// All Identity entity types are multi-tenant by default and have the tenant ID added to the unique index.
 /// </remarks>
@@ -98,8 +97,10 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
 /// <typeparam name="TUserLogin">The <see cref="IdentityUserLogin{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TRoleClaim">The <see cref="IdentityRoleClaim{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TUserToken">The <see cref="IdentityUserToken{TKey}"/> derived type.</typeparam>
+/// <typeparam name="TUserPasskey">The <see cref="IdentityUserPasskey{TKey}"/> derived type.</typeparam>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim,
-    TUserToken> : IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>,
+    TUserToken, TUserPasskey> :
+    IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken, TUserPasskey>,
     IMultiTenantDbContext
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
@@ -108,6 +109,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TUserLogin : IdentityUserLogin<TKey>
     where TRoleClaim : IdentityRoleClaim<TKey>
     where TUserToken : IdentityUserToken<TKey>
+    where TUserPasskey : IdentityUserPasskey<TKey>
     where TKey : IEquatable<TKey>
 {
     /// <inheritdoc />
@@ -143,7 +145,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         builder.Entity<TUser>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<TRole>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<TUserClaim>().IsMultiTenant().AdjustUniqueIndexes();
@@ -151,6 +153,8 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
         builder.Entity<TUserLogin>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<TRoleClaim>().IsMultiTenant().AdjustUniqueIndexes();
         builder.Entity<TUserToken>().IsMultiTenant().AdjustUniqueIndexes();
+        if(SchemaVersion == IdentitySchemaVersions.Version3)
+            builder.Entity<TUserPasskey>().IsMultiTenant().AdjustUniqueIndexes();
         builder.ConfigureMultiTenant();
     }
 

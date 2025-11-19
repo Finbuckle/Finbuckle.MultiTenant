@@ -19,12 +19,8 @@ in [Data Isolation With Entity Framework Core](EFCore) with a few extra specific
 The simplest approach is to derive a db context from `MultiTenantIdentityDbContext` (which itself derives
 from `IdentityDbContext`) and configure Identity to use the derived context.
 
-When customizing the Identity data model, for example deriving a user entity type class from `IdentityUser`,
-designate the customized entity type as multi-tenant by either:
-
-- Adding the `[MultiTenant]` data attribute to the entity type class, or
-- Using the `IsMultiTenant` fluent api method in `OnModelCreating` **after** calling the base class `OnModelCreating`
-  method (to ensure the Identity model exists).
+If for some reason you do not want an Identity entity to be multi-tenant you can override the behavior by
+calling the `IsNotMultiTenant` extension method in `OnModelCreating` after calling the base class method.
 
 If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the
 appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is
@@ -34,6 +30,35 @@ required that base class `OnModelCreating` method is called **before** any multi
 
 When using a variant of `MultiTenantIdentityDbContext` any entity designated as multi-tenant will also have the 
 `TenantId` property added to its unique index.
+
+> Note: Starting in v10, all Identity entity types are configured as multi-tenant by default when you derive from one of
+> the `MultiTenantIdentityDbContext` variants. You generally do not need to add `[MultiTenant]` or call `IsMultiTenant`
+> yourself unless you are explicitly overriding behavior on a specific type.
+
+## Passkeys (WebAuthn) and Identity schema versions
+
+ASP.NET Core Identity introduced passkey support via `IdentityUserPasskey<TKey>` in Identity schema version 3.
+Finbuckle.MultiTenant respects this and only configures the passkey entity as multi-tenant when the Identity
+schema version is set to 3.
+
+- Schema version 3: `IdentityUserPasskey<TKey>` (aka `TUserPasskey`) is configured as multi-tenant and its unique
+  indexes include `TenantId`.
+- Schema version 2: The passkey entity is not configured for multi-tenancy and its unique indexes will not include
+  `TenantId`. Depending on your Identity configuration it may not even be part of the model.
+
+To enable passkey support with multi-tenant configuration, set the Identity stores schema version to 3:
+
+```csharp
+services.AddOptions();
+services.Configure<IdentityOptions>(o =>
+{
+    // Use Identity schema version 3 to enable passkeys
+    o.Stores.SchemaVersion = new Version(3, 0);
+});
+```
+
+No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext` will detect the schema version
+and configure passkey entities accordingly.
 
 ## Caveats
 
@@ -76,6 +101,7 @@ relies on several types which are passed to the database context as generic para
 - `TUserLogin`
 - `TRoleClaim`
 - `TUserRole`
+- `TUserPasskey` (Identity schema version 3 only)
 
 Default entity types exist such as the `IdentityUser`, `IdentityRole`, and `IdentityUserClaim`, which are commonly used
 as the generic parameters. The default for `TKey` is `string`. Your app can provide its own entity types for any of these
@@ -83,22 +109,23 @@ by using alternative forms of the database context which take varying number of 
 use-cases derive from `IdentityDbContext` types which require only a few generic parameters and plug in the default
 entity types for the rest.
 
+> In v10, the `MultiTenantIdentityDbContext` variants will configure all provided Identity entity types as
+> multi-tenant by default. The passkey entity (`TUserPasskey`) is configured only when the Identity schema version
+> is set to 3.
+
 Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all the default entity types
 and `string` for `TKey`. All entity types will be configured as multi-tenant.
 
 Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the
-rest. `TUser` will not be configured as multi-tenant by default, and it is up to you to do so as described
-above. All other entity types will be configured as multi-tenant.
+rest. All entity types will be configured as multi-tenant.
 
 Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters
-for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. `TUser` and `TRole` will not be configured as
-multi-tenant by default, and it is up to you to do so as described above if desired. All other entity types
-will be configured as multi-tenant.
+for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. All entity types will be configured as multi-tenant.
 
-Deriving
-from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken>` will
-only use provided parameters. No entity types will be configured as multi-tenant, and it is up to you to do
-so as described above if desired.
+Deriving from
+`MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken, TUserPasskey>`
+will use all provided parameters. All entity types will be configured as multi-tenant, and `TUserPasskey` is configured
+only when the Identity schema version is set to 3.
 
 When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]`
 attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the
