@@ -2,14 +2,25 @@
 
 This folder contains simple examples of Finbuckle.MultiTenant and related packages in action.
 
-Samples are grouped by Finbuckle.MultiTenant version and .NET version.
+## Available Samples
 
-## Where are the samples?
+### [Web API Sample](WebApiSample/)
 
-Samples may not always be present in the main branch as they need to be updated to support later .NET versions. 
-Contributions providing simple, up-to-date samples are always appreciated!
+A minimal multi-tenant Web API demonstrating the base path strategy and in-memory tenant store. The weather forecast endpoint returns localized summaries based on each tenant's preferred language.
 
-The following tagged commits have legacy samples from their respective release:
-- [v8.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v8.0.0/samples/)
-- [v6.13.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.13.1/samples/)
-- [v6.2.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.2.0/samples)
+**Key Features:**
+- Base path strategy for tenant identification
+- In-memory tenant store
+- Custom tenant properties
+- Localized content per tenant
+
+### [Identity Sample App](IdentitySampleApp/)
+
+An ASP.NET Core MVC application with ASP.NET Core Identity integration showing per-tenant authentication and user management. Each tenant maintains isolated users in separate database contexts.
+
+**Key Features:**
+- Route strategy with tenant parameter
+- Configuration store from appsettings.json
+- Per-tenant authentication and Identity DbContext
+- Multi-tenant Razor Pages
+- Automatic database seeding

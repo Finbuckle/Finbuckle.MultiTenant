@@ -6,7 +6,7 @@ Finbuckle.MultiTenant is an open-source multitenancy middleware library for .NET
 per-tenant app behavior, and per-tenant data isolation.
 See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
 
-**This release supports .NET 9 and .NET 8.**
+**This release supports .NET 10.**
 
 ## Open Source Support
 
@@ -98,7 +98,7 @@ That's all that is needed to get going. Let's breakdown each line:
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must be an implementation of `ITenantInfo` which holds basic
+The type parameter for `AddMultiTenant<TTenantInfo>` must be `TenantInfo` or a derived record class which holds basic
 information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but
 a custom implementation can be used if more properties are needed.
 
@@ -113,9 +113,9 @@ See [MultiTenant Strategies](https://www.finbuckle.com/MultiTenant/Docs/Strategi
 
 `.WithConfigurationStore()`
 
-This line tells the app that information for all tenants are in the `appsettings.json` file used for app configuration.
-If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the
-current request.
+This line tells the app that information for all tenants are in the app configuration, typically in the
+`appsettings.json` file. If a tenant in the store has the identifier found by the strategy, the tenant will be 
+successfully resolved for the current request.
 
 See [MultiTenant Stores](https://www.finbuckle.com/MultiTenant/Docs/Stores) for more information.
 
@@ -131,23 +131,22 @@ settings. Be sure to call it before other middleware which will use per-tenant f
 ### Basic Usage
 
 With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `MultiTenantContext<T>` object accessed from the `GetMultiTenantContext<T>` extension method:
+the `MultiTenantContext<T>` object accessed from the `GetMultiTenantContext<T>` and `GetTenantInfo<T>` extension 
+methods:
 
 ```cs
+// obtain the tenant info from the MultiTenantContext
 var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
 
-if(tenantInfo != null)
-{
-    var tenantId = tenantInfo.Id;
-    var identifier = tenantInfo.Identifier;
-    var name = tenantInfo.Name;
-}
+// or obtain the tenant info directly
+var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
 ```
 
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<T>` during configuration.
 If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `ITenantInfo` instance and/or the typed instance are also available directly through dependency injection.
+The `TenantInfo` instance and/or the typed instance are also available directly through dependency injection via the
+`IMultiTenantContextAccessor<T>`.
 
 See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/ConfigurationAndUsage) for more information.
 
@@ -164,7 +163,7 @@ the [documentation](https://www.finbuckle.com/multitenant/docs) for more details
 ## Sample Projects
 
 A variety of [sample projects](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) are available in
-the repository. Check older tagged release commits for samples from prior .NET versions.
+the repository. Older release branches also contain a variety of legacy samples.
 
 ## Build and Test Status
 
@@ -195,12 +194,10 @@ or peruse the code!
 From the command line clone the git repository, `cd` into the new directory, and compile with `dotnet build`.
 
 ```bash
-$ git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
-$ cd Finbuckle.MultiTenant
-Cloning into 'Finbuckle.MultiTenant'...
-<output omitted>
-$ cd Finbuckle.MultiTenant
-$ dotnet build
+git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
+cd Finbuckle.MultiTenant
+cd Finbuckle.MultiTenant
+dotnet build
 ```
 
 ## Running Unit Tests
@@ -208,5 +205,5 @@ $ dotnet build
 Run the unit tests from the command line with `dotnet test` from the solution directory.
 
 ```bash
-$ dotnet test
+dotnet test
 ```
