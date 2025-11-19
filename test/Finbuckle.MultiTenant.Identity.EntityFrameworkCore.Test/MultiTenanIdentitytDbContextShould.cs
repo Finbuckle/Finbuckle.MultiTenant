@@ -56,68 +56,68 @@ public class MultiTenantIdentityDbContextShould
     }
 
     [Theory]
-    [InlineData(typeof(IdentityUser), true)]
-    [InlineData(typeof(IdentityRole), true)]
-    [InlineData(typeof(IdentityUserClaim<string>), true)]
-    [InlineData(typeof(IdentityUserRole<string>), true)]
-    [InlineData(typeof(IdentityUserLogin<string>), true)]
-    [InlineData(typeof(IdentityRoleClaim<string>), true)]
-    [InlineData(typeof(IdentityUserToken<string>), true)]
-    public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType, bool isMultiTenant)
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_None(Type entityType)
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContext, TenantInfo>(tenant1);
 
-        Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
     }
 
     [Theory]
-    [InlineData(typeof(IdentityUser), false)]
-    [InlineData(typeof(IdentityRole), true)]
-    [InlineData(typeof(IdentityUserClaim<string>), true)]
-    [InlineData(typeof(IdentityUserRole<string>), true)]
-    [InlineData(typeof(IdentityUserLogin<string>), true)]
-    [InlineData(typeof(IdentityRoleClaim<string>), true)]
-    [InlineData(typeof(IdentityUserToken<string>), true)]
-    public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType, bool isMultiTenant)
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser(Type entityType)
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContextTUser, TenantInfo>(tenant1);
 
-        Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
     }
 
     [Theory]
-    [InlineData(typeof(IdentityUser), false)]
-    [InlineData(typeof(IdentityRole), false)]
-    [InlineData(typeof(IdentityUserClaim<string>), true)]
-    [InlineData(typeof(IdentityUserRole<string>), true)]
-    [InlineData(typeof(IdentityUserLogin<string>), true)]
-    [InlineData(typeof(IdentityRoleClaim<string>), true)]
-    [InlineData(typeof(IdentityUserToken<string>), true)]
-    public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType, bool isMultiTenant)
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_TUser_TRole(Type entityType)
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c =
             MultiTenantDbContext.Create<TestIdentityDbContextTUserTRole, TenantInfo>(tenant1);
 
-        Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
     }
 
     [Theory]
-    [InlineData(typeof(IdentityUser), false)]
-    [InlineData(typeof(IdentityRole), false)]
-    [InlineData(typeof(IdentityUserClaim<string>), false)]
-    [InlineData(typeof(IdentityUserRole<string>), false)]
-    [InlineData(typeof(IdentityUserLogin<string>), false)]
-    [InlineData(typeof(IdentityRoleClaim<string>), false)]
-    [InlineData(typeof(IdentityUserToken<string>), false)]
-    public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType, bool isMultiTenant)
+    [InlineData(typeof(IdentityUser))]
+    [InlineData(typeof(IdentityRole))]
+    [InlineData(typeof(IdentityUserClaim<string>))]
+    [InlineData(typeof(IdentityUserRole<string>))]
+    [InlineData(typeof(IdentityUserLogin<string>))]
+    [InlineData(typeof(IdentityRoleClaim<string>))]
+    [InlineData(typeof(IdentityUserToken<string>))]
+    public void SetMultiTenantOnIdentityDbContextVariant_All(Type entityType)
     {
         var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
         using var c = MultiTenantDbContext.Create<TestIdentityDbContextAll, TenantInfo>(tenant1);
 
-        Assert.Equal(isMultiTenant, c.Model.FindEntityType(entityType).IsMultiTenant());
+        Assert.True(c.Model.FindEntityType(entityType).IsMultiTenant());
     }
 
     [Fact]
