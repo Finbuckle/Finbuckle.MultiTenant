@@ -1,9 +1,9 @@
-using IdentitySampleApp.Data;
+using IdentityAppSample.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
-using IdentitySampleApp;
+using IdentityAppSample;
 
 var builder = WebApplication.CreateBuilder(args);
 

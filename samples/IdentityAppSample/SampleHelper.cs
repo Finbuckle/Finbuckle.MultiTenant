@@ -1,10 +1,10 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
-using IdentitySampleApp.Data;
+using IdentityAppSample.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace IdentitySampleApp;
+namespace IdentityAppSample;
 
 public abstract class SampleHelper
 {

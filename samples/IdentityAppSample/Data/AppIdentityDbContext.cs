@@ -2,7 +2,7 @@
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdentitySampleApp.Data;
+namespace IdentityAppSample.Data;
 
 public class AppIdentityDbContext(
     IMultiTenantContextAccessor<AppTenantInfo> mtca,

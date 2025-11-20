@@ -1,4 +1,4 @@
-namespace IdentitySampleApp.Data.Models;
+namespace IdentityAppSample.Data.Models;
 
 public class ErrorViewModel
 {

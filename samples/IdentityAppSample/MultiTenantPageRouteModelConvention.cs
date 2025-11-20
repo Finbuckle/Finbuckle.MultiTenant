@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace IdentitySampleApp;
+namespace IdentityAppSample;
 
 public class MultiTenantPageRouteModelConvention : IPageRouteModelConvention
 {

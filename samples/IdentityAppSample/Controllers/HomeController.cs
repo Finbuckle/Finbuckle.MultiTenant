@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using IdentityAppSample.Data.Models;
 using Microsoft.AspNetCore.Mvc;
-using IdentitySampleApp.Data.Models;
 
-namespace IdentitySampleApp.Data.Controllers;
+namespace IdentityAppSample.Data.Controllers;
 
 public class HomeController : Controller
 {
