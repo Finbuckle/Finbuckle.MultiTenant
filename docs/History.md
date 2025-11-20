@@ -1,6 +1,64 @@
 # Version History
 
 <!--_history-->
+## [10.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.2...v10.0.0) (2025-11-20)
+
+### ⚠ BREAKING CHANGES
+
+* In prior versions user provided generic types to the `MultiTenantIdentityDbContext` family of classes were not mult-tenant by default. This was confusing and to simplify all are now multi-tenant by default.
+* The `RouteStrategy` will include the tenant in the ambient route values used for link generation, similar to `Controller` and `Action`. Can be disabled via the `WithRouteStrategy` overload taking a boolean for `useTenantAmbientRouteValue` set to false.
+* General improvements in folder structure to reduce overnesting has caused namespace changes for certain types. Namely some stores and options types.
+* BasePathStrategy default behavior is changed to rebase the aspnetcore path base. This was opt in before. Can be set via `BasePathStrategyOptions`.
+* This was opt in before. Can be set via `BasePathStrategyOptions`.
+* Namespaces were standardized to match folder locations.
+* Making TenantInfo a record reduces risk of unintended changes to the current tenant. This change also removes `ITenantInfo` and `TenantInfo` should be used as the base for custom implementations. Note that `EFCoreStore` uses this record as an entity but takes care not to rely on tracking.
+* prior extension namespaces were inconsistent, now they are all `{PackageName}.Extensions`, e.g. `Finbuckle.MultiTenant.Options.Extensions`
+* Per-tenant options support was previously part of the Finbuckle.MultiTenant package. Projects will need to reference the Finbuckle.MultiTenant.Options package going forward.
+* Minor changes to the `IMultiTenantStore` interface signatures.
+* Removes the 64 character limit on Tenant ID. This also removes the max length constraint where Tenant ID is used in EF Core if applicable.
+* `IMultiTenantContext` and its implementations are now immutable. Changes will require assigning a new instance.
+* Prior to this change anonymous filters were used and required special consideration in advanced scenarios. The change to named filters removes these considerations, but named filters cannot be mixed with anonymous filters.
+* net8 and net9 targets were removed
+* This change better isolates dependencies. Basic interfaces and types are now in the `Finbuckle.MultiTenant.Abstractions` package and `MultiTenantIdentityDbContext` functionality is now in the `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` package.
+
+### Features
+
+* add `IsNotMultiTenant` method to exclude entities from multi-tenancy in EF Core per-tenant data functionality. ([b160826](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b160826d33a41957dddaa664984d1c92124fe97b))
+* add Identity passkey multi-tenant support ([7f0bf73](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7f0bf738107c0ce72d63ffc75a81a88415ab7bec))
+* add MultiTenantAmbientValueLinkGenerator to promote tenant route values ([#1041](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1041)) ([259511c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/259511ca7100d836e17d7ce5dffabe42bb276b81))
+* all projects target net10 ([#1007](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1007)) ([1f02e8f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1f02e8f9be2a25048b410e312641ef7e2f12cc26))
+* BasePathStrategy will rebase the aspnetcore path base by default ([bd7f0d0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/bd7f0d064f539850309e89041db0ecf9999a87dc))
+* BasePathStrategy will rebase the aspnetcore path base by default ([d107d81](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d107d818ded597ea298108afd1e085b9f241dde8))
+* expose many internal types as public and adjust namespaces ([#1030](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1030)) ([f680843](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f6808434e90b820fe54ff8638085bd2316153a1d))
+* Identity entity types are all multi-tenant by default on `MultiTenantIdentityDbContext` variants. ([4e1bd9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4e1bd9faf111344499fcf4feb0eee1636737eef7))
+* immutable IMultiTenantContext ([#1018](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1018)) ([03ddeb0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/03ddeb067654c23e3747f7d2c90b33f7ca0ceeb9))
+* improve folder structure ([#1040](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1040)) ([d46ce8c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d46ce8c9fb6e6b1cc30c09f6fd4fbb05e076a0bc))
+* improved depedency structure with `Finbuckle.MultiTenant.Abstractions` and `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` ([#1006](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1006)) ([e191d83](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e191d83dfe2b161aeafcf08bcca5978d23bcd783))
+* improved store interface ([#1020](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1020)) ([c6a16c4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c6a16c44880ac1edcf5b7c09da9986091efe3a52))
+* improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([fdd59b9](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fdd59b980d9209296d7e4af6a3bb73211e9aa91c))
+* improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([8ee6597](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/8ee65977088989cfb16936fbd70999789cca9d90))
+* namespaces for extension methods changed ([#1026](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1026)) ([318fcec](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/318fcecefc53fa765e5d50de730baa8b86be4b95))
+* refactors per-tenant options into Finbuckle.MultiTenant.Options package ([#1024](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1024)) ([ca4877f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ca4877f2ffccc3d8d686cf449dd865e05db3f6cb))
+* removed max char length on TenantInfo ([#1019](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1019)) ([37bb15b](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/37bb15b18c9af505202cc49b221f71654b23ad05))
+* TenantInfo is now a record and `ITenantInfo` is removed ([#1029](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1029)) ([21559da](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/21559dab15e20a451aae49252b128bad81549977))
+* use named global query filters in EF Core ([#1016](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1016)) ([c3ac833](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c3ac833a561c6e122d5d618659cf2308c9a0c0c1))
+
+### Bug Fixes
+
+* update dependencies ([#1023](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1023)) ([69ac561](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/69ac5613526acb3e3001bf284698853a3feb9b4e))
+* update dependencies ([#1027](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1027)) ([b185944](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b185944a63f3027fed0f04b3aed9eb2491f16959))
+* update dependencies ([#1037](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1037)) ([b168900](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b1689005f0ee1437762a7ac511d90931fd2364f1))
+
+### Performance Improvements
+
+* new Lock use ([#1022](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1022)) ([55bde60](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/55bde60fd81c14ca6bdac6d628cd27b3f098f8eb))
+
+### Reverts
+
+* Revert "feat: BasePathStrategy will rebase the aspnetcore path base by default" ([0a154e1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0a154e17796ccd09b910ee6b17d1267dbe73ca79))
+* Revert "feat: improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038))" ([#1039](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1039)) ([b036339](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b036339eb38430f70d1342afd527f54d9fefc638))
+* Revert "feat: refactors per-tenant options into Finbuckle.MultiTenant.Options package ([#1024](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1024))" ([0db79eb](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0db79ebac593fab6219c6ecf6bfaf82845239558))
+
 ## [9.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.1...v9.4.2) (2025-11-01)
 
 ### Bug Fixes
@@ -107,7 +165,7 @@
 ### ⚠ BREAKING CHANGES
 
 * `OnTenantResolved` and `OnTenantNotResolved` are no longer used. Use the `OnStrategyResolveCompleted`, `OnStoreResolveCompleted`, and `OnTenantResolveCompleted` events instead.
-* `MultiTenantDbContext` constructors accepting `TenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
+* `MultiTenantDbContext` constructors accepting `ITenantInfo` removed, use `MultiTenantDbContext.Create` factory method instead.
 * net6.0 and net7.0 are no longer supported targets.
 * dotnet runtime specific dependencies now float to the latest patch version and are locked at release time with a NuGet lock file. This is a security mitigation and may break some builds not on the latest SDKs.
 
@@ -175,7 +233,7 @@
   constructor that injects IMultiTenantContextAccessor or IMultiTenantContext<TTenantInfo>.
 * Many namespaces have been updated for consistency. Most code will only need to use the Finbuckle.MultiTenant or
   Finbuckle.MultiTenant.Abstractions namespace.
-* Connection string is removed from TenantInfo and the default TenantInfo implementation.
+* Connection string is removed from ITenantInfo and the default TenantInfo implementation.
 * Added support for OptionsBuilder API and more efficient per-tenant options overall.
 * WithPerTenantOptions replaced by ConfigurePerTenant service collection extensions methods.
 * Unique indexes and the UserLogin primary key in the standard Identity models adjusted to include tenant id.
@@ -188,7 +246,7 @@
 * MultiTenantDbContext and MultiTenantIdentityDbContext support for IMultiTenantContextAccessor DI ([9015085](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/901508563af4fa872a0dc3930ff3b8315777b912))
 * namespace cleaned up ([b354838](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b354838a90741626c47ea4f109c49f7fe2ca5b3d))
 * refactor DI and improve nullability ([eca24bf](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/eca24bfa0c314f95794b235141cff42059cf3fcf))
-* remove ConnectionString from TenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
+* remove ConnectionString from ITenantInfo and TenantInfo ([f4e20db](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f4e20db35fe9e31e1cfb37a667b1ba4b64ce6f3f))
 
 
 ### Bug Fixes
@@ -444,7 +502,7 @@
 
 ### Changes
 
-- Customizable `TenantInfo`. Implement `TenantInfo` as needed or use the basic `TenantInfo` derived class. Should work with most strategies and stores. This was a major overhaul to the library. See docs for more information.
+- Customizable `TenantInfo`. Implement `ITenantInfo` as needed or use the basic `TenantInfo` implementation. Should work with most strategies and stores. This was a major overhaul to the library. See docs for more information.
 - Changed NuGet structure: use `Finbuckle.MultiTenant.AspNetCore` for web apps and if needed add `Finbuckle.MultiTenant.EntityFrameworkCore`.
 - `WithPerTenantAuthentication` - Adds support for common per-tenant authentication scenarios. See docs for full details.
 - Multiple strategies and stores can be registered. They will run in the order registered and the first tenant returned by a strategy/store combination is used.
