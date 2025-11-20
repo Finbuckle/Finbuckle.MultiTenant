@@ -2,7 +2,7 @@
 
 ## About MultiTenant
 
-MultiTenant is open source multi-tenancy middleware library for .NET created and maintained by [Finbuckle LLC]
+MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC]
 (https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 

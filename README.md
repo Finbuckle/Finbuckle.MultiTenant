@@ -1,6 +1,6 @@
 # ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">9.4.2</span>
 
-MultiTenant is open source multi-tenancy middleware library for .NET created and maintained by [Finbuckle LLC]
+MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC]
 (https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
