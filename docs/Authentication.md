@@ -1,6 +1,6 @@
 # Per-Tenant Authentication
 
-Finbuckle.MultiTenant provides built-in support for isolating tenant
+MultiTenant provides built-in support for isolating tenant
 authentication. This means that the login session for a given request will only
 be valid for the current tenant. Subsequent requests from the same client, but
 for a different tenant (e.g. a different path when using the route strategy),
@@ -15,7 +15,7 @@ Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
-The sections below assume Finbuckle.MultiTenant is installed and configured. See
+The sections below assume MultiTenant is installed and configured. See
 [Getting Started](GettingStarted) for details.
 
 ## Using WithPerTenantAuthentication()
@@ -87,7 +87,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        .AddCookie()
        .AddOpenIdConnect();
 
-// add Finbuckle.MultiTenant services
+// add MultiTenant services
 builder.Services.AddMultiTenant<TenantInfo>()
        .WithRouteStrategy()
        .WithConfigurationStore()
@@ -95,7 +95,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 var app = builder.Build();
 
-// add the Finbuckle.MultiTenant middleware
+// add the MultiTenant middleware
 app.UseMultiTenant();
 
 // ...add other middleware

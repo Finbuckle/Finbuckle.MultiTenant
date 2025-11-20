@@ -1,24 +1,21 @@
 # Getting Started
 
-Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This
+MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This
 introduction assumes a typical ASP.NET Core use case, but any application using .NET dependency injection can work with
 the library.
 
 ## Installation
 
-Finbuckle.MultiTenant is split into focused NuGet packages so you only reference what you need. For a typical ASP.NET
-Core app install **Finbuckle.MultiTenant.AspNetCore**:
+MultiTenant is split into focused NuGet packages so you only reference what you need. For a typical ASP.NET
+Core app install `Finbuckle.MultiTenant.AspNetCore`:
 
 ```bash
 dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
-If you prefer the Package Manager UI or `paket`, add the same package reference there—no special build steps are
-required.
-
 ## Basic Configuration
 
-Finbuckle.MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant
+MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant
 identifier and the app's [configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) (
 most likely from an `appsettings.json` file) as the source of tenant details.
 
@@ -29,14 +26,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // add app services...
 
-// add Finbuckle.MultiTenant services
+// add MultiTenant services
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithHostStrategy()
     .WithConfigurationStore();
 
 var app = builder.Build();
 
-// add the Finbuckle.MultiTenant middleware
+// add the MultiTenant middleware
 app.UseMultiTenant();
 
 // add other middleware...
@@ -88,7 +85,7 @@ A minimal configuration entry looks like this:
 
 See [Stores](Stores) for more information.
 
-Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
+MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
 ways.
 
 `app.UseMultiTenant()`
@@ -136,20 +133,4 @@ more details:
 A variety of sample projects are available in
 the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
 
-## Compiling from Source
-
-From the command line clone the git repository, `cd` into the new directory, and compile with `dotnet build`.
-
-```bash
-git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
-cd Finbuckle.MultiTenant
-dotnet build
-```
-
-## Running Unit Tests
-
-Run the unit tests from the command line with `dotnet test` from the solution directory.
-
-```bash
-dotnet test
 ```

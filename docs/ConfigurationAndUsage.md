@@ -2,7 +2,7 @@
 
 ## Configuration
 
-Finbuckle.MultiTenant uses the standard application builder pattern for its configuration. In addition to adding the
+MultiTenant uses the standard application builder pattern for its configuration. In addition to adding the
 services, configuration for one or more [MultiTenant Stores](Stores) and [MultiTenant Strategies](Strategies) are
 required. A typical configuration for your ASP.NET Core app might look like this:
 
@@ -13,14 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ...add app services
 
-// add Finbuckle.MultiTenant services
+// add MultiTenant services
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithHostStrategy()
     .WithConfigurationStore();
 
 var app = builder.Build();
 
-// add the Finbuckle.MultiTenant middleware
+// add the MultiTenant middleware
 app.UseMultiTenant();
 
 // ...add other middleware
@@ -28,7 +28,7 @@ app.UseMultiTenant();
 app.Run();
 ```
 
-## Adding the Finbuckle.MultiTenant Service
+## Adding the MultiTenant Service
 
 Use the `AddMultiTenant<TTenantInfo>` extension method on `IServiceCollection` to register the basic dependencies needed
 by the library. It returns a `MultiTenantBuilder<TTenantInfo>` instance on which the methods below can be called for
@@ -74,14 +74,14 @@ Configures support for per-tenant authentication. See [Per-Tenant Authentication
 
 ## Per-Tenant Options
 
-Finbuckle.MultiTenant is designed to integrate with the
+MultiTenant is designed to integrate with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also
 the [ASP.NET Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)) and
 lets apps customize options distinctly for each tenant. See [Per-Tenant Options](Options) for more details.
 
 ## Tenant Resolution and Usage
 
-Finbuckle.MultiTenant will perform tenant resolution using the context, strategies, and stores as configured.
+MultiTenant will perform tenant resolution using the context, strategies, and stores as configured.
 
 The context will depend on the type of app. For an ASP.NET Core web app the context is the `HttpContext` for each
 request and a tenant will be resolved for each request. For other types of apps the context will be different. For
@@ -229,7 +229,7 @@ There are several ways your app can see the current tenant:
   useful in advanced scenarios and should be used with caution. Prefer using the `HttpContext` extension method
   `TrySetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
 
-> Prior versions of Finbuckle.MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
+> Prior versions of MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
 > via dependency injection. This was removed as these are not actual services, similar to
 > how [HttpContext is not a service](https://github.com/dotnet/aspnetcore/issues/47996#issuecomment-1529364233) and not
 > available directly via dependency injection.

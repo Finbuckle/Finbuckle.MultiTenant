@@ -3,7 +3,7 @@
 ## Introduction
 
 Data isolation is one of the most important considerations in a multi-tenant app. Whether each tenant has its own
-database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant
+database, a shared database, or a hybrid approach can make a significant different in app design. MultiTenant
 supports each of these models by associating a connection string with each tenant.
 
 ## Separate Databases
@@ -47,12 +47,12 @@ its own complexity in operating and maintaining a larger number of database inst
 ## Shared Database
 
 In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data
-belonging to other tenants. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where"
+belonging to other tenants. MultiTenant handles this automatically and removes the need to sprinkle "where"
 clauses all over your app. Internally a shadow `TenantId` property is added (or an existing one is used if already present)
 to multi-tenant entity types and managed as the database context is used. It also performs validation and related options for handling
 null or mismatched tenants.
 
-Finbuckle.MultiTenant provides two different ways to utilize this behavior in a database context class:
+MultiTenant provides two different ways to utilize this behavior in a database context class:
 
 1. Implement `IMultiTenantDbContext` and use the provided helper methods as described in
    [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext),
@@ -188,7 +188,7 @@ impact any other named global query filters applied to the entity. See
 [using multiple query filters](https://learn.microsoft.com/en-us/ef/core/querying/filters#using-multiple-query-filters)
 in the EF Core documentation for more details.
 
-> In earlier version of Finbuckle.MultiTenant an anonymous global filter query was used which required 
+> In earlier version of MultiTenant an anonymous global filter query was used which required 
 > special consideration for combining with existing query filters. Since EF Core introduced named global query 
 > filters in .NET 10 these considerations are no longer relevant.
 
@@ -197,7 +197,7 @@ in the EF Core documentation for more details.
 This approach is more flexible than deriving from `MultiTenantDbContext`, but needs more configuration. It requires
 implementing `IMultiTenantDbContext` and following a strict convention of helper method calls.
 
-Start by adding the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
+Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 
 ```{.bash}
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
@@ -271,7 +271,7 @@ already have a base class. `MultiTenantDbContext` a pre-configured implementatio
 helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
-Start by adding the `Finbuckle.MultiTenant.EntityFrameworkCore` package to the project:
+Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 
 ```{.bash}
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
@@ -308,7 +308,7 @@ Now whenever this database context is used it will only set and query records fo
 ## Binding the Tenant to the DbContext
 
 It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is 
-immutable. Finbuckle.MultiTenant is designed with this in mind and `IMultiTenantDbContext` only has a getter for 
+immutable. MultiTenant is designed with this in mind and `IMultiTenantDbContext` only has a getter for 
 the `TenantInfo` property. It is possible to define a setter on your own `IMultiTenantDbContext` implementation but 
 doing so will make it difficult ensure data isolation and consistency.
 
@@ -385,7 +385,7 @@ altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) an
 
 > EF Core will require a non-null value when adding an entity that has `TenantId` as a part of the primary key.
 > If the `TenandId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
-> Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension 
+> MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension 
 > method of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
 
 ```csharp
@@ -426,7 +426,7 @@ var yourBlogs = yourDbContext.Blogs.First();
 
 ## Query Without the Tenant Filter
 `IgnoreQueryFilters` can be used to bypass the filter for LINQ queries.
-Finbuckle.MultiTenant uses the `Finbuckle.MultiTenant.Abstractions.Constants.TenantToken` constant as the global 
+MultiTenant uses the `MultiTenant.Abstractions.Constants.TenantToken` constant as the global 
 query filter name. See [disabling filters](https://learn.microsoft.com/en-us/ef/core/querying/filters?tabs=ef10#disabling-filters)
 in the EF Core documentation for more details.
 
@@ -434,7 +434,7 @@ in the EF Core documentation for more details.
 // TenantBlogs will contain all blogs, regardless of tenant.
 var myTenantInfo = ...;
 var db = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-var tenantBlogs = db.Blogs.IgnoreQueryFilters([Finbuckle.MultiTenant.Abstractions.Constants.TenantToken][Finbuckle.MultiTenant.Abstractions.Constants.TenantToken]).ToList(); 
+var tenantBlogs = db.Blogs.IgnoreQueryFilters(Abstractions.Constants.TenantToken).ToList(); 
 ```
 
 ## Updating and Deleting Data
@@ -492,7 +492,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 ## EF Core Tracking
 
 When attaching an entity to tracking in EFCore using either `Add` or `Attach`, all primary keys are required 
-to be non-null. Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the 
+to be non-null. MultiTenant will ensure a `TenantId` is assigned if you call the 
 `EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext` on your db context. If no `TenantId` is 
 initially set then the current `TenantId` of the db context will be used. This applies to both explicit `TenantId` 
 properties and implicit `TenantId` shadow properties. It is recommended to call `EnforceMultiTenantOnTracking`
@@ -500,7 +500,7 @@ in your db context constructor.
 
 ## Tenant Mismatch Mode
 
-Normally Finbuckle.MultiTenant will automatically coordinate the `TenantId` property of each entity. However, in certain
+Normally MultiTenant will automatically coordinate the `TenantId` property of each entity. However, in certain
 situations the `TenantId` can be manually set.
 
 By default, attempting to add or update an entity with a different `TenantId` property throws a `MultiTenantException`
