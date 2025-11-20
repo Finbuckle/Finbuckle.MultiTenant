@@ -1,4 +1,4 @@
-# Identity Sample App
+# Identity App Sample
 
 This sample demonstrates a multi-tenant ASP.NET Core MVC application with ASP.NET Core Identity integration using Finbuckle.MultiTenant.
 
