@@ -1,7 +1,6 @@
 # ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.0</span>
 
-MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC]
-(https://www.finbuckle.com).
+MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
 See [https://www.finbuckle.com/MultiTenant](https://www.finbuckle.com/MultiTenant) for more details and documentation.
@@ -88,11 +87,6 @@ Table of Contents
 
 * new Lock use ([#1022](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1022)) ([55bde60](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/55bde60fd81c14ca6bdac6d628cd27b3f098f8eb))
 
-### Reverts
-
-* Revert "feat: BasePathStrategy will rebase the aspnetcore path base by default" ([0a154e1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0a154e17796ccd09b910ee6b17d1267dbe73ca79))
-* Revert "feat: improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038))" ([#1039](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1039)) ([b036339](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b036339eb38430f70d1342afd527f54d9fefc638))
-* Revert "feat: refactors per-tenant options into Finbuckle.MultiTenant.Options package ([#1024](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1024))" ([0db79eb](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0db79ebac593fab6219c6ecf6bfaf82845239558))
 <!--_release-notes-->
 
 ## Open Source Support
