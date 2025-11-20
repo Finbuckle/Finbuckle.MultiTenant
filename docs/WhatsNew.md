@@ -55,10 +55,4 @@
 
 * new Lock use ([#1022](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1022)) ([55bde60](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/55bde60fd81c14ca6bdac6d628cd27b3f098f8eb))
 
-### Reverts
-
-* Revert "feat: BasePathStrategy will rebase the aspnetcore path base by default" ([0a154e1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0a154e17796ccd09b910ee6b17d1267dbe73ca79))
-* Revert "feat: improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038))" ([#1039](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1039)) ([b036339](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b036339eb38430f70d1342afd527f54d9fefc638))
-* Revert "feat: refactors per-tenant options into Finbuckle.MultiTenant.Options package ([#1024](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1024))" ([0db79eb](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0db79ebac593fab6219c6ecf6bfaf82845239558))
-
 <!--_release-notes-->
