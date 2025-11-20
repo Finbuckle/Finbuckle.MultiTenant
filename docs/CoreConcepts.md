@@ -59,6 +59,6 @@ strategy).
 
 ## MultiTenantException
 
-Exception type thrown when a serious problem occurs within Finbuckle.MultiTenant.
+Exception type thrown when a serious problem occurs within MultiTenant.
 
 * Usually wraps an underlying exception.

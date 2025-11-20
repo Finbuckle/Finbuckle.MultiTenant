@@ -1,12 +1,19 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">9.4.2</span>
 
-## About Finbuckle.MultiTenant
+MultiTenant is open source multi-tenancy middleware library for .NET created and maintained by [Finbuckle LLC]
+(https://www.finbuckle.com).
+It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
-Finbuckle.MultiTenant is an open-source multitenancy middleware library for .NET. It enables tenant resolution,
-per-tenant app behavior, and per-tenant data isolation.
-See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenant) for more details and documentation.
+See [https://www.finbuckle.com/MultiTenant](https://www.finbuckle.com/MultiTenant) for more details and documentation.
 
 **This release supports .NET 10.**
+
+Beginning with MultiTenant v10, major version releases align with .NET major version releases.
+
+New development focuses on the latest MultiTenant release version while critical security and severe bug
+fixes will be released for prior versions which target .NET versions supported by Microsoft.
+
+In general, you should target the version of MultiTenant that matches your .NET version.
 
 ## Open Source Support
 
@@ -58,101 +65,12 @@ Additional support is provided by the following organizations:
 
 ## Quick Start
 
-Finbuckle.MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. This
-introduction assumes a standard ASP.NET Core use case, but any application using .NET dependency injection can work with
-the library.
-
-### Installation
-
-First, install the Finbuckle.MultiTenant.AspNetCore NuGet package:
-
-.NET Core CLI
-
-```bash
-$ dotnet add package Finbuckle.MultiTenant.AspNetCore
-```
-
-### Basic Configuration
-
-Next, in the app's service configuration call `AddMultiTenant<TTenantInfo>` and its various builder methods and in the
-middleware configuration call `UseMultiTenant()`:
-
-```cs
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHostStrategy()
-    .WithConfigurationStore();
-
-// other app code...
-
-app.UseMultiTenant();
-
-// other app code...
-
-app.Run();
-```
-
-That's all that is needed to get going. Let's breakdown each line:
-
-`builder.Services.AddMultiTenant<TenantInfo>()`
-
-This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
-runtime.
-
-The type parameter for `AddMultiTenant<TTenantInfo>` must be `TenantInfo` or a derived record class which holds basic
-information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic implementation, but
-a custom implementation can be used if more properties are needed.
-
-See [Core Concepts](https://www.finbuckle.com/MultiTenant/Docs/CoreConcepts) for more information on `ITenantInfo`.
-
-`.WithHostStrategy()`
-
-The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
-defaults to the extracting the subdomain as a tenant identifier.
-
-See [MultiTenant Strategies](https://www.finbuckle.com/MultiTenant/Docs/Strategies) for more information.
-
-`.WithConfigurationStore()`
-
-This line tells the app that information for all tenants are in the app configuration, typically in the
-`appsettings.json` file. If a tenant in the store has the identifier found by the strategy, the tenant will be 
-successfully resolved for the current request.
-
-See [MultiTenant Stores](https://www.finbuckle.com/MultiTenant/Docs/Stores) for more information.
-
-Finbuckle.MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
-ways.
-
-`app.UseMultiTenant()`
-
-This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
-settings. Be sure to call it before other middleware which will use per-tenant functionality, e.g.
-`UseAuthentication()`.
-
-### Basic Usage
-
-With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `MultiTenantContext<T>` object accessed from the `GetMultiTenantContext<T>` and `GetTenantInfo<T>` extension 
-methods:
-
-```cs
-// obtain the tenant info from the MultiTenantContext
-var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
-
-// or obtain the tenant info directly
-var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
-```
-
-The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<T>` during configuration.
-If the current tenant could not be determined then `TenantInfo` will be null.
-
-The `TenantInfo` instance and/or the typed instance are also available directly through dependency injection via the
-`IMultiTenantContextAccessor<T>`.
-
-See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/ConfigurationAndUsage) for more information.
+MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. See the 
+[Getting Started](https://www.finbuckle.com/MultiTenant/Docs/GettingStarted) documentation for more details.
 
 ## Documentation
 
-The library builds on this basic functionality to provide a variety of higher level features. See
+The library builds on on basic multi-tenant functionality to provide a variety of higher level features. See
 the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
 
 * [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
@@ -163,7 +81,7 @@ the [documentation](https://www.finbuckle.com/multitenant/docs) for more details
 ## Sample Projects
 
 A variety of [sample projects](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) are available in
-the repository. Older release branches also contain a variety of legacy samples.
+the repository.
 
 ## Build and Test Status
 

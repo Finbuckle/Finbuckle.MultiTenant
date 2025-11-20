@@ -2,12 +2,12 @@
 
 ## Introduction
 
-Finbuckle.MultiTenant has support for data isolation with ASP.NET Core Identity when Entity Framework Core is
+MultiTenant has support for data isolation with ASP.NET Core Identity when Entity Framework Core is
 used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except Identity
 calls into the database instead of your own code.
 
 See the [multi-tenant Identity sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples)
-for and example of how to use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate
+for and example of how to use MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate
 tenant Identity data and integrate the Identity UI to work with a route multi-tenant strategy.
 
 ## Configuration
@@ -37,7 +37,7 @@ When using a variant of `MultiTenantIdentityDbContext` any entity designated as 
 ## Passkeys (WebAuthn) and Identity schema versions
 
 ASP.NET Core Identity introduced passkey support via `IdentityUserPasskey<TKey>` in Identity schema version 3.
-Finbuckle.MultiTenant respects this and only configures the passkey entity as multi-tenant when the Identity
+MultiTenant respects this and only configures the passkey entity as multi-tenant when the Identity
 schema version is set to 3.
 
 - Schema version 3: `IdentityUserPasskey<TKey>` (aka `TUserPasskey`) is configured as multi-tenant and its unique
@@ -61,7 +61,7 @@ and configure passkey entities accordingly.
 
 ## Caveats
 
-Internally Finbuckle.MultiTenant's EFCore functionality relies on a global query filter. Calling the `Find` method on
+Internally MultiTenant's EFCore functionality relies on a global query filter. Calling the `Find` method on
 an `DBSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multi-tenant.
 
 Due to this limitation the Identity method `UserManager<TUser>.FindByIdAsync` will bypass the filter and search across
@@ -84,7 +84,7 @@ ASP.NET Core Identity uses cookies for authentication. It uses
 a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration),
 but under the hood standard ASP.NET Core authentication is used.
 
-Finbuckle.MultiTenant can isolate Identity authentication per tenant so that user sessions are unique per tenant.
+MultiTenant can isolate Identity authentication per tenant so that user sessions are unique per tenant.
 See [per-tenant authentication](Authentication) for information on how to customize authentication options per tenant.
 
 ## Identity Model Customization with MultiTenantIdentityDbContext
