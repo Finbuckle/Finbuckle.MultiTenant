@@ -67,15 +67,17 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant
 
-Uses a provided `Func<object, Task<string>>` to determine the tenant. For example the lambda
+Uses a provided `Func<object, Task<string?>>` to determine the tenant. For example the lambda
 function `async context => "initech"` would use "initech" as the identifier when resolving the tenant for every request.
 This strategy is good to use for testing or simple logic. This strategy can be used multiple times and will run
 in the order configured.
 
-Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>` A `Func<object, Task<string?>>`is passed
+Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>`. A `Func<object, Task<string?>>` is passed
 in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter.
-Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. Tenant resolution will
-ignore this strategy if the context is not of the correct type:
+Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. When using the typed
+variant, the delegate will run when the runtime context instance is assignable to `TContext` — that is, when it's of
+`TContext` or any derived type. If the runtime type isn't assignable to `TContext`, this strategy returns `null` and
+resolution falls through to the next strategy.
 
 ```csharp
 // use async logic to get the tenant identifier
@@ -83,19 +85,19 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithDelegateStrategy(async context =>
     {
         string? tenantIdentifier = await DoSomethingAsync(context);
-        return tenantIdentifier
+        return tenantIdentifier;
     })...
 
-// or register with a typed lambda, HttpContext in this case
+// or register with a typed lambda, HttpContext in this case; derived runtime types are also supported
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithDelegateStrategy<HttpContext, TenantInfo>(httpContext =>
     {      
         httpContext.Request.Query.TryGetValue("tenant", out StringValues tenantIdentifier);
         
-        if (tenantIdentifier is null)
+        if (tenantIdentifier == StringValues.Empty)
             return Task.FromResult<string?>(null);
         
-        return Task.FromResult(tenantIdentifier.ToString());
+        return Task.FromResult<string?>(tenantIdentifier.ToString());
     })...
 ```
 
@@ -159,7 +161,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 >   `UseMultiTenant` in your pipeline to serve the files correctly. The template projects use these types of URLs extensively in layouts and views, i.e. for CSS and JavaScript references.
 > 
 > **Recommendations**:
-> - For resources such as css and images use absolute paths (e.g. `/images/logo.png`) and use the static file middleware before `UseMultiTenant`.
+> - For resources such as css and images use absolute paths (e.g., `/images/logo.png`) and use the static file middleware before `UseMultiTenant`.
 > - Consider using the `RouteStrategy` instead of the `BasePathStrategy` if these implications are problematic for your app.
 >
 > **Note**: APIs are not affected by these implications since they typically do not use relative URLs.
