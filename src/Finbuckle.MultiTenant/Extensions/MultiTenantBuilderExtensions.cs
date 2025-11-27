@@ -188,6 +188,11 @@ public static class MultiTenantBuilderExtensions
     /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <param name="doStrategy">The delegate implementing the strategy.</param>
+    /// <remarks>
+    /// The delegate will be invoked when the runtime <c>context</c> instance is assignable to <typeparamref name="TContext"/>,
+    /// i.e., when it is of type <typeparamref name="TContext"/> or a derived type. If the runtime type is not assignable to
+    /// <typeparamref name="TContext"/>, this strategy returns <c>null</c> and resolution falls through to the next strategy.
+    /// </remarks>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithDelegateStrategy<TContext, TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder,
@@ -198,9 +203,9 @@ public static class MultiTenantBuilderExtensions
 
         Func<object, Task<string?>> wrapStrategy = context =>
         {
-            if (context.GetType() == typeof(TContext))
+            if (context is TContext typed)
             {
-                return doStrategy((TContext)context);
+                return doStrategy(typed);
             }
 
             return Task.FromResult<string?>(null);

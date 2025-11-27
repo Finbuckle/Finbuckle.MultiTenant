@@ -207,6 +207,37 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Null(identifier);
     }
 
+    private class BaseCtx { }
+    private class DerivedCtx : BaseCtx { }
+
+    [Fact]
+    public async Task InvokeTypedDelegateWhenRuntimeContextIsDerivedType()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<BaseCtx, TenantInfo>(ctx => Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var identifier = await strategy.GetIdentifierAsync(new DerivedCtx());
+
+        Assert.Equal("ok-DerivedCtx", identifier);
+    }
+
+    [Fact]
+    public async Task ReturnNullWhenRuntimeContextIsBaseOfExpectedDerivedType()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<DerivedCtx, TenantInfo>(ctx => Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var identifier = await strategy.GetIdentifierAsync(new BaseCtx());
+
+        Assert.Null(identifier);
+    }
+
     [Fact]
     public void AddStaticStrategy()
     {
