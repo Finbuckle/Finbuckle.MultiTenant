@@ -13,9 +13,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0"/>
-
-        <ProjectReference Include="../../src/Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
-        <ProjectReference Include="../../src/Finbuckle.MultiTenant.Identity.EntityFrameworkCore/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj" />
+        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="10.0.0" />
+        <PackageReference Include="Finbuckle.MultiTenant.Identity.EntityFrameworkCore" Version="10.0.0" />
     </ItemGroup>
 
 </Project>
