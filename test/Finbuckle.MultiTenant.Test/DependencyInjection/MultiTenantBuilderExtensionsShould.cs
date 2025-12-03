@@ -216,6 +216,72 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
+    public async Task WorkWithExactTypeForTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<string, TenantInfo>(context => Task.FromResult(context)!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        var identifier = await strategy.GetIdentifierAsync("test-tenant");
+        Assert.Equal("test-tenant", identifier);
+    }
+
+    [Fact]
+    public async Task WorkWithDerivedTypeForTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<BaseContext, TenantInfo>(context => Task.FromResult(context.TenantId)!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        
+        // Test with exact type
+        var baseContext = new BaseContext { TenantId = "base-tenant" };
+        var identifier = await strategy.GetIdentifierAsync(baseContext);
+        Assert.Equal("base-tenant", identifier);
+        
+        // Test with derived type
+        var derivedContext = new DerivedContext { TenantId = "derived-tenant", ExtraInfo = "extra" };
+        identifier = await strategy.GetIdentifierAsync(derivedContext);
+        Assert.Equal("derived-tenant", identifier);
+    }
+
+    [Fact]
+    public async Task ReturnNullForUnrelatedTypeInTypedDelegateStrategy()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithDelegateStrategy<BaseContext, TenantInfo>(context => Task.FromResult(context.TenantId)!);
+        var sp = services.BuildServiceProvider();
+
+        var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
+        
+        // Test with unrelated type
+        var unrelatedContext = new UnrelatedContext { SomeData = "data" };
+        var identifier = await strategy.GetIdentifierAsync(unrelatedContext);
+        Assert.Null(identifier);
+    }
+
+    // Helper classes for testing type hierarchy
+    private class BaseContext
+    {
+        public string TenantId { get; set; } = "";
+    }
+
+    private class DerivedContext : BaseContext
+    {
+        public string ExtraInfo { get; set; } = "";
+    }
+
+    private class UnrelatedContext
+    {
+        public string SomeData { get; set; } = "";
+    }
+
+    [Fact]
     public void AddStaticStrategy()
     {
         var services = new ServiceCollection();

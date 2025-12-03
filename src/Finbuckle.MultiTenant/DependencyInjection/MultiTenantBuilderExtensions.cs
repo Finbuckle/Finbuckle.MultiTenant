@@ -187,13 +187,13 @@ public static class MultiTenantBuilderExtensions
         Func<TContext, Task<string?>> doStrategy)
         where TTenantInfo : class, ITenantInfo, new()
     {
-        ArgumentNullException.ThrowIfNull(doStrategy, nameof(doStrategy));
+        ArgumentNullException.ThrowIfNull(doStrategy);
 
         Func<object, Task<string?>> wrapStrategy = context =>
         {
-            if (context.GetType() == typeof(TContext))
+            if (context is TContext typed)
             {
-                return doStrategy((TContext)context);
+                return doStrategy(typed);
             }
 
             return Task.FromResult<string?>(null);

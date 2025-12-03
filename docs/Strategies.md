@@ -65,8 +65,8 @@ in the order configured.
 
 Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>` A `Func<object, Task<string?>>`is passed
 in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter.
-Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. Tenant resolution will
-ignore this strategy if the context is not of the correct type:
+Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. Tenant 
+resolution will ignore this strategy if the context type does not match or cannot be cast to the specified type:
 
 ```csharp
 // use async logic to get the tenant identifier
