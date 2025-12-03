@@ -1,6 +1,6 @@
 ﻿<Solution>
     <Folder Name="/samples/">
-        <Project Path="samples/IdentitySampleApp/IdentitySampleApp.csproj" />
+        <Project Path="samples\IdentityAppSample\IdentityAppSample.csproj" />
         <Project Path="samples\WebApiSample\WebApiSample.csproj" />
     </Folder>
     <Folder Name="/src/">
