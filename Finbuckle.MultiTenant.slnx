@@ -4,7 +4,7 @@
         <Project Path="samples\WebApiSample\WebApiSample.csproj" />
     </Folder>
     <Folder Name="/src/">
-        <Project Path="src/Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj" />
+        <Project Path="src\Finbuckle.MultiTenant.Abstractions\Finbuckle.MultiTenant.Abstractions.csproj" />
         <Project Path="src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" />
         <Project Path="src\Finbuckle.MultiTenant.EntityFrameworkCore\Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
         <Project Path="src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj" />

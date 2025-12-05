@@ -98,7 +98,8 @@ Finbuckle.MultiTenant is primarily supported by its [GitHub sponsors](https://gi
 Additional support is provided by the following organizations:
 
 <p><a href="https://www.digitalocean.com/">
-  <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" alt="Digital Ocean logo" height="40">
+
+  <img src="https://cdn.brandfetch.io/idvF37rNoN/w/800/h/137/theme/dark/logo.png?c=1dxbfHSJFAPEGdCLU4o5B" alt="Digital Ocean logo" height="40">
 </a></p>
 
 <p><a href="https://www.github.com/">
