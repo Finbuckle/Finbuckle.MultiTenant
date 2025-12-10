@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Finbuckle.MultiTenant
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.2.0
         with:
           fetch-depth: 0
       - name: Get Current Version
         run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV
       - name: Checkout Website
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.2.0
         with:
           repository: Finbuckle/Website
           token: ${{ secrets.workflow_pat }}

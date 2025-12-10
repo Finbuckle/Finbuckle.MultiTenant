@@ -8,14 +8,14 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.2.0
+      - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
         with:
           dotnet-version: 10
       - name: Create the package
         run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
       - name: NuGet login
-        uses: NuGet/login@v1
+        uses: NuGet/login@fd9fffd3f05b5555ad0c779bbe1324c781f85aa6 # v1.0.5
         id: nuget-login
         with:
           user: ${{ secrets.NUGET_USER }}
