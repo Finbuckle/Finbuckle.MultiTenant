@@ -8,8 +8,15 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      - dependency-name: "*"
+      - dependency-name: "Microsoft.*"
         update-types: ["version-update:semver-major"]
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+    group:
+      "microsoft-packages":
+        patterns:
+          - "Microsoft.*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
