@@ -13,7 +13,7 @@ updates:
     commit-message:
       prefix: "fix"
       include: "scope"
-    group:
+    groups:
       "microsoft-packages":
         patterns:
           - "Microsoft.*"
