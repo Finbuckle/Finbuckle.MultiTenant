@@ -16,13 +16,6 @@ updates:
         patterns:
           - "Microsoft.*"
   
-  - package-ecosystem: "nuget"
-    directories:
-      - "/samples/*"
-      - "/test/*"
-    schedule:
-      interval: "daily"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
