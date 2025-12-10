@@ -5,8 +5,8 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Direct",
         "requested": "[10.0.*, )",
-        "resolved": "10.0.0",
-        "contentHash": "6ATONu+5A2oh/vzmoFhf3cuQcclMaWGHrb1kvjVsYtml+gzuWD48MmbsItM4xAUQkJZ2t8XFmbGp8pZLPxKneA==",
+        "resolved": "10.0.1",
+        "contentHash": "dUm1l7EvSBn3pUHphy+OSKBzZvhwkFCq12YAh8OJBM6/tFpo3HHoOGiOwEwC9ljJOyK+QwwdQJZuqwDXwK2WlQ==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         }
