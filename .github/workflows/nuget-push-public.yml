@@ -5,6 +5,8 @@ on: [workflow_dispatch]
 jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
