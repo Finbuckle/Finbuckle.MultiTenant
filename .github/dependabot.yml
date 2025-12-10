@@ -2,14 +2,12 @@ version: 2
 updates:
   - package-ecosystem: "nuget"
     directories:
-      - "/samples/*"
       - "/src/*"
-      - "/test/*"
     schedule:
       interval: "daily"
     ignore:
       - dependency-name: "Microsoft.*"
-        update-types: ["version-update:semver-major"]
+        update-types: [ "version-update:semver-major" ]
     commit-message:
       prefix: "fix"
       include: "scope"
@@ -17,6 +15,13 @@ updates:
       "microsoft-packages":
         patterns:
           - "Microsoft.*"
+  
+  - package-ecosystem: "nuget"
+    directories:
+      - "/samples/*"
+      - "/test/*"
+    schedule:
+      interval: "daily"
 
   - package-ecosystem: "github-actions"
     directory: "/"
