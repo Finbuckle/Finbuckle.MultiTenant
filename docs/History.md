@@ -1,6 +1,14 @@
 # Version History
 
 <!--_history-->
+## [10.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.0...v10.0.1) (2025-12-10)
+
+### Bug Fixes
+
+* delegate strategy correctly resolves at runtime with derived types ([#1053](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1053)) ([7fd5559](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7fd5559baca169e8913f5392bbdea10398e5fea1))
+* update dependencies ([#1051](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1051)) ([944ac70](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/944ac704887ea908e2294d89a103c9098f0a9f9b))
+* update dependencies ([#1062](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1062)) ([840fbaa](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/840fbaa2fd1d2db158e224076c0b3411e7694159))
+
 ## [10.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.2...v10.0.0) (2025-11-20)
 
 ### ⚠ BREAKING CHANGES
@@ -52,6 +60,12 @@
 ### Performance Improvements
 
 * new Lock use ([#1022](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1022)) ([55bde60](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/55bde60fd81c14ca6bdac6d628cd27b3f098f8eb))
+
+### Reverts
+
+* Revert "feat: BasePathStrategy will rebase the aspnetcore path base by default" ([0a154e1](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0a154e17796ccd09b910ee6b17d1267dbe73ca79))
+* Revert "feat: improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038))" ([#1039](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1039)) ([b036339](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b036339eb38430f70d1342afd527f54d9fefc638))
+* Revert "feat: refactors per-tenant options into Finbuckle.MultiTenant.Options package ([#1024](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1024))" ([0db79eb](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0db79ebac593fab6219c6ecf6bfaf82845239558))
 
 ## [9.4.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.1...v9.4.2) (2025-11-01)
 

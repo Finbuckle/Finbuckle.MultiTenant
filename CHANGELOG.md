@@ -1,3 +1,11 @@
+## [10.0.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.0...v10.0.1) (2025-12-10)
+
+### Bug Fixes
+
+* delegate strategy correctly resolves at runtime with derived types ([#1053](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1053)) ([7fd5559](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/7fd5559baca169e8913f5392bbdea10398e5fea1))
+* update dependencies ([#1051](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1051)) ([944ac70](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/944ac704887ea908e2294d89a103c9098f0a9f9b))
+* update dependencies ([#1062](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1062)) ([840fbaa](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/840fbaa2fd1d2db158e224076c0b3411e7694159))
+
 ## [10.0.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.2...v10.0.0) (2025-11-20)
 
 ### ⚠ BREAKING CHANGES
