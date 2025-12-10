@@ -15,8 +15,8 @@ jobs:
       - name: Create the package
         run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
       - name: NuGet login
-        uses: NuGet/login@v1
-        id: nuget-login@76cce0bd8d4b2f5dcdb45e2316d76c328632a902
+        uses: NuGet/login@76cce0bd8d4b2f5dcdb45e2316d76c328632a902
+        id: nuget-login
         with:
           user: ${{ secrets.NUGET_USER }}
       - name: Publish the package to NuGet.org
