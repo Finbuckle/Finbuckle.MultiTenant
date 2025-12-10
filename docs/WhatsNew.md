@@ -1,12 +1,12 @@
-# What's New in v<span class="_version">9.4.3</span>
+# What's New in v<span class="_version">9.4.4</span>
 
-> This page only lists release update details specific to v<span class="_version">9.4.3</span>. [Release update details for all releases are shown in the history page.](History)
+> This page only lists release update details specific to v<span class="_version">9.4.4</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
-## [9.4.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.2...v9.4.3) (2025-11-20)
+## [9.4.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.3...v9.4.4) (2025-12-10)
 
 ### Bug Fixes
 
-* update dependencies ([#1034](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1034)) ([2c33440](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/2c3344018de4f7e4b9cf6f5bec5cae92e4342749))
+* delegate strategy correctly resolves at runtime with derived types ([#1057](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1057)) ([fb2a333](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fb2a333ed45eec4e2f0c212a1410ae249e99bdd6))
 
 <!--_release-notes-->
