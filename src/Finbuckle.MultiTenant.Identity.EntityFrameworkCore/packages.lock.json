@@ -4,7 +4,7 @@
     "net10.0": {
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
         "type": "Direct",
-        "requested": "[10.0.*, )",
+        "requested": "[10.0.1, )",
         "resolved": "10.0.1",
         "contentHash": "Dljm38k9d36gMXvNuhNrevoh2hh9wp7z3wcWN21qesm37GToDhYtdMjyQzw4a2J+rTJ19io0FDb0HQBtQVo7rw==",
         "dependencies": {
@@ -14,7 +14,7 @@
       },
       "Microsoft.Extensions.Identity.Stores": {
         "type": "Direct",
-        "requested": "[10.0.*, )",
+        "requested": "[10.0.1, )",
         "resolved": "10.0.1",
         "contentHash": "Wx8922HZMf+NV5SlZyVwFsYnMVJBOFUBjeiO8F3QNXO37QpVANc0itpsujMhIVqwyMxYjG3kT0VIiwSUCZEbzA==",
         "dependencies": {
@@ -218,13 +218,13 @@
         "type": "Project",
         "dependencies": {
           "Finbuckle.MultiTenant.Abstractions": "[10.0.1, )",
-          "Microsoft.Extensions.Caching.Abstractions": "[10.0.*, )",
-          "Microsoft.Extensions.Configuration": "[10.0.*, )",
-          "Microsoft.Extensions.DependencyInjection": "[10.0.*, )",
-          "Microsoft.Extensions.Http": "[10.0.*, )",
-          "Microsoft.Extensions.Logging": "[10.0.*, )",
-          "Microsoft.Extensions.Options": "[10.0.*, )",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.*, )"
+          "Microsoft.Extensions.Caching.Abstractions": "[10.0.1, )",
+          "Microsoft.Extensions.Configuration": "[10.0.1, )",
+          "Microsoft.Extensions.DependencyInjection": "[10.0.1, )",
+          "Microsoft.Extensions.Http": "[10.0.1, )",
+          "Microsoft.Extensions.Logging": "[10.0.1, )",
+          "Microsoft.Extensions.Options": "[10.0.1, )",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.1, )"
         }
       },
       "finbuckle.multitenant.abstractions": {
@@ -234,7 +234,7 @@
         "type": "Project",
         "dependencies": {
           "Finbuckle.MultiTenant": "[10.0.1, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.*, )"
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.1, )"
         }
       }
     }
