@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/samples/" />
+  <Folder Name="/samples/v9/" />
+  <Folder Name="/samples/v9/net8/">
+    <Project Path="samples/v9/net8/webapi/webapi.csproj" />
+  </Folder>
+  <Folder Name="/samples/v9/net9/">
+    <Project Path="samples/v9/net9/webapi/webapi.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Finbuckle.MultiTenant.AspNetCore/Finbuckle.MultiTenant.AspNetCore.csproj" />
+    <Project Path="src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
+    <Project Path="src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Finbuckle.MultiTenant.AspNetCore.Test/Finbuckle.MultiTenant.AspNetCore.Test.csproj" />
+    <Project Path="test/Finbuckle.MultiTenant.EntityFrameworkCore.Test/Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj" />
+    <Project Path="test/Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj" />
+  </Folder>
+</Solution>
