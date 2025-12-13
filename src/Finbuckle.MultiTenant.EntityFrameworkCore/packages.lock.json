@@ -4,7 +4,7 @@
     "net10.0": {
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Direct",
-        "requested": "[10.0.*, )",
+        "requested": "[10.0.1, )",
         "resolved": "10.0.1",
         "contentHash": "8/5kYGwKN6wtc89QqcPTOZDAJSMX8MzKCf5OmYjIfAHWTfsUEpGKYrdtfNk4X36rQ0BiU3n57Y4rbtnerzJN0Q==",
         "dependencies": {
@@ -174,13 +174,13 @@
         "type": "Project",
         "dependencies": {
           "Finbuckle.MultiTenant.Abstractions": "[10.0.1, )",
-          "Microsoft.Extensions.Caching.Abstractions": "[10.0.*, )",
-          "Microsoft.Extensions.Configuration": "[10.0.*, )",
-          "Microsoft.Extensions.DependencyInjection": "[10.0.*, )",
-          "Microsoft.Extensions.Http": "[10.0.*, )",
-          "Microsoft.Extensions.Logging": "[10.0.*, )",
-          "Microsoft.Extensions.Options": "[10.0.*, )",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.*, )"
+          "Microsoft.Extensions.Caching.Abstractions": "[10.0.1, )",
+          "Microsoft.Extensions.Configuration": "[10.0.1, )",
+          "Microsoft.Extensions.DependencyInjection": "[10.0.1, )",
+          "Microsoft.Extensions.Http": "[10.0.1, )",
+          "Microsoft.Extensions.Logging": "[10.0.1, )",
+          "Microsoft.Extensions.Options": "[10.0.1, )",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.1, )"
         }
       },
       "finbuckle.multitenant.abstractions": {
