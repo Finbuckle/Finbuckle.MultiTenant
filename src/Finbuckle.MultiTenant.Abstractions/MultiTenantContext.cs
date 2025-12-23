@@ -8,11 +8,8 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
 public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
-    // internal for testing purposes
-    internal readonly TTenantInfo? _tenantInfo;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiTenantContext{TTenantInfo}"/> class
     /// with the specified tenant information.
@@ -38,19 +35,7 @@ public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public TTenantInfo? TenantInfo
-    {
-        get
-        {
-            if (_tenantInfo != null) return _tenantInfo with { };
-            return null;
-        }
-        init
-        {
-            if (value != null) _tenantInfo = value with { };
-            else _tenantInfo = null;
-        }
-    }
+    public TTenantInfo? TenantInfo { get; init; }
 
     /// <inheritdoc />
     public bool IsResolved => TenantInfo != null;
@@ -62,9 +47,9 @@ public class MultiTenantContext<TTenantInfo> : IMultiTenantContext<TTenantInfo>
     public StoreInfo<TTenantInfo>? StoreInfo { get; init; }
 
     /// <inheritdoc />
-    TenantInfo? IMultiTenantContext.TenantInfo
+    ITenantInfo? IMultiTenantContext.TenantInfo
     {
         get => TenantInfo;
-        init => TenantInfo = value as TTenantInfo;
+        init => TenantInfo = (TTenantInfo?)value;
     }
 }

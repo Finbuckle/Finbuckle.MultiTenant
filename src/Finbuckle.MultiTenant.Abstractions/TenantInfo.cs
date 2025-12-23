@@ -4,11 +4,18 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Default implementation of TenantInfo.
+/// Default implementation of <see cref="ITenantInfo"/>.
 /// </summary>
-/// <param name="Id">A unique identifier for the tenant. Typically used as the primary key.</param>
-/// <param name="Identifier">A externally-facing identifier used for tenant resolution.</param>
-/// <param name="Name">A friendly name for the tenant.</param>
-public record TenantInfo(string Id, string Identifier, string? Name = null)
+public class TenantInfo : ITenantInfo
 {
+    /// <inheritdoc />
+    public required string Id { get; init; }
+
+    /// <inheritdoc />
+    public required string Identifier { get; init; }
+    
+    /// <summary>
+    /// A friendly name for the tenant.
+    /// </summary>
+    public string? Name { get; init; }
 }

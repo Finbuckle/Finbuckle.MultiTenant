@@ -11,7 +11,6 @@
         <Project Path="src\Finbuckle.MultiTenant\Finbuckle.MultiTenant.csproj" />
     </Folder>
     <Folder Name="/test/">
-        <Project Path="test\Finbuckle.MultiTenant.Abstractions.Test\Finbuckle.MultiTenant.Abstractions.Test.csproj" />
         <Project Path="test\Finbuckle.MultiTenant.AspNetCore.Test\Finbuckle.MultiTenant.AspNetCore.Test.csproj" />
         <Project Path="test\Finbuckle.MultiTenant.EntityFrameworkCore.Test\Finbuckle.MultiTenant.EntityFrameworkCore.Test.csproj" />
         <Project Path="test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test.csproj" />
