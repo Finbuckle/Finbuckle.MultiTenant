@@ -12,7 +12,7 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
     private readonly Action<ModelBuilder> _config;
 
     public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) :
-        base(new StaticMultiTenantContextAccessor<TenantInfo>(new TenantInfo(Id: "dummy", "")), options)
+        base(new StaticMultiTenantContextAccessor<TenantInfo>(new TenantInfo { Id = "dummy", Identifier = "" }), options)
     {
         _config = config;
     }

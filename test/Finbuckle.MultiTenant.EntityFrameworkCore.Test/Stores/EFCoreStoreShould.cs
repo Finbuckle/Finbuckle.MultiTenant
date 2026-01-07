@@ -44,7 +44,7 @@ public class EfCoreStoreShould
         _connection.Open();
         var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
         var dbContext = new TestEfCoreStoreDbContext(options);
-        dbContext.Database.EnsureCreated();
+        await dbContext.Database.EnsureCreatedAsync();
 
         var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
         return await PopulateTestStore(store);
@@ -103,7 +103,7 @@ public class EfCoreStoreShould
     public async Task NotTrackContextOnAdd()
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
-        var tenant = new TenantInfo(Id: "test-id", Identifier: "test-identifier", Name: "test");
+        var tenant = new TenantInfo { Id = "test-id", Identifier = "test-identifier", Name = "test" };
         await store.AddAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -115,7 +115,7 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant = tenant! with { Name = "new name" };
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
         await store.UpdateAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -127,7 +127,7 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant = tenant! with { Name = "new name" };
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
         await store.RemoveAsync(tenant.Id);
 
         var entity = store.dbContext.Entry(tenant);
