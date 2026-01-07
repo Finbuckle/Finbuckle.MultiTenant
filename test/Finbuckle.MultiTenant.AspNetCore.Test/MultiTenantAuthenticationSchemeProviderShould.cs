@@ -30,9 +30,9 @@ public class MultiTenantAuthenticationSchemeProviderShould
 
         var sp = services.BuildServiceProvider();
 
-        var tenant1 = new TenantInfo("tenant1", "tenant1");
+        var tenant1 = new TenantInfo { Id = "tenant1", Identifier = "tenant1" };
 
-        var tenant2 = new TenantInfo("tenant2", "tenant2");
+        var tenant2 = new TenantInfo { Id = "tenant2", Identifier = "tenant2" };
 
         var mtc = new MultiTenantContext<TenantInfo>(tenant1);
         var setter = sp.GetRequiredService<IMultiTenantContextSetter>();

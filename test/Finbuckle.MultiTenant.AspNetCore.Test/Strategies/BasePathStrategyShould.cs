@@ -30,7 +30,7 @@ public class BasePathStrategyShould
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo("base123", "base", "base tenant"));
+            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base", Name = "base tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();
@@ -53,7 +53,7 @@ public class BasePathStrategyShould
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo("base123", "base", "base tenant"));
+            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base", Name = "base tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = false);
         var serviceProvider = services.BuildServiceProvider();
@@ -101,7 +101,7 @@ public class BasePathStrategyShould
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo("tenant", "tenant", "tenant"));
+            options.Tenants.Add(new TenantInfo { Id = "tenant", Identifier = "tenant", Name = "tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();

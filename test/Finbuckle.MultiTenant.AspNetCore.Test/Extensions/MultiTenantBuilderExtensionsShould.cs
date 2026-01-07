@@ -3,6 +3,7 @@
 
 using System.Security.Claims;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Authentication;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
@@ -33,7 +34,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -76,7 +77,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -110,7 +111,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -146,7 +147,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc1"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc1" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -187,7 +188,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc1"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc1" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -226,7 +227,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo("", "abc1"));
+        var mtc = new MultiTenantContext<TenantInfo>(new TenantInfo { Id = "", Identifier = "abc1" });
         sp.GetRequiredService<IMultiTenantContextSetter>().MultiTenantContext = mtc;
 
         // Trigger the ValidatePrincipal event
@@ -315,8 +316,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             ChallengeScheme = "customScheme"
         };
 
@@ -340,8 +340,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             ChallengeScheme = "customScheme"
         };
 
@@ -369,7 +368,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TenantInfo("id1", "identifier1");
+        var ti1 = new TenantInfo { Id = "id1", Identifier = "identifier1" };
 
         var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
         setter.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti1);
@@ -393,8 +392,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             OpenIdConnectAuthority = "https://tenant",
             OpenIdConnectClientId = "tenant",
             OpenIdConnectClientSecret = "secret"
@@ -422,8 +420,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             OpenIdConnectAuthority = "https://tenant",
             OpenIdConnectClientId = "tenant",
             OpenIdConnectClientSecret = "secret"
@@ -457,7 +454,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TenantInfo("id1", "identifier1");
+        var ti1 = new TenantInfo { Id = "id1", Identifier = "identifier1" };
 
         var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
         setter.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti1);
@@ -480,8 +477,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             CookieLoginPath = "/path1",
             CookieLogoutPath = "/path2",
             CookieAccessDeniedPath = "/path3"
@@ -508,8 +504,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TestTenantInfo("id1", "identifier1")
-        {
+        var ti1 = new TestTenantInfo { Id = "id1", Identifier = "identifier1",
             CookieLoginPath = "/path1",
             CookieLogoutPath = "/path2",
             CookieAccessDeniedPath = "/path3"
@@ -541,7 +536,7 @@ public class MultiTenantBuilderExtensionsShould
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
-        var ti1 = new TenantInfo("id1", "identifier1");
+        var ti1 = new TenantInfo { Id = "id1", Identifier = "identifier1" };
 
         var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
         setter.MultiTenantContext = new MultiTenantContext<TenantInfo>(ti1);
@@ -724,7 +719,7 @@ public class MultiTenantBuilderExtensionsShould
         Assert.IsType<MultiTenantAmbientValueLinkGenerator>(linkGenerator);
     }
 
-    private record TestTenantInfo(string Id, string Identifier) : TenantInfo(Id, Identifier)
+    private class TestTenantInfo : TenantInfo
     {
         public string? ChallengeScheme { get; set; }
         public string? CookieLoginPath { get; set; }
