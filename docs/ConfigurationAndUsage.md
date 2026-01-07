@@ -219,7 +219,7 @@ There are several ways your app can see the current tenant:
 
 ### Dependency Injection
 
-* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTeenantInfo>` are available via dependency injection
+* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTenantInfo>` are available via dependency injection
   and behave similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async
   contexts any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the
   post-endpoint processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
@@ -227,7 +227,7 @@ There are several ways your app can see the current tenant:
 
 * `IMultiTenantContextSetter` is available via dependency injection and can be used to set the current tenant. This is
   useful in advanced scenarios and should be used with caution. Prefer using the `HttpContext` extension method
-  `TrySetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
+  `SetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
 
 > Prior versions of MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
 > via dependency injection. This was removed as these are not actual services, similar to
@@ -251,7 +251,6 @@ For web apps these convenience methods are also available:
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
     var name = tenantInfo.Name;
-    var something = tenantInfo.Items["something"];
   }
   ```
 
@@ -260,21 +259,20 @@ For web apps these convenience methods are also available:
   For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly overriding
   the `TenantInfo` set by the middleware.
 
-  Use this 'HttpContext' extension method to the current tenant to the provided `TenantInfo`. Returns true if
-  successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will
+  Use this 'HttpContext' extension method to set the current tenant to the provided `TenantInfo`.
+  Optionally it can also reset the service provider scope so that any scoped services already resolved will
   be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting
   the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the
   `MultiTenantContext<TTenantInfo>` to `null`.
 
   ```csharp
-  var newTenantInfo = new TenantInfo(...);
+  var newTenantInfo = new TenantInfo { Id = "new-id", Identifier = "new-identifier" };
   
-  if(HttpContext.TrySetTenantInfo(newTenantInfo, resetServiceProvider: true))
-  {
-      // This will be the new tenant.
-      var tenant = HttpContext.GetMultiTenantContext().TenantInfo;
+  HttpContext.SetTenantInfo(newTenantInfo, resetServiceProviderScope: true);
   
-      // This will regenerate the options class.
-      var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
-  }
+  // This will be the new tenant.
+  var tenant = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
+
+  // This will regenerate the options class.
+  var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
   ```

@@ -13,29 +13,28 @@ implementation. and use it in the `OnConfiguring` method of the database context
 by injecting a `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
 
 ```csharp
-public class AppTenantInfo : TenantInfo
+public class AppTenantInfo : ITenantInfo
 {
-    public string Id { get; set; }
-    public string Identifier { get; set; }
-    public string Name { get; set; }
-    public string ConnectionString { get; set; }
+    public required string Id { get; init; }
+    public required string Identifier { get; init; }
+    public string? Name { get; init; }
+    public string? ConnectionString { get; init; }
 }
 
 public class MyAppDbContext : DbContext
 {
-   // AppTenantInfo is the app's custom implementation of TenantInfo which 
-   private AppTenantInfo TenantInfo { get; set; }
+   private AppTenantInfo? TenantInfo { get; set; }
 
    public MyAppDbContext(IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor)
    {
        // get the current tenant info at the time of construction
-       TenantInfo = multiTenantContextAccessor.tenantInfo;
+       TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
    } 
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
    {
        // use the connection string to connect to the per-tenant database
-       optionsBuilder.UseSqlServer(TenantInfo.ConnectionString);
+       optionsBuilder.UseSqlServer(TenantInfo?.ConnectionString);
    }
    ...
 }
@@ -210,7 +209,7 @@ will have the information needed to provide proper data isolation.
 public class MyDbContext : DbContext, IMultiTenantDbContext
 {
     ...
-    public TenantInfo TenantInfo { get; }
+    public ITenantInfo? TenantInfo { get; }
     public TenantMismatchMode TenantMismatchMode { get; }
     public TenantNotSetMode TenantNotSetMode { get; }
     ...
@@ -294,9 +293,9 @@ public class BloggingDbContext : MultiTenantDbContext
     }
     
     // these constructors are useful for testing or other use cases where depdenency injection is not used
-    public BloggingDbContext(TenantInfo tenantInfo) : base(tenantInfo) { }
+    public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
 
-    public BloggingDbContext(TenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
+    public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
         base(tenantInfo, options) { }
 
     public DbSet<Blog> Blogs { get; set; }
@@ -331,7 +330,7 @@ database context instance for a specific tenant.
 
 ```csharp
 // create or otherwise obtain a tenant info instance
-var tenantInfo = new MyTenantInfo(...);
+var tenantInfo = new MyTenantInfo { Id = "id", Identifier = "identifier" };
 
 // create a database context instance for the tenant
 var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo);
@@ -392,13 +391,13 @@ altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) an
 Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
 
 // Add the blog to a db context for a tenant.
-var myTenantInfo = ...;
+var myTenantInfo = new TenantInfo { Id = "1", Identifier = "tenant-1" };
 var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-myDbContext.Blogs.Add(myBlog));
+myDbContext.Blogs.Add(myBlog);
 myDbContext.SaveChanges();
 
 // Try to add the same blog to a different tenant.
-var yourTenantInfo = ...;
+var yourTenantInfo = new TenantInfo { Id = "2", Identifier = "tenant-2" };
 var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(yourTenantInfo);
 yourDbContext.Blogs.Add(myBlog);
 await yourDbContext.SaveChangesAsync(); // Throws MultiTenantException.
@@ -410,12 +409,12 @@ EF Core Queries will only return results associated to the `TenantInfo`.
 
 ```csharp
 // Will only return "My Blog".
-var myTenantInfo = ...;
+var myTenantInfo = new TenantInfo { Id = "1", Identifier = "tenant-1" };
 var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
 var tenantBlog = myDbContext.Blogs.First();
 
 // Will only return "Your Blog".
-var yourTenantInfo = ...;
+var yourTenantInfo = new TenantInfo { Id = "2", Identifier = "tenant-2" };
 var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(yourTenantInfo);
 var yourBlogs = yourDbContext.Blogs.First(); 
 ```
@@ -447,13 +446,13 @@ This behavior can be altered by changing the values of [TenantMisMatchMode](#ten
 ```csharp
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
-var myTenantInfo = ...;
+var myTenantInfo = new TenantInfo { Id = "1", Identifier = "tenant-1" };
 var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-myDbContext.Blogs.Add(myBlog));
+myDbContext.Blogs.Add(myBlog);
 myDbContext.SaveChanges();
 
 // Modify and attach the same blog to a different tenant.
-var yourTenantInfo = ...;
+var yourTenantInfo = new TenantInfo { Id = "2", Identifier = "tenant-2" };
 var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(yourTenantInfo);
 yourDbContext.Blogs.Attach(myBlog);
 myBlog.Title = "My Changed Blog";
