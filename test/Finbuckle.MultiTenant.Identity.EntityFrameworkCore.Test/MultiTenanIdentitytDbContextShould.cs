@@ -23,7 +23,7 @@ public class MultiTenantIdentityDbContextShould
         services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion,0));
         services.AddMultiTenant<TenantInfo>();
         // override the generic accessor with a static one bound to a test tenant
-        var tenant = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
+        var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
         services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new StaticMultiTenantContextAccessor<TenantInfo>(tenant));
         services.AddDbContext<TContext>(o =>
         {
@@ -272,7 +272,7 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void CreateMultiTenantIdentityDbContextWithFactory()
     {
-        var tenant1 = new TenantInfo(Id: "abc", Identifier: "abc", Name: "abc");
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
         var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
