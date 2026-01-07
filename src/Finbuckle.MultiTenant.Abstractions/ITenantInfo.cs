@@ -11,7 +11,7 @@ public interface ITenantInfo
     public string Id { get; }
 
     /// <summary>
-    /// Gets an externally-facing identifier used for tenant resolution.
+    /// Gets an externally facing identifier used for tenant resolution.
     /// </summary>
     public string Identifier { get; }
 }

@@ -9,8 +9,8 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : TenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Gets or sets the <see cref="IServiceCollection"/> instance used by the builder.

@@ -8,9 +8,9 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Events for successful and failed tenant resolution.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class MultiTenantEvents<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Called after each <see cref="IMultiTenantStrategy"/> has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.

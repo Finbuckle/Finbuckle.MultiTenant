@@ -24,7 +24,7 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
             if (string.Equals(request.RequestUri.Segments[numSegments - 1], "initech",
                     StringComparison.OrdinalIgnoreCase))
             {
-                var tenantInfo = new TenantInfo(Id: "initech-id", Identifier: "initech");
+                var tenantInfo = new TenantInfo{Id= "initech-id", Identifier= "initech"};
                 var json = JsonConvert.SerializeObject(tenantInfo);
                 result.StatusCode = HttpStatusCode.OK;
                 result.Content = new StringContent(json);
@@ -84,49 +84,53 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
         var client = new HttpClient(new TestHandler());
         var clientFactory = new Mock<IHttpClientFactory>();
         clientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
         var typedClient = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
-        return new HttpRemoteStore<TenantInfo>(typedClient, "http://example.com");
+        return Task.FromResult<IMultiTenantStore<TenantInfo>>(new HttpRemoteStore<TenantInfo>(typedClient, "http://example.com"));
     }
 
-    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         throw new NotImplementedException();
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void GetTenantInfoFromStoreById()
+    public override Task GetTenantInfoFromStoreById()
     {
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-        base.GetTenantInfoFromStoreByIdentifier();
+        await base.GetTenantInfoFromStoreByIdentifier();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void AddTenantInfoToStore()
+    public override Task AddTenantInfoToStore()
     {
+        return Task.CompletedTask;
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void RemoveTenantInfoFromStore()
+    public override Task RemoveTenantInfoFromStore()
     {
+        return Task.CompletedTask;
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void UpdateTenantInfoInStore()
+    public override Task UpdateTenantInfoInStore()
     {
+        return Task.CompletedTask;
     }
 }

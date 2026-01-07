@@ -10,9 +10,9 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// Basic store that keeps tenants in memory.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
 
@@ -79,7 +79,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <inheritdoc />
     public async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
-        var result = tenantInfo.Identifier != null && _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
+        var result = _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
         return await Task.FromResult(result).ConfigureAwait(false);
     }
@@ -95,7 +95,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <inheritdoc />
     public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
-        var existingTenantInfo = tenantInfo.Id != null ? await GetAsync(tenantInfo.Id).ConfigureAwait(false) : null;
+        var existingTenantInfo = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
 
         if (existingTenantInfo?.Identifier != null)
         {

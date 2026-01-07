@@ -134,7 +134,7 @@ public class MultiTenantBuilderExtensionsShould
         builder.WithInMemoryStore(options =>
         {
             options.IsCaseSensitive = true;
-            options.Tenants.Add(new TenantInfo(Id: "lol", Identifier: "lol"));
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol" });
         });
         var sp = services.BuildServiceProvider();
 
@@ -207,8 +207,13 @@ public class MultiTenantBuilderExtensionsShould
         Assert.Null(identifier);
     }
 
-    private class BaseCtx { }
-    private class DerivedCtx : BaseCtx { }
+    private class BaseCtx
+    {
+    }
+
+    private class DerivedCtx : BaseCtx
+    {
+    }
 
     [Fact]
     public async Task InvokeTypedDelegateWhenRuntimeContextIsDerivedType()
@@ -229,7 +234,8 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<DerivedCtx, TenantInfo>(ctx => Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
+        builder.WithDelegateStrategy<DerivedCtx, TenantInfo>(ctx =>
+            Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();

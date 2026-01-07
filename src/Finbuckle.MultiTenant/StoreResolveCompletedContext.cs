@@ -8,9 +8,9 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Context for when a <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to look up a tenant identifier.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class StoreResolveCompletedContext<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Gets or sets the context used for attempted tenant resolution.

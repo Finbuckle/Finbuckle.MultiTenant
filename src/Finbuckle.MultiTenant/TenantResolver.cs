@@ -13,9 +13,9 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     private readonly IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options;
     private readonly ILoggerFactory? loggerFactory;
@@ -59,7 +59,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     /// <inheritdoc />
     public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
     {
-        var mtc = new MultiTenantContext<TTenantInfo>(null);
+        var mtc = new MultiTenantContext<TTenantInfo>(default);
         var tenantResolverLogger = loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance;
 
         foreach (var strategy in Strategies)

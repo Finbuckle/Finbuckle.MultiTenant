@@ -9,27 +9,36 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// Basic store that simply returns a tenant based on the identifier without any additional settings.
 /// Note that add, update, and remove functionality is not implemented.
-/// If underlying configuration supports reload-on-change then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
-        var tenantInfo = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
-        tenantInfo = tenantInfo with { Id = identifier, Identifier = identifier };
+        var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
+    
+        // use reflection since the interfaces only has getters for id and identifier (design choice)
+        var idProperty = typeof(TTenantInfo).GetProperty("Id");
+        idProperty?.SetValue(tenantInfo, identifier);
+        var identifierProperty = typeof(TTenantInfo).GetProperty("Identifier");
+        identifierProperty?.SetValue(tenantInfo, identifier);
 
-        // Ensure TTenantInfo has a parameterless constructor.
-        return await Task.FromResult(tenantInfo).ConfigureAwait(false);
+        return Task.FromResult(tenantInfo);
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id)
     {
-        var tenantInfo = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
-        tenantInfo = tenantInfo with { Id = id, Identifier = id };
-        return await Task.FromResult(tenantInfo).ConfigureAwait(false);
+        var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
+        
+        // use reflection since the interfaces only has getters for id and identifier (design choice)
+        var idProperty = typeof(TTenantInfo).GetProperty("Id");
+        idProperty?.SetValue(tenantInfo, id);
+        var identifierProperty = typeof(TTenantInfo).GetProperty("Identifier");
+        identifierProperty?.SetValue(tenantInfo, id);
+
+        return Task.FromResult(tenantInfo);
     }
 
     /// <summary>
