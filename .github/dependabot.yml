@@ -2,7 +2,11 @@ version: 2
 updates:
   - package-ecosystem: "nuget"
     directories:
-      - "/src/*"
+      - "/src/Finbuckle.MultiTenant"
+      - "/src/Finbuckle.MultiTenant.Abstractions"
+      - "/src/Finbuckle.MultiTenant.AspNetCore"
+      - "/src/Finbuckle.MultiTenant.EntityFrameworkCore"
+      - "/src/Finbuckle.MultiTenant.Identity.EntityFrameworkCore"
     schedule:
       interval: "daily"
     ignore:
