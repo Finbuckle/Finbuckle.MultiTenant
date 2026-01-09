@@ -102,7 +102,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <inheritdoc />
     public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        return Task.FromResult(tenantMap.Values.Take(take).Skip(skip).ToList().AsEnumerable());
+        return Task.FromResult(tenantMap.Values.Skip(skip).Take(take).ToList().AsEnumerable());
     }
 
     /// <inheritdoc />
