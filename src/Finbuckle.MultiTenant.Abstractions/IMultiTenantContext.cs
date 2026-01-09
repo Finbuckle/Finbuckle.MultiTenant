@@ -34,10 +34,10 @@ public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    new TTenantInfo? TenantInfo { get; init; }
+    new TTenantInfo? TenantInfo { get; }
 
     /// <summary>
     /// Information about the <see cref="IMultiTenantStore{ITenantInfo}"/> for this context.
     /// </summary>
-    StoreInfo<TTenantInfo>? StoreInfo { get; init; }
+    StoreInfo<TTenantInfo>? StoreInfo { get; }
 }
