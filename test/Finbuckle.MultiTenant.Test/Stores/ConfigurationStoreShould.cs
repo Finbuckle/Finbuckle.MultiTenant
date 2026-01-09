@@ -132,4 +132,10 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     {
         await base.GetAllTenantsFromStoreAsync();
     }
+    
+    [Fact]
+    public override async Task GetAllTenantsFromStoreAsyncSkip1Take1()
+    {
+        await base.GetAllTenantsFromStoreAsyncSkip1Take1();
+    }
 }
