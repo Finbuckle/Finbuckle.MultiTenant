@@ -10,8 +10,8 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// HTTP client for retrieving tenant information from a remote endpoint.
 /// </summary>
-/// <typeparam name="TTenantInfo">The TenantInfo derived type.</typeparam>
-public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     private readonly IHttpClientFactory clientFactory;
     private readonly JsonSerializerOptions _defaultSerializerOptions;
@@ -22,7 +22,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
     /// <param name="clientFactory">The HTTP client factory.</param>
     /// <param name="serializerOptions">Optional JSON serializer options.</param>
     /// <exception cref="ArgumentNullException">Thrown when clientFactory is null.</exception>
-    public HttpRemoteStoreClient(IHttpClientFactory clientFactory, JsonSerializerOptions? serializerOptions = default)
+    public HttpRemoteStoreClient(IHttpClientFactory clientFactory, JsonSerializerOptions? serializerOptions = null)
     {
         this.clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
 
@@ -43,7 +43,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : TenantInfo
         var response = await client.GetAsync(uri).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
-            return null;
+            return default;
 
         var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         var result = JsonSerializer.Deserialize<TTenantInfo>(json, _defaultSerializerOptions);

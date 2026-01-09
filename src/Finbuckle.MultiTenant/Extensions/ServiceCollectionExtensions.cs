@@ -17,13 +17,13 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the <see cref="MultiTenantOptions{TTenantInfo}"/> instance.</param>
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services,
         Action<MultiTenantOptions<TTenantInfo>> config)
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
@@ -45,11 +45,11 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo> AddMultiTenant<TTenantInfo>(this IServiceCollection services)
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         return services.AddMultiTenant<TTenantInfo>(_ => { });
     }
@@ -156,7 +156,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -186,7 +186,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         return services.ConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -203,7 +203,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         return services.ConfigurePerTenant(null, configureOptions);
     }
@@ -221,7 +221,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ConfigurePerTenantReqs<TOptions>(services);
 
@@ -251,7 +251,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         return services.PostConfigurePerTenant(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -268,7 +268,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         return services.PostConfigurePerTenant(null, configureOptions);
     }

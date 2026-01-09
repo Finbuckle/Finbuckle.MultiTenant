@@ -9,9 +9,9 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// Multi-tenant store decorator that handles exception handling and logging.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     // ReSharper disable once MemberCanBePrivate.Global
     /// <summary>
@@ -38,7 +38,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        TTenantInfo? result = null;
+        TTenantInfo? result = default;
 
         try
         {
@@ -103,7 +103,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     {
         ArgumentNullException.ThrowIfNull(identifier);
 
-        TTenantInfo? result = null;
+        TTenantInfo? result = default;
 
         try
         {

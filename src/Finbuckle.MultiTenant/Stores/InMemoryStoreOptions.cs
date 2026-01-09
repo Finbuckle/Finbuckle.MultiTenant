@@ -8,9 +8,9 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// Options for configuring the <see cref="InMemoryStore{TTenantInfo}"/>.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class InMemoryStoreOptions<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Gets or sets whether tenant identifier lookups are case-sensitive.

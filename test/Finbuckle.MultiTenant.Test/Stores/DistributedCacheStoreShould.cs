@@ -17,14 +17,14 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task ThrowOnGetAllTenantsFromStoreAsync()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
         await Assert.ThrowsAsync<NotImplementedException>(async () => await store.GetAllAsync());
     }
 
     [Fact]
     public async Task RemoveDualEntriesOnRemove()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
         var r = await store.RemoveAsync("lol");
         Assert.True(r);
@@ -39,7 +39,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task RemoveReturnsFalseWhenNoMatchingIdentifierFound()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
         var r = await store.RemoveAsync("DoesNotExist");
 
@@ -49,7 +49,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task AddDualEntriesOnAdd()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
         var t2 = await store.GetByIdentifierAsync("lol");
         var t1 = await store.GetAsync("lol-id");
@@ -67,8 +67,11 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var cache = new Mock<IDistributedCache>();
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
-                Identifier: "lol"))));
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
+            {
+                Id = "lol-id",
+                Identifier = "lol"
+            })));
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
@@ -81,8 +84,8 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
     {
         var cache = new Mock<IDistributedCache>();
         cache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo(Id: "lol-id",
-                Identifier: "lol"))));
+            .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
+                { Id = "lol-id", Identifier = "lol" })));
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
@@ -106,7 +109,7 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.AddAsync(new TenantInfo(Id: "test-id", Identifier: "test"));
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test" });
     }
 
     [Fact]
@@ -125,12 +128,12 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
 
         var store = new DistributedCacheStore<TenantInfo>(cache.Object, Constants.TenantToken, TimeSpan.FromSeconds(1));
 
-        await store.AddAsync(new TenantInfo(Id: "test-id", Identifier: "test"));
+        await store.AddAsync(new TenantInfo { Id = "test-id", Identifier = "test" });
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
         var services = new ServiceCollection();
         services.AddOptions().AddDistributedMemoryCache();
@@ -139,48 +142,48 @@ public class DistributedCacheStoreShould : MultiTenantStoreTestBase
         var store = new DistributedCacheStore<TenantInfo>(sp.GetRequiredService<IDistributedCache>(),
             Constants.TenantToken, TimeSpan.MaxValue);
 
-        return PopulateTestStore(store);
+        return await PopulateTestStore(store);
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreById()
+    public override async Task GetTenantInfoFromStoreById()
     {
-        base.GetTenantInfoFromStoreById();
+        await base.GetTenantInfoFromStoreById();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-        base.GetTenantInfoFromStoreByIdentifier();
+        await base.GetTenantInfoFromStoreByIdentifier();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
     }
 
     [Fact]
-    public override void AddTenantInfoToStore()
+    public override async Task AddTenantInfoToStore()
     {
-        base.AddTenantInfoToStore();
+        await base.AddTenantInfoToStore();
     }
 
     [Fact]
-    public override void RemoveTenantInfoFromStore()
+    public override async Task RemoveTenantInfoFromStore()
     {
-        base.RemoveTenantInfoFromStore();
+        await base.RemoveTenantInfoFromStore();
     }
 
     [Fact]
-    public override void UpdateTenantInfoInStore()
+    public override async Task UpdateTenantInfoInStore()
     {
-        base.UpdateTenantInfoInStore();
+        await base.UpdateTenantInfoInStore();
     }
 }

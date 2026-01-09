@@ -11,14 +11,14 @@ namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not
-/// implemented. If underlying configuration supports reload-on-change then this store will reflect such changes.
+/// implemented. If the underlying configuration supports reload-on-change, then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> derived type.</typeparam>
+public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
     private readonly IConfigurationSection section;
-    private ConcurrentDictionary<string, TTenantInfo>? tenantMap;
+    private ConcurrentDictionary<string, TTenantInfo> tenantMap = new();
 
     // ReSharper disable once IntroduceOptionalParameters.Global
     /// <summary>
@@ -87,41 +87,29 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id)
     {
         ArgumentNullException.ThrowIfNull(id);
-
-        return await Task.FromResult(tenantMap?.Where(kv => kv.Value.Id == id).SingleOrDefault().Value)
-            .ConfigureAwait(false);
+        return Task.FromResult(tenantMap.Values.SingleOrDefault(v => v.Id == id));
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(tenantMap?.Select(x => x.Value).ToList() ?? new List<TTenantInfo>())
-            .ConfigureAwait(false);
+        return Task.FromResult(tenantMap.Values.ToList().AsEnumerable());
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        return await Task
-            .FromResult(tenantMap?.Select(x => x.Value).Take(take).Skip(skip).ToList() ?? new List<TTenantInfo>())
-            .ConfigureAwait(false);
+        return Task.FromResult(tenantMap.Values.Take(take).Skip(skip).ToList().AsEnumerable());
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
     {
         ArgumentNullException.ThrowIfNull(identifier);
-
-        if (tenantMap is null)
-        {
-            return null;
-        }
-
-        return await Task.FromResult(tenantMap.TryGetValue(identifier, out var result) ? result : null)
-            .ConfigureAwait(false);
+        return Task.FromResult(tenantMap.GetValueOrDefault(identifier));
     }
 
     /// <summary>

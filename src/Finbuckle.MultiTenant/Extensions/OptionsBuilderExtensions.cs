@@ -26,7 +26,7 @@ public static class OptionsBuilderExtensions
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -38,7 +38,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -59,7 +59,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -72,7 +72,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep, tenantInfo);
                 }));
@@ -95,7 +95,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -109,7 +109,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, tenantInfo);
                 }));
@@ -135,7 +135,7 @@ public static class OptionsBuilderExtensions
         where TDep1 : class
         where TDep2 : class
         where TDep3 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -150,7 +150,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, tenantInfo);
                 }));
@@ -178,7 +178,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -194,7 +194,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, dep4, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, dep4, tenantInfo);
                 }));
@@ -212,7 +212,7 @@ public static class OptionsBuilderExtensions
     //     where TDep3 : class
     //     where TDep4 : class
     //     where TDep5 : class
-    //     where TTenantInfo : TenantInfo
+    //     where TTenantInfo : ITenantInfo
     // {
     //     if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
     //
@@ -250,7 +250,7 @@ public static class OptionsBuilderExtensions
     public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TTenantInfo>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -262,7 +262,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -283,7 +283,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -296,7 +296,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep, tenantInfo);
                 }));
@@ -319,7 +319,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -333,7 +333,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, tenantInfo);
                 }));
@@ -359,7 +359,7 @@ public static class OptionsBuilderExtensions
         where TDep1 : class
         where TDep2 : class
         where TDep3 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -374,7 +374,7 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, tenantInfo);
                 }));
@@ -402,7 +402,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -418,49 +418,11 @@ public static class OptionsBuilderExtensions
                 sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
                 (options, dep1, dep2, dep3, dep4, mtcAccessor) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
+                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, dep1, dep2, dep3, dep4, tenantInfo);
                 }));
 
         return optionsBuilder;
     }
-
-    // Experimental
-    // public static OptionsBuilder<TOptions> PostConfigurePerTenant<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5,
-    //     TTenantInfo>(
-    //     this OptionsBuilder<TOptions> optionsBuilder,
-    //     Action<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5, TTenantInfo> configureOptions)
-    //     where TOptions : class
-    //     where TDep1 : class
-    //     where TDep2 : class
-    //     where TDep3 : class
-    //     where TDep4 : class
-    //     where TDep5 : class
-    //     where TTenantInfo : TenantInfo
-    // {
-    //     if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
-    //
-    //     FinbuckleServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
-    //
-    //     optionsBuilder.Services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
-    //     {
-    //         var mtcAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>();
-    //         return new PostConfigureOptions<TOptions, TDep1, TDep2, TDep3, TDep4, TDep5>(
-    //             optionsBuilder.Name,
-    //             sp.GetRequiredService<TDep1>(),
-    //             sp.GetRequiredService<TDep2>(),
-    //             sp.GetRequiredService<TDep3>(),
-    //             sp.GetRequiredService<TDep4>(),
-    //             sp.GetRequiredService<TDep5>(),
-    //             (options, dep1, dep2, dep3, dep4, dep5) =>
-    //             {
-    //                 var tenantInfo = mtcAccessor.MultiTenantContext?.TenantInfo;
-    //                 if (tenantInfo is not null)
-    //                     configureOptions(options, dep1, dep2, dep3, dep4, dep5, tenantInfo);
-    //             });
-    //     });
-    //
-    //     return optionsBuilder;
-    // }
 }

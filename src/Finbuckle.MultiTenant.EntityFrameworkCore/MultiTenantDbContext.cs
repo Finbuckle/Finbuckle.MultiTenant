@@ -15,7 +15,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
     /// <inheritdoc />
     // internal set for testing
-    public TenantInfo? TenantInfo { get; internal set; }
+    public ITenantInfo? TenantInfo { get; internal set; }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -28,11 +28,11 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
         where TContext : DbContext
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
         => Create<TContext, TTenantInfo>(tenantInfo, []);
 
     /// <summary>
@@ -41,11 +41,11 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <param name="args">Additional dependencies for the <see cref="DbContext"/> constructor.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, params object[] args)
         where TContext : DbContext
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         try
         {
@@ -71,12 +71,12 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to resolve <see cref="DbContext"/> constructor dependencies.</param>
     /// <param name="args">Additional dependencies for the <see cref="DbContext"/> constructor.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
-    /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, IServiceProvider serviceProvider,
         params object[] args)
         where TContext : DbContext
-        where TTenantInfo : TenantInfo
+        where TTenantInfo : ITenantInfo
     {
         try
         {

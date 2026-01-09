@@ -1,7 +1,7 @@
 # MultiTenant Strategies
 
 A multi-tenant strategy is responsible for defining how the tenant is determined. It ultimately produces an identifier
-string which is used to create a `TenantInfo` object with information from the [MultiTenant store](Stores).
+string which is used to resolve an `ITenantInfo` object with information from the [MultiTenant store](Stores).
 
 MultiTenant supports several "out-of-the-box" strategies for resolving the tenant. Custom strategies can be
 created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
@@ -20,7 +20,7 @@ created by implementing `IMultiTenantStrategy` or using `DelegateStrategy`.
 All MultiTenant strategies derive from `IMultiTenantStrategy` and must implement the `GetIdentifierAsync` method.
 
 If an identifier can't be determined, `GetIdentifierAsync` should return null which will ultimately result in a
-null `TenantInfo`.
+null `ITenantInfo`.
 
 Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>`
 after `AddMultiTenant<TTenantInfo>` in your app configuration. There are several

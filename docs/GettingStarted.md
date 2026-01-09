@@ -48,9 +48,9 @@ That's all that is needed to get going. Let's break down each line:
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must be an instance of `TenantInfo` or a derived class and holds
-basic information about the tenant such as its name and an identifier. `TenantInfo` is provided as a basic
-implementation record, but a derived record can be used if more properties are needed.
+The type parameter for `AddMultiTenant<TTenantInfo>` must implement `ITenantInfo` and holds
+basic information about the tenant such as its id and an identifier. `TenantInfo` is provided as a basic
+implementation class, but any implementation of `ITenantInfo` can be used if more properties are needed.
 
 See [Core Concepts](CoreConcepts) for more information on `TenantInfo`.
 

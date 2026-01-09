@@ -5,9 +5,9 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Context for when tenant resolution has completed.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public record TenantResolveCompletedContext<TTenantInfo>
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// The resolved <see cref="MultiTenantContext{TTenantInfo}"/>.

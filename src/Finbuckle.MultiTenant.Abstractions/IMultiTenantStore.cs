@@ -6,8 +6,8 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Interface definition for tenant stores.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
-public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : TenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Try to add the TTenantInfo to the store.

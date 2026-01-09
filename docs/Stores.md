@@ -1,7 +1,7 @@
 # MultiTenant Stores
 
 A MultiTenant store is responsible for retrieving information about a tenant based on an identifier string determined
-by [MultiTenant strategies](Strategies). The retrieved information is then used to create a `TenantInfo` object which
+by [MultiTenant strategies](Strategies). The retrieved information is then used to create an `ITenantInfo` object which
 provides the current tenant information to your app.
 
 MultiTenant supports several "out-of-the-box" stores for resolving the tenant. Custom stores can be created by
@@ -9,7 +9,7 @@ implementing `IMultiTenantStore`.
 
 ## Custom TenantInfo Support
 
-MultiTenant stores support custom `TenantInfo` derived classes, but complex implementations may require special
+MultiTenant stores support custom `ITenantInfo` implementations, but complex implementations may require special
 handling. For best results ensure the class works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
@@ -168,8 +168,8 @@ Uses an Entity Framework Core database context as the backing store.
 
 Case sensitivity is determined by the underlying EF Core database provider.
 
-The database context must derive from `EFCoreStoreDbContext`. Note that `TTenantInfo` is a record type and EF Core
-does not support tracking for record types. The `EFCoreStore` carefully avoids tracking issues, but if your app uses the
+The database context must derive from `EFCoreStoreDbContext`. The `EFCoreStore` carefully avoids tracking issues by 
+using no-tracking queries and detaching entities after store operations. If your app uses the
 `EFCoreStoreDbContext` directly it should be aware of these issues.
 
 This database context is not itself multi-tenant, but rather contains the details of all tenants.

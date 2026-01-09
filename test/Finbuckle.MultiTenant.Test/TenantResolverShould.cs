@@ -68,7 +68,7 @@ public class TenantResolverShould
         var sp = services.BuildServiceProvider();
         await sp.GetServices<IMultiTenantStore<TenantInfo>>()
             .Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>))
-            .AddAsync(new TenantInfo(Id: "null", Identifier: "null"));
+            .AddAsync(new TenantInfo { Id = "null", Identifier = "null" });
 
         var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
         var result = await resolver.ResolveAsync(new object());
@@ -114,7 +114,7 @@ public class TenantResolverShould
         var sp = services.BuildServiceProvider();
         await sp.GetServices<IMultiTenantStore<TenantInfo>>()
             .Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>))
-            .AddAsync(new TenantInfo(Id: "null", Identifier: "null"));
+            .AddAsync(new TenantInfo { Id = "null", Identifier = "null" });
 
         var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
         var result = await resolver.ResolveAsync(new object());
@@ -188,7 +188,7 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
         services.Configure<MultiTenantOptions<TenantInfo>>(options =>
-            options.Events.OnStrategyResolveCompleted = context => Task.FromResult(numCalls++));
+            options.Events.OnStrategyResolveCompleted = _ => Task.FromResult(numCalls++));
         services.AddMultiTenant<TenantInfo>()
             .WithDelegateStrategy(_ => Task.FromResult<string?>("not-found"))
             .WithStaticStrategy("initech")
@@ -213,7 +213,7 @@ public class TenantResolverShould
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
         services.Configure<MultiTenantOptions<TenantInfo>>(options =>
-            options.Events.OnStoreResolveCompleted = context => Task.FromResult(numCalls++));
+            options.Events.OnStoreResolveCompleted = _ => Task.FromResult(numCalls++));
         services.AddMultiTenant<TenantInfo>()
             .WithStaticStrategy("initech")
             .WithInMemoryStore()

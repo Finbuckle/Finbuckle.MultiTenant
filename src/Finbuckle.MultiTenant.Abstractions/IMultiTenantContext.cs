@@ -11,10 +11,10 @@ public interface IMultiTenantContext
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    TenantInfo? TenantInfo { get; init; }
+    ITenantInfo? TenantInfo { get; init; }
 
     /// <summary>
-    /// True if a tenant has been resolved and <see cref="TenantInfo"/> is not null.
+    /// True if a tenant has been resolved and <see cref="ITenantInfo"/> is not null.
     /// </summary>
     bool IsResolved { get; }
 
@@ -27,17 +27,17 @@ public interface IMultiTenantContext
 /// <summary>
 /// Generic interface for the multi-tenant context.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
-    where TTenantInfo : TenantInfo
+    where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    new TTenantInfo? TenantInfo { get; init; }
+    new TTenantInfo? TenantInfo { get; }
 
     /// <summary>
-    /// Information about the <see cref="IMultiTenantStore{TTenantInfo}"/> for this context.
+    /// Information about the <see cref="IMultiTenantStore{ITenantInfo}"/> for this context.
     /// </summary>
-    StoreInfo<TTenantInfo>? StoreInfo { get; init; }
+    StoreInfo<TTenantInfo>? StoreInfo { get; }
 }

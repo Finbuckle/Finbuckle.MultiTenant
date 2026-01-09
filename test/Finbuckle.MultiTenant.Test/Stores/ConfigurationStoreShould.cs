@@ -53,7 +53,7 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
         var tenant = await store.GetByIdentifierAsync("INITECH");
 
@@ -64,69 +64,72 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.GetByIdentifierAsync(null!));
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
         var configuration = configBuilder.Build();
 
-        return new ConfigurationStore<TenantInfo>(configuration);
+        return Task.FromResult<IMultiTenantStore<TenantInfo>>(new ConfigurationStore<TenantInfo>(configuration));
     }
 
-    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
         throw new NotImplementedException();
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreById()
+    public override async Task GetTenantInfoFromStoreById()
     {
-        base.GetTenantInfoFromStoreById();
+        await base.GetTenantInfoFromStoreById();
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-        base.GetTenantInfoFromStoreByIdentifier();
+        await base.GetTenantInfoFromStoreByIdentifier();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void AddTenantInfoToStore()
+    public override Task AddTenantInfoToStore()
     {
+        return Task.CompletedTask;
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void RemoveTenantInfoFromStore()
+    public override Task RemoveTenantInfoFromStore()
     {
+        return Task.CompletedTask;
     }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void UpdateTenantInfoInStore()
+    public override Task UpdateTenantInfoInStore()
     {
+        return Task.CompletedTask;
     }
 
     [Fact]
-    public override void GetAllTenantsFromStoreAsync()
+    public override async Task GetAllTenantsFromStoreAsync()
     {
-        base.GetAllTenantsFromStoreAsync();
+        await base.GetAllTenantsFromStoreAsync();
     }
 }
