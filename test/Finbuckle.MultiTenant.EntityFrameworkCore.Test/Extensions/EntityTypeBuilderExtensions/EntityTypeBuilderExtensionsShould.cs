@@ -112,19 +112,27 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     }
 
     [Fact]
-    public void SetNonMultiTenantAnnotation()
+    public void UnSetMultiTenantAnnotationOnIsNotMultiTenant()
     {
-        using var db = GetDbContext(b => b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant());
+        using var db = GetDbContext(b =>
+        { 
+            b.Entity<MyNonMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
+        });
         var annotation = db.Model.FindEntityType(typeof(MyNonMultiTenantThing))?
             .FindAnnotation(Constants.MultiTenantAnnotationName);
 
         Assert.False((bool)annotation!.Value!);
     }
-
+    
     [Fact]
-    public void NotAddTenantIdPropertyForNonMultiTenantEntity()
+    public void RemoveShadowTenantIdPropertyForNonMultiTenantEntity()
     {
-        using var db = GetDbContext(b => b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant());
+        using var db = GetDbContext(b =>
+        { 
+            b.Entity<MyNonMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
+        });
         var prop = db.Model.FindEntityType(typeof(MyNonMultiTenantThing))?.FindProperty("TenantId");
 
         Assert.Null(prop);
