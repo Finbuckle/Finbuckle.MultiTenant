@@ -2,6 +2,9 @@ name: Release
 
 on: [ workflow_dispatch ]
 
+permissions:
+  contents: write
+
 jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest
