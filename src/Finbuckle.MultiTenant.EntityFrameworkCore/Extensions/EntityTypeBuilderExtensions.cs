@@ -4,6 +4,7 @@
 using System.Linq.Expressions;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -26,16 +27,26 @@ public static class EntityTypeBuilderExtensions
     /// <returns>The same <see cref="EntityTypeBuilder"/> instance for method chaining.</returns>
     /// <remarks>
     /// This method is useful for excluding specific entities from tenant isolation in a multi-tenant context.
-    /// It sets the multi-tenant annotation to false and removes the tenant query filter if it exists.
+    /// It sets the multi-tenant annotation to false, removes the Tenant Id shadow property if applicable, and removes the tenant query filter if it exists.
     /// </remarks>
     public static EntityTypeBuilder IsNotMultiTenant(this EntityTypeBuilder builder)
     {
-        builder.HasAnnotation(Constants.MultiTenantAnnotationName, false);
-        //remove the named query filter if it exists
-        var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
-        if(existingFilter is not null)
-            builder.Metadata.SetQueryFilter(Abstractions.Constants.TenantToken, null);
-        
+        if (builder.Metadata.FindAnnotation(Constants.MultiTenantAnnotationName) is IAnnotation { Value: true })
+        {
+            // remove the multi-tenant annotation
+            builder.Metadata.SetAnnotation(Constants.MultiTenantAnnotationName, false);
+
+            // remove the shadow tenant id property if it exists
+            if (builder.Metadata.GetProperty("TenantId") is var property && property.IsShadowProperty())
+                builder.Metadata.RemoveProperty(property);
+
+
+                // remove the named query filter if it exists
+                var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
+            if (existingFilter is not null)
+                builder.Metadata.SetQueryFilter(Abstractions.Constants.TenantToken, null);
+        }
+
         return builder;
     }
     
