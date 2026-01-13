@@ -2,11 +2,13 @@ name: NuGet Push Public
 
 on: [workflow_dispatch]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.2.0
       - uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1

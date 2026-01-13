@@ -2,6 +2,9 @@ name: Release Dry Run
 
 on: [workflow_dispatch]
 
+permissions:
+  contents: read
+
 jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest

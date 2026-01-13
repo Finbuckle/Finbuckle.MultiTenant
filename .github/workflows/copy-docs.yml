@@ -5,6 +5,9 @@ on:
     release:
         types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   checkout-copy-checkin:
     runs-on: ubuntu-latest
