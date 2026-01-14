@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.4</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.5</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -12,7 +12,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 Table of Contents
 
-1. [What's New in v<span class="_version">9.4.4</span>](#whats-new)
+1. [What's New in v<span class="_version">9.4.5</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -25,15 +25,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">9.4.4</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">9.4.5</span>
 
-> This section only lists release update details specific to v<span class="_version">9.4.4</span>. See
+> This section only lists release update details specific to v<span class="_version">9.4.5</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* delegate strategy correctly resolves at runtime with derived types ([#1057](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1057)) ([fb2a333](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fb2a333ed45eec4e2f0c212a1410ae249e99bdd6))
+* update dependencies for .NET 9.0.12 ([#1086](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1086)) ([c297f0d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c297f0d5860a8b2c67a9d160515509615d05cf8c))
 <!--_release-notes-->
 
 ## Open Source Support
