@@ -1,14 +1,14 @@
-# What's New in v<span class="_version">8.1.9</span>
+# What's New in v<span class="_version">8.1.10</span>
 
-> This page only lists release update details specific to v<span class="_version">8.1.9</span>. [Release update details for all releases are shown in the history page.](History)
+> This page only lists release update details specific to v<span class="_version">8.1.10</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
-## [8.1.9](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.8...v8.1.9) (2025-11-20)
+## [8.1.10](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.9...v8.1.10) (2026-01-14)
 
 
 ### Bug Fixes
 
-* update dependencies ([#1035](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1035)) ([da01c9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/da01c9f3c60b4a09fa199182f94f88f953306236))
+* update dependencies for NET 8.0.23 ([#1085](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1085)) ([52db639](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/52db639d8462af4d74d833cf94a9d4698df371fe))
 
 
 

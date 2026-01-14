@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.9</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.10</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -13,7 +13,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in v<span class="_version">8.1.9</span>](#whats-new)
+1. [What's New in v<span class="_version">8.1.10</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -25,9 +25,9 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">8.1.9</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">8.1.10</span>
 
-> This section only lists release update details specific to v<span class="_version">8.1.9</span>. See
+> This section only lists release update details specific to v<span class="_version">8.1.10</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 
 <!--_release-notes-->
@@ -35,7 +35,7 @@ Table of Contents
 
 ### Bug Fixes
 
-* update dependencies ([#1035](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1035)) ([da01c9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/da01c9f3c60b4a09fa199182f94f88f953306236))
+* update dependencies for NET 8.0.23 ([#1085](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1085)) ([52db639](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/52db639d8462af4d74d833cf94a9d4698df371fe))
 <!--_release-notes-->
 
 ## Quick Start
