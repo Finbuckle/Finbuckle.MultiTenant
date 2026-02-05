@@ -65,7 +65,7 @@ public static class EntityTypeBuilderExtensions
 
         try
         {
-            #region Modifié par Sirfull
+            #region Fork Sirfull
             //Ancien code : builder.Property<string>("TenantId").IsRequired();
             builder.Property<string>("TenantId");
             #endregion

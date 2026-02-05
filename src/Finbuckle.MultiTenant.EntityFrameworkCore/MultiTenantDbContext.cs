@@ -13,11 +13,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 /// </summary>
 public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
+    #region Fork Sirfull : set public
     /// <inheritdoc />
     // internal set for testing
-    // Modifié par sirfull : set public
     //public ITenantInfo? TenantInfo { get; internal set; }
     public ITenantInfo? TenantInfo { get; set; }
+    #endregion
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
