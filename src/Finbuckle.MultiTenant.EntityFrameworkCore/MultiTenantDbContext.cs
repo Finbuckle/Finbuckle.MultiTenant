@@ -15,6 +15,8 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
     /// <inheritdoc />
     // internal set for testing
+    // Modifié par sirfull : set public
+    //public ITenantInfo? TenantInfo { get; internal set; }
     public ITenantInfo? TenantInfo { get; set; }
 
     /// <inheritdoc />

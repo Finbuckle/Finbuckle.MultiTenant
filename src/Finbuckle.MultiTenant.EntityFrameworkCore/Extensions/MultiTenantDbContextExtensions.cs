@@ -29,7 +29,10 @@ public static class MultiTenantDbContextExtensions
             if (multiTenantDbContext.TenantInfo is null)
                 throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
 
+            #region Modifié par Sirfull : Permet d'autoriser null pour TenantId
+            // Ancien code : args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
             args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
+            #endregion
         };
     }
 
@@ -46,6 +49,12 @@ public static class MultiTenantDbContextExtensions
         var tenantMismatchMode = context.TenantMismatchMode;
         var tenantNotSetMode = context.TenantNotSetMode;
 
+        // Sirfull : Permet d'autoriser null pour TenantInfo
+        if (tenantInfo is null)
+        {
+            return;
+        }
+
         var changedMultiTenantEntities = changeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
             .Where(e => e.Metadata.IsMultiTenant()).ToList();
@@ -56,7 +65,6 @@ public static class MultiTenantDbContextExtensions
 
         if (tenantInfo is null)
             throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
-
 
         // get list of all added entities with MultiTenant annotation
         var addedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Added).ToList();

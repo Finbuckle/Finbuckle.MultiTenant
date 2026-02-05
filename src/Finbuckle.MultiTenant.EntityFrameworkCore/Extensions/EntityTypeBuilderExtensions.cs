@@ -41,15 +41,15 @@ public static class EntityTypeBuilderExtensions
                 builder.Metadata.RemoveProperty(property);
 
 
-                // remove the named query filter if it exists
-                var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
+            // remove the named query filter if it exists
+            var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
             if (existingFilter is not null)
                 builder.Metadata.SetQueryFilter(Abstractions.Constants.TenantToken, null);
         }
 
         return builder;
     }
-    
+
     /// <summary>
     /// Adds multi-tenant support for an entity via a named query filter.
     /// </summary>
@@ -65,7 +65,10 @@ public static class EntityTypeBuilderExtensions
 
         try
         {
-            builder.Property<string>("TenantId").IsRequired();
+            #region Modifié par Sirfull
+            //Ancien code : builder.Property<string>("TenantId").IsRequired();
+            builder.Property<string>("TenantId");
+            #endregion
         }
         catch (Exception ex)
         {
@@ -80,8 +83,7 @@ public static class EntityTypeBuilderExtensions
 
         // build up expression tree for: EF.Property<string>(e, "TenantId")
         var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-        var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp,
-            tenantIdExp);
+        var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp, tenantIdExp);
         var leftExp = efPropertyExp;
 
         // build up express tree for: TenantInfo.Id
@@ -92,28 +94,40 @@ public static class EntityTypeBuilderExtensions
         var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
 
         #region Fork Sirfull
-
         // this code will generate this expression : EF.Property<string>(e, "TenantId") == TenantInfo.Id
         // var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
 
-        // the previous instruction is replaced by this one
-        // which will generate this expression : EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
-        var rightExp = Expression.Condition(Expression.NotEqual(contextTenantInfoExp, Expression.Constant(null)),
-            Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id)),
-            Expression.Constant(string.Empty, typeof(string))
+        // Generate expression: IsMultiTenantEnabled == False 
+        var multiTenantDisabled = Expression.Equal(Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)), Expression.Constant(false));
+
+        // Generate expression:  EF.Property<string>(e, "TenantId") == null 
+        var tenantIdIsNull = Expression.Equal(leftExp, Expression.Constant(null, typeof(string)));
+
+        // Generate expression: TenantInfo == null
+        var tenantInfoIsNull = Expression.Equal(contextTenantInfoExp, Expression.Constant(null));
+
+        // Generate expression: EF.Property<string>(e, "TenantId") == TenantInfo == null ? null : TenantInfo.Id
+        var rightExp = Expression.Condition(
+            Expression.Equal(contextTenantInfoExp, Expression.Constant(null)),
+            Expression.Constant(null, typeof(string)),
+            Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id))
         );
+        var tenantIdEqualsInfo = Expression.Equal(leftExp, rightExp);
 
-        // build expression tree for EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
-        var predicate = Expression.Equal(leftExp, rightExp);
-
-        // build expression tree for : IsMultiTenantEnabled == False || EF.Property<string>(e, "TenantId") == (TenantInfo != null ? TenantInfo.Id : "")
-        //                              -------------------------------
-        predicate = Expression.OrElse(
-            Expression.Equal(
-                Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)),
-                Expression.Constant(false)
-            ),
-            predicate
+        // Build the complete predicate with OR conditions
+        //  IsMultiTenantEnabled == False 
+        //   || EF.Property<string>(e, "TenantId") == null 
+        //   || TenantInfo == null
+        //   || EF.Property<string>(e, "TenantId") == TenantInfo == null ? null : TenantInfo.Id
+        var predicate = Expression.OrElse(
+            multiTenantDisabled,
+            Expression.OrElse(
+                tenantIdIsNull,
+                Expression.OrElse(
+                    tenantInfoIsNull,
+                    tenantIdEqualsInfo
+                )
+            )
         );
         #endregion
 
