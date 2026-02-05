@@ -1,30 +1,31 @@
-name: Copy docs to website
+name: Copy Docs to Website
 
-on: [workflow_dispatch]
+on:
+    workflow_dispatch:
+    release:
+        types: [published]
+
+permissions:
+  contents: read
 
 jobs:
   checkout-copy-checkin:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Finbuckle.MultiTenant
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.2.0
         with:
-          path: main
-          fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
+          fetch-depth: 0
       - name: Get Current Version
-        id: currentversion
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-        with:
-          workingDirectory: main
-          prefix: v
+        run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV
       - name: Checkout Website
-        uses: actions/checkout@v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.2.0
         with:
           repository: Finbuckle/Website
           token: ${{ secrets.workflow_pat }}
           path: website
       - name: Copy Docs
-        run: mkdir -p website/docs/${{ steps.currentversion.outputs.tag }} && cp main/docs/* website/docs/${{ steps.currentversion.outputs.tag }}
+        run: mkdir -p website/content/docs/${{ env.tag }} && cp docs/* website/content/docs/${{ env.tag }}
       - name: Checkin Website
         working-directory: website
         run: |

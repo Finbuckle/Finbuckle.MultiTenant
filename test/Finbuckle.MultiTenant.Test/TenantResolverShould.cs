@@ -2,9 +2,8 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Events;
-using Finbuckle.MultiTenant.Stores.ConfigurationStore;
-using Finbuckle.MultiTenant.Stores.InMemoryStore;
+using Finbuckle.MultiTenant.Extensions;
+using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,7 +68,7 @@ public class TenantResolverShould
         var sp = services.BuildServiceProvider();
         await sp.GetServices<IMultiTenantStore<TenantInfo>>()
             .Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>))
-            .TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" });
+            .AddAsync(new TenantInfo { Id = "null", Identifier = "null" });
 
         var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
         var result = await resolver.ResolveAsync(new object());
@@ -115,7 +114,7 @@ public class TenantResolverShould
         var sp = services.BuildServiceProvider();
         await sp.GetServices<IMultiTenantStore<TenantInfo>>()
             .Single(i => i.GetType() == typeof(InMemoryStore<TenantInfo>))
-            .TryAddAsync(new TenantInfo { Id = "null", Identifier = "null" });
+            .AddAsync(new TenantInfo { Id = "null", Identifier = "null" });
 
         var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
         var result = await resolver.ResolveAsync(new object());
@@ -126,9 +125,9 @@ public class TenantResolverShould
     }
 
     [Fact]
-    public async Task CallOnTenantResolvedEventIfSuccess()
+    public async Task CallOnTenantResolveCompletedIfSuccess()
     {
-        TenantResolvedContext? resolvedContext = null;
+        TenantResolveCompletedContext<TenantInfo>? resolvedContext = null;
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("ConfigurationStoreTestSettings.json")
@@ -136,8 +135,60 @@ public class TenantResolverShould
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.Configure<MultiTenantOptions>(options =>
-            options.Events.OnTenantResolved = context => Task.FromResult(resolvedContext = context));
+        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+            options.Events.OnTenantResolveCompleted = context => Task.FromResult(resolvedContext = context));
+        services.AddMultiTenant<TenantInfo>()
+            .WithStaticStrategy("initech")
+            .WithConfigurationStore();
+        var sp = services.BuildServiceProvider();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+
+        await resolver.ResolveAsync(new object());
+
+        Assert.NotNull(resolvedContext);
+        Assert.Equal("initech", resolvedContext.MultiTenantContext.TenantInfo!.Identifier);
+        Assert.Equal(typeof(StaticStrategy), resolvedContext.MultiTenantContext.StrategyInfo!.StrategyType);
+        Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.MultiTenantContext.StoreInfo!.StoreType);
+    }
+
+    [Fact]
+    public async Task CallOnTenantResolveCompletedIfFailure()
+    {
+        TenantResolveCompletedContext<TenantInfo>? resolvedContext = null;
+
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("ConfigurationStoreTestSettings.json")
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+            options.Events.OnTenantResolveCompleted = context => Task.FromResult(resolvedContext = context));
+        services.AddMultiTenant<TenantInfo>()
+            .WithDelegateStrategy(_ => Task.FromResult<string?>("not-found"))
+            .WithConfigurationStore();
+        var sp = services.BuildServiceProvider();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+
+        await resolver.ResolveAsync(new object());
+
+        Assert.NotNull(resolvedContext);
+        Assert.False(resolvedContext.IsResolved);
+    }
+
+    [Fact]
+    public async Task CallOnStrategyResolveCompletedPerStrategy()
+    {
+        var numCalls = 0;
+
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("ConfigurationStoreTestSettings.json")
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IConfiguration>(configuration);
+        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+            options.Events.OnStrategyResolveCompleted = _ => Task.FromResult(numCalls++));
         services.AddMultiTenant<TenantInfo>()
             .WithDelegateStrategy(_ => Task.FromResult<string?>("not-found"))
             .WithStaticStrategy("initech")
@@ -147,46 +198,31 @@ public class TenantResolverShould
 
         await resolver.ResolveAsync(new object());
 
-        Assert.NotNull(resolvedContext);
-        Assert.Equal("initech", resolvedContext.TenantInfo!.Identifier);
-        Assert.Equal(typeof(StaticStrategy), resolvedContext.StrategyType);
-        Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.StoreType);
+        Assert.Equal(2, numCalls);
     }
 
     [Fact]
-    public async Task CallOnTenantNotResolvedEventIfNoStrategySuccess()
+    public async Task CallOnStoreResolveCompletedPerStore()
     {
-        TenantNotResolvedContext? notResolvedContext = null;
+        var numCalls = 0;
+
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("ConfigurationStoreTestSettings.json")
+            .Build();
 
         var services = new ServiceCollection();
-        services.Configure<MultiTenantOptions>(options =>
-            options.Events.OnTenantNotResolved = context => Task.FromResult(notResolvedContext = context));
-        services
-            .AddMultiTenant<TenantInfo>()
-            .WithDelegateStrategy(_ => Task.FromResult<string?>(null!));
-        var sp = services.BuildServiceProvider();
-        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
-
-        await resolver.ResolveAsync(new object());
-
-        Assert.NotNull(notResolvedContext);
-    }
-
-    [Fact]
-    public async Task CallOnTenantNotResolvedEventIfNoStoreSuccess()
-    {
-        TenantNotResolvedContext? notResolvedContext = null;
-        var services = new ServiceCollection();
-        services.Configure<MultiTenantOptions>(options =>
-            options.Events.OnTenantNotResolved = context => Task.FromResult(notResolvedContext = context));
+        services.AddSingleton<IConfiguration>(configuration);
+        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+            options.Events.OnStoreResolveCompleted = _ => Task.FromResult(numCalls++));
         services.AddMultiTenant<TenantInfo>()
-            .WithStaticStrategy("not-found")
-            .WithInMemoryStore();
+            .WithStaticStrategy("initech")
+            .WithInMemoryStore()
+            .WithConfigurationStore();
         var sp = services.BuildServiceProvider();
         var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
 
         await resolver.ResolveAsync(new object());
 
-        Assert.NotNull(notResolvedContext);
+        Assert.Equal(2, numCalls);
     }
 }

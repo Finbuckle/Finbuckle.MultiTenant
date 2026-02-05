@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Title>Finbuckle.MultiTenant.Abstractions</Title>
+        <Description>Abstraction library package for Finbuckle.MultiTenant.</Description>
+    </PropertyGroup>
+
+</Project>

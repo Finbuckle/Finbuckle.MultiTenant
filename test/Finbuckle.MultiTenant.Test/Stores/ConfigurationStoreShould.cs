@@ -2,7 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Stores.ConfigurationStore;
+using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.Configuration;
 using Xunit;
 
@@ -13,120 +13,129 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     [Fact]
     public void NotThrowIfNoDefaultSection()
     {
-            // See https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/426
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings_NoDefaults.json");
-            IConfiguration configuration = configBuilder.Build();
+        // See https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/426
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings_NoDefaults.json");
+        IConfiguration configuration = configBuilder.Build();
 
-            // ReSharper disable once ObjectCreationAsStatement
-            // Will throw if fail
-            new ConfigurationStore<TenantInfo>(configuration);
-        }
+        // ReSharper disable once ObjectCreationAsStatement
+        // Will throw if fail
+        new ConfigurationStore<TenantInfo>(configuration);
+    }
 
     [Fact]
     public void ThrowIfNullConfiguration()
     {
-            Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null!));
-        }
+        Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null!));
+    }
 
     [Fact]
     public void ThrowIfEmptyOrNullSection()
     {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            IConfiguration configuration = configBuilder.Build();
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        IConfiguration configuration = configBuilder.Build();
 
-            Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, ""));
-            Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null!));
-        }
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, ""));
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null!));
+    }
 
     [Fact]
     public void ThrowIfInvalidSection()
     {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            IConfiguration configuration = configBuilder.Build();
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        IConfiguration configuration = configBuilder.Build();
 
-            Assert.Throws<MultiTenantException>(() => new ConfigurationStore<TenantInfo>(configuration, "invalid"));
-        }
+        Assert.Throws<MultiTenantException>(() => new ConfigurationStore<TenantInfo>(configuration, "invalid"));
+    }
 
     [Fact]
     public async Task IgnoreCaseWhenGettingTenantInfoFromStoreByIdentifier()
     {
-            var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-            var tenant = await store.TryGetByIdentifierAsync("INITECH");
+        var tenant = await store.GetByIdentifierAsync("INITECH");
 
-            Assert.NotNull(tenant);
-            Assert.Equal("initech", tenant.Identifier);
-        }
+        Assert.NotNull(tenant);
+        Assert.Equal("initech", tenant.Identifier);
+    }
 
     [Fact]
     public async Task ThrowWhenTryingToGetIdentifierGivenNullIdentifier()
     {
-            var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.TryGetByIdentifierAsync(null!));
-        }
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.GetByIdentifierAsync(null!));
+    }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
-            var configuration = configBuilder.Build();
+        var configBuilder = new ConfigurationBuilder();
+        configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
+        var configuration = configBuilder.Build();
 
-            return new ConfigurationStore<TenantInfo>(configuration);
-        }
+        return Task.FromResult<IMultiTenantStore<TenantInfo>>(new ConfigurationStore<TenantInfo>(configuration));
+    }
 
-    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-            throw new NotImplementedException();
-        }
-
-    [Fact]
-    public override void GetTenantInfoFromStoreById()
-    {
-            base.GetTenantInfoFromStoreById();
-        }
+        throw new NotImplementedException();
+    }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreById()
     {
-            base.GetTenantInfoFromStoreByIdentifier();
-        }
+        await base.GetTenantInfoFromStoreById();
+    }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-            base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
-        }
+        await base.GetTenantInfoFromStoreByIdentifier();
+    }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-            base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
-        }
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+    }
+
+    [Fact]
+    public override async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    {
+        await base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+    }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void AddTenantInfoToStore()
+    public override Task AddTenantInfoToStore()
     {
-        }
+        return Task.CompletedTask;
+    }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void RemoveTenantInfoFromStore()
+    public override Task RemoveTenantInfoFromStore()
     {
-        }
+        return Task.CompletedTask;
+    }
 
     // [Fact(Skip = "Not valid for this store.")]
-    public override void UpdateTenantInfoInStore()
+    public override Task UpdateTenantInfoInStore()
     {
-        }
+        return Task.CompletedTask;
+    }
 
     [Fact]
-    public override void GetAllTenantsFromStoreAsync()
+    public override async Task GetAllTenantsFromStoreAsync()
     {
-            base.GetAllTenantsFromStoreAsync();
-        }
+        await base.GetAllTenantsFromStoreAsync();
+    }
+    
+    [Fact]
+    public override async Task GetAllTenantsFromStoreAsyncSkip1Take1()
+    {
+        await base.GetAllTenantsFromStoreAsyncSkip1Take1();
+    }
 }

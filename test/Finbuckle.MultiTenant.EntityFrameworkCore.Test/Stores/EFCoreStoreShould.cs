@@ -1,11 +1,8 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 using Finbuckle.MultiTenant.Test.Stores;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -21,182 +18,175 @@ public class EfCoreStoreShould
     {
         public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
         {
-            }
+        }
     }
 
     private readonly SqliteConnection _connection = new SqliteConnection("DataSource=:memory:");
 
     public void Dispose()
     {
-            _connection.Dispose();
-        }
+        _connection.Dispose();
+    }
 
     private IProperty? GetModelProperty(string propName)
     {
-            _connection.Open();
-            var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
-            var dbContext = new TestEfCoreStoreDbContext(options);
+        _connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
+        var dbContext = new TestEfCoreStoreDbContext(options);
 
-            var model = dbContext.Model.FindEntityType(typeof(TenantInfo));
-            var prop = model?.GetProperties().SingleOrDefault(p => p.Name == propName);
-            return prop;
-        }
+        var model = dbContext.Model.FindEntityType(typeof(TenantInfo));
+        var prop = model?.GetProperties().SingleOrDefault(p => p.Name == propName);
+        return prop;
+    }
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
-            _connection.Open();
-            var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
-            var dbContext = new TestEfCoreStoreDbContext(options);
-            dbContext.Database.EnsureCreated();
+        _connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
+        var dbContext = new TestEfCoreStoreDbContext(options);
+        await dbContext.Database.EnsureCreatedAsync();
 
-            var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
-            return PopulateTestStore(store);
-        }
+        var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
+        return await PopulateTestStore(store);
+    }
 
-    // ReSharper disable once RedundantOverriddenMember
-    protected override IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-            return base.PopulateTestStore(store);
-        }
-
-    [Fact]
-    public void AddTenantIdLengthConstraint()
-    {
-            var prop = GetModelProperty("Id");
-            Assert.Equal(Internal.Constants.TenantIdMaxLength, prop!.GetMaxLength());
-        }
+        return base.PopulateTestStore(store);
+    }
 
     [Fact]
     public void AddTenantIdAsKey()
     {
-            var prop = GetModelProperty("Id");
-            Assert.True(prop!.IsPrimaryKey());
-        }
+        var prop = GetModelProperty("Id");
+        Assert.True(prop!.IsPrimaryKey());
+    }
 
     [Fact]
     public void AddIdentifierUniqueConstraint()
     {
-            var prop = GetModelProperty("Identifier");
-            Assert.True(prop!.IsIndex());
-        }
-        
+        var prop = GetModelProperty("Identifier");
+        Assert.True(prop!.IsIndex());
+    }
+
     [Fact]
     public async Task NotTrackContextOnGet()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = await store.TryGetAsync("initech-id");
-            
-            var entity = store.dbContext.Entry(tenant!);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
-        
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = await store.GetAsync("initech-id");
+
+        var entity = store.dbContext.Entry(tenant!);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
+
     [Fact]
     public async Task NotTrackContextOnGetByIdentifier()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = await store.TryGetByIdentifierAsync("initech");
-            
-            var entity = store.dbContext.Entry(tenant!);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
-        
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = await store.GetByIdentifierAsync("initech");
+
+        var entity = store.dbContext.Entry(tenant!);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
+
     [Fact]
     public async Task NotTrackContextOnGetAll()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = (await store.GetAllAsync()).First();
-            
-            var entity = store.dbContext.Entry(tenant);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
-        
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = (await store.GetAllAsync()).First();
+
+        var entity = store.dbContext.Entry(tenant);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
+
     [Fact]
     public async Task NotTrackContextOnAdd()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = new TenantInfo
-            {
-                Id = "test-id",
-                Identifier = "test-identifier",
-                Name = "test"
-            };
-            await store.TryAddAsync(tenant);
-            
-            var entity = store.dbContext.Entry(tenant);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
-        
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = new TenantInfo { Id = "test-id", Identifier = "test-identifier", Name = "test" };
+        await store.AddAsync(tenant);
+
+        var entity = store.dbContext.Entry(tenant);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
+
     [Fact]
     public async Task NotTrackContextOnUpdate()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = await store.TryGetByIdentifierAsync("initech");
-            tenant!.Name = "new name";
-            await store.TryUpdateAsync(tenant);
-            
-            var entity = store.dbContext.Entry(tenant);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
-        
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = await store.GetByIdentifierAsync("initech");
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
+        await store.UpdateAsync(tenant);
+
+        var entity = store.dbContext.Entry(tenant);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
+
     [Fact]
     public async Task NotTrackContextOnRemove()
     {
-            var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)CreateTestStore();
-            var tenant = await store.TryGetByIdentifierAsync("initech");
-            tenant!.Name = "new name";
-            await store.TryRemoveAsync(tenant.Id!);
-            
-            var entity = store.dbContext.Entry(tenant);
-            Assert.Equal(EntityState.Detached, entity.State);
-        }
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var tenant = await store.GetByIdentifierAsync("initech");
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
+        await store.RemoveAsync(tenant.Id);
+
+        var entity = store.dbContext.Entry(tenant);
+        Assert.Equal(EntityState.Detached, entity.State);
+    }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     [Fact]
-    public override void GetTenantInfoFromStoreById()
+    public override async Task GetTenantInfoFromStoreById()
     {
-            base.GetTenantInfoFromStoreById();
-        }
+        await base.GetTenantInfoFromStoreById();
+    }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
-            base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
-        }
+        await base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+    }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-            base.GetTenantInfoFromStoreByIdentifier();
-        }
+        await base.GetTenantInfoFromStoreByIdentifier();
+    }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-            base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
-        }
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+    }
 
     [Fact]
-    public override void AddTenantInfoToStore()
+    public override async Task AddTenantInfoToStore()
     {
-            base.AddTenantInfoToStore();
-        }
+        await base.AddTenantInfoToStore();
+    }
 
     [Fact]
-    public override void RemoveTenantInfoFromStore()
+    public override async Task RemoveTenantInfoFromStore()
     {
-            base.RemoveTenantInfoFromStore();
-        }
+        await base.RemoveTenantInfoFromStore();
+    }
 
     [Fact]
-    public override void UpdateTenantInfoInStore()
+    public override async Task UpdateTenantInfoInStore()
     {
-            base.UpdateTenantInfoInStore();
-        }
+        await base.UpdateTenantInfoInStore();
+    }
 
     [Fact]
-    public override void GetAllTenantsFromStoreAsync()
+    public override async Task GetAllTenantsFromStoreAsync()
     {
-            base.GetAllTenantsFromStoreAsync();
-        }
+        await base.GetAllTenantsFromStoreAsync();
+    }
+    
+    [Fact]
+    public override async Task GetAllTenantsFromStoreAsyncSkip1Take1()
+    {
+        await base.GetAllTenantsFromStoreAsyncSkip1Take1();
+    }
 }

@@ -1,10 +1,11 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System;
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.AspNetCore.Strategies;
+using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -24,18 +25,12 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void RebaseAspNetCoreBasePathIfOptionTrue()
+    public async Task RebaseAspNetCoreBasePathIfOptionTrue()
     {
-
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo
-            {
-                Id = "base123",
-                Identifier = "base",
-                Name = "base tenant"
-            });
+            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base", Name = "base tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();
@@ -44,27 +39,21 @@ public class BasePathStrategyShould
 
         Assert.Equal("/", httpContext.Request.PathBase);
         Assert.Equal("/base/notBase", httpContext.Request.Path);
-            
+
         // will trigger OnTenantFound event...
-        var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
+        await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
 
         Assert.Equal("/base", httpContext.Request.PathBase);
         Assert.Equal("/notBase", httpContext.Request.Path);
     }
-        
-    [Fact]
-    public async void NotRebaseAspNetCoreBasePathIfOptionFalse()
-    {
 
+    [Fact]
+    public async Task NotRebaseAspNetCoreBasePathIfOptionFalse()
+    {
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo
-            {
-                Id = "base123",
-                Identifier = "base",
-                Name = "base tenant"
-            });
+            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base", Name = "base tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = false);
         var serviceProvider = services.BuildServiceProvider();
@@ -73,9 +62,9 @@ public class BasePathStrategyShould
 
         Assert.Equal("/", httpContext.Request.PathBase);
         Assert.Equal("/base/notBase", httpContext.Request.Path);
-            
+
         // will trigger OnTenantFound event...
-        var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
+        await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
 
         Assert.Equal("/", httpContext.Request.PathBase);
         Assert.Equal("/base/notBase", httpContext.Request.Path);
@@ -87,7 +76,7 @@ public class BasePathStrategyShould
     [InlineData("", null)] // no path
     [InlineData("/", null)] // just trailing slash
     [InlineData("/initech/ignore/ignore", "initech")] // multiple path segments
-    public async void ReturnExpectedIdentifier(string path, string? expected)
+    public async Task ReturnExpectedIdentifier(string path, string? expected)
     {
         var httpContext = CreateHttpContextMock(path);
         var strategy = new BasePathStrategy();
@@ -98,27 +87,21 @@ public class BasePathStrategyShould
     }
 
     [Fact]
-    public async void ThrowIfContextIsNotHttpContext()
+    public async Task ReturnNullIfContextIsNotHttpContext()
     {
-        var context = new Object();
+        var context = new object();
         var strategy = new BasePathStrategy();
 
-        await Assert.ThrowsAsync<MultiTenantException>(() => strategy.GetIdentifierAsync(context));
+        Assert.Null(await strategy.GetIdentifierAsync(context));
     }
 
     [Fact]
-    public async void AppendTenantToExistingBase()
+    public async Task AppendTenantToExistingBase()
     {
-
         var services = new ServiceCollection();
         services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
         {
-            options.Tenants.Add(new TenantInfo
-            {
-                Id = "tenant",
-                Identifier = "tenant",
-                Name = "tenant"
-            });
+            options.Tenants.Add(new TenantInfo { Id = "tenant", Identifier = "tenant", Name = "tenant" });
         });
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();
@@ -129,7 +112,7 @@ public class BasePathStrategyShould
         Assert.Equal("/tenant/path", httpContext.Request.Path);
 
         // will trigger OnTenantFound event...
-        var resolver = await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
+        await serviceProvider.GetRequiredService<ITenantResolver>().ResolveAsync(httpContext);
 
         Assert.Equal("/base/tenant", httpContext.Request.PathBase);
         Assert.Equal("/path", httpContext.Request.Path);

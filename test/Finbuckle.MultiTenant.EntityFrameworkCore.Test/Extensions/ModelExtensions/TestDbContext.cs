@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Diagnostics.CodeAnalysis;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.ModelExtensions;
@@ -14,14 +15,14 @@ public class TestDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-            optionsBuilder.UseSqlite("DataSource=:memory:");
-            base.OnConfiguring(optionsBuilder);
-        }
+        optionsBuilder.UseSqlite("DataSource=:memory:");
+        base.OnConfiguring(optionsBuilder);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
-        }
+        modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+    }
 }
 
 public class MyMultiTenantThing

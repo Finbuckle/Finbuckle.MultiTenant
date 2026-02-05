@@ -14,14 +14,14 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     where TOptions : class
 {
     private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
-    
+
     private readonly ConcurrentDictionary<string, IOptionsMonitorCache<TOptions>> map = new();
 
     /// <summary>
     /// Constructs a new instance of MultiTenantOptionsCache.
     /// </summary>
-    /// <param name="multiTenantContextAccessor"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="multiTenantContextAccessor">The multi-tenant context accessor.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="multiTenantContextAccessor"/> is null.</exception>
     public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
     {
         this.multiTenantContextAccessor = multiTenantContextAccessor ??
@@ -67,10 +67,7 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     /// <returns>The existing or new options instance.</returns>
     public TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
     {
-        if (createOptions == null)
-        {
-            throw new ArgumentNullException(nameof(createOptions));
-        }
+        ArgumentNullException.ThrowIfNull(createOptions);
 
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";

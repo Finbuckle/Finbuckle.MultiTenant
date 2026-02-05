@@ -1,12 +1,15 @@
 {
-  "branches": ["main"],
   "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
+    ["@semantic-release/commit-analyzer", {
+          "preset": "conventionalcommits"
+        }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits"
+    }],
     "@semantic-release/github",
     "@semantic-release/changelog",
     ["@semantic-release/exec", {
-      "prepareCmd": "./release.sh -f private -v ${nextRelease.version} -r \"${nextRelease.notes}\""
+      "prepareCmd": "./release.sh -f private -v ${nextRelease.version} -r '${nextRelease.notes}'"
     }],
     ["@semantic-release/git", {
       "assets": ["src/Directory.Build.props", "*.md", "docs"],

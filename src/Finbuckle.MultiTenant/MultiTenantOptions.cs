@@ -1,15 +1,28 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-// TODO move to options folder/namespace on future major release
-
-using Finbuckle.MultiTenant.Events;
+using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant;
 
-public class MultiTenantOptions
+/// <summary>
+/// Options for multi-tenant resolution.
+/// </summary>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+public class MultiTenantOptions<TTenantInfo> where TTenantInfo : ITenantInfo
 {
-    public Type? TenantInfoType { get; internal set; }
+    /// <summary>
+    /// Gets or sets the type of <see cref="TenantInfo"/> derived.
+    /// </summary>
+    public required Type TenantInfoType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of identifiers that should be ignored during tenant resolution.
+    /// </summary>
     public IList<string> IgnoredIdentifiers { get; set; } = new List<string>();
-    public MultiTenantEvents Events { get; set; } = new ();
+
+    /// <summary>
+    /// Gets or sets the event handlers for tenant resolution.
+    /// </summary>
+    public MultiTenantEvents<TTenantInfo> Events { get; set; } = new();
 }

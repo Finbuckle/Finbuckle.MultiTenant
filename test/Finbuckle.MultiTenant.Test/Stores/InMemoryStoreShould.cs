@@ -2,7 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.Stores.InMemoryStore;
+using Finbuckle.MultiTenant.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Test.Stores;
 
 public class InMemoryStoreShould : MultiTenantStoreTestBase
 {
-    private IMultiTenantStore<TenantInfo> CreateCaseSensitiveTestStore()
+    private async Task<IMultiTenantStore<TenantInfo>> CreateCaseSensitiveTestStore()
     {
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(o => o.IsCaseSensitive = true);
@@ -20,20 +20,10 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
 
         var store = new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>());
 
-        var ti1 = new TenantInfo
-        {
-            Id = "initech",
-            Identifier = "initech",
-            Name = "initech"
-        };
-        var ti2 = new TenantInfo
-        {
-            Id = "lol",
-            Identifier = "lol",
-            Name = "lol"
-        };
-        store.TryAddAsync(ti1).Wait();
-        store.TryAddAsync(ti2).Wait();
+        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
+        var ti2 = new TenantInfo { Id = "lol", Identifier = "lol", Name = "lol" };
+        await store.AddAsync(ti1);
+        await store.AddAsync(ti2);
 
         return store;
     }
@@ -41,49 +31,26 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     [Fact]
     public async Task GetTenantInfoFromStoreCaseInsensitiveByDefault()
     {
-        var store = CreateTestStore();
-        Assert.Equal("initech", (await store.TryGetByIdentifierAsync("iNitEch"))?.Identifier);
+        var store = await CreateTestStore();
+        Assert.Equal("initech", (await store.GetByIdentifierAsync("iNitEch"))?.Identifier);
     }
 
     [Fact]
     public async Task GetTenantInfoFromStoreCaseSensitive()
     {
-        var store = CreateCaseSensitiveTestStore();
-        Assert.Equal("initech", (await store.TryGetByIdentifierAsync("initech"))?.Identifier);
-        Assert.Null(await store.TryGetByIdentifierAsync("iNitEch"));
+        var store = await CreateCaseSensitiveTestStore();
+        Assert.Equal("initech", (await store.GetByIdentifierAsync("initech"))?.Identifier);
+        Assert.Null(await store.GetByIdentifierAsync("iNitEch"));
     }
 
     [Fact]
     public async Task FailIfAddingDuplicateCaseSensitive()
     {
-        var store = CreateCaseSensitiveTestStore();
-        var ti1 = new TenantInfo
-        {
-            Id = "initech",
-            Identifier = "initech",
-            Name = "initech"
-        };
-        var ti2 = new TenantInfo
-        {
-            Id = "iNiTEch",
-            Identifier = "iNiTEch",
-            Name = "Initech"
-        };
-        Assert.False(await store.TryAddAsync(ti1));
-        Assert.True(await store.TryAddAsync(ti2));
-    }
-
-    [Fact]
-    public async Task FailIfAddingWithoutTenantIdentifier()
-    {
-        var store = CreateCaseSensitiveTestStore();
-        var ti = new TenantInfo
-        {
-            Id = "NullTenant",
-            Name = "NullTenant"
-        };
-
-        Assert.False(await store.TryAddAsync(ti));
+        var store = await CreateCaseSensitiveTestStore();
+        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
+        var ti2 = new TenantInfo { Id = "iNiTEch", Identifier = "iNiTEch", Name = "Initech" };
+        Assert.False(await store.AddAsync(ti1));
+        Assert.True(await store.AddAsync(ti2));
     }
 
     [Fact]
@@ -97,7 +64,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         });
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() => new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        Assert.Throws<MultiTenantException>(() =>
+            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
     }
 
     [Theory]
@@ -113,16 +81,17 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo { Id = id, Identifier = identifier, Name = "LOL"});
+            options.Tenants.Add(new TenantInfo { Id = id!, Identifier = identifier!, Name = "LOL" });
         });
         var sp = services.BuildServiceProvider();
 
-        Assert.Throws<MultiTenantException>(() => new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        Assert.Throws<MultiTenantException>(() =>
+            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override IMultiTenantStore<TenantInfo> CreateTestStore()
+    protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
         var optionsMock = new Mock<IOptions<InMemoryStoreOptions<TenantInfo>>>();
         var options = new InMemoryStoreOptions<TenantInfo>
@@ -133,54 +102,54 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         optionsMock.Setup(o => o.Value).Returns(options);
         var store = new InMemoryStore<TenantInfo>(optionsMock.Object);
 
-        return PopulateTestStore(store);
+        return await PopulateTestStore(store);
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreById()
+    public override async Task GetTenantInfoFromStoreById()
     {
-        base.GetTenantInfoFromStoreById();
+        await base.GetTenantInfoFromStoreById();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdIfTenantInfoNotFound();
     }
 
     [Fact]
-    public override void GetTenantInfoFromStoreByIdentifier()
+    public override async Task GetTenantInfoFromStoreByIdentifier()
     {
-        base.GetTenantInfoFromStoreByIdentifier();
+        await base.GetTenantInfoFromStoreByIdentifier();
     }
 
     [Fact]
-    public override void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public override async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-        base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
+        await base.ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound();
     }
 
     [Fact]
-    public override void AddTenantInfoToStore()
+    public override async Task AddTenantInfoToStore()
     {
-        base.AddTenantInfoToStore();
+        await base.AddTenantInfoToStore();
     }
 
     [Fact]
-    public override void RemoveTenantInfoFromStore()
+    public override async Task RemoveTenantInfoFromStore()
     {
-        base.RemoveTenantInfoFromStore();
+        await base.RemoveTenantInfoFromStore();
     }
 
     [Fact]
-    public override void UpdateTenantInfoInStore()
+    public override async Task UpdateTenantInfoInStore()
     {
-        base.UpdateTenantInfoInStore();
+        await base.UpdateTenantInfoInStore();
     }
 
     [Fact]
-    public override void GetAllTenantsFromStoreAsync()
+    public override async Task GetAllTenantsFromStoreAsync()
     {
-        base.GetAllTenantsFromStoreAsync();
+        await base.GetAllTenantsFromStoreAsync();
     }
 }

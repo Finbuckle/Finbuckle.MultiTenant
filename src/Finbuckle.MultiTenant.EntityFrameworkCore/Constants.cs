@@ -8,5 +8,8 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 /// </summary>
 public static class Constants
 {
+    /// <summary>
+    /// The annotation name used to mark entity types as multi-tenant.
+    /// </summary>
     public static readonly string MultiTenantAnnotationName = "Finbuckle:MultiTenant";
 }

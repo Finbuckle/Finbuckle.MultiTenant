@@ -2,24 +2,26 @@ name: NuGet Push Public
 
 on: [workflow_dispatch]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.2.0
+      - uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
         with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore
-        run: dotnet restore
-        
+          dotnet-version: 10
       - name: Create the package
-        run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
-        
-      - name: Publish the package to github
+        run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
+      - name: NuGet login
+        uses: NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544 # v1.1.0
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Publish the package to NuGet.org
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}
-        run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://nuget.pkg.github.com/SirFull/index.json --skip-duplicate
+        run: dotnet nuget push nupkgs/*.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate

@@ -2,4 +2,5 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Runtime.CompilerServices;
-[assembly:InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore.Test")]
+
+[assembly: InternalsVisibleTo("Finbuckle.MultiTenant.EntityFrameworkCore.Test")]

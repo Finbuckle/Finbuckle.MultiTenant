@@ -5,19 +5,30 @@ using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant.Strategies;
 
+/// <summary>
+/// A strategy that always returns a pre-configured tenant identifier.
+/// </summary>
 public class StaticStrategy : IMultiTenantStrategy
 {
+    // internal for testing
+    // ReSharper disable once MemberCanBePrivate.Global
     internal readonly string Identifier;
 
-    public int Priority { get => -1000; }
+    /// <inheritdoc />
+    public int Priority => -1000;
 
+    /// <summary>
+    /// Initializes a new instance of StaticStrategy.
+    /// </summary>
+    /// <param name="identifier">The tenant identifier to return.</param>
     public StaticStrategy(string identifier)
     {
-        this.Identifier = identifier;
+        Identifier = identifier;
     }
 
+    /// <inheritdoc />
     public async Task<string?> GetIdentifierAsync(object context)
     {
-        return await Task.FromResult(Identifier);
+        return await Task.FromResult(Identifier).ConfigureAwait(false);
     }
 }

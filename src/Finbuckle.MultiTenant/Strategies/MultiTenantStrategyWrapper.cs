@@ -6,25 +6,38 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbuckle.MultiTenant.Strategies;
 
+/// <summary>
+/// Multi-tenant strategy decorator that handles exception handling and logging.
+/// </summary>
 public class MultiTenantStrategyWrapper : IMultiTenantStrategy
 {
+    /// <summary>
+    /// Gets the internal <see cref="IMultiTenantStrategy"/> instance.
+    /// </summary>
     public IMultiTenantStrategy Strategy { get; }
 
     private readonly ILogger logger;
 
+    /// <summary>
+    /// Initializes a new instance of MultiTenantStrategyWrapper.
+    /// </summary>
+    /// <param name="strategy">The <see cref="IMultiTenantStrategy"/> instance to wrap.</param>
+    /// <param name="logger">The logger instance.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="strategy"/> or <paramref name="logger"/> is null.</exception>
     public MultiTenantStrategyWrapper(IMultiTenantStrategy strategy, ILogger logger)
     {
-        this.Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
+        Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    /// <inheritdoc />
     public async Task<string?> GetIdentifierAsync(object context)
     {
         string? identifier = null;
 
         try
         {
-            identifier = await Strategy.GetIdentifierAsync(context);
+            identifier = await Strategy.GetIdentifierAsync(context).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -32,7 +45,7 @@ public class MultiTenantStrategyWrapper : IMultiTenantStrategy
             throw new MultiTenantException($"Exception in {Strategy.GetType()}.GetIdentifierAsync.", e);
         }
 
-        if(identifier != null)
+        if (identifier != null)
         {
             if (logger.IsEnabled(LogLevel.Debug))
             {

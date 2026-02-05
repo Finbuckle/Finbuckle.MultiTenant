@@ -1,19 +1,22 @@
 name: Release
 
-on: [workflow_dispatch]
+on: [ workflow_dispatch ]
+
+permissions:
+  contents: write
 
 jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.2.0
+      - uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
         with:
-          node-version: 20
+          dotnet-version: 10
       - name: build and test
         run: |
           dotnet restore
-          dotnet build -c Release --no-restore
+          dotnet build -c Release --no-restore -p:ContinuousIntegrationBuild=true
           dotnet test -c Release --no-build
       - name: setup semantic-release
         run: |

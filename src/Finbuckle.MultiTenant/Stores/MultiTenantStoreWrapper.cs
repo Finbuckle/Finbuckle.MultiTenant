@@ -7,25 +7,26 @@ using Microsoft.Extensions.Logging;
 namespace Finbuckle.MultiTenant.Stores;
 
 /// <summary>
-/// Multitenant store decorator that handles exception handling and logging.
+/// Multi-tenant store decorator that handles exception handling and logging.
 /// </summary>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+    where TTenantInfo : ITenantInfo
 {
     // ReSharper disable once MemberCanBePrivate.Global
     /// <summary>
-    /// The internal IMultiTenantStore instance.
+    /// The internal <see cref="IMultiTenantStore{TTenantInfo}"/> instance.
     /// </summary>
     public IMultiTenantStore<TTenantInfo> Store { get; }
 
     private readonly ILogger _logger;
 
     /// <summary>
-    /// Constructor for MultiTenantStoreWrapper
+    /// Constructor for MultiTenantStoreWrapper.
     /// </summary>
-    /// <param name="store">IMultiTenantStore instance to wrap.</param>
+    /// <param name="store"><see cref="IMultiTenantStore{TTenantInfo}"/> instance to wrap.</param>
     /// <param name="logger">Logger instance.</param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="store"/> or <paramref name="logger"/> is null.</exception>
     public MultiTenantStoreWrapper(IMultiTenantStore<TTenantInfo> store, ILogger logger)
     {
         Store = store ?? throw new ArgumentNullException(nameof(store));
@@ -33,34 +34,31 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id)
     {
-        if (id == null)
-        {
-            throw new ArgumentNullException(nameof(id));
-        }
+        ArgumentNullException.ThrowIfNull(id);
 
-        TTenantInfo? result = null;
+        TTenantInfo? result = default;
 
         try
         {
-            result = await Store.TryGetAsync(id);
+            result = await Store.GetAsync(id).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in TryGetAsync");
+            _logger.LogError(e, $"Exception in {nameof(GetAsync)}");
         }
 
         if (result != null)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("TryGetAsync: Tenant Id \"{TenantId}\" found.", id);
+                _logger.LogDebug($"{nameof(GetAsync)}: Tenant Id \"{{TenantId}}\" found.", id);
             }
         }
         else
         {
-            _logger.LogDebug("TryGetAsync: Unable to find Tenant Id \"{TenantId}\".", id);
+            _logger.LogDebug($"{nameof(GetAsync)}: Unable to find Tenant Id \"{{TenantId}}\".", id);
         }
 
         return result;
@@ -73,40 +71,55 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         try
         {
-            result = await Store.GetAllAsync();
+            result = await Store.GetAllAsync().ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in GetAllAsync");
+            _logger.LogError(e, $"Exception in {nameof(GetAllAsync)}");
         }
 
         return result;
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
     {
-        if (identifier == null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
-
-        TTenantInfo? result = null;
+        IEnumerable<TTenantInfo> result = new List<TTenantInfo>();
 
         try
         {
-            result = await Store.TryGetByIdentifierAsync(identifier);
+            result = await Store.GetAllAsync(take, skip).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in TryGetByIdentifierAsync");
+            _logger.LogError(e, $"Exception in {nameof(GetAllAsync)}");
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    {
+        ArgumentNullException.ThrowIfNull(identifier);
+
+        TTenantInfo? result = default;
+
+        try
+        {
+            result = await Store.GetByIdentifierAsync(identifier).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Exception in {nameof(GetByIdentifierAsync)}");
         }
 
         if (result != null)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("TryGetByIdentifierAsync: Tenant found with identifier \"{TenantIdentifier}\"",
+                _logger.LogDebug(
+                    $"{nameof(GetByIdentifierAsync)}: Tenant found with identifier \"{{TenantIdentifier}}\"",
                     identifier);
             }
         }
@@ -115,7 +128,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
-                    "TryGetByIdentifierAsync: Unable to find Tenant with identifier \"{TenantIdentifier}\"",
+                    $"{nameof(GetByIdentifierAsync)}: Unable to find Tenant with identifier \"{{TenantIdentifier}}\"",
                     identifier);
             }
         }
@@ -124,59 +137,51 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public async Task<bool> AddAsync(TTenantInfo tenantInfo)
     {
         ArgumentNullException.ThrowIfNull(tenantInfo);
-        
-        if (tenantInfo.Id == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Id));
-        }
-
-        if (tenantInfo.Identifier == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Identifier));
-        }
+        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
+        ArgumentNullException.ThrowIfNull(tenantInfo.Identifier);
 
         var result = false;
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing != null)
             {
                 _logger.LogDebug(
-                    "TryAddAsync: Tenant already exists. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
+                    $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                     tenantInfo.Id, tenantInfo.Identifier);
             }
             else
             {
-                existing = await TryGetByIdentifierAsync(tenantInfo.Identifier);
+                existing = await GetByIdentifierAsync(tenantInfo.Identifier).ConfigureAwait(false);
                 if (existing != null)
                 {
                     _logger.LogDebug(
-                        "TryAddAsync: Tenant already exists. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
+                        $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                         tenantInfo.Id, tenantInfo.Identifier);
                 }
                 else
-                    result = await Store.TryAddAsync(tenantInfo);
+                    result = await Store.AddAsync(tenantInfo).ConfigureAwait(false);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in TryAddAsync");
+            _logger.LogError(e, $"Exception in {nameof(AddAsync)}");
         }
 
-        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (result)
         {
-            _logger.LogDebug("TryAddAsync: Tenant added. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
+            _logger.LogDebug(
+                $"{nameof(AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                 tenantInfo.Id, tenantInfo.Identifier);
         }
         else
         {
             _logger.LogDebug(
-                "TryAddAsync: Unable to add Tenant. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
+                $"{nameof(AddAsync)}: Unable to add Tenant. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                 tenantInfo.Id, tenantInfo.Identifier);
         }
 
@@ -184,75 +189,64 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryRemoveAsync(string identifier)
+    public async Task<bool> RemoveAsync(string identifier)
     {
-        if (identifier == null)
-        {
-            throw new ArgumentNullException(nameof(identifier));
-        }
+        ArgumentNullException.ThrowIfNull(identifier);
 
         var result = false;
 
         try
         {
-            result = await Store.TryRemoveAsync(identifier);
+            result = await Store.RemoveAsync(identifier).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in TryRemoveAsync");
+            _logger.LogError(e, $"Exception in {nameof(RemoveAsync)}");
         }
 
-        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (result)
         {
-            _logger.LogDebug("TryRemoveAsync: Tenant Identifier: \"{TenantIdentifier}\" removed", identifier);
+            _logger.LogDebug($"{nameof(RemoveAsync)}: Tenant Identifier: \"{{TenantIdentifier}}\" removed", identifier);
         }
         else
         {
-            _logger.LogDebug("TryRemoveAsync: Unable to remove Tenant Identifier: \"{TenantIdentifier}\"", identifier);
+            _logger.LogDebug($"{nameof(RemoveAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"",
+                identifier);
         }
 
         return result;
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
     {
-        if (tenantInfo == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo));
-        }
-
-        if (tenantInfo.Id == null)
-        {
-            throw new ArgumentNullException(nameof(tenantInfo.Id));
-        }
+        ArgumentNullException.ThrowIfNull(tenantInfo);
+        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
 
         var result = false;
 
         try
         {
-            var existing = await TryGetAsync(tenantInfo.Id);
+            var existing = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing == null)
             {
-                _logger.LogDebug("TryUpdateAsync: Tenant Id: \"{TenantId}\" not found", tenantInfo.Id);
+                _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
             }
             else
-                result = await Store.TryUpdateAsync(tenantInfo);
+                result = await Store.UpdateAsync(tenantInfo).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Exception in TryUpdateAsync");
+            _logger.LogError(e, $"Exception in {nameof(UpdateAsync)}");
         }
 
-        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
         if (result)
         {
-            _logger.LogDebug("TryUpdateAsync: Tenant Id: \"{TenantId}\" updated", tenantInfo.Id);
+            _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" updated", tenantInfo.Id);
         }
         else
         {
-            _logger.LogDebug("TryUpdateAsync: Unable to update Tenant Id: \"{TenantId}\"", tenantInfo.Id);
+            _logger.LogDebug($"{nameof(UpdateAsync)}: Unable to update Tenant Id: \"{{TenantId}}\"", tenantInfo.Id);
         }
 
         return result;

@@ -1,38 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
-    <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
-    <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
+        <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2"/>
 
-  <Choose>
-    <When Condition=" '$(TargetFramework)' == 'net8.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net7.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.0" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net6.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
-      </ItemGroup>
-    </When>
-  </Choose>
+        <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
+    </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Version>7.0.5</Version>
+        <Version>10.0.2</Version>
         <Authors>Finbuckle LLC (Sirfull fork)</Authors>
         <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors (Sirfull fork)</Copyright>
         <PackageIconUrl>https://www.finbuckle.com/images/finbuckle-128x128.png</PackageIconUrl>
@@ -10,13 +10,24 @@
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;entityframework;entityframework-core;efcore</PackageTags>
+        <PackageTags>finbuckle;multitenant;multitenancy;aspnet;aspnetcore;efcore</PackageTags>
         <PackageIcon>finbuckle-128x128.png</PackageIcon>
+        <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>CS1591</NoWarn>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup Label="Analysis rules">
+        <AnalysisLevel>latest-Recommended</AnalysisLevel>
+        <NoWarn>$(NoWarn);CA1848</NoWarn> <!-- For improved performance, use the LoggerMessage delegates -->
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="\"/>
+        <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
+        <None Include="../../NUGET_README.md" Pack="true" PackagePath="/"/>
     </ItemGroup>
 </Project>

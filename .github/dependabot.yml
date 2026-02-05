@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directories:
+      - "/src/Finbuckle.MultiTenant"
+      - "/src/Finbuckle.MultiTenant.Abstractions"
+      - "/src/Finbuckle.MultiTenant.AspNetCore"
+      - "/src/Finbuckle.MultiTenant.EntityFrameworkCore"
+      - "/src/Finbuckle.MultiTenant.Identity.EntityFrameworkCore"
+    schedule:
+      interval: "daily"
+    ignore:
+      - dependency-name: "Microsoft.*"
+        update-types: [ "version-update:semver-major" ]
+    commit-message:
+      prefix: "fix"
+      include: "scope"
+    groups:
+      "microsoft-packages":
+        patterns:
+          - "Microsoft.*"
+  
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      

@@ -1,28 +1,28 @@
 # Per-Tenant Authentication
 
-Finbuckle.MultiTenant provides built-in support for isolating tenant
+MultiTenant provides built-in support for isolating tenant
 authentication. This means that the login session for a given request will only
 be valid for the current tenant. Subsequent requests from the same client, but
 for a different tenant (e.g. a different path when using the route strategy),
 will not leak the previous login session into the tenant. This feature also
 avoids the need to create separate authentication schemes for each tenant.
 
+> Tip: If you explicitly need a unique cookie per tenant (for example so that switching tenants keeps both sessions
+> signed in), see the [other authentication options](#other-authentication-options) section for a per-tenant cookie name
+> example.
+
 Common authentication options are supported per-tenant as discussed below, but
 additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
-See
-the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
-for a demonstration of the features discussed in this topic.
-
-The sections below assume Finbuckle.MultiTenant is installed and configured. See
+The sections below assume MultiTenant is installed and configured. See
 [Getting Started](GettingStarted) for details.
 
 ## Using WithPerTenantAuthentication()
 
 The `WithPerTenantAuthentication()` method can be called after
 `AddMultiTenant<TTenantInfo>()` and uses conventions to configure common authentication
-options based on public properties of the `ITenantInfo` type parameter.
+options based on public properties of the `TenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
 
@@ -32,26 +32,26 @@ The following happens when `WithPerTenantAuthentication()` is called:
   which matches the current requests tenant. Existing validation events are
   preserved.
 
-The following also happens if the `ItenantInfo` implementation has the appropriate property:
+The following also happens if the `TenantInfo` derived class has the appropriate property:
 
 - The default challenge scheme is set to the `ChallengeScheme` property
-  of the `ITenantInfo` implementation.
+  of the `TenantInfo` derived class.
 - 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
-  of the `ITenantInfo` implementation.
+  of the `TenantInfo` derived class.
 - 'LogoutPath' for cookie authentication is set to the `CookieLogoutPath`
-  property of the `ITenantInfo` implementation.
+  property of the `TenantInfo` derived class.
 - 'AccessDeniedPath' for cookie authentication is set to the
-  `CookieAccessDeniedPath` property of the `ITenantInfo` implementation.
+  `CookieAccessDeniedPath` property of the `TenantInfo` derived class.
 - Several internal services are registered to support remote authentication such
   as OAuth 2.0 and OpenID Connect.
 - `Authority` for OpenID connect authentication is set to the
-  `OpenIdConnectAuthority` property of the `ITenantInfo` implementation.
+  `OpenIdConnectAuthority` property of the `TenantInfo` derived class.
 - `ClientId` for OpenID connect authentication is set to the
-  `OpenIdConnectClientId` property of the `ITenantInfo` implementation.
+  `OpenIdConnectClientId` property of the `TenantInfo` derived class.
 - `ClientSecret` for OpenID connect authentication is set to the
-  `OpenIdConnectClientSecret` property of the `ITenantInfo` implementation.
+  `OpenIdConnectClientSecret` property of the `TenantInfo` derived class.
 
-If the `ITenantInfo` implementation lacks one of these properties there is no
+If the `TenantInfo` derived class lacks one of these properties there is no
 impact on the respective authentication property.
 
 The cookie sign-in and validation events ensure that a tenant sign-in does not
@@ -87,7 +87,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        .AddCookie()
        .AddOpenIdConnect();
 
-// add Finbuckle.MultiTenant services
+// add MultiTenant services
 builder.Services.AddMultiTenant<TenantInfo>()
        .WithRouteStrategy()
        .WithConfigurationStore()
@@ -95,7 +95,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 var app = builder.Build();
 
-// add the Finbuckle.MultiTenant middleware
+// add the MultiTenant middleware
 app.UseMultiTenant();
 
 // ...add other middleware
@@ -128,8 +128,8 @@ work.
         "Name": "ACME",
         "ChallengeScheme": "OpenIdConnect",
         "OpenIdConnectAuthority": "https://finbuckle-acme.us.auth0.com",
-        "OpenIdConnectClientId": "2lGONpJBwIqWuN2QDAmBbYGt0k0khwQB",
-        "OpenIdConnectClientSecret": "HWxQfz6U8GvPCSsvfH5U3uv6CzAeQSt8qHrc19_qEvUQhdsaJX9Dp-t9W-5SAj0m"
+        "OpenIdConnectClientId": "<acme-client-id>",
+        "OpenIdConnectClientSecret": "<acme-client-secret>"
       },
       {
         "Id": "4ee609d6da0342e682012232566cff0e",
@@ -137,8 +137,8 @@ work.
         "Name": "Initech",
         "ChallengeScheme": "OpenIdConnect",
         "OpenIdConnectAuthority": "https://finbuckle-initech.us.auth0.com",
-        "OpenIdConnectClientId": "nmPF6VABNmzTISvtYLPenf08ARveQifZ",
-        "OpenIdConnectClientSecret": "WINWtT2WAhWYUOgGHsAPIUV-dAHs1X4qcU6Pv98HBrorlOB5OMKetnsR0Ov0LuVm"
+        "OpenIdConnectClientId": "<initech-client-id>",
+        "OpenIdConnectClientSecret": "<initech-client-secret>"
       }
     ]
   }
@@ -153,8 +153,8 @@ Internally `WithPerTenantAuthentication()` makes use of
 
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
-`ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
-configureations:
+`TenantInfo` derived class and configure the option per-tenant. Any options configured will overwrite earlier
+configurations:
 
 ```csharp 
 builder.Services.AddMultiTenant<TenantInfo>()
@@ -191,11 +191,11 @@ builder.Services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default cookie authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default cookie authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
   {
-    options.Cookie.Name = "SignInCookie-" + tenantInfo.Id;
+    options.Cookie.Name = $"SignInCookie-{tenantInfo.Identifier}";
   });
 ```

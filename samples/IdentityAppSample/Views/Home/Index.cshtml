@@ -1,0 +1,90 @@
+﻿@using Finbuckle.MultiTenant.AspNetCore.Extensions
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
+@inject UserManager<IdentityUser> UserManager;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (Context.GetTenantInfo<AppTenantInfo>() is AppTenantInfo tenant)
+{
+    <div class="row">
+        <dl class="col-3">
+            <dt>Tenant ID</dt>
+            <dd>@tenant.Id</dd>
+            <dt>Identifier</dt>
+            <dd>@tenant.Identifier</dd>
+            <dt>Name</dt>
+            <dd>@tenant.Name</dd>
+            <dt>Tier</dt>
+            <dd>@tenant.Tier</dd>
+        </dl>
+        <div class="col">
+            <h4>Identity User Information</h4>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">UserName</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Default Password</th>
+                    <th scope="col">Signed In?</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in UserManager.Users)
+                {
+                    @if (User.Identity?.Name == user.UserName)
+                    {
+                        <tr class="table-primary">
+                            <td>@user.UserName</td>
+                            <td>@user.Email</td>
+                            <td class="text-muted">P@ssword1</td>
+                            <td>Yes</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>@user.Email</td>
+                            <td class="text-muted">P@ssword1</td>
+                            <td>No</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <h1 class="display-4">Identity Sample Application</h1>
+    <p>This sample demonstrates a multi-tenant ASP.NET Core Identity application built with Finbuckle.MultiTenant.</p>
+    
+    <h4>Features</h4>
+    <ul>
+        <li>
+            <strong>Route Strategy</strong>: Tenants are identified by the route template parameter <code>{__tenant__}</code>.
+        </li>
+        <li>
+            <strong>Configuration Store</strong>: Tenant definitions are stored in <code>appsettings.json</code>.
+        </li>
+        <li>
+            <strong>Per-Tenant Isolation</strong>: Identity uses a single SQLite database, but each tenant's users are completely isolated from other tenants.
+        </li>
+        <li>
+            <strong>Custom Tenant Info</strong>: Extends <code>TenantInfo</code> with the <code>ACustomProperty</code> property.
+        </li>
+        <li>
+            <strong>Pre-populated Users</strong>: Each tenant includes sample users with the default password <strong>P@ssword1</strong>.
+        </li>
+        <li>
+            <strong>User Registration</strong>: New users can register and authenticate under any tenant.
+        </li>
+    </ul>
+    
+    <h4>Usage</h4>
+    <p>Select a tenant from the dropdown in the navigation bar to view tenant-specific information and manage users.</p>
+}

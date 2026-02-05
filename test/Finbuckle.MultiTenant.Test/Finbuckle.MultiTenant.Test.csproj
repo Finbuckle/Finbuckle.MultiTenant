@@ -1,42 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net8.0</TargetFrameworks>
-    <IsPackable>false</IsPackable>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>true</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
-  </ItemGroup>
-  
-  <Choose>
-    <When Condition=" '$(TargetFramework)' == 'net8.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.*" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net7.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="7.0.*" />
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(TargetFramework)' == 'net6.0' ">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.*" />
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="6.0.*" />
-      </ItemGroup>
-    </When>
-  </Choose>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
 
-  <ItemGroup>
-    <None Include="*TestSettings*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+        <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
+
+        <None Include="*TestSettings*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+
+        <PackageReference Update="xunit" Version="2.9.3" />
+
+        <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Update="Moq" Version="4.20.72" />
+
+    </ItemGroup>
 </Project>

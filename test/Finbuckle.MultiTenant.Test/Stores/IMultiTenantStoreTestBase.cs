@@ -8,85 +8,93 @@ using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores;
 
-// TODO convert these to async
-
 public abstract class MultiTenantStoreTestBase
 {
-    protected abstract IMultiTenantStore<TenantInfo> CreateTestStore();
+    protected abstract Task<IMultiTenantStore<TenantInfo>> CreateTestStore();
 
-    protected virtual IMultiTenantStore<TenantInfo> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected virtual async Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-        store.TryAddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech" }).Wait();
-        store.TryAddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc." }).Wait();
+        await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech" });
+        await store.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc." });
 
         return store;
     }
 
     //[Fact]
-    public virtual void GetTenantInfoFromStoreById()
+    public virtual async Task GetTenantInfoFromStoreById()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-        Assert.Equal("initech", store.TryGetAsync("initech-id").Result!.Identifier);
+        Assert.Equal("initech", (await store.GetAsync("initech-id"))!.Identifier);
     }
 
     //[Fact]
-    public virtual void ReturnNullWhenGettingByIdIfTenantInfoNotFound()
+    public virtual async Task ReturnNullWhenGettingByIdIfTenantInfoNotFound()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-        Assert.Null(store.TryGetAsync("fake123").Result);
+        Assert.Null(await store.GetAsync("fake123"));
     }
 
     //[Fact]
-    public virtual void GetTenantInfoFromStoreByIdentifier()
+    public virtual async Task GetTenantInfoFromStoreByIdentifier()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-        Assert.Equal("initech", store.TryGetByIdentifierAsync("initech").Result!.Identifier);
+        Assert.Equal("initech", (await store.GetByIdentifierAsync("initech"))!.Identifier);
     }
 
     //[Fact]
-    public virtual void ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
+    public virtual async Task ReturnNullWhenGettingByIdentifierIfTenantInfoNotFound()
     {
-        var store = CreateTestStore();
-        Assert.Null(store.TryGetByIdentifierAsync("fake123").Result);
+        var store = await CreateTestStore();
+        Assert.Null(await store.GetByIdentifierAsync("fake123"));
     }
 
     //[Fact]
-    public virtual void AddTenantInfoToStore()
+    public virtual async Task AddTenantInfoToStore()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-        Assert.Null(store.TryGetByIdentifierAsync("identifier").Result);
-        Assert.True(store.TryAddAsync(new TenantInfo
-            { Id = "id", Identifier = "identifier", Name = "name" }).Result);
-        Assert.NotNull(store.TryGetByIdentifierAsync("identifier").Result);
+        Assert.Null(await store.GetByIdentifierAsync("identifier"));
+        Assert.True(await store.AddAsync(new TenantInfo { Id = "id", Identifier = "identifier", Name = "name" }));
+        Assert.NotNull(await store.GetByIdentifierAsync("identifier"));
     }
 
     //[Fact]
-    public virtual void UpdateTenantInfoInStore()
+    public virtual async Task UpdateTenantInfoInStore()
     {
-        var store = CreateTestStore();
+        var store = await CreateTestStore();
 
-        var result = store.TryUpdateAsync(new TenantInfo
-            { Id = "initech-id", Identifier = "initech2", Name = "Initech2" }).Result;
+        var result = await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" });
         Assert.True(result);
     }
 
     //[Fact]
-    public virtual void RemoveTenantInfoFromStore()
+    public virtual async Task RemoveTenantInfoFromStore()
     {
-        var store = CreateTestStore();
-        Assert.NotNull(store.TryGetByIdentifierAsync("initech").Result);
-        Assert.True(store.TryRemoveAsync("initech").Result);
-        Assert.Null(store.TryGetByIdentifierAsync("initech").Result);
+        var store = await CreateTestStore();
+        Assert.NotNull(await store.GetByIdentifierAsync("initech"));
+        Assert.True(await store.RemoveAsync("initech"));
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
     }
 
     //[Fact]
-    public virtual void GetAllTenantsFromStoreAsync()
+    public virtual async Task GetAllTenantsFromStoreAsync()
     {
-        var store = CreateTestStore();
-        Assert.Equal(2, store.GetAllAsync().Result.Count());
+        var store = await CreateTestStore();
+        Assert.Equal(2, (await store.GetAllAsync()).Count());
+    }
+
+    //[Fact]
+    public virtual async Task GetAllTenantsFromStoreAsyncSkip1Take1()
+    {
+        var store = await CreateTestStore();
+        var tenants = (await store.GetAllAsync(1, 1)).ToList();
+        Assert.Single(tenants);
+
+        var tenant = tenants.FirstOrDefault();
+        Assert.NotNull(tenant);
+        Assert.Equal("lol", tenant.Identifier);
     }
 }
