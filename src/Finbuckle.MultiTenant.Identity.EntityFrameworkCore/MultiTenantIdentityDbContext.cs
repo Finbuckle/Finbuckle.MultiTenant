@@ -121,6 +121,9 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     /// <inheritdoc />
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
+    /// <inheritdoc />
+    public bool IsMultiTenantEnabled { get; set; } = true;
+
     /// <summary>
     /// Constructs the database context instance and binds to the current tenant.
     /// </summary>
@@ -161,7 +164,10 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     /// <inheritdoc />
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        this.EnforceMultiTenant();
+        if (IsMultiTenantEnabled)
+        {
+            this.EnforceMultiTenant();
+        }
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
@@ -169,7 +175,10 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default(CancellationToken))
     {
-        this.EnforceMultiTenant();
+        if (IsMultiTenantEnabled)
+        {
+            this.EnforceMultiTenant();
+        }
         return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -23,6 +23,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <inheritdoc />
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
+    /// <inheritdoc />
     public bool IsMultiTenantEnabled { get; set; } = true;
 
     /// <summary>

@@ -117,12 +117,6 @@ public static class EntityTypeBuilderExtensions
         );
         #endregion
 
-        // combine with existing filter
-        if (existingQueryFilter != null)
-        {
-            predicate = Expression.AndAlso(existingQueryFilter.Body, predicate);
-        }
-
         // build the final expression tree
         var delegateType = Expression.GetDelegateType(builder.Metadata.ClrType, typeof(bool));
         var lambdaExp = Expression.Lambda(delegateType, predicate, entityParamExp);

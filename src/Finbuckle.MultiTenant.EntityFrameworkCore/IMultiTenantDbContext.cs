@@ -24,5 +24,9 @@ public interface IMultiTenantDbContext
     /// Gets the mode used to handle entities where TenantId is not set.
     /// </summary>
     TenantNotSetMode TenantNotSetMode { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether multi-tenant support is enabled.
+    /// </summary>
     bool IsMultiTenantEnabled { get; }
 }
