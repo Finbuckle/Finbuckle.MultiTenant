@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <Title>Finbuckle.MultiTenant.Abstractions</Title>
+        <Title>Finbuckle.MultiTenant.Abstractions.Sirfull</Title>
         <Description>Abstraction library package for Finbuckle.MultiTenant.</Description>
+        <PackageId>$(AssemblyName).Sirfull</PackageId>
     </PropertyGroup>
 
 </Project>

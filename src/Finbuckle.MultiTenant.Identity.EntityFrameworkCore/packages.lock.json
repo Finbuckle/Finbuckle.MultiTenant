@@ -214,10 +214,20 @@
         "resolved": "10.0.2",
         "contentHash": "QmSiO+oLBEooGgB3i0GRXyeYRDHjllqt3k365jwfZlYWhvSHA3UL2NEVV5m8aZa041eIlblo6KMI5txvTMpTwA=="
       },
-      "finbuckle.multitenant": {
+      "Finbuckle.MultiTenant.Abstractions.Sirfull": {
+        "type": "Project"
+      },
+      "Finbuckle.MultiTenant.EntityFrameworkCore.Sirfull": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[10.0.1, )",
+          "Finbuckle.MultiTenant.Sirfull": "[10.0.2, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.2, )"
+        }
+      },
+      "Finbuckle.MultiTenant.Sirfull": {
+        "type": "Project",
+        "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.0.2, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.0.2, )",
           "Microsoft.Extensions.Configuration": "[10.0.2, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.2, )",
@@ -225,16 +235,6 @@
           "Microsoft.Extensions.Logging": "[10.0.2, )",
           "Microsoft.Extensions.Options": "[10.0.2, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.2, )"
-        }
-      },
-      "finbuckle.multitenant.abstractions": {
-        "type": "Project"
-      },
-      "finbuckle.multitenant.entityframeworkcore": {
-        "type": "Project",
-        "dependencies": {
-          "Finbuckle.MultiTenant": "[10.0.1, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.2, )"
         }
       }
     }

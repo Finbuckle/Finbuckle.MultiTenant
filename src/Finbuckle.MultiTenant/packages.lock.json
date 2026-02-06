@@ -132,7 +132,7 @@
         "resolved": "10.0.2",
         "contentHash": "QmSiO+oLBEooGgB3i0GRXyeYRDHjllqt3k365jwfZlYWhvSHA3UL2NEVV5m8aZa041eIlblo6KMI5txvTMpTwA=="
       },
-      "finbuckle.multitenant.abstractions": {
+      "Finbuckle.MultiTenant.Abstractions.Sirfull": {
         "type": "Project"
       }
     }

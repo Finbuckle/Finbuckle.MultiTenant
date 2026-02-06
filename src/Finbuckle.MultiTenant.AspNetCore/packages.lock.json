@@ -66,14 +66,14 @@
           "Microsoft.IdentityModel.Tokens": "8.0.1"
         }
       },
-      "finbuckle.multitenant": {
+      "Finbuckle.MultiTenant.Abstractions.Sirfull": {
+        "type": "Project"
+      },
+      "Finbuckle.MultiTenant.Sirfull": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[10.0.1, )"
+          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.0.2, )"
         }
-      },
-      "finbuckle.multitenant.abstractions": {
-        "type": "Project"
       }
     }
   }
