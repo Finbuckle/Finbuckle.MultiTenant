@@ -29,9 +29,10 @@ public static class MultiTenantDbContextExtensions
             if (multiTenantDbContext.TenantInfo is null)
                 throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
 
-            #region Fork Sirfull : Permet d'autoriser null pour TenantId
+            #region Fork Sirfull : Permet de gérer '*' pour TenantId
             // Ancien code : args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
-            args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
+            // Si pas de Tenant alors TenantId = '*' pour les entités globales (non multi-tenant)
+            args.Entry.Property("TenantId").CurrentValue ??= (multiTenantDbContext.TenantInfo?.Id != null ? multiTenantDbContext.TenantInfo.Id : '*');
             #endregion
         };
     }
@@ -49,16 +50,18 @@ public static class MultiTenantDbContextExtensions
         var tenantMismatchMode = context.TenantMismatchMode;
         var tenantNotSetMode = context.TenantNotSetMode;
 
-        #region Fork Sirfull : Permet d'autoriser null pour TenantInfo
-        if (tenantInfo is null)
-        {
-            return;
-        }
-        #endregion
+        #region Fork Sirfull : Permet de gérer '*' pour TenantId
+        //var changedMultiTenantEntities = changeTracker.Entries()
+        //    .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
+        //    .Where(e => e.Metadata.IsMultiTenant()).ToList();
 
+        // On ne vérifie pas les entités avec TenantId = '*' car elles sont considérées comme des entités globales (non multi-tenant)
         var changedMultiTenantEntities = changeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
-            .Where(e => e.Metadata.IsMultiTenant()).ToList();
+            .Where(e => e.Metadata.IsMultiTenant())
+            .Where(e => (string?)e.Property("TenantId").CurrentValue != "*")
+            .ToList();
+        #endregion
 
         // ensure tenant context is valid
         if (changedMultiTenantEntities.Count == 0)
