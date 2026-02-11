@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.3"/>
 
         <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
     </ItemGroup>
