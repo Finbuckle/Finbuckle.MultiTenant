@@ -151,20 +151,26 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
         try
         {
             var existing = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
-            if (existing != null && _logger.IsEnabled(LogLevel.Debug))
+            if (existing != null)
             {
-                _logger.LogDebug(
-                    $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
-                    tenantInfo.Id, tenantInfo.Identifier);
-            }
-            else
-            {
-                existing = await GetByIdentifierAsync(tenantInfo.Identifier).ConfigureAwait(false);
-                if (existing != null && _logger.IsEnabled(LogLevel.Debug))
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
                         $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                         tenantInfo.Id, tenantInfo.Identifier);
+                }
+            }
+            else
+            {
+                existing = await GetByIdentifierAsync(tenantInfo.Identifier).ConfigureAwait(false);
+                if (existing != null)
+                {
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug(
+                            $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                            tenantInfo.Id, tenantInfo.Identifier);
+                    }
                 }
                 else
                     result = await Store.AddAsync(tenantInfo).ConfigureAwait(false);
@@ -175,11 +181,14 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             _logger.LogError(e, $"Exception in {nameof(AddAsync)}");
         }
 
-        if (result && _logger.IsEnabled(LogLevel.Debug))
+        if (result)
         {
-            _logger.LogDebug(
-                $"{nameof(AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
-                tenantInfo.Id, tenantInfo.Identifier);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    $"{nameof(AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                    tenantInfo.Id, tenantInfo.Identifier);
+            }
         }
         else
         {
@@ -238,9 +247,12 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
         try
         {
             var existing = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
-            if (existing == null && _logger.IsEnabled(LogLevel.Debug))
+            if (existing == null)
             {
-                _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
+                }
             }
             else
                 result = await Store.UpdateAsync(tenantInfo).ConfigureAwait(false);
