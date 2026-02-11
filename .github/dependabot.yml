@@ -7,6 +7,10 @@ updates:
       - "/src/Finbuckle.MultiTenant.AspNetCore"
       - "/src/Finbuckle.MultiTenant.EntityFrameworkCore"
       - "/src/Finbuckle.MultiTenant.Identity.EntityFrameworkCore"
+      - "/test/Finbuckle.MultiTenant.Test"
+      - "/test/Finbuckle.MultiTenant.AspNetCore.Test"
+      - "/test/Finbuckle.MultiTenant.EntityFrameworkCore.Test"
+      - "/test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test"
     schedule:
       interval: "daily"
     ignore:
@@ -24,4 +28,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-      
