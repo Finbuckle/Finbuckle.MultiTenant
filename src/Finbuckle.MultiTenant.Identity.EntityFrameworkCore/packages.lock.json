@@ -224,7 +224,7 @@
           "Microsoft.Extensions.Http": "[10.0.3, )",
           "Microsoft.Extensions.Logging": "[10.0.3, )",
           "Microsoft.Extensions.Options": "[10.0.3, )",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.2, )"
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.3, )"
         }
       },
       "finbuckle.multitenant.abstractions": {
