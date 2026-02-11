@@ -53,12 +53,12 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug($"{nameof(GetAsync)}: Tenant Id \"{{TenantId}}\" found.", id);
+                _logger.LogDebug(nameof(GetAsync) + ": Tenant Id \"{TenantId}\" found.", id);
             }
         }
         else
         {
-            _logger.LogDebug($"{nameof(GetAsync)}: Unable to find Tenant Id \"{{TenantId}}\".", id);
+            _logger.LogDebug(nameof(GetAsync) + ": Unable to find Tenant Id \"{TenantId}\".", id);
         }
 
         return result;
@@ -119,7 +119,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
-                    $"{nameof(GetByIdentifierAsync)}: Tenant found with identifier \"{{TenantIdentifier}}\"",
+                    nameof(GetByIdentifierAsync) + ": Tenant found with identifier \"{TenantIdentifier}\"",
                     identifier);
             }
         }
@@ -128,7 +128,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
-                    $"{nameof(GetByIdentifierAsync)}: Unable to find Tenant with identifier \"{{TenantIdentifier}}\"",
+                    nameof(GetByIdentifierAsync) + ": Unable to find Tenant with identifier \"{TenantIdentifier}\"",
                     identifier);
             }
         }
@@ -151,7 +151,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             if (existing != null)
             {
                 _logger.LogDebug(
-                    $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                    nameof(AddAsync) + ": Tenant already exists. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
                     tenantInfo.Id, tenantInfo.Identifier);
             }
             else
@@ -160,7 +160,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
                 if (existing != null)
                 {
                     _logger.LogDebug(
-                        $"{nameof(AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                        nameof(AddAsync) + ": Tenant already exists. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
                         tenantInfo.Id, tenantInfo.Identifier);
                 }
                 else
@@ -175,13 +175,13 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
         if (result)
         {
             _logger.LogDebug(
-                $"{nameof(AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                nameof(AddAsync) + ": Tenant added. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
                 tenantInfo.Id, tenantInfo.Identifier);
         }
         else
         {
             _logger.LogDebug(
-                $"{nameof(AddAsync)}: Unable to add Tenant. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                nameof(AddAsync) + ": Unable to add Tenant. Id: \"{TenantId}\", Identifier: \"{TenantIdentifier}\"",
                 tenantInfo.Id, tenantInfo.Identifier);
         }
 
@@ -206,11 +206,11 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         if (result)
         {
-            _logger.LogDebug($"{nameof(RemoveAsync)}: Tenant Identifier: \"{{TenantIdentifier}}\" removed", identifier);
+            _logger.LogDebug(nameof(RemoveAsync) + ": Tenant Identifier: \"{TenantIdentifier}\" removed", identifier);
         }
         else
         {
-            _logger.LogDebug($"{nameof(RemoveAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"",
+            _logger.LogDebug(nameof(RemoveAsync) + ": Unable to remove Tenant Identifier: \"{TenantIdentifier}\"",
                 identifier);
         }
 
@@ -230,7 +230,7 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
             var existing = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
             if (existing == null)
             {
-                _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
+                _logger.LogDebug(nameof(UpdateAsync) + ": Tenant Id: \"{TenantId}\" not found", tenantInfo.Id);
             }
             else
                 result = await Store.UpdateAsync(tenantInfo).ConfigureAwait(false);
@@ -242,11 +242,11 @@ public class MultiTenantStoreWrapper<TTenantInfo> : IMultiTenantStore<TTenantInf
 
         if (result)
         {
-            _logger.LogDebug($"{nameof(UpdateAsync)}: Tenant Id: \"{{TenantId}}\" updated", tenantInfo.Id);
+            _logger.LogDebug(nameof(UpdateAsync) + ": Tenant Id: \"{TenantId}\" updated", tenantInfo.Id);
         }
         else
         {
-            _logger.LogDebug($"{nameof(UpdateAsync)}: Unable to update Tenant Id: \"{{TenantId}}\"", tenantInfo.Id);
+            _logger.LogDebug(nameof(UpdateAsync) + ": Unable to update Tenant Id: \"{TenantId}\"", tenantInfo.Id);
         }
 
         return result;
