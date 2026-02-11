@@ -1,6 +1,12 @@
 # Version History
 
 <!--_history-->
+## [9.4.6](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.5...v9.4.6) (2026-02-11)
+
+### Bug Fixes
+
+* update .NET dependencies to 8.0.24 and 9.0.13 ([#1097](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1097)) ([e2ded82](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e2ded8217621acd4d80b09b357702ab9c78208cc))
+
 ## [9.4.5](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.4...v9.4.5) (2026-01-14)
 
 ### Bug Fixes

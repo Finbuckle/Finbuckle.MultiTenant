@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.5</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.6</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -12,7 +12,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 Table of Contents
 
-1. [What's New in v<span class="_version">9.4.5</span>](#whats-new)
+1. [What's New in v<span class="_version">9.4.6</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -25,15 +25,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">9.4.5</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">9.4.6</span>
 
-> This section only lists release update details specific to v<span class="_version">9.4.5</span>. See
+> This section only lists release update details specific to v<span class="_version">9.4.6</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* update dependencies for .NET 9.0.12 ([#1086](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1086)) ([c297f0d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c297f0d5860a8b2c67a9d160515509615d05cf8c))
+* update .NET dependencies to 8.0.24 and 9.0.13 ([#1097](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1097)) ([e2ded82](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e2ded8217621acd4d80b09b357702ab9c78208cc))
 <!--_release-notes-->
 
 ## Open Source Support

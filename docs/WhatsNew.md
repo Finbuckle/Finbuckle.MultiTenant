@@ -1,12 +1,12 @@
-# What's New in v<span class="_version">9.4.5</span>
+# What's New in v<span class="_version">9.4.6</span>
 
-> This page only lists release update details specific to v<span class="_version">9.4.5</span>. [Release update details for all releases are shown in the history page.](History)
+> This page only lists release update details specific to v<span class="_version">9.4.6</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
-## [9.4.5](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.4...v9.4.5) (2026-01-14)
+## [9.4.6](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v9.4.5...v9.4.6) (2026-02-11)
 
 ### Bug Fixes
 
-* update dependencies for .NET 9.0.12 ([#1086](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1086)) ([c297f0d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c297f0d5860a8b2c67a9d160515509615d05cf8c))
+* update .NET dependencies to 8.0.24 and 9.0.13 ([#1097](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1097)) ([e2ded82](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e2ded8217621acd4d80b09b357702ab9c78208cc))
 
 <!--_release-notes-->
