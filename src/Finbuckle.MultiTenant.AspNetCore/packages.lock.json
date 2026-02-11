@@ -475,8 +475,8 @@
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Direct",
         "requested": "[8.0.*, )",
-        "resolved": "8.0.23",
-        "contentHash": "5+LXkVHU9ohJjZhszcDTwBY2mk9BpDt74mZGHMIrI5VhSfhp1B2WjIoHXcQj/588xJTK1NN+BsLDR2Xff2Xx+g==",
+        "resolved": "8.0.24",
+        "contentHash": "VEiQH7Crdv/qnPMnczDoVtmmEpi0/JrC6G+3X/YxYeowg0QqXfdhTNZJXnFCMA5IX6zYrAVWOK3ArtM18oasUg==",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
         }
