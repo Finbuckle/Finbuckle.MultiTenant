@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.3</span>
 
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.0.2</span>](#whats-new)
+1. [What's New in v<span class="_version">10.0.3</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,18 +31,16 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.0.2</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.0.3</span>
 
-> This section only lists release update details specific to v<span class="_version">10.0.2</span>. See
+> This section only lists release update details specific to v<span class="_version">10.0.3</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* correct store skip take order bug ([#1076](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1076)) ([42a6139](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/42a6139d05f45ed21700b1c71f70b3a0362c3708))
-* re-add ITenantInfo interface ([#1075](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1075)) ([4b4db14](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4b4db1487f012961671dd7969c94ef143dfc7c17))
-* remove the shadow `TenantId` property when calling `IsNotMultiTenant()` ([#1079](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1079)) ([d258b62](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d258b622600e96da160638a7fee7b53d615a7e0e))
-* update dependencies for .NET 10.0.2 ([#1084](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1084)) ([def5e59](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/def5e59d5a577d51b000a7df55c58fef018c1205))
+* add logging level checks to improve perf ([#1095](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1095)) ([78c1cad](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/78c1cad7e1e1659baa704e44bf9289e975cbfebe))
+* Bump the microsoft-packages group with 15 updates ([#1098](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1098)) ([1b96122](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1b96122b89597715ec75d195d304319f443a6109))
 <!--_release-notes-->
 
 ## Open Source Support
