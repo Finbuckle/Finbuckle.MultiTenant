@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.3</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.4</span>
 
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.0.3</span>](#whats-new)
+1. [What's New in v<span class="_version">10.0.4</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,16 +31,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.0.3</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.0.4</span>
 
-> This section only lists release update details specific to v<span class="_version">10.0.3</span>. See
+> This section only lists release update details specific to v<span class="_version">10.0.4</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* add logging level checks to improve perf ([#1095](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1095)) ([78c1cad](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/78c1cad7e1e1659baa704e44bf9289e975cbfebe))
-* Bump the microsoft-packages group with 15 updates ([#1098](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1098)) ([1b96122](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1b96122b89597715ec75d195d304319f443a6109))
+* Bump Microsoft.AspNetCore.Authentication.OpenIdConnect and 15 others ([#1104](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1104)) ([bcaf705](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/bcaf7050df1ee8d8ac170a9802e8a0b8f21dd1be))
 <!--_release-notes-->
 
 ## Open Source Support

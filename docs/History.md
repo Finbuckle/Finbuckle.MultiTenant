@@ -1,6 +1,12 @@
 # Version History
 
 <!--_history-->
+## [10.0.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.3...v10.0.4) (2026-03-12)
+
+### Bug Fixes
+
+* Bump Microsoft.AspNetCore.Authentication.OpenIdConnect and 15 others ([#1104](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1104)) ([bcaf705](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/bcaf7050df1ee8d8ac170a9802e8a0b8f21dd1be))
+
 ## [10.0.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.2...v10.0.3) (2026-02-11)
 
 ### Bug Fixes
