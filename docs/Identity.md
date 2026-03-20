@@ -6,8 +6,8 @@ MultiTenant has support for data isolation with ASP.NET Core Identity when Entit
 used as the backing store. It works similarly to [Data Isolation with Entity Framework Core](EFCore) except Identity
 calls into the database instead of your own code.
 
-See the [multi-tenant Identity sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples)
-for and example of how to use MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate
+See the [multi-tenant Identity sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples)
+for an example of how to use MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate
 tenant Identity data and integrate the Identity UI to work with a route multi-tenant strategy.
 
 ## Configuration

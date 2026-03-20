@@ -132,7 +132,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses the base (i.e. first) path segment to determine the tenant. For example, a request
 to `https://www.example.com/initech` would use `initech` as the identifier when resolving the tenant.
 
-By default the strategy modifies the the ASP.NET Core `PathBase` and `Path` so that the tenant segment is added to the `PathBase` and removed from the `Path`.
+By default the strategy modifies the ASP.NET Core `PathBase` and `Path` so that the tenant segment is added to the `PathBase` and removed from the `Path`.
 This allows subsequent app logic to operate as if the tenant segment was never there. For example, a request to
 `https://mydomain.com/mytenant/mypath` by default has a `PathBase` of `/` and
 a `Path` of `/mytenant/mypath`. This behavior will adjust these values to `/mytenant` and `/mypath`
@@ -157,7 +157,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > - **Relative URLs**: Any relative URLs in your app (e.g. links, form actions) will be affected by the adjusted `PathBase`.
 > - **Tilde slash (`~/`) URLs**: ASP.NET Core's `~/` path resolution uses the `PathBase`, so `~/images/logo.png` will 
 >   resolve to `/mytenant/images/logo.png` instead of `/images/logo.png`. 
-> - **Static File Middleware**: If using the static file middlewware, in these cases it will need to come after
+> - **Static File Middleware**: If using the static file middleware, in these cases it will need to come after
 >   `UseMultiTenant` in your pipeline to serve the files correctly. The template projects use these types of URLs extensively in layouts and views, i.e. for CSS and JavaScript references.
 > 
 > **Recommendations**:
@@ -175,7 +175,7 @@ custom type name can also be used. This strategy uses the default authentication
 but does not go so far as to set `HttpContext.User`. Thus, the ASP.NET Core authentication middleware should still be
 used as normal, and in most use cases should come after `UseMultiTenant`.
 
-Note that this strategy is does not work well with per-tenant cookie names since it must know the cookie name before the
+Note that this strategy does not work well with per-tenant cookie names since it must know the cookie name before the
 tenant is resolved.
 
 Configure by calling `WithClaimStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type

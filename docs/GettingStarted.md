@@ -132,5 +132,3 @@ more details:
 
 A variety of sample projects are available in
 the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
-
-```

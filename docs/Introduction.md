@@ -63,7 +63,6 @@ From the command line clone the git repository, `cd` into the new directory, and
 ```bash
 git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
 cd Finbuckle.MultiTenant
-cd Finbuckle.MultiTenant
 dotnet build
 ```
 
