@@ -1,0 +1,65 @@
+name: Dependabot Clone Legacy
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  check-and-update-dependencies:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [ 8.x, 9.x ]
+    steps:
+      - name: Checkout Finbuckle.MultiTenant
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+
+      - name: Checkout branch for update
+        run: |
+          UPDATE_BRANCH="fix/update-dependencies-${{ matrix.branch }}"
+          if git ls-remote --exit-code --heads origin "$UPDATE_BRANCH" >/dev/null 2>&1; then
+            git checkout -B "$UPDATE_BRANCH" "origin/$UPDATE_BRANCH"
+          else
+            git checkout -b "$UPDATE_BRANCH"
+          fi
+
+      - name: Restore dependencies
+        run: dotnet restore --force-evaluate
+
+      - name: Check for changes in a packages.lock.json
+        id: check-for-changes
+        run: git diff --exit-code src/*/packages.lock.json || echo CHANGED=1 >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: Check if update PR already exists
+        if: env.CHANGED == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh pr list --state open --head "fix/update-dependencies-${{ matrix.branch }}" --base "${{ matrix.branch }}" --json number --jq 'length > 0' | grep -q true; then
+            echo "PR_EXISTS=1" >> $GITHUB_ENV
+          fi
+
+      - name: Push changes if changed
+        if: env.CHANGED == '1'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "fix: update dependencies"
+          git push origin fix/update-dependencies-${{ matrix.branch }}
+
+      - name: Create PR if changed
+        if: env.CHANGED == '1' && env.PR_EXISTS != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create --title "Update dependencies for ${{ matrix.branch }}" --body "This PR updates project dependencies." --head fix/update-dependencies-${{ matrix.branch }} --base ${{ matrix.branch }}
+
+
+
+
