@@ -7,7 +7,7 @@ used as the backing store. It works similarly to [Data Isolation with Entity Fra
 calls into the database instead of your own code.
 
 See the Identity data isolation sample projects
-in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
+in the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for examples on how to
 use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrate how to isolate the tenant Identity data
 and integrate the Identity UI to work with a route multi-tenant strategy.
 
@@ -47,7 +47,7 @@ id.
 
 ## Identity Options
 
-Identity options can be configured for the `IdentityOptions` class as described in (Per-Tenant Options). Any option that
+Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options). Any option that
 internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as described above. If in doubt check the
 Identity source code to be sure.
 
@@ -56,7 +56,7 @@ current tenant, i.e. per-tenant options are not required for this.
 
 ## Authentication
 
-ASP.NET Core Identity cookies for authentication. It uses
+ASP.NET Core Identity uses cookies for authentication. It uses
 a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration),
 but under the hood standard ASP.NET Core authentication is used.
 

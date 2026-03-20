@@ -8,8 +8,8 @@ supports each of these models by associating a connection string with each tenan
 
 ## Separate Databases
 
-If each tenant uses a separate database then add a `ConnectionString` property to the app's `ITenantIxfnfo`
-implementation. and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
+If each tenant uses a separate database then add a `ConnectionString` property to the app's `ITenantInfo`
+implementation and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
 by injecting a `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
 
 ```csharp
@@ -29,7 +29,7 @@ public class MyAppDbContext : DbContext
    public MyAppDbContext(IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor)
    {
        // get the current tenant info at the time of construction
-       TenantInfo = multiTenantContextAccessor.tenantInfo;
+        TenantInfo = multiTenantContextAccessor.MultiTenantContext?.TenantInfo;
    } 
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -48,7 +48,7 @@ its own complexity in operating and maintaining a larger number of database inst
 
 In shared database scenarios it is important to make sure that queries and commands for a tenant do not affect the data
 belonging to other tenants. Finbuckle.MultiTenant handles this automatically and removes the need to sprinkle "where"
-clauses all over an app. Internally a shadow `TenantId` property is added (or and existing is used if already present)
+clauses all over an app. Internally a shadow `TenantId` property is added (or an existing one is used if already present)
 to multi-tenant entity types and managed as the database context is used. It also performs validation and related options for handling
 null or mismatched tenants.
 
@@ -261,7 +261,7 @@ Now whenever this database context is used, it will only set and query records f
 ## Deriving from `MultiTenantDbContext`
 
 This approach is easier but requires inheriting from `MultiTenantDbContext` which may not always be possible if you
-already have a base class. `MultiTenantDbContext` a pre-configured implementation of `IMultiTenantDbContext` with the
+already have a base class. `MultiTenantDbContext` is a pre-configured implementation of `IMultiTenantDbContext` with the
 helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
@@ -272,7 +272,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
 The `MultiTenantDbContext` has two constructors which should be called from any derived database context. Make sure to
-forward the `IMultiTenatContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
+forward the `IMultiTenantContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
 
 ```csharp
 public class BloggingDbContext : MultiTenantDbContext
@@ -287,7 +287,7 @@ public class BloggingDbContext : MultiTenantDbContext
     {
     }
     
-    // these constructors are useful for testing or other use cases where depdenency injection is not used
+    // these constructors are useful for testing or other use cases where dependency injection is not used
     public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
 
     public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
@@ -378,9 +378,9 @@ altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) an
 [TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext`.
 
 > EF Core will require a non-null value when adding an entity that has `TenantId` as a part of the primary key.
-> If the `TenandId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
+> If the `TenantId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
 > Finbuckle.MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension
-> ethod of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
+> method of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
 
 ```csharp
 Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
@@ -388,7 +388,7 @@ Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
 // Add the blog to a db context for a tenant.
 var myTenantInfo = ...;
 var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-myDbContext.Blogs.Add(myBlog));
+myDbContext.Blogs.Add(myBlog);
 myDbContext.SaveChanges();
 
 // Try to add the same blog to a different tenant.
@@ -414,7 +414,7 @@ var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(y
 var yourBlogs = yourDbContext.Blogs.First(); 
 ```
 > The global query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or
-> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute>
+> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute
 > then all results are associated to the same tenant. See [global query filter limitations](https://learn.microsoft.com/en-us/ef/core/querying/filters#limitations)
 > in the EF Core documentation for more details.
 
@@ -442,7 +442,7 @@ This behavior can be altered by changing the values of [TenantMisMatchMode](#ten
 Blog  myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
 var myTenantInfo = ...;
 var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
-myDbContext.Blogs.Add(myBlog));
+myDbContext.Blogs.Add(myBlog);
 myDbContext.SaveChanges();
 
 // Modify and attach the same blog to a different tenant.
@@ -468,8 +468,8 @@ key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `I
 methods for this purpose:
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that
-  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
-  This will also require the use of `EnforceMultiTenantOnTracking` as desbrived below in [EFCore Tracking](#efcore-tracking).
+  this will also impact entities with a dependent foreign key and may add an implicit `TenantId` there as well.
+  This will also require the use of `EnforceMultiTenantOnTracking` as described below in [EFCore Tracking](#efcore-tracking).
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
@@ -480,7 +480,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 ```
 * `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
 * `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
-* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
+* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include the implicit `TenantId`.
 
 ## EF Core Tracking
 

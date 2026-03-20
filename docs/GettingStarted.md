@@ -58,7 +58,7 @@ See [Core Concepts](CoreConcepts) for more information on `ITenantInfo`.
 `.WithHostStrategy()`
 
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
-defaults to the extracting the subdomain as a tenant identifier.
+defaults to extracting the subdomain as a tenant identifier.
 
 See [Strategies](Strategies) for more information.
 
@@ -99,7 +99,7 @@ The type of the `TenantInfo` property depends on the type passed when calling `A
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
 The `ITenantInfo` instance and the typed instance are also available using the
-`IMultiTenantContextAccessor<TTenantinfo>` interface which is available via dependency injection.
+`IMultiTenantContextAccessor<TTenantInfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
