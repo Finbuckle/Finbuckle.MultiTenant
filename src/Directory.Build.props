@@ -18,6 +18,7 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Nullable>enable</Nullable>
         <ImplicitUsings>true</ImplicitUsings>
+        <NoWarn>$(NoWarn);CA1873;CA1874</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Label="Analysis rules">
