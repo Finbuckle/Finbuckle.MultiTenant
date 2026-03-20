@@ -6,9 +6,9 @@ However, there are a few important specifics to be aware of. The items below mak
 ## `ITenantInfo` and `TenantInfo`
 
 A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context an
-app. These instances' type implements `ITenantInfo` which defines properties
+app. The type of these instances implements `ITenantInfo` which defines properties
 for `Id`, `Identifier`, `Name`. When calling `AddMultiTenant<TTenantInfo>` the type passed into the
-type parameter defines the`ITenantInfo` use throughout the library and app.
+type parameter defines the `ITenantInfo` used throughout the library and app.
 
 * `Id` is a unique id for a tenant in the app and should never change.
 * `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for the app (i.e. no
@@ -29,7 +29,7 @@ when needed via the tenant `Id`.
 
 The `MultiTenantContext<TTenantInfo>` contains information about the current tenant.
 
-* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from depdency injection.
+* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from dependency injection.
 * Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
   determined, and from where its information was retrieved.
 * Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`

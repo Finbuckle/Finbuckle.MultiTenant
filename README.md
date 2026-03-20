@@ -129,7 +129,7 @@ if(tenantInfo != null)
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<T>` during configuration.
 If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `ITenantInfo` instance and/or the typed instance are also available directly through dependency injection.
+The `ITenantInfo` instance and/or the typed instance are also available via the `IMultiTenantContextAccessor<TTenantInfo>` interface through dependency injection.
 
 See [Configuration and Usage](https://www.finbuckle.com/MultiTenant/Docs/ConfigurationAndUsage) for more information.
 

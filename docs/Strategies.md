@@ -72,7 +72,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithDelegateStrategy(async context =>
     {
         string? tenantIdentifier = await DoSomethingAsync(context);
-        return tenantIdentifier
+        return tenantIdentifier;
     })...
     
  // or do it without async
@@ -86,9 +86,9 @@ builder.Services.AddMultiTenant<TenantInfo>()
         httpContext.Request.Query.TryGetValue("tenant", out StringValues tenantIdentifier);
         
         if (tenantIdentifier is null)
-            return Task.FromValue<string?>(null);
+            return Task.FromResult<string?>(null);
         
-        return Task.FromValue(tenantIdentifier.ToString());
+        return Task.FromResult(tenantIdentifier.ToString());
     })...
 ```
 
