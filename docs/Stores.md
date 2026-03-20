@@ -29,7 +29,7 @@ after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `St
 dependency
 injection along with any passed parameters to construct the implementation instance. An alternative overload accepts
 a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service
-lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a
+lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime with a
 wrapper providing basic logging and exception handling.
 
 ```csharp
@@ -112,7 +112,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     
 // or use a different configuration path key
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithConfigurationStore("customConfigurationPathKey)...
+    .WithConfigurationStore("customConfigurationPathKey")...
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
@@ -152,7 +152,7 @@ Uses an Entity Framework Core database context as the backing store.
 This store is usually case-sensitive when retrieving tenant information by tenant identifier, depending on the underlying database.
 
 The database context should derive from `EFCoreStoreDbContext`. The code examples below are taken from
-the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/EFCoreStoreSample)
+the [EFCore Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples)
 .
 
 The database context used with the EFCore store must derive from `EFCoreStoreDbContext`, but other entities can be
@@ -192,7 +192,7 @@ Entity Framework Core works with any database context which can offer richer fun
 Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object
 in return.
 
-The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/v6.9.1/samples/ASP.NET%20Core%203/HttpRemoteStoreSample)
+The [Http Remote Store Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples)
 projects demonstrate this store. This store is usually case insensitive when retrieving tenant information by tenant identifier, but the remote server might be more restrictive.
 
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
@@ -215,11 +215,11 @@ of `WithHttpRemoteStore` allows for a lambda function to further configure the i
 ```csharp
 // append the identifier to the provided url
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHttpRemoteStore("https://remoteserver.com/)...
+    .WithHttpRemoteStore("https://remoteserver.com/")...
 
 // or template the identifier into a custom location
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo)...
+    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo")...
 
 // or modify the underlying `HttpClient` with a custom message handler and settings
 builder.Services.AddMultiTenant<TenantInfo>()

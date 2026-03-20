@@ -51,14 +51,14 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used
+Adds and configures an IMultiTenantStrategy to the application. Multiple strategies can be configured and each will be used
 in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
 - `WithBasePathStrategy`
 - `WithClaimStrategy`
 - `WithDelegateStrategy`
-- `WithHeaderStrateg`y
+- `WithHeaderStrategy`
 - `WithHostStrategy`
 - `WithRouteStrategy`
 - `WithSessionStrategy`
@@ -88,7 +88,7 @@ There are several ways an app can see the current tenant:
 
 ### Dependency Injection
 
-* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTeenantInfo>` are available via dependency injection
+* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTenantInfo>` are available via dependency injection
   and behave similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async
   contexts any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the
   post-endpoint processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
@@ -130,7 +130,7 @@ For web apps these convenience methods are also available:
   For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly
   overriding the `TenantInfo` set by the middleware.
 
-  Use this 'HttpContext' extension method to the current tenant to the provided `TenantInfo`. Returns true if
+  Use this `HttpContext` extension method to set the current tenant to the provided `TenantInfo`. Returns true if
   successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will
   be
   resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting

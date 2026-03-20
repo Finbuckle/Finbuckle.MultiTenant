@@ -7,7 +7,7 @@ used as the backing store. It works similarly to [Data Isolation with Entity Fra
 calls into the database instead of your own code.
 
 See the Identity data isolation sample projects in
-the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for examples on how to
+the [GitHub repository](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for examples on how to
 use Finbuckle.MultiTenant with ASP.NET Core Identity. These samples illustrates how to isolate the tenant Identity data
 and integrate the Identity UI to work with a route multi-tenant strategy.
 
@@ -36,7 +36,7 @@ the `UserLogin` entity will have the `TenantId` added to its primary key.
 ## Caveats
 
 Internally Finbuckle.MultiTenant's EFCore functionality relies on a global query filter. Calling the `Find` method on
-an `DBSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multi-tenant.
+a `DbSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multi-tenant.
 
 Due to this limitation the Identity method `UserManager<TUser>.FindByIdAsync` will bypass the filter and search across
 all tenants in the database. The `IdentityUser` class uses a GUID for the user id so there is negligible risk of data
@@ -45,7 +45,7 @@ id.
 
 ## Identity Options
 
-Identity options can be configured for the `IdentityOptions` class as described in (Per-Tenant Options). Any option that
+Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options). Any option that
 internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as described above. If in doubt check the
 Identity source code to be sure.
 

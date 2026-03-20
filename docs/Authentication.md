@@ -12,7 +12,7 @@ additional authentication options can be configured per-tenant using
 [per-tenant options](Options) as needed.
 
 See
-the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples/ASP.NET%20Core%203/PerTenantAuthenticationSample)
+the [Per-Tenant Authentication Sample](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples)
 for a demonstration of the features discussed in this topic.
 
 The sections below assume Finbuckle.MultiTenant is installed and configured. See
@@ -32,7 +32,7 @@ The following happens when `WithPerTenantAuthentication()` is called:
   which matches the current requests tenant. Existing validation events are
   preserved.
 
-The following also happens if the `ItenantInfo` implementation has the appropriate property:
+The following also happens if the `ITenantInfo` implementation has the appropriate property:
 
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `ITenantInfo` implementation.
@@ -154,7 +154,7 @@ Internally `WithPerTenantAuthentication()` makes use of
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
 `ITenantInfo` implementation and configure the option per-tenant. Any options configured will overwrite earlier
-configureations:
+configurations:
 
 ```csharp 
 builder.Services.AddMultiTenant<TenantInfo>()
@@ -163,7 +163,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default JwtBearer authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default JwtBearer authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<JwtBearerOptions, TenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
@@ -191,7 +191,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
         .WithPerTenantAuthentication()
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default cookie authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default cookie authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>

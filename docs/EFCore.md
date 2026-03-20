@@ -3,7 +3,7 @@
 ## Introduction
 
 Data isolation is one of the most important considerations in a multi-tenant app. Whether each tenant has its own
-database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant
+database, a shared database, or a hybrid approach can make a significant difference in app design. Finbuckle.MultiTenant
 supports each of these models by associating a connection string with each tenant.
 
 ## Separate Databases
@@ -29,7 +29,7 @@ public class MyAppDbContext : DbContext
    public MyAppDbContext(IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor)
    {
        // get the current tenant info at the time of construction
-       TenantInfo = multiTenantContextAccessor.tenantInfo;
+       TenantInfo = multiTenantContextAccessor.MultiTenantContext?.TenantInfo;
    } 
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -136,7 +136,7 @@ This approach is more flexible than using the `[MultiTenant]` attribute because 
 have the attribute, e.g. from another assembly.
 
 `IsMultiTenant()` returns an `MultiTenantEntityTypeBuilder` instance which enables further multi-tenant configuration of
-the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes] for
+the entity type via `AdjustKey`,`AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes](#keys-and-indexes) for
 more details.
 
 ## Existing Query Filters
@@ -237,7 +237,7 @@ Now, whenever this database context is used it will only set and query records f
 
 ## Deriving from `MultiTenantDbContext`
 
-This approach is easier bit requires inheriting from `MultiTenantDbContext` which may not always be possible. It is
+This approach is easier but requires inheriting from `MultiTenantDbContext` which may not always be possible. It is
 simply a pre-configured implementation of `IMultiTenantDbContext` with the helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
@@ -248,7 +248,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
 The `MultiTenantDbContext` has two constructors which should be called from any derived database context. Make sure to
-forward the `IMultiTenatContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
+forward the `IMultiTenantContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
 Variants of these constructors that pass `ITenantInfo` to the base constructor are also available, but these will not be
 used for dependency injection.
 
@@ -325,9 +325,9 @@ different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` 
 
 ```csharp
 // Add a blog for a tenant.
-Blog  myBlog = new Blog{ Title = "My Blog" };;
+Blog  myBlog = new Blog{ Title = "My Blog" };
 var db = new BloggingDbContext(myTenantInfo, null);
-db.Blogs.Add(myBlog));
+db.Blogs.Add(myBlog);
 db.SaveChanges();
 
 
@@ -372,7 +372,7 @@ associated with a different `TenantInfo` then a `MultiTenantException` is thrown
 // Add a blog for a tenant.
 Blog  myBlog = new Blog{ Title = "My Blog" };
 var db = new BloggingDbContext(myTenantInfo);
-db.Blogs.Add(myBlog));
+db.Blogs.Add(myBlog);
 db.SaveChanges();
 
 // Modify and attach the same blog to a different tenant.
@@ -395,7 +395,7 @@ methods for this purpose:
   this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well.
 * `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
 * `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
-* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
+* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include the implicit `TenantId`.
 
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
