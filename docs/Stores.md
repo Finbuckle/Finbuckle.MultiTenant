@@ -78,7 +78,7 @@ support if needed when iterating through a large number of tenants or retrieving
 > NuGet package: Finbuckle.MultiTenant
 
 Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store. See the
-[web api sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for an example of 
+[web api sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for an example of 
 using the in-memory store.
 
 Configure by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. By default, the store is empty and the
@@ -108,7 +108,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses an
 app's [configuration](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) as
 the underlying store. See
-the [multi-tenant Identity sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/master/samples) for
+the [multi-tenant Identity sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for
 an example of using this store with `appsettings.json`.
 
 This store is case-insensitive when retrieving tenant information by tenant identifier.
@@ -129,7 +129,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     
 // or use a different configuration path key
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithConfigurationStore("customConfigurationPathKey)...
+    .WithConfigurationStore("customConfigurationPathKey")...
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
@@ -215,11 +215,11 @@ of `WithHttpRemoteStore` allows for a lambda function to further configure the i
 ```csharp
 // append the identifier to the provided url
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHttpRemoteStore("https://remoteserver.com/)...
+    .WithHttpRemoteStore("https://remoteserver.com/")...
 
 // or template the identifier into a custom location
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo)...
+    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo")...
 
 // or modify the underlying `HttpClient` with a custom message handler and settings
 builder.Services.AddMultiTenant<TenantInfo>()
@@ -247,7 +247,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > NuGet package: Finbuckle.MultiTenant
 
 Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/performance/caching/distributed)
-mechanism. The distributed cache can use Redis, SQl Server, NCache, or an in-memory (for testing purposes)
+mechanism. The distributed cache can use Redis, SQL Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported. The store does not interact with any other stores by default.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using

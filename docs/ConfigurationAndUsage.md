@@ -43,11 +43,11 @@ Adds and configures an IMultiTenantStore for your app. Only the last store confi
 See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
-- `WithInMemoryStore<TTenantStore>`
-- `WithConfigurationStore<TTenantStore>`
-- `WithEFCoreStore<TTenantStore>`
-- `WithDistributedCacheStore<TTenantStore>`
-- `WithHttpRemoteStore<TTenantStore>`
+- `WithInMemoryStore`
+- `WithConfigurationStore`
+- `WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>`
+- `WithDistributedCacheStore`
+- `WithHttpRemoteStore`
 
 ### WithStrategy Variants
 
@@ -161,12 +161,12 @@ public class DashboardController : Controller
 ### Short Circuiting
 
 The `MultiTenantMiddleware` can be configured to short circuit a request pipeline when no tenant is found or when some
-custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo()` and `ShortCircuitWhen<TTenantInfo>()` as
+custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` and `ShortCircuitWhen<TTenantInfo>()` as
 shown below will configure this behavior as necessary.
 
 #### Short Circuit When Tenant Not resolved
 
-Call `ShortCircuitWhenTenantNotResolved<TTenantInfo()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
+Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
 the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
 tenant was found.
 
@@ -259,7 +259,7 @@ For web apps these convenience methods are also available:
   For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly overriding
   the `TenantInfo` set by the middleware.
 
-  Use this 'HttpContext' extension method to set the current tenant to the provided `TenantInfo`.
+  Use this `HttpContext` extension method to set the current tenant to the provided `TenantInfo`.
   Optionally it can also reset the service provider scope so that any scoped services already resolved will
   be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting
   the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the

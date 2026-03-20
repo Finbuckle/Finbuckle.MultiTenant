@@ -3,7 +3,7 @@
 ## Introduction
 
 Data isolation is one of the most important considerations in a multi-tenant app. Whether each tenant has its own
-database, a shared database, or a hybrid approach can make a significant different in app design. MultiTenant
+database, a shared database, or a hybrid approach can make a significant difference in app design. MultiTenant
 supports each of these models by associating a connection string with each tenant.
 
 ## Separate Databases
@@ -277,7 +277,7 @@ dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
 The `MultiTenantDbContext` has two constructors which should be called from any derived database context. Make sure to
-forward the `IMultiTenatContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
+forward the `IMultiTenantContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
 
 ```csharp
 public class BloggingDbContext : MultiTenantDbContext
@@ -292,7 +292,7 @@ public class BloggingDbContext : MultiTenantDbContext
     {
     }
     
-    // these constructors are useful for testing or other use cases where depdenency injection is not used
+    // these constructors are useful for testing or other use cases where dependency injection is not used
     public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
 
     public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
@@ -383,7 +383,7 @@ altered by changing the values of [TenantMisMatchMode](#tenant-mismatch-mode) an
 [TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext`.
 
 > EF Core will require a non-null value when adding an entity that has `TenantId` as a part of the primary key.
-> If the `TenandId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
+> If the `TenantId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
 > MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension 
 > method of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
 
@@ -419,7 +419,7 @@ var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(y
 var yourBlogs = yourDbContext.Blogs.First(); 
 ```
 > The global query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or
-> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute> 
+> `ThenInclude` are not filtered, but if all entity classes involved in a query have the `[MultiTenant]` attribute
 > then all results are associated to the same tenant. See [global query filter limitations](https://learn.microsoft.com/en-us/ef/core/querying/filters#limitations)
 > in the EF Core documentation for more details.
 
@@ -474,8 +474,8 @@ key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `I
 methods for this purpose:
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that
-  this will also impact entities with a dependent foreign key and may add an implicit `Tenant Id` there as well. 
-  This will also require the use of `EnforceMultiTenantOnTracking` as desbrived below in [EFCore Tracking](#efcore-tracking).
+  this will also impact entities with a dependent foreign key and may add an implicit `TenantId` there as well. 
+  This will also require the use of `EnforceMultiTenantOnTracking` as described below in [EFCore Tracking](#efcore-tracking).
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
@@ -486,7 +486,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 ```
 * `AdjustIndex(IMutableIndex)` - Alters an existing index include the implicit `TenantId`.
 * `AdjustIndexes()` - Alters all existing indexes to include the implicit `TenantId`.
-* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include te implicit `TenantId`.
+* `AdjustUniqueIndexes()` - Alters only all existing unique indexes to include the implicit `TenantId`.
 
 ## EF Core Tracking
 

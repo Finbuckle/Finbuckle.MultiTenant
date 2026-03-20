@@ -160,10 +160,10 @@ configurations:
 builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
-        .WithPerTenantAuthentication()
+        .WithPerTenantAuthentication();
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default JwtBearer authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default JwtBearer authentication scheme is used for the options name per AspNetCore defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<JwtBearerOptions, TenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
@@ -171,7 +171,7 @@ tenantInfo) =>
     {
         // assume tenants are configured with an authority string to use here.
         options.Authority = tenantInfo.JwtAuthority;
-    }
+    });
 ```
 
 The same approach can be used for cookie, OpenID Connect, or any other
@@ -188,7 +188,7 @@ agent because new sign-ins are not replacing the existing cookie:
 builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
-        .WithPerTenantAuthentication()
+        .WithPerTenantAuthentication();
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
 // Note the default cookie authentication scheme is used for the options name per AspNetCore defaults,
