@@ -84,9 +84,9 @@ builder.Services.AddMultiTenant<TenantInfo>()
         httpContext.Request.Query.TryGetValue("tenant", out StringValues tenantIdentifier);
         
         if (tenantIdentifier is null)
-            return Task.FromValue<string?>(null);
+            return Task.FromResult<string?>(null);
         
-        return Task.FromValue(tenantIdentifier.ToString());
+        return Task.FromResult(tenantIdentifier.ToString());
     })...
 ```
 
@@ -95,7 +95,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
 Uses a delegate that takes an `HttpContext` parameter to determine the tenant identifier. When used with the ASP.NET
-Core middleware each request's`HttpConeext` is passed to the strategy. This strategy can be used multiple times and will
+Core middleware each request's `HttpContext` is passed to the strategy. This strategy can be used multiple times and will
 run in the order configured. Tenant resolution will ignore this strategy if the context is not of the correct type.
 
 Configure by calling `WithHttpContextStrategy` after `AddMultiTenant<TTenantInfo>`:

@@ -9,7 +9,7 @@ implementing `IMultiTenantStore`.
 
 ## Custom ITenantInfo Support
 
-MultiTenant stores support custom `ITenantInfo` implementations. but complex implementations may require special
+MultiTenant stores support custom `ITenantInfo` implementations, but complex implementations may require special
 handling. For best results ensure the class works well with the underlying store approach--e.g. that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
@@ -29,7 +29,7 @@ after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `St
 dependency
 injection along with any passed parameters to construct the implementation instance. An alternative overload accepts
 a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service
-lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime ith a
+lifetime when registering. The library internally decorates any `IMultiTenantStore<TTenantInfo>` at runtime with a
 wrapper providing basic logging and exception handling.
 
 ```csharp
@@ -53,7 +53,7 @@ store to be checked multiple times during tenant resolution.
 MultiTenant stores are registered in the dependency injection system under the
 `IMultiTenantStore<TenantInfo>` service type.
 
-If multiple stores are registered a specific one can be retrieving an
+If multiple stores are registered a specific one can be retrieved by getting an
 `IEnumerable<IMultiTenantStore<TenantInfo>>` and filtering to the specific implementation type:
 
 ## Getting All Tenants from Store
@@ -115,7 +115,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     
 // or use a different configuration path key
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithConfigurationStore("customConfigurationPathKey)...
+    .WithConfigurationStore("customConfigurationPathKey")...
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be

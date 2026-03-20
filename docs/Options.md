@@ -1,7 +1,7 @@
 # Per-Tenant Options
 
 Finbuckle.MultiTenant is designed to emphasize using per-tenant options in an app to drive per-tenant behavior. This
-approach allows app logic to be written having to add tenant-dependent or tenant-specific logic to the code.
+approach allows app logic to be written without having to add tenant-dependent or tenant-specific logic to the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -72,7 +72,7 @@ public MyController : Controller
 }
 
 // or with a service provider
-httpContext.RequestServices.GetServices<IOptionsSnaption<MyOptions>();
+httpContext.RequestServices.GetService<IOptionsSnapshot<MyOptions>>();
 ```
 
 With standard options each tenant would get see the same exact options.

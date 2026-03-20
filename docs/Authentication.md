@@ -28,7 +28,7 @@ The following happens when `WithPerTenantAuthentication()` is called:
   which matches the current requests tenant. Existing validation events are
   preserved.
 
-The following also happens if the `ItenantInfo` implementation has the appropriate property:
+The following also happens if the `ITenantInfo` implementation has the appropriate property:
 
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `ITenantInfo` implementation.
@@ -156,10 +156,10 @@ configurations:
 builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
-        .WithPerTenantAuthentication()
+        .WithPerTenantAuthentication();
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default JwtBearer authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default JwtBearer authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<JwtBearerOptions, TenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
@@ -184,10 +184,10 @@ agent because new sign-ins are not replacing the existing cookie:
 builder.Services.AddMultiTenant<TenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
-        .WithPerTenantAuthentication()
+        .WithPerTenantAuthentication();
 
 // WithPerTenantAuthentication, as shown above, is needed for this to work as intended.
-// Note the default cookie authentication scheme is used for the options name per AspNetCore defauls,
+// Note the default cookie authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
 builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>

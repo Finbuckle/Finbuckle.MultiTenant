@@ -51,7 +51,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an IMultiTenantStore to the application. Multiple strategies can be configured and each will be used
+Adds and configures an `IMultiTenantStrategy` to the application. Multiple strategies can be configured and each will be used
 in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
@@ -72,7 +72,7 @@ Configures support for per-tenant authentication. See [Per-Tenant Authentication
 
 ## Per-Tenant Options
 
-Finbuckle.MultiTenant id designed to integrate with the
+Finbuckle.MultiTenant is designed to integrate with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also
 the [ASP.NET Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)) and
 lets apps customize options distinctly for each tenant. See [Per-Tenant Options](Options) for more details.
@@ -111,7 +111,7 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
 
 ## ASP.NET Core Features
 
-Some additional features are avaiable to tailor the middleware to your specific needs.
+Some additional features are available to tailor the middleware to your specific needs.
 
 ### Exclude Endpoints From Tenant Resolution
 
@@ -159,12 +159,12 @@ public class DashboardController : Controller
 ### Short Circuiting
 
 The `MultiTenantMiddleware` can be configured to short circuit a request pipeline when no tenant is found or when some
-custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo()` and `ShortCircuitWhen<TTenantInfo>()` as
+custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` and `ShortCircuitWhen<TTenantInfo>()` as
 shown below will configure this behavior as necessary.
 
-#### Short Circuit When Tenant Not resolved
+#### Short Circuit When Tenant Not Resolved
 
-Call `ShortCircuitWhenTenantNotResolved<TTenantInfo()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
+Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
 the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
 tenant was found.
 
@@ -217,7 +217,7 @@ There are several ways an app can see the current tenant:
 
 ### Dependency Injection
 
-* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTeenantInfo>` are available via dependency injection
+* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTenantInfo>` are available via dependency injection
   and behave similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async
   contexts any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the
   post-endpoint processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
