@@ -12,7 +12,7 @@
 
         <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.Identity.EntityFrameworkCore\Finbuckle.MultiTenant.Identity.EntityFrameworkCore.csproj"/>
 
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.4.0" />
 
         <PackageReference Update="xunit" Version="2.9.3" />
 

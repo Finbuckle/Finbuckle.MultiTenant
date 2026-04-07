@@ -12,7 +12,7 @@
 
         <ProjectReference Include="../../src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj"/>
         <ProjectReference Include="../Finbuckle.MultiTenant.Test/Finbuckle.MultiTenant.Test.csproj"/>
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.4.0" />
         <PackageReference Update="xunit" Version="2.9.3" />
         <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5">
           <PrivateAssets>all</PrivateAssets>
