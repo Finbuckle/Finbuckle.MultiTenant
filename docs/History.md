@@ -1,6 +1,12 @@
 # Version History
 
 <!--_history-->
+## [10.0.5](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.4...v10.0.5) (2026-04-15)
+
+### Bug Fixes
+
+* Bump the microsoft-packages group with 15 updates ([#1112](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1112)) ([603ffc0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/603ffc01538a098221ae4c360d25ef3c49df8150))
+
 ## [10.0.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.3...v10.0.4) (2026-03-12)
 
 ### Bug Fixes
