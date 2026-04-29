@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.0.6</span>](#whats-new)
+1. [What's New in v<span class="_version">10.0.7</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,15 +31,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.0.6</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.0.7</span>
 
-> This section only lists release update details specific to v<span class="_version">10.0.6</span>. See
+> This section only lists release update details specific to v<span class="_version">10.0.7</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* Bump the microsoft-packages group with 15 updates ([#1115](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1115)) ([02a2415](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/02a2415728b702ffd1bff3bd81942605a92f7b04))
+* update to 10.0.7 for version alignment with .NET ([#1120](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1120)) ([3a470ed](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3a470ed624844a1ca2dc6607efc456de81bb9026))
 <!--_release-notes-->
 
 ## Open Source Support
