@@ -2,11 +2,10 @@
 # This script is intended for use with semantic-release prepare step with
 # the exec plugin.
 
-while getopts v:r:f: flag
+while getopts v:f: flag
 do
     case "${flag}" in
         v) version=${OPTARG};;
-        r) release_notes=${OPTARG};;
         f) feed_type=${OPTARG};;
     esac
 done
@@ -19,6 +18,14 @@ sed -E -i 's|<span class="_version">.*</span>|<span class="_version">'"${version
 
 # Set text to display whether the release is public feed or private feed:
 sed -E -i 's|<span class="_release-feed-type">.*</span>|<span class="_release-feed-type">'"${feed_type}"'</span>|g' README.md docs/*.md
+
+# Extract the release notes for this version from the changelog:
+escaped_version=$(printf '%s' "${version}" | sed 's/\./\\./g')
+release_notes=$(perl -0777 -ne 'if (/(## \['"${escaped_version}"'\].*?)(?=## \[|\z)/s) { print $1 }' CHANGELOG.md)
+if [ -z "${release_notes}" ]; then
+    echo "Error: could not extract release notes for version ${version} from CHANGELOG.md" >&2
+    exit 1
+fi
 
 # Set text wherever release notes are needed in docs:
 perl -i -0777 -pe 's|<!--_release-notes-->.*<!--_release-notes-->|<!--_release-notes-->\n'"${release_notes}"'\n<!--_release-notes-->|s' docs/*.md
