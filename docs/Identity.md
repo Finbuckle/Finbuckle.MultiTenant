@@ -59,21 +59,30 @@ services.Configure<IdentityOptions>(o =>
 No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext` will detect the schema version
 and configure passkey entities accordingly.
 
-## Caveats
+## Global Query Filters and Find/FindAsync
 
-Internally MultiTenant's EFCore functionality relies on a global query filter. Calling the `Find` method on
-an `DBSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multi-tenant.
+In EF Core 5.0 and later, `DbSet.Find()` and `FindAsync()` **do not bypass** global query filters.
 
-Due to this limitation the Identity method `UserManager<TUser>.FindByIdAsync` will bypass the filter and search across
-all tenants in the database. The `IdentityUser` class uses a GUID for the user id so there is negligible risk of data
-spillover, however a different implementation of `IdentityUser<TKey>` will need to ensure global uniqueness for the user
-id.
+Earlier EF Core versions (<5.0) executed unfiltered primary-key lookups when using `Find`, which could bypass tenant or soft-delete filters. This behavior changed in EF Core 5.0, and `Find` now uses the same query pipeline as LINQ, respecting all configured global query filters.
+
+As a result:
+- Finbuckle's tenant isolation via global query filters is enforced
+- `Find()` and `FindAsync()` are safe in multi-tenant scenarios
+- ASP.NET Core Identity queries are tenant-isolated by default
+
+To bypass filters explicitly, use `IgnoreQueryFilters()` in a LINQ query.
+
+> Note: If an entity is already tracked by the DbContext, `Find` will return the tracked instance regardless of filters, consistent with EF Core’s change tracking behavior.
+
+## Identity and Tenant Isolation
+
+ASP.NET Core Identity does not use `DbSet.Find()` internally. Identity queries (e.g. `FindByIdAsync`) are executed via LINQ and therefore always respect Finbuckle's tenant query filters.
+
+No additional configuration is required to ensure tenant isolation for Identity entities.
 
 ## Identity Options
 
-Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options). Any option that
-internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as described above. If in doubt check the
-Identity source code to be sure.
+Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options).
 
 The Identity option to require a unique email address per user will require email addresses be unique only within the
 current tenant, i.e. per-tenant options are not required for this.
