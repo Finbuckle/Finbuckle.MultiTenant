@@ -59,27 +59,6 @@ services.Configure<IdentityOptions>(o =>
 No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext` will detect the schema version
 and configure passkey entities accordingly.
 
-## Global Query Filters and Find/FindAsync
-
-In EF Core 5.0 and later, `DbSet.Find()` and `FindAsync()` **do not bypass** global query filters.
-
-Earlier EF Core versions (<5.0) executed unfiltered primary-key lookups when using `Find`, which could bypass tenant or soft-delete filters. This behavior changed in EF Core 5.0, and `Find` now uses the same query pipeline as LINQ, respecting all configured global query filters.
-
-As a result:
-- Finbuckle's tenant isolation via global query filters is enforced
-- `Find()` and `FindAsync()` are safe in multi-tenant scenarios
-- ASP.NET Core Identity queries are tenant-isolated by default
-
-To bypass filters explicitly, use `IgnoreQueryFilters()` in a LINQ query.
-
-> Note: If an entity is already tracked by the DbContext, `Find` will return the tracked instance regardless of filters, consistent with EF Core’s change tracking behavior.
-
-## Identity and Tenant Isolation
-
-ASP.NET Core Identity does not use `DbSet.Find()` internally. Identity queries (e.g. `FindByIdAsync`) are executed via LINQ and therefore always respect Finbuckle's tenant query filters.
-
-No additional configuration is required to ensure tenant isolation for Identity entities.
-
 ## Identity Options
 
 Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options).
