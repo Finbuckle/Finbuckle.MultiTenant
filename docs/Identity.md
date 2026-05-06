@@ -59,21 +59,9 @@ services.Configure<IdentityOptions>(o =>
 No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext` will detect the schema version
 and configure passkey entities accordingly.
 
-## Caveats
-
-Internally MultiTenant's EFCore functionality relies on a global query filter. Calling the `Find` method on
-an `DBSet<T>` bypasses this filter thus any place Identity uses this method internally is not filtered by multi-tenant.
-
-Due to this limitation the Identity method `UserManager<TUser>.FindByIdAsync` will bypass the filter and search across
-all tenants in the database. The `IdentityUser` class uses a GUID for the user id so there is negligible risk of data
-spillover, however a different implementation of `IdentityUser<TKey>` will need to ensure global uniqueness for the user
-id.
-
 ## Identity Options
 
-Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options). Any option that
-internally relies on `UserManager<TUser>.FindByIdAsync` may be problematic as described above. If in doubt check the
-Identity source code to be sure.
+Identity options can be configured for the `IdentityOptions` class as described in [Per-Tenant Options](Options).
 
 The Identity option to require a unique email address per user will require email addresses be unique only within the
 current tenant, i.e. per-tenant options are not required for this.
