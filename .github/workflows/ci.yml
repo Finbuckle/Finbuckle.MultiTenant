@@ -22,7 +22,7 @@ jobs:
         with:
           dotnet-version: 10
       - name: build
-        run: dotnet build
+        run: dotnet build -p:ContinuousIntegrationBuild=true
       - name: test Finbuckle.MultiTenant
         run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
         working-directory: ./test/Finbuckle.MultiTenant.Test
