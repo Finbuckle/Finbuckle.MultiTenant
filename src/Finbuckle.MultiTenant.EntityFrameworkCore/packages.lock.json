@@ -420,67 +420,67 @@
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
         "type": "Direct",
         "requested": "[8.0.*, )",
-        "resolved": "8.0.26",
-        "contentHash": "Bd6GaMcAMfiv9Ya+7ll4x4xomFTTdTgLBZ8zbHuSbjc5ZDjqzDvlBLzQvsb2mbiYbV/kxYidqE7/Ep+I8IXqqA==",
+        "resolved": "8.0.27",
+        "contentHash": "4oGSVkKkrGcHsdU1cV97B0Uw85Ml+qr+WRSYSD2tyz/J+3mo9qPfAW5YS85OspqtdoASJWbt8n9gTFF9dtwdHw==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Relational": "8.0.26",
-          "Microsoft.Extensions.Identity.Stores": "8.0.26"
+          "Microsoft.EntityFrameworkCore.Relational": "8.0.27",
+          "Microsoft.Extensions.Identity.Stores": "8.0.27"
         }
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Direct",
         "requested": "[8.0.*, )",
-        "resolved": "8.0.26",
-        "contentHash": "u9+JYECGPFyEtfsym+e8inVb9e0vnp+Nn80aTOmUj/AxdJ7GqM9lvO/CSgDs7BtDtMFwjK+r8h977zsXbSzT+Q==",
+        "resolved": "8.0.27",
+        "contentHash": "ulztr0Jcvzg6bbL8wuwshVKcuU4GMeObvSJopg9KM/MBHwEcOroawdoYOJKmcmfmIp2dfXCl0n/qNRLfBfJwZg==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.26",
+          "Microsoft.EntityFrameworkCore": "8.0.27",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
         }
       },
       "Microsoft.Extensions.Identity.Stores": {
         "type": "Direct",
         "requested": "[8.0.*, )",
-        "resolved": "8.0.26",
-        "contentHash": "J4WeYSmQ5I5NrHpC/qnaCjRz0sLDMpJ4wU77whsh28BZ3mIM9qItTLKDY7ORCteEGxA2E80t3w7MizSvKJ04MA==",
+        "resolved": "8.0.27",
+        "contentHash": "nBazeKR/VqCxpZ/W99RTfWe3PAG9f70YKs7u1+lrxGnAxhqPtT0P6SvpQmYRApnTvWxwnqZZYBB3+kShMvyrmg==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Abstractions": "8.0.0",
-          "Microsoft.Extensions.Identity.Core": "8.0.26",
+          "Microsoft.Extensions.Identity.Core": "8.0.27",
           "Microsoft.Extensions.Logging": "8.0.1"
         }
       },
       "Microsoft.AspNetCore.Cryptography.Internal": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "v2y+Rk86RjlKEB7UG53Y538p0W9jItF0GS+cixl5x3UXEZ08P/Jja35G2CQLKkOgc9WIQSArw9gXmkGxHnDdWA=="
+        "resolved": "8.0.27",
+        "contentHash": "YNgMaKAvbgSjC7ZlRotnNH+0HAT80W7j9A8vAcgu4AN6nGE3LEhhnYXkTU/KiklOtwhicmQksFqopsmXcNhoug=="
       },
       "Microsoft.AspNetCore.Cryptography.KeyDerivation": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "TaK5LqMJRZTJPMqO6nWDSdMibrRzf7csP43qTgI8WpPuxhZX+uKIyHiUlXWfcqhQo5iNfDu2AGbOnnW/5mQE+g==",
+        "resolved": "8.0.27",
+        "contentHash": "nY7rxwjIlvimh2Y5/v/Y2Xbrsa5gXUVla115G9qxA5saBQKKqzDwZbTpfHn/q3gWkNpb2TKZv7KioWBAXd5Abw==",
         "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.Internal": "8.0.26"
+          "Microsoft.AspNetCore.Cryptography.Internal": "8.0.27"
         }
       },
       "Microsoft.EntityFrameworkCore": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "lOBe7qWbtS4UBPZCDjwbDqDgJFgnPHA5duKEae0RrW67q3EyX3mnE3vPdJ3pFWtTFPcCX0V/7wFX/xE4SkJ2og==",
+        "resolved": "8.0.27",
+        "contentHash": "fe3vhlibOcspurgPucQQW4KGC3Z2aj3hafb68AKxFVFawzT5+x6FA4NGzLrWMDs682A3uTodd0hOHX0ZUDwdzA==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "8.0.26",
-          "Microsoft.EntityFrameworkCore.Analyzers": "8.0.26",
+          "Microsoft.EntityFrameworkCore.Abstractions": "8.0.27",
+          "Microsoft.EntityFrameworkCore.Analyzers": "8.0.27",
           "Microsoft.Extensions.Caching.Memory": "8.0.1",
           "Microsoft.Extensions.Logging": "8.0.1"
         }
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "UVXlDz6os+VLpCjEcCjxexXyrxlq7vM3OD2KnyQlnzM9Q8WCsKNI+1PJiR2B6Em+yDCROSHy1jPNXaqxrzrCPQ=="
+        "resolved": "8.0.27",
+        "contentHash": "/pqkVwmVsMOePo58AlmpXCQOOsGTqMahgbANhmP7WZMd9PiXLnzVxU06R+HbW0u+YdZ4w4aBDvVg+vUpGKydJg=="
       },
       "Microsoft.EntityFrameworkCore.Analyzers": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "uKIwY5fy7Xk3BrWMxryYyzQuzQxmhQADjZqXanXa27vE3vll8QHcUZuI1J1vyPu0bzyBITGdw9nJKDCsJmIHjg=="
+        "resolved": "8.0.27",
+        "contentHash": "9hl8QNHrgOtidE7I5aom9ABcXCIjv1fnRxgNNC4PaA043zPte28ifvkW2KK91OoAYF7trZSmU1qYScTra3N7HA=="
       },
       "Microsoft.Extensions.Caching.Abstractions": {
         "type": "Transitive",
@@ -574,10 +574,10 @@
       },
       "Microsoft.Extensions.Identity.Core": {
         "type": "Transitive",
-        "resolved": "8.0.26",
-        "contentHash": "rVbkLeiyurniliMYXYpeTp1KiJuF1VEPBL0/fNWA7YqRADcMI7qxaKgl1RHh1N5sHL/aA7dwMWhiYD+e7bIXGw==",
+        "resolved": "8.0.27",
+        "contentHash": "JoDfiY/4V8eF++bRV/pxEO4lJsWhzv5Cp/83PB4qezYEZb7rxyndid0auPc3214ws9hV73LNQF+L/W9qr6WRig==",
         "dependencies": {
-          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "8.0.26",
+          "Microsoft.AspNetCore.Cryptography.KeyDerivation": "8.0.27",
           "Microsoft.Extensions.Logging": "8.0.1",
           "Microsoft.Extensions.Options": "8.0.2"
         }
