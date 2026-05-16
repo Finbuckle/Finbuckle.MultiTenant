@@ -39,7 +39,7 @@ correct values for the current tenant are used.
 
 ## Options Basics
 
-Consider a typical scenario in ASP.Net Core, starting with a simple class:
+Consider a typical scenario in ASP.NET Core, starting with a simple class:
 
 ```csharp
 public class MyOptions
@@ -80,7 +80,7 @@ public MyController : Controller
 httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>();
 ```
 
-With standard options each tenant would get see the same exact options.
+With standard options each tenant would see the same exact options.
 
 ## Customizing Options Per Tenant
 

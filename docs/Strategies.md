@@ -307,7 +307,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used,
 but a custom key can also be used.
 
-Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type
+Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom header key
 is also available:
 
 ```csharp

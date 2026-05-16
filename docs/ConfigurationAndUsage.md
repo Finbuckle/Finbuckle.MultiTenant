@@ -39,8 +39,8 @@ chaining method calls.
 
 ### WithStore Variants
 
-Adds and configures an IMultiTenantStore for your app. Only the last store configured will be used.
-See [MultiTenant Stores](Stores) for more information on each type.
+Adds and configures an `IMultiTenantStore` for your app. Multiple stores can be configured and each will be checked
+in the order registered. See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
 - `WithInMemoryStore`
