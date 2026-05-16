@@ -40,4 +40,59 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Registers a MultiTenant db context as a scoped service.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The <see cref="DbContext"/> type to register. Must implement
+    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// </typeparam>
+    /// <param name="services">The service collection to add registrations to.</param>
+    /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
+    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services)
+        where T : DbContext, IMultiTenantDbContext
+        => services.AddMultiTenantDbContext<T>((_, _) => { });
+
+    /// <summary>
+    /// Registers a MultiTenant db context as a scoped service.
+    /// </summary>
+    /// <param name="services">The service collection to add registrations to.</param>
+    /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/>.</param>
+    /// <typeparam name="T">
+    /// The <see cref="DbContext"/> type to register. Must implement
+    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// </typeparam>
+    /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
+    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services,
+        Action<DbContextOptionsBuilder> optionsAction)
+        where T : DbContext, IMultiTenantDbContext
+        => services.AddMultiTenantDbContext<T>((_, b) => optionsAction(b));
+
+    /// <summary>
+    /// Registers a MultiTenant db context as a scoped service.
+    /// </summary>
+    /// <param name="services">The service collection to add registrations to.</param>
+    /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/> with access to the <see cref="IServiceProvider"/>.</param>
+    /// <typeparam name="T">
+    /// The <see cref="DbContext"/> type to register. Must implement
+    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// </typeparam>
+    /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
+    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services,
+        Action<IServiceProvider, DbContextOptionsBuilder> optionsAction)
+        where T : DbContext, IMultiTenantDbContext
+    {
+        services.AddDbContextFactory<T>(optionsAction);
+        services.AddScoped<T>(sp =>
+        {
+            var factory = sp.GetRequiredService<IDbContextFactory<T>>();
+            var context = factory.CreateDbContext();
+            context.EnforceMultiTenantOnTracking();
+
+            return context;
+        });
+
+        return services;
+    }
 }
