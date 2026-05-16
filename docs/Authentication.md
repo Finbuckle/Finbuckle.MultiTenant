@@ -73,7 +73,7 @@ will be replaced with the identifier for each specific tenant. For example, a
 `CookieLoginPath` of "/\_\_tenant\_\_/Identity/Account/Login" will result in
 "/initech/Identity/Account/Login" for the Initech tenant.
 
-The code setup is straight-forward:
+The code setup is straightforward:
 
 ```csharp
 using Finbuckle.MultiTenant;
@@ -149,7 +149,7 @@ work.
 
 Internally `WithPerTenantAuthentication()` makes use of
 [per-tenant options](Options). For authentication options not covered by
-`WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
+`WithPerTenantAuthentication()`, per-tenant options can provide similar behavior.
 
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
