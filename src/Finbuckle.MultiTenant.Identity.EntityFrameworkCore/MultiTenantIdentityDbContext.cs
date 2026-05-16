@@ -113,7 +113,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TKey : IEquatable<TKey>
 {
     /// <inheritdoc />
-    public ITenantInfo? TenantInfo { get; }
+    public ITenantInfo? TenantInfo { get; set; }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
