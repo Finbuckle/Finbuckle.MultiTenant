@@ -111,10 +111,14 @@ public class Roles
 
 public class BloggingDbContext : MultiTenantDbContext
 {
-    public BloggingDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    public BloggingDbContext()
     {
     }
-    
+
+    public BloggingDbContext(DbContextOptions<BloggingDbContext> options) : base(options)
+    {
+    }
+
     public DbSet<BlogPost> BlogPosts { get; set; } // this will be multi-tenant!
     public DbSet<Roles> Roles { get; set; } // not multi-tenant!
 }
@@ -280,27 +284,21 @@ Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
-The `MultiTenantDbContext` has two constructors which should be called from any derived database context. Make sure to
-forward the `IMultiTenantContextAccessor` and, if applicable the `DbContextOptions<T>` into the base constructor.
+`MultiTenantDbContext` exposes a parameterless constructor and a constructor that accepts `DbContextOptions`. Derived
+contexts should call the appropriate base constructor. The tenant is not set through the constructor — it is bound
+automatically by `AddMultiTenantDbContext` when using dependency injection, or set explicitly via `TenantInfo` when
+using the `Create` factory method.
 
 ```csharp
 public class BloggingDbContext : MultiTenantDbContext
 {
-    // these constructors are called when dependency injection is used
-    public BloggingDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    public BloggingDbContext()
     {
     }
-    
-    public BloggingDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions<BloggingDbContext> options) :
-        base(multiTenantContextAccessor, options)
-    {
-    }
-    
-    // these constructors are useful for testing or other use cases where dependency injection is not used
-    public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
 
-    public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :
-        base(tenantInfo, options) { }
+    public BloggingDbContext(DbContextOptions<BloggingDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
@@ -414,8 +412,7 @@ foreach (var tenant in tenants)
 ```
 
 Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block or
-variable. This method will work for any database context class expecting an `IMultiTenantContextAccessor` in its
-constructor and a `DbContextOptions<T>` in its constructor.
+variable. The `Create` method requires that `TContext` implements both `DbContext` and `IMultiTenantDbContext`.
 
 ## Design Time Instantiation
 
