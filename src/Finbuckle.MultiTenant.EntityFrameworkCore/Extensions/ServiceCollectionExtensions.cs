@@ -1,3 +1,6 @@
+// Copyright Finbuckle LLC, Andrew White, and Contributors.
+// Refer to the solution LICENSE file for more information.
+
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,6 +91,8 @@ public static class ServiceCollectionExtensions
         {
             var factory = sp.GetRequiredService<IDbContextFactory<T>>();
             var context = factory.CreateDbContext();
+            var tenantInfo = sp.GetRequiredService<IMultiTenantContextAccessor>().MultiTenantContext.TenantInfo;
+            context.TenantInfo = tenantInfo;
             context.EnforceMultiTenantOnTracking();
 
             return context;

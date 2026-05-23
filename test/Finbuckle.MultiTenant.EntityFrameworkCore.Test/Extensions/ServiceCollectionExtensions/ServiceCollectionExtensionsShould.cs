@@ -181,6 +181,32 @@ public class ServiceCollectionExtensionsShould
         Assert.NotNull(descriptor);
         Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
     }
+
+    /// <summary>
+    /// Regression test: AddMultiTenantDbContext must set TenantInfo from the scoped
+    /// IMultiTenantContextAccessor even when the DbContext does NOT inherit from
+    /// MultiTenantDbContext (i.e. no constructor-injected accessor).
+    /// Without the explicit assignment in the scoped factory lambda, TenantInfo would
+    /// remain null for such custom contexts.
+    /// </summary>
+    [Fact]
+    public void AddMultiTenantDbContext_SetsTenantInfoOnCustomContext_WithoutConstructorInjection()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenantDbContext<CustomIMultiTenantDbContext>(
+            options => options.UseSqlite("DataSource=:memory:"));
+
+        var sp = services.BuildServiceProvider();
+        var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
+        var tenant = new TenantInfo { Id = "tenant-custom", Identifier = "tenant-custom" };
+        setter.MultiTenantContext = new MultiTenantContext<TenantInfo>(tenant);
+
+        using var scope = sp.CreateScope();
+        var ctx = scope.ServiceProvider.GetRequiredService<CustomIMultiTenantDbContext>();
+
+        Assert.Equal("tenant-custom", ctx.TenantInfo!.Id);
+    }
 }
 
 public class NonPooledTestDbContext(
@@ -208,6 +234,31 @@ public class PooledTestDbContext(
 
 [MultiTenant]
 public class PooledBlog
+{
+    public int Id { get; set; }
+    public string? Title { get; set; }
+}
+
+/// <summary>
+/// A DbContext that implements IMultiTenantDbContext directly, WITHOUT inheriting from
+/// MultiTenantDbContext and WITHOUT constructor-injecting IMultiTenantContextAccessor.
+/// TenantInfo must be wired up externally by the service registration.
+/// </summary>
+public class CustomIMultiTenantDbContext(DbContextOptions<CustomIMultiTenantDbContext> options)
+    : DbContext(options), IMultiTenantDbContext
+{
+    public ITenantInfo? TenantInfo { get; set; }
+    public TenantMismatchMode TenantMismatchMode { get; } = TenantMismatchMode.Throw;
+    public TenantNotSetMode TenantNotSetMode { get; } = TenantNotSetMode.Throw;
+
+    public DbSet<CustomBlog>? Blogs { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+        => modelBuilder.ConfigureMultiTenant();
+}
+
+[MultiTenant]
+public class CustomBlog
 {
     public int Id { get; set; }
     public string? Title { get; set; }
