@@ -311,9 +311,11 @@ Now whenever this database context is used it will only set and query records fo
 ## Binding the Tenant to the DbContext
 
 It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is
-immutable. When implementing `IMultiTenantDbContext` directly, you may choose to only expose a getter for `TenantInfo`
-to enforce this. `MultiTenantDbContext` and `MultiTenantIdentityDbContext` expose a public setter for `TenantInfo` to
-support advanced scenarios such as pooled context reuse, but the setter should be used with caution:
+immutable. When implementing `IMultiTenantDbContext` directly, note that the interface requires a setter for
+`TenantInfo`. If you want `TenantInfo` to remain effectively immutable to consumers of your concrete DbContext, you can
+implement the interface setter explicitly and expose only a public getter on the concrete type. `MultiTenantDbContext`
+and `MultiTenantIdentityDbContext` expose a public setter for `TenantInfo` to support advanced scenarios such as
+pooled context reuse, but the setter should be used with caution:
 
 > **Warning:** Changing `TenantInfo` on a context that already has tracked entities can cause data isolation
 > violations. Always call `ChangeTracker.Clear()` before reassigning `TenantInfo` to ensure no stale, cross-tenant
