@@ -16,16 +16,16 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class MultiTenantIdentityDbContextShould
 {
-    private TContext CreateDbContextViaDi<TContext>(int schemaVersion = 3) where TContext : DbContext
+    private TContext CreateDbContextViaDi<TContext>(int schemaVersion = 3) where TContext : DbContext, IMultiTenantDbContext
     {
         var services = new ServiceCollection();
         services.AddOptions();
-        services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion,0));
-        services.AddMultiTenant<TenantInfo>();
-        // override the generic accessor with a static one bound to a test tenant
+        services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion, 0));
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new StaticMultiTenantContextAccessor<TenantInfo>(tenant));
-        services.AddDbContext<TContext>(o =>
+        services.AddMultiTenant<TenantInfo>()
+            .WithStaticStrategy(tenant.Identifier)
+            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+        services.AddMultiTenantDbContext<TContext>(o =>
         {
             o.UseSqlite("DataSource=:memory:");
             o.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
@@ -39,8 +39,11 @@ public class MultiTenantIdentityDbContextShould
     public void WorkWithDependencyInjection()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.AddDbContext<TestIdentityDbContext>();
+        var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
+        services.AddMultiTenant<TenantInfo>()
+            .WithStaticStrategy(tenant.Identifier)
+            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+        services.AddMultiTenantDbContext<TestIdentityDbContext>();
         var scope = services.BuildServiceProvider().CreateScope();
 
         var context = scope.ServiceProvider.GetService<TestIdentityDbContext>();
@@ -50,7 +53,7 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var c = CreateDbContextViaDi<TestIdentityDbContext>();
+        var c = new TestIdentityDbContext();
         Assert.NotNull(c);
     }
 

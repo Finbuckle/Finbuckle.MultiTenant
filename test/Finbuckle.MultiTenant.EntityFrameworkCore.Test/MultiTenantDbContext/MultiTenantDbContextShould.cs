@@ -26,20 +26,14 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca);
-
+        var c = new TestBlogDbContext();
         Assert.NotNull(c);
     }
 
     [Fact]
     public void WorkWithTwoParamCtor()
     {
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca, new DbContextOptions<TestBlogDbContext>());
-
+        var c = new TestBlogDbContext(new DbContextOptions<TestBlogDbContext>());
         Assert.NotNull(c);
     }
 
@@ -91,9 +85,10 @@ public class MultiTenantDbContextShould
     [Fact]
     public void ThrowOnInvalidDbContext()
     {
+        // Passing args that no constructor accepts should throw ArgumentException.
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
 
         Assert.Throws<ArgumentException>(() =>
-            EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
+            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object(), new object()));
     }
 }
