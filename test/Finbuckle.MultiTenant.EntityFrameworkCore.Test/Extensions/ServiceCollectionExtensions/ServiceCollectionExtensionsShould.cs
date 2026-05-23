@@ -209,10 +209,8 @@ public class ServiceCollectionExtensionsShould
     }
 }
 
-public class NonPooledTestDbContext(
-    IMultiTenantContextAccessor multiTenantContextAccessor,
-    DbContextOptions<NonPooledTestDbContext> options)
-    : EntityFrameworkCore.MultiTenantDbContext(multiTenantContextAccessor, options)
+public class NonPooledTestDbContext(DbContextOptions<NonPooledTestDbContext> options)
+    : EntityFrameworkCore.MultiTenantDbContext(options)
 {
     public DbSet<NonPooledBlog>? Blogs { get; set; }
 }
@@ -224,10 +222,8 @@ public class NonPooledBlog
     public string? Title { get; set; }
 }
 
-public class PooledTestDbContext(
-    IMultiTenantContextAccessor multiTenantContextAccessor,
-    DbContextOptions<PooledTestDbContext> options)
-    : EntityFrameworkCore.MultiTenantDbContext(multiTenantContextAccessor, options)
+public class PooledTestDbContext(DbContextOptions<PooledTestDbContext> options)
+    : EntityFrameworkCore.MultiTenantDbContext(options)
 {
     public DbSet<PooledBlog>? Blogs { get; set; }
 }
