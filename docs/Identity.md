@@ -54,7 +54,7 @@ current tenant, i.e. per-tenant options are not required for this.
 
 ## Authentication
 
-ASP.NET Core Identity cookies for authentication. It uses
+ASP.NET Core Identity uses cookies for authentication. It uses
 a [slightly different method for configuring cookies](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity-configuration),
 but under the hood standard ASP.NET Core authentication is used.
 

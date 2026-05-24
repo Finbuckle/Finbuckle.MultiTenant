@@ -79,7 +79,7 @@ With standard options each tenant would get see the same exact options.
 
 ## Customizing Options Per Tenant
 
-This sections assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
+This section assumes a standard web application builder is configured and Finbuckle.MultiTenant is configured with
 a `TTenantInfo` type of `TenantInfo`.
 See [Getting Started](GettingStarted) for details.
 

@@ -265,7 +265,7 @@ public class BloggingDbContext : MultiTenantDbContext
     {
     }
     
-    // these constructors are useful for testing or other use cases where depdenency injection is not used
+    // these constructors are useful for testing or other use cases where dependency injection is not used
     public BloggingDbContext(ITenantInfo tenantInfo) : base(tenantInfo) { }
 
     public BloggingDbContext(ITenantInfo tenantInfo, DbContextOptions<BloggingDbContext> options) :

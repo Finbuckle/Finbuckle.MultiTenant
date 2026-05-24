@@ -182,7 +182,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
-In addition the `IMultiTenantStore` interface methods, the database context can be used to modify data in the same way
+In addition to the `IMultiTenantStore` interface methods, the database context can be used to modify data in the same way
 Entity Framework Core works with any database context which can offer richer functionality.
 
 ## Http Remote Store
@@ -198,7 +198,7 @@ projects demonstrate this store. This store is usually case insensitive when ret
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
 This strategy will attempt to deserialize the tenant using the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
-For a successfully request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
+For a successful request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
 , `Name`, and other properties which will be mapped into a `TenantInfo` object with the type
 passed to `AddMultiTenant<TTenantInfo>`.
 
