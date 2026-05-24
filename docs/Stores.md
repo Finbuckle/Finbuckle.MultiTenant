@@ -223,7 +223,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 // or template the identifier into a custom location
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo)...
+    .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo")...
 
 // or modify the underlying `HttpClient` with a custom message handler and settings
 builder.Services.AddMultiTenant<TenantInfo>()

@@ -258,7 +258,7 @@ For web apps these convenience methods are also available:
   For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly overriding
   the `TenantInfo` set by the middleware.
 
-  Use this 'HttpContext' extension method to the current tenant to the provided `TenantInfo`. Returns true if
+  Use this `HttpContext` extension method to set the current tenant to the provided `TenantInfo`. Returns true if
   successful. Optionally it can also reset the service provider scope so that any scoped services already resolved will
   be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting
   the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the

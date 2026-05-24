@@ -3,7 +3,7 @@
 ## Introduction
 
 Data isolation is one of the most important considerations in a multi-tenant app. Whether each tenant has its own
-database, a shared database, or a hybrid approach can make a significant different in app design. Finbuckle.MultiTenant
+database, a shared database, or a hybrid approach can make a significant difference in app design. Finbuckle.MultiTenant
 supports each of these models by associating a connection string with each tenant.
 
 ## Separate Databases
@@ -240,7 +240,7 @@ public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
 If the derived database context overrides `OnModelCreating` is it recommended that the base class `OnModelCreating`
 method is called last so that the multi-tenant query filters are not overwritten.
 
-```
+```csharp
 public class BloggingDbContext : MultiTenantDbContext
 {
 ...
