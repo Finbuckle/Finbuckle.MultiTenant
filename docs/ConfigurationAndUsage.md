@@ -39,7 +39,7 @@ chaining method calls.
 
 ### WithStore Variants
 
-Adds and configures an IMultiTenantStore for your app. Only the last store configured will be used.
+Adds and configures an `IMultiTenantStore` for your app. Only the last store configured will be used.
 See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
@@ -51,7 +51,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an IMultiTenantStrategy for your app. Multiple strategies can be configured and each will be used
+Adds and configures an `IMultiTenantStrategy` for your app. Multiple strategies can be configured and each will be used
 in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
@@ -164,7 +164,7 @@ The `MultiTenantMiddleware` can be configured to short circuit a request pipelin
 custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` and `ShortCircuitWhen<TTenantInfo>()` as
 shown below will configure this behavior as necessary.
 
-#### Short Circuit When Tenant Not resolved
+#### Short Circuit When Tenant Not Resolved
 
 Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
 the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no

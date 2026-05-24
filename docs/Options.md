@@ -77,10 +77,10 @@ public MyController : Controller
 }
 
 // or with a service provider
-httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>();
+httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>>();
 ```
 
-With standard options each tenant would get see the same exact options.
+With standard options each tenant would see the same exact options.
 
 ## Customizing Options Per Tenant
 

@@ -67,7 +67,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant
 
-Uses a provided `Func<object, Task<string?>>` to determine the tenant. For example the lambda
+Uses a provided `Func<object, Task<string?>>` to determine the tenant. For example, the lambda
 function `async context => "initech"` would use "initech" as the identifier when resolving the tenant for every request.
 This strategy is good to use for testing or simple logic. This strategy can be used multiple times and will run
 in the order configured.
