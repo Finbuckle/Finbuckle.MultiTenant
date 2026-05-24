@@ -57,7 +57,7 @@ See [Core Concepts](CoreConcepts) for more information on `TenantInfo`.
 `.WithHostStrategy()`
 
 The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
-defaults to the extracting the subdomain as a tenant identifier.
+defaults to extracting the subdomain as a tenant identifier.
 
 See [Strategies](Strategies) for more information.
 

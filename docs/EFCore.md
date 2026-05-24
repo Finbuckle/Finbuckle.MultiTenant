@@ -9,7 +9,7 @@ supports each of these models by associating a connection string with each tenan
 ## Separate Databases
 
 If each tenant uses a separate database then add a `ConnectionString` property to the app's `TenantInfo`
-implementation. and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
+implementation and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
 by injecting a `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
 
 ```csharp
@@ -216,7 +216,7 @@ public class MyDbContext : DbContext, IMultiTenantDbContext
 }
 ```
 
-The database context will need to ensure that these properties haves values, either through constructors, setters, or
+The database context will need to ensure that these properties have values, either through constructors, setters, or
 default values.
 
 Finally, call the library extension methods as described below. This requires overriding the `OnModelCreating`,
@@ -266,7 +266,7 @@ Now whenever this database context is used, it will only set and query records f
 ## Deriving from `MultiTenantDbContext`
 
 This approach is easier but requires inheriting from `MultiTenantDbContext` which may not always be possible if you
-already have a base class. `MultiTenantDbContext` a pre-configured implementation of `IMultiTenantDbContext` with the
+already have a base class. `MultiTenantDbContext` is a pre-configured implementation of `IMultiTenantDbContext` with the
 helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
