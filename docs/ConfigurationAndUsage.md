@@ -72,7 +72,7 @@ Configures support for per-tenant authentication. See [Per-Tenant Authentication
 
 Finbuckle.MultiTenant integrates with the
 standard [.NET Options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) (see also the [ASP.NET
-Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options) and lets apps
+Core Options pattern](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options)) and lets apps
 customize options distinctly for each tenant. See [Per-Tenant Options](Options) for more details.
 
 ## Tenant Resolution

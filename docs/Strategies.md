@@ -159,7 +159,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses the ASP.NET Core session to retrieve the tenant identifier. This strategy is configured as a singleton.
 
 Configure by calling `WithSessionStrategy` after `AddMultiTenant<TTenantInfo>`. Uses a default session key
-named `__tenant__`. An overload of `WithSessionStrategy can be used to specify a different key name:
+named `__tenant__`. An overload of `WithSessionStrategy` can be used to specify a different key name:
 
 ```csharp
 // check for default "__tenant__" as the session key
