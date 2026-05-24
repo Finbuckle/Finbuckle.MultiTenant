@@ -1,7 +1,7 @@
 # Core Concepts
 
 The library uses standard .NET Core conventions and most of the internal details are abstracted away from app code.
-However, there are a few important specifics to be aware of. The items below make up the foundation of the library
+However, there are a few important specifics to be aware of. The items below make up the foundation of the library.
 
 ## `ITenantInfo` and `TenantInfo`
 

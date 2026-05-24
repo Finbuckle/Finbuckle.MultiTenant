@@ -145,7 +145,7 @@ work.
 
 Internally `WithPerTenantAuthentication()` makes use of
 [per-tenant options](Options). For authentication options not covered by
-`WithPerTenantAuthentication()`, per-tenant option can provide similar behavior.
+`WithPerTenantAuthentication()`, per-tenant options can provide similar behavior.
 
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
