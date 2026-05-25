@@ -66,7 +66,8 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 - `WithSessionStrategy`
 - `WithStaticStrategy`
 
-> Need fallbacks? Chain several strategies and more than one store; the resolver will keep trying strategies in order and run through the configured stores until a `TenantInfo` is found.
+> Need fallbacks? Chain several strategies and more than one store; the resolver will keep trying strategies in order
+> and run through the configured stores until a `TenantInfo` is found.
 
 ### WithPerTenantAuthentication
 
@@ -115,9 +116,17 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
 
 Some additional features are available to tailor the middleware to your specific needs.
 
-### Exclude Endpoints From Tenant Resolution
+### Bypassing Tenant Resolution
 
-If you have scenarios where you do not want Tenant resolution to be performed, you can exclude specific endpoints.
+There are several ways to prevent the middleware from performing tenant resolution for some or all requests. Bypassing
+causes the middleware to skip resolution entirely and pass the request directly to the next middleware.
+
+> Bypassing runs **before** tenant resolution. [Short circuiting](#short-circuiting) runs **after** resolution.
+
+#### Exclude Specific Endpoints
+
+For scenarios where individual, known endpoints should never trigger tenant resolution, you can annotate them directly
+at registration time.
 
 Using the `IEndpointConventionBuilder` extension `ExcludeFromMultiTenantResolution`:
 
@@ -135,7 +144,7 @@ app.MapGet("/oops", () => "Oops! An error happened.")
 // Exclude a group of endpoints.
 app.MapGroup("api/v{version:apiVersion}/dashboard")
     .ExcludeFromMultiTenantResolution();
-	
+
 // Exclude static asset endpoints.
 app.MapStaticAssets()
     .ExcludeFromMultiTenantResolution();
@@ -144,18 +153,49 @@ app.Run();
 ```
 
 Using the `ExcludeFromMultiTenantResolutionAttribute` attribute to configure the behavior of controllers and action
-methods.
+methods:
 
 ```csharp
-// Here --> [ExcludeFromMultiTenantResolution]
+// Here to exclude an entire controller
+[ExcludeFromMultiTenantResolution]
 public class DashboardController : Controller
 {
-    // Or here --> [ExcludeFromMultiTenantResolution]
+    // Or here to exclude a specific action
+    [ExcludeFromMultiTenantResolution]
     public ActionResult Index()
     {
         return View();
     }
 }
+```
+
+#### Bypass When No Endpoint Is Matched
+
+Call `BypassWhenEndpointNotResolved()` after `AddMultiTenant<TTenantInfo>` to skip tenant resolution entirely when the
+current request has no matched endpoint. This is especially useful when requests arrive that do not match any route.
+
+> This bypass does **not** require the route strategy.
+
+```csharp
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithRouteStrategy()
+    .WithConfigurationStore()
+    .BypassWhenEndpointNotResolved();
+```
+
+#### Bypass When a Custom Condition is Met
+
+Use `BypassWhen()` to bypass resolution based on any condition derived from `HttpContext`:
+
+```csharp
+// Bypass resolution for health check requests.
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithRouteStrategy()
+    .WithConfigurationStore()
+    .BypassWhen(options =>
+    {
+        options.Predicate = ctx => ctx.Request.Path.StartsWithSegments("/health");
+    });
 ```
 
 ### Short Circuiting
@@ -164,14 +204,19 @@ The `MultiTenantMiddleware` can be configured to short circuit a request pipelin
 custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` and `ShortCircuitWhen<TTenantInfo>()` as
 shown below will configure this behavior as necessary.
 
+> Short-curcuiting the request pipeline does not return an HTTP code, it simply stops calling further middlware.
+
+> Bypassing runs **before** tenant resolution. [Short circuiting](#short-circuiting) runs **after** resolution.
+
 #### Short Circuit When Tenant Not Resolved
 
-Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing of
-the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
+Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing
+of the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
 tenant was found.
 
 > If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant,
-> then `ExcludeFromMultiTenantResolution` becomes a necessity, otherwise, these endpoints would never be reached.
+> then [excluding those endpoints](#exclude-specific-endpoints) becomes a necessity, otherwise, they would never be
+> reached.
 
 ```csharp
 // Simply short circuit the request, ending request handling.
