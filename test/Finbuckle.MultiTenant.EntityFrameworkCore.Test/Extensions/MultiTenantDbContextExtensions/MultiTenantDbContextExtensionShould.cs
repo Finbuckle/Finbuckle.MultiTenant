@@ -2,10 +2,12 @@
 // Refer to the solution LICENSE file for more information.
 
 using System.Data.Common;
+using System.Reflection;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantDbContextExtensions;
@@ -376,4 +378,84 @@ public class MultiTenantDbContextExtensionsShould
             _connection.Close();
         }
     }
+
+    [Fact]
+    public void AddOneTrackingHandlerWhenEnforceMultiTenantOnTrackingCalledTwice()
+    {
+        var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
+        using var db = new TestDbContext(tenant, _options);
+
+        db.EnforceMultiTenantOnTracking();
+        db.EnforceMultiTenantOnTracking();
+
+        var stateManager = typeof(ChangeTracker)
+            .GetField("_stateManager", BindingFlags.NonPublic | BindingFlags.Instance)
+            ?.GetValue(db.ChangeTracker)
+            ?? typeof(ChangeTracker)
+                .GetProperty("StateManager", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.GetValue(db.ChangeTracker);
+
+        Assert.NotNull(stateManager);
+
+        var trackingDelegateField = stateManager!.GetType()
+            .GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
+            .FirstOrDefault(f => typeof(MulticastDelegate).IsAssignableFrom(f.FieldType) &&
+                                 f.Name.Contains("Tracking", StringComparison.OrdinalIgnoreCase));
+
+        Assert.NotNull(trackingDelegateField);
+
+        var trackingDelegate = trackingDelegateField!.GetValue(stateManager) as MulticastDelegate;
+        Assert.Equal(1, trackingDelegate?.GetInvocationList().Length ?? 0);
+    }
+
+    [Fact]
+    public void SetTenantIdOnAttachWhenTenantNotSetModeIsThrow()
+    {
+        try
+        {
+            _connection.Open();
+            var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
+
+            using var db = new TestDbContext(tenant, _options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.TenantNotSetMode = TenantNotSetMode.Throw;
+            db.EnforceMultiTenantOnTracking();
+
+            var blog = new Blog { Title = "attached" };
+            db.Attach(blog);
+
+            Assert.Equal(tenant.Id, db.Entry(blog).Property("TenantId").CurrentValue);
+        }
+        finally
+        {
+            _connection.Close();
+        }
+    }
+
+    [Fact]
+    public void SetTenantIdWhenAddingEntity()
+    {
+        try
+        {
+            _connection.Open();
+            var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
+
+            using var db = new TestDbContext(tenant, _options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.TenantNotSetMode = TenantNotSetMode.Throw;
+            db.EnforceMultiTenantOnTracking();
+
+            var blog = new Blog { Title = "state-change" };
+            db.Add(blog);
+
+            Assert.Equal(tenant.Id, db.Entry(blog).Property("TenantId").CurrentValue);
+        }
+        finally
+        {
+            _connection.Close();
+        }
+    }
+
 }

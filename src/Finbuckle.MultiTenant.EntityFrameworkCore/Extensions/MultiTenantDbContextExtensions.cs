@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using System.Runtime.CompilerServices;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,9 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 /// </summary>
 public static class MultiTenantDbContextExtensions
 {
+    private static readonly ConditionalWeakTable<DbContext, object?> TrackingHandlerRegistry = new();
+    private static readonly Lock TrackingHandlerRegistryLock = new();
+
     /// <summary>
     /// Ensures a TenantId property is set when an entity is attached.
     /// </summary>
@@ -19,18 +23,28 @@ public static class MultiTenantDbContextExtensions
     public static void EnforceMultiTenantOnTracking<TContext>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext
     {
-        // Configure event to handle newly tracked entities.
-        context.ChangeTracker.Tracking += (sender, args) =>
+        // need to lock and track if the event handler has been registered already so that multiple
+        // calls to EnforceMultiTenantOnTracking do not register multiple instances
+        lock (TrackingHandlerRegistryLock)
         {
-            // Honor TenantNotSetMode on tracking from attach multi-tenant entities.
-            if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
-                args.Entry.Context is not IMultiTenantDbContext multiTenantDbContext) return;
+            if (TrackingHandlerRegistry.TryGetValue(context, out _))
+                return;
 
-            if (multiTenantDbContext.TenantInfo is null)
-                throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
+            // Configure event to handle newly tracked entities.
+            context.ChangeTracker.Tracking += (sender, args) =>
+            {
+                if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
+                    args.Entry.Context is not IMultiTenantDbContext multiTenantDbContext) return;
 
-            args.Entry.Property("TenantId").CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
-        };
+                if (multiTenantDbContext.TenantInfo is null)
+                    throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
+
+                var tenantIdProperty = args.Entry.Property("TenantId");
+                tenantIdProperty.CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
+            };
+
+            TrackingHandlerRegistry.Add(context, null);
+        }
     }
 
     /// <summary>
