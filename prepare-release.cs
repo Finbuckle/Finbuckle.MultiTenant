@@ -15,7 +15,7 @@
 //    7. Update <span class="_version"> elements in README.md and docs/*.md
 //    8. Update <!--_release-notes--> blocks in docs/*.md (full release notes)
 //    9. Update <!--_release-notes--> block in README.md (release notes without section heading)
-//   10. Insert release notes into the <!--_history--> block in docs/History.md
+//   10. Prepend release notes to docs/History.md
 //
 // Conventional Commits and version bump rules:
 //   MAJOR bump  - any commit with `!` after the type, e.g. `feat!:` or `fix(scope)!:`
@@ -622,11 +622,11 @@ static void UpdateReleaseNotesBlocks(string releaseNotes, string repoRoot)
     }
 }
 
-// STEP 11 - Replace the <!--_history-->…<!--_history--> block in docs/History.md
-// with the newly built release notes.
+// STEP 11 - Prepend the release notes to docs/History.md, preserving any
+// top-level "# …" heading that already exists at the top of the file.
 static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
 {
-    Console.WriteLine("Step 11: Update <!--_history--> block in docs/History.md");
+    Console.WriteLine("Step 11: Prepend release notes to docs/History.md");
     Console.WriteLine();
 
     string historyPath = Path.Combine(repoRoot, "docs", "History.md");
@@ -634,20 +634,14 @@ static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
     if (!File.Exists(historyPath))
         throw new FileNotFoundException($"Required file not found: {historyPath}");
 
-    string content = File.ReadAllText(historyPath);
+    string existing = File.ReadAllText(historyPath);
 
-    const string markerPattern = @"<!--_history-->.*?<!--_history-->";
-    const RegexOptions dotAll  = RegexOptions.Singleline;
+    var headerMatch = Regex.Match(existing, @"^(#[^#][^\n]*\n+)", RegexOptions.Multiline);
+    string newContent = (headerMatch.Success && existing.StartsWith(headerMatch.Value))
+        ? headerMatch.Value + releaseNotes + existing[headerMatch.Length..]
+        : releaseNotes + existing;
 
-    if (!Regex.IsMatch(content, markerPattern, dotAll))
-        throw new InvalidOperationException($"No <!--_history--> markers found in {historyPath}");
-
-    string updated = Regex.Replace(
-        content,
-        markerPattern,
-        $"<!--_history-->\n{releaseNotes}\n<!--_history-->",
-        dotAll);
-    File.WriteAllText(historyPath, updated);
+    File.WriteAllText(historyPath, newContent);
     Console.WriteLine($"{historyPath} updated.");
 }
 
