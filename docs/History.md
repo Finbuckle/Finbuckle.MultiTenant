@@ -1,6 +1,5 @@
 # Version History
 
-<!--_history-->
 ## [10.0.8](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.7...v10.0.8) (2026-05-12)
 
 ### Bug Fixes
@@ -737,4 +736,3 @@
 ### Changes
 
 - Initial release
-<!--_history-->
