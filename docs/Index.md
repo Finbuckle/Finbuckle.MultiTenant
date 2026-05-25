@@ -10,14 +10,16 @@
 
 [Configuration and Usage](ConfigurationAndUsage)
 
-[MultiTenant Strategies](Strategies)
-
-[MultiTenant Stores](Stores)
-
 [Per-Tenant Options](Options)
+
+[ASP.NET Core Integration](AspNetCore)
 
 [Per-Tenant Authentication](Authentication)
 
 [Per-Tenant Data with EFCore](EFCore)
 
 [Per-Tenant Data with Identity](Identity)
+
+[MultiTenant Strategies](Strategies)
+
+[MultiTenant Stores](Stores)

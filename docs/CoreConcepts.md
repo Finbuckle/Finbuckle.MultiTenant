@@ -34,7 +34,7 @@ The `MultiTenantContext<TTenantInfo>` contains information about the current ten
   determined, and from where its information was retrieved.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
 * Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`
-  object.
+  object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.
 * A custom implementation can be defined for advanced use cases.
 

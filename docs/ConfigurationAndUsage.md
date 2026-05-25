@@ -112,212 +112,41 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
       contains the resolved multi-tenant context and can be changed by the event handler to override the resolver's
       result.
 
-## ASP.NET Core Features
-
-Some additional features are available to tailor the middleware to your specific needs.
-
-### Bypassing Tenant Resolution
-
-There are several ways to prevent the middleware from performing tenant resolution for some or all requests. Bypassing
-causes the middleware to skip resolution entirely and pass the request directly to the next middleware.
-
-> Bypassing runs **before** tenant resolution. [Short circuiting](#short-circuiting) runs **after** resolution.
-
-#### Exclude Specific Endpoints
-
-For scenarios where individual, known endpoints should never trigger tenant resolution, you can annotate them directly
-at registration time.
-
-Using the `IEndpointConventionBuilder` extension `ExcludeFromMultiTenantResolution`:
-
-```csharp
-var app = builder.Build();
-
-// Exclude OpenApi endpoints.
-app.MapOpenApi()
-    .ExcludeFromMultiTenantResolution();
-
-// Exclude a specific endpoint.
-app.MapGet("/oops", () => "Oops! An error happened.")
-    .ExcludeFromMultiTenantResolution();
-
-// Exclude a group of endpoints.
-app.MapGroup("api/v{version:apiVersion}/dashboard")
-    .ExcludeFromMultiTenantResolution();
-
-// Exclude static asset endpoints.
-app.MapStaticAssets()
-    .ExcludeFromMultiTenantResolution();
-
-app.Run();
-```
-
-Using the `ExcludeFromMultiTenantResolutionAttribute` attribute to configure the behavior of controllers and action
-methods:
-
-```csharp
-// Here to exclude an entire controller
-[ExcludeFromMultiTenantResolution]
-public class DashboardController : Controller
-{
-    // Or here to exclude a specific action
-    [ExcludeFromMultiTenantResolution]
-    public ActionResult Index()
-    {
-        return View();
-    }
-}
-```
-
-#### Bypass When No Endpoint Is Matched
-
-Call `BypassWhenEndpointNotResolved()` after `AddMultiTenant<TTenantInfo>` to skip tenant resolution entirely when the
-current request has no matched endpoint. This is especially useful when requests arrive that do not match any route.
-
-> This bypass does **not** require the route strategy.
-
-```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithRouteStrategy()
-    .WithConfigurationStore()
-    .BypassWhenEndpointNotResolved();
-```
-
-#### Bypass When a Custom Condition is Met
-
-Use `BypassWhen()` to bypass resolution based on any condition derived from `HttpContext`:
-
-```csharp
-// Bypass resolution for health check requests.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithRouteStrategy()
-    .WithConfigurationStore()
-    .BypassWhen(options =>
-    {
-        options.Predicate = ctx => ctx.Request.Path.StartsWithSegments("/health");
-    });
-```
-
-### Short Circuiting
-
-The `MultiTenantMiddleware` can be configured to short circuit a request pipeline when no tenant is found or when some
-custom condition is met. `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` and `ShortCircuitWhen<TTenantInfo>()` as
-shown below will configure this behavior as necessary.
-
-> Short-curcuiting the request pipeline does not return an HTTP code, it simply stops calling further middlware.
-
-> Bypassing runs **before** tenant resolution. [Short circuiting](#short-circuiting) runs **after** resolution.
-
-#### Short Circuit When Tenant Not Resolved
-
-Call `ShortCircuitWhenTenantNotResolved<TTenantInfo>()` after `AddMultiTenant<TTenantInfo>` to halt further processing
-of the request pipeline when no tenant can be found. An overload accepts a URI where the user will be redirected if no
-tenant was found.
-
-> If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant,
-> then [excluding those endpoints](#exclude-specific-endpoints) becomes a necessity, otherwise, they would never be
-> reached.
-
-```csharp
-// Simply short circuit the request, ending request handling.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHostStrategy()
-    .WithConfigurationStore()
-    .ShortCircuitWhenTenantNotResolved();
-	
-// Short circuit and redirect to a specific Uri.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHostStrategy()
-    .WithConfigurationStore()
-    .ShortCircuitWhenTenantNotResolved(new Uri("/tenant/notfound", UriKind.Relative));
-```
-
-#### Short Circuit When a Custom Condition is Met
-
-If you find that you need to short circuit for other, more advanced reasons,
-use the `MultiTenantBuilder<TTenantInfo>` extension `ShortCircuitWhen()`.
-
-```csharp
-// Advanced short circuiting, if an obsolete strategy was used or when tenant not resolved.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHostStrategy()
-    .WithConfigurationStore()
-    .ShortCircuitWhen(config =>
-	{
-		config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
-	});
-	
-// Including a redirect.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithHostStrategy()
-    .WithConfigurationStore()
-	.ShortCircuitWhen(config =>
-	{
-		config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
-		config.RedirectTo = new Uri("/tenant/notfound", UriKind.Relative)
-	});
-```
-
 ## Getting the Current Tenant
 
-There are several ways your app can see the current tenant:
+There are several ways your app can read the current tenant:
 
-### Dependency Injection
+### Via Dependency Injection
 
-* `IMultiTenantContextAccessor` and `IMultiTenantContextAccessor<TTenantInfo>` are available via dependency injection
-  and behave similar to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track state and in parent async
-  contexts any changes in tenant will not be reflected. For example, the accessor will not reflect a tenant in the
-  post-endpoint processing in ASP.NET Core middleware registered prior to `UseMultiTenant`. Use the `HttpContext`
-  extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
-
-* `IMultiTenantContextSetter` is available via dependency injection and can be used to set the current tenant. This is
-  useful in advanced scenarios and should be used with caution. Prefer using the `HttpContext` extension method
-  `SetTenantInfo<TTenantInfo>` in use cases where `HttpContext` is available.
+`IMultiTenantContextAccessor<TTenantInfo>` (and its non-generic variant `IMultiTenantContextAccessor`) are available
+via dependency injection and behave similarly to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track
+state. Note that in parent async contexts any changes in tenant will not be reflected — for example, the accessor will
+not reflect a tenant in the post-endpoint processing of ASP.NET Core middleware registered prior to `UseMultiTenant`.
+Use the `HttpContext` extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
 
 > Prior versions of MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
 > via dependency injection. This was removed as these are not actual services, similar to
 > how [HttpContext is not a service](https://github.com/dotnet/aspnetcore/issues/47996#issuecomment-1529364233) and not
 > available directly via dependency injection.
 
-### `HttpContext` Extension Methods
+### Via `HttpContext` (ASP.NET Core)
 
-For web apps these convenience methods are also available:
+For ASP.NET Core web apps the `GetMultiTenantContext<TTenantInfo>` extension method is available directly on
+`HttpContext` and is the preferred approach. See
+[ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
-* `GetMultiTenantContext<TTenantInfo>`
+## Setting the Current Tenant
 
-  Use this `HttpContext` extension method to get the `MultiTenantContext<TTenantInfo>` instance for the current request.
-  This should be preferred to `IMultiTenantContextAccessor` or `IMultiTenantContextAccessor<TTenantInfo>` when possible.
+In most cases the middleware resolves and sets the tenant automatically. When manual override is needed there are two
+options:
 
-  ```csharp
-  var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
-  
-  if(tenantInfo != null)
-  {
-    var tenantId = tenantInfo.Id;
-    var identifier = tenantInfo.Identifier;
-    var name = tenantInfo.Name;
-  }
-  ```
+### Via Dependency Injection
 
-* `SetTenantInfo<TTenantInfo>`
+`IMultiTenantContextSetter` is available via dependency injection and can be used to set the current tenant. This is
+useful in advanced scenarios and should be used with caution. Prefer the `HttpContext` extension method
+`SetTenantInfo<TTenantInfo>` when `HttpContext` is available.
 
-  For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly overriding
-  the `TenantInfo` set by the middleware.
+### Via `HttpContext` (ASP.NET Core)
 
-  Use this `HttpContext` extension method to set the current tenant to the provided `TenantInfo`.
-  Optionally it can also reset the service provider scope so that any scoped services already resolved will
-  be resolved again under the current tenant when needed. This has no effect on singleton or transient services. Setting
-  the `TenantInfo` with this method sets both the `StoreInfo` and `StrategyInfo` properties on the
-  `MultiTenantContext<TTenantInfo>` to `null`.
-
-  ```csharp
-  var newTenantInfo = new TenantInfo { Id = "new-id", Identifier = "new-identifier" };
-  
-  HttpContext.SetTenantInfo(newTenantInfo, resetServiceProviderScope: true);
-  
-  // This will be the new tenant.
-  var tenant = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
-
-  // This will regenerate the options class.
-  var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
-  ```
+For ASP.NET Core web apps the `SetTenantInfo<TTenantInfo>` extension method is available directly on `HttpContext`.
+See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.

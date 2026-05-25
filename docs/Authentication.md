@@ -1,5 +1,8 @@
 # Per-Tenant Authentication
 
+> Per-tenant authentication requires `Finbuckle.MultiTenant.AspNetCore`. See
+> [ASP.NET Core Integration](AspNetCore) for an overview of setup and middleware configuration.
+
 MultiTenant provides built-in support for isolating tenant
 authentication. This means that the login session for a given request will only
 be valid for the current tenant. Subsequent requests from the same client, but

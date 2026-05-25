@@ -105,6 +105,10 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant.AspNetCore
 
+> The strategies below (`HttpContext`, `Base Path`, `Claim`, `Session`, `Route`, `Host`, `Header`, and
+> `Remote Authentication Callback`) all require `Finbuckle.MultiTenant.AspNetCore`. For an overview of
+> ASP.NET Core integration and middleware setup see [ASP.NET Core Integration](AspNetCore).
+
 Uses a delegate that takes an `HttpContext` parameter to determine the tenant identifier. When used with the ASP.NET
 Core middleware each request's `HttpContext` is passed to the strategy. This strategy can be used multiple times and will
 run in the order configured. Tenant resolution will ignore this strategy if the context is not of the correct type.

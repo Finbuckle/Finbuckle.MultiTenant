@@ -123,6 +123,7 @@ See [Configuration and Usage](ConfigurationAndUsage) for more information.
 The library builds on this basic functionality to provide a variety of higher level features. See the documentation for
 more details:
 
+* [ASP.NET Core Integration](AspNetCore) — middleware options, bypassing, short-circuiting, `HttpContext` helpers
 * [Per-tenant Options](Options)
 * [Per-tenant Authentication](Authentication)
 * [Entity Framework Core Data Isolation](EFCore)
