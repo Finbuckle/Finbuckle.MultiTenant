@@ -3,13 +3,15 @@ name: Release Dry Run
 on: [workflow_dispatch]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.2.0
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: 10
@@ -18,14 +20,5 @@ jobs:
           dotnet restore
           dotnet build -c Release --no-restore -p:ContinuousIntegrationBuild=true
           dotnet test -c Release --no-build
-      - name: setup semantic-release
-        run: |
-          npm install -D semantic-release
-          npm install -D @semantic-release/git
-          npm install -D @semantic-release/changelog
-          npm install -D @semantic-release/exec
-          npm install -D conventional-changelog-conventionalcommits
-      - name: run semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.workflow_pat }}
-        run: npx semantic-release --dry-run
+      - name: prepare release (dry run - no commit or push)
+        run: dotnet prepare-release.cs

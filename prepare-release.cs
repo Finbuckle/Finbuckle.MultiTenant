@@ -2,12 +2,20 @@
 // Requires .NET 10+  -  run with: dotnet run prepare-release.cs
 // Or make executable and run directly: chmod +x prepare-release.cs && ./prepare-release.cs
 //
+// Usage: prepare-release.cs
+//        Run from the repository root.
+//
 // What this script does:
-//   1. Find the most recent semantic-version git tag (v1.2.3)
-//   2. Collect every commit since that tag
-//   3. Parse commits against the Conventional Commits spec
-//   4. Calculate the version bump: MAJOR / MINOR / PATCH / none
-//   5. Build formatted release notes and prepend them to CHANGELOG.md
+//    1. Find the most recent semantic-version git tag (v1.2.3)
+//    2. Collect every commit since that tag
+//    3. Parse commits against the Conventional Commits spec
+//    4. Calculate the version bump: MAJOR / MINOR / PATCH / none
+//    5. Build formatted release notes and prepend them to CHANGELOG.md
+//    6. Update <Version> in src/Directory.Build.props
+//    7. Update <span class="_version"> elements in README.md and docs/*.md
+//    8. Update <!--_release-notes--> blocks in docs/*.md (full release notes)
+//    9. Update <!--_release-notes--> block in README.md (release notes without section heading)
+//   10. Insert release notes into the <!--_history--> block in docs/History.md
 //
 // Conventional Commits and version bump rules:
 //   MAJOR bump  - any commit with `!` after the type, e.g. `feat!:` or `fix(scope)!:`
@@ -27,13 +35,12 @@ using System.Text.RegularExpressions;
 // ENTRY POINT  (top-level statements must appear before type declarations)
 // ============================================================================
 
+try
+{
 // Verify we are inside a git repository before doing anything.
 string repoRoot = Directory.GetCurrentDirectory();
 if (!Directory.Exists(Path.Combine(repoRoot, ".git")))
-{
-    Console.Error.WriteLine("ERROR: No .git directory found. Run this script from the repository root.");
-    Environment.Exit(1);
-}
+    throw new InvalidOperationException("No .git directory found. Run this script from the repository root.");
 
 Console.WriteLine("Finbuckle.MultiTenant - Release Preparation");
 Console.WriteLine();
@@ -66,6 +73,9 @@ if (bumpLevel == BumpLevel.None)
     return;
 }
 
+// Validate that the new major version matches the current branch (e.g. "8.x" or "9.x")
+ValidateBranchMajorVersion(newVersion);
+
 // Resolve the GitHub repo URL from the git remote (used for links in release notes)
 string repoUrl = GetRepoUrl();
 
@@ -81,16 +91,39 @@ Console.WriteLine();
 // --- Step 6: Prepend the notes to CHANGELOG.md ---
 PrependToChangelog(releaseNotes, repoRoot);
 
+// --- Step 7: Update <Version> in src/Directory.Build.props ---
+UpdateBuildPropsVersion(newVersion, repoRoot);
+
+// --- Step 8: Update _version spans in README.md and docs/*.md ---
+UpdateVersionSpans(newVersion, repoRoot);
+
+// --- Step 9 & 10: Update <!--_release-notes--> blocks ---
+UpdateReleaseNotesBlocks(releaseNotes, repoRoot);
+
+// --- Step 11: Insert release notes into <!--_history--> block in docs/History.md ---
+UpdateHistoryBlock(releaseNotes, repoRoot);
+
 Console.WriteLine();
-Console.WriteLine($"Previous version: {currentVersion!.ToTag()}");
-Console.WriteLine($"New version: {newVersion.ToTag()}");
-Console.WriteLine($"CHANGELOG.md: updated");
-Console.WriteLine();
-Console.WriteLine("Suggested next steps:");
-Console.WriteLine($"  git add CHANGELOG.md");
-Console.WriteLine($"  git commit -m \"chore: release {newVersion.ToTag()}\"");
-Console.WriteLine($"  git tag {newVersion.ToTag()}");
-Console.WriteLine($"  git push origin {newVersion.ToTag()}");
+Console.WriteLine($"Previous version : {currentVersion!.ToTag()}");
+Console.WriteLine($"New version      : {newVersion.ToTag()}");
+
+// Emit the new version as a GitHub Actions output variable when running in CI.
+string? githubOutput = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
+if (githubOutput is not null)
+{
+    // Write release notes to a temp file so the workflow can pass them to gh release create.
+    string notesFile = Path.Combine(Path.GetTempPath(), "release-notes.md");
+    File.WriteAllText(notesFile, releaseNotes);
+
+    File.AppendAllText(githubOutput, $"new_version={newVersion.ToTag()}\n");
+    File.AppendAllText(githubOutput, $"release_notes_file={notesFile}\n");
+}
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine($"ERROR: {ex.Message}");
+    Environment.Exit(1);
+}
 
 // ============================================================================
 // LOCAL FUNCTIONS
@@ -142,8 +175,51 @@ static string GetRepoUrl()
     }
 }
 
-// STEP 1 - List every tag sorted by version (newest first) and return the
-// first one that matches the v1.2.3 pattern.
+// Validate that the major component of newVersion is consistent with the current
+// git branch. Rules:
+//   main   - any version is allowed (new major versions are cut from main)
+//   N.x    - the new version's major must equal N
+//   other  - error; releases must be made from main or an N.x branch.
+static void ValidateBranchMajorVersion(SemanticVersion newVersion)
+{
+    string branch = Git("rev-parse --abbrev-ref HEAD");
+
+    if (branch == "main")
+    {
+        // On main, check that no N.x branch already exists for the new major version.
+        // If one does, the release should be made from that branch instead.
+        string expectedReleaseBranch = $"{newVersion.Major}.x";
+        var allBranches = Git("branch --list --all")
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(b => b.Trim().TrimStart('*').Trim()
+                          .Replace("remotes/origin/", ""))
+            .Distinct();
+
+        if (allBranches.Any(b => b == expectedReleaseBranch))
+            throw new InvalidOperationException(
+                $"Branch \"{expectedReleaseBranch}\" already exists. " +
+                $"Release {newVersion.ToTag()} should be made from that branch, not from main.");
+
+        Console.WriteLine($"Branch check passed: on main and \"{expectedReleaseBranch}\" does not yet exist.");
+        return;
+    }
+
+    var m = Regex.Match(branch, @"^(\d+)\.x$");
+    if (!m.Success)
+        throw new InvalidOperationException(
+            $"Current branch \"{branch}\" is not a valid release branch. " +
+            $"Releases must be made from \"main\" or an \"N.x\" branch (e.g. \"8.x\").");
+
+    int branchMajor = int.Parse(m.Groups[1].Value);
+    if (branchMajor != newVersion.Major)
+        throw new InvalidOperationException(
+            $"Version mismatch: calculated version {newVersion.ToTag()} has major version {newVersion.Major}, " +
+            $"but the current branch \"{branch}\" expects major version {branchMajor}.");
+
+    Console.WriteLine($"Branch check passed: {branch} is consistent with {newVersion.ToTag()}");
+}
+
+
 // Returns (null, 0.0.0) when no matching tag exists.
 static (string? tag, SemanticVersion? version) FindLatestTag()
 {
@@ -449,6 +525,133 @@ static void PrependToChangelog(string releaseNotes, string repoRoot)
     File.WriteAllText(path, newContent);
     Console.WriteLine($"{path} updated.");
 }
+
+// STEP 7 - Replace the <Version>…</Version> element in src/Directory.Build.props
+// with the newly calculated version.
+static void UpdateBuildPropsVersion(SemanticVersion newVersion, string repoRoot)
+{
+    Console.WriteLine("Step 7: Update <Version> in src/Directory.Build.props");
+    Console.WriteLine();
+
+    string path = Path.Combine(repoRoot, "src", "Directory.Build.props");
+    if (!File.Exists(path))
+        throw new FileNotFoundException($"Required file not found: {path}");
+
+    string content = File.ReadAllText(path);
+    string updated = Regex.Replace(content, @"<Version>.*?</Version>", $"<Version>{newVersion}</Version>");
+    File.WriteAllText(path, updated);
+    Console.WriteLine($"{path} updated.");
+}
+
+// STEP 8 - Replace <span class="_version">…</span> elements with the new
+// version string in README.md and every docs/*.md file.
+static void UpdateVersionSpans(SemanticVersion newVersion, string repoRoot)
+{
+    Console.WriteLine("Step 8: Update _version spans");
+    Console.WriteLine();
+
+    var files = new List<string>();
+    string readme = Path.Combine(repoRoot, "README.md");
+    if (File.Exists(readme)) files.Add(readme);
+
+    string docsDir = Path.Combine(repoRoot, "docs");
+    if (Directory.Exists(docsDir))
+        files.AddRange(Directory.GetFiles(docsDir, "*.md"));
+
+    foreach (var file in files)
+    {
+        string content = File.ReadAllText(file);
+        string updated = Regex.Replace(
+            content,
+            @"<span class=""_version"">.*?</span>",
+            $"""<span class="_version">{newVersion}</span>""");
+
+
+        File.WriteAllText(file, updated);
+        Console.WriteLine($"{file} updated.");
+    }
+}
+
+// STEP 9 & 10 - Replace <!--_release-notes-->…<!--_release-notes--> delimiters
+// in docs/*.md (full release notes) and README.md (notes without the first heading line).
+static void UpdateReleaseNotesBlocks(string releaseNotes, string repoRoot)
+{
+    Console.WriteLine("Step 9 & 10: Update <!--_release-notes--> blocks");
+    Console.WriteLine();
+
+    // For README, strip the first line (the "## [version](url) (date)" heading)
+    string releaseNotesNoHeader = string.Join('\n',
+        releaseNotes.Split('\n').Skip(1)).TrimStart('\r', '\n');
+
+    // Regex that matches the content between the marker comments (dotall / singleline)
+    const string markerPattern = @"<!--_release-notes-->.*?<!--_release-notes-->";
+    const RegexOptions dotAll  = RegexOptions.Singleline;
+
+    string docsDir = Path.Combine(repoRoot, "docs");
+    if (Directory.Exists(docsDir))
+    {
+        foreach (var file in Directory.GetFiles(docsDir, "*.md"))
+        {
+            string content = File.ReadAllText(file);
+            if (!Regex.IsMatch(content, markerPattern, dotAll)) continue;
+
+            string updated = Regex.Replace(
+                content,
+                markerPattern,
+                $"<!--_release-notes-->\n{releaseNotes}\n<!--_release-notes-->",
+                dotAll);
+            File.WriteAllText(file, updated);
+            Console.WriteLine($"{file} updated.");
+        }
+    }
+
+    string readme = Path.Combine(repoRoot, "README.md");
+    if (File.Exists(readme))
+    {
+        string content = File.ReadAllText(readme);
+        if (Regex.IsMatch(content, markerPattern, dotAll))
+        {
+            string updated = Regex.Replace(
+                content,
+                markerPattern,
+                $"<!--_release-notes-->\n{releaseNotesNoHeader}\n<!--_release-notes-->",
+                dotAll);
+            File.WriteAllText(readme, updated);
+            Console.WriteLine($"{readme} updated.");
+        }
+    }
+}
+
+// STEP 11 - Replace the <!--_history-->…<!--_history--> block in docs/History.md
+// with the newly built release notes.
+static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
+{
+    Console.WriteLine("Step 11: Update <!--_history--> block in docs/History.md");
+    Console.WriteLine();
+
+    string historyPath = Path.Combine(repoRoot, "docs", "History.md");
+
+    if (!File.Exists(historyPath))
+        throw new FileNotFoundException($"Required file not found: {historyPath}");
+
+    string content = File.ReadAllText(historyPath);
+
+    const string markerPattern = @"<!--_history-->.*?<!--_history-->";
+    const RegexOptions dotAll  = RegexOptions.Singleline;
+
+    if (!Regex.IsMatch(content, markerPattern, dotAll))
+        throw new InvalidOperationException($"No <!--_history--> markers found in {historyPath}");
+
+    string updated = Regex.Replace(
+        content,
+        markerPattern,
+        $"<!--_history-->\n{releaseNotes}\n<!--_history-->",
+        dotAll);
+    File.WriteAllText(historyPath, updated);
+    Console.WriteLine($"{historyPath} updated.");
+}
+
+
 
 // ============================================================================
 // TYPE DECLARATIONS
