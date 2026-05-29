@@ -105,26 +105,36 @@ There are several ways an app can see the current tenant:
 
 ### `HttpContext` Extension Methods
 
-For web apps these convenience methods are also available:
+For web apps, these convenience methods are also available:
 
-* `GetMultiTenantContext<TTenantInfo>`
+* `GetTenantInfo<TTenantInfo>`
 
-  Use this `HttpContext` extension method to get the `MultiTenantContext<TTenantInfo>` instance for the current
-  request. This should be preferred to `IMultiTenantContextAccessor` or `IMultiTenantContextAccessor<TTenantInfo>` when
-  possible.
+  Use this `HttpContext` extension method to get the `TTenantInfo` instance for the current request.
 
-  ```csharp
-  var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
+```csharp
+  var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
   
   if(tenantInfo != null)
   {
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
     var name = tenantInfo.Name;
-    var something = tenantInfo.Items["something"];
   }
   ```
+  
+* `GetMultiTenantContext<TTenantInfo>`
 
+  Use this `HttpContext` extension method to get the `MultiTenantContext<TTenantInfo>` instance for the current
+  request. This should be preferred to `IMultiTenantContextAccessor` or `IMultiTenantContextAccessor<TTenantInfo>` when
+  possible.
+
+  This can be used if additional information, beyond the tenant, is needed.
+
+  ```csharp
+  var multiTenantContext = HttpContext.GetMultiTenantContext<TenantInfo>();
+  var storeInfo = multiTenantContext.StoreInfo;
+  ```
+  
 * `TrySetTenantInfo<TTenantInfo>`
 
   For most cases the middleware sets the `TenantInfo` and this method is not needed. Use only if explicitly
