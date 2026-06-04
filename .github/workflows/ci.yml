@@ -14,13 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repo
-        uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            6
-            7
-            8
+        uses: actions/checkout@v3
       - name: build
         run: dotnet build
       - name: test Finbuckle.MultiTenant
