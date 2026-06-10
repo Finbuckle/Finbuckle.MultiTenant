@@ -3,7 +3,7 @@ name: Dependabot Clone Legacy
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 20 * * *' # 8 PM UTC (2 PM MDT / 1 PM MST)
+    - cron: '0 20 * * *'
 
 permissions:
   contents: write
