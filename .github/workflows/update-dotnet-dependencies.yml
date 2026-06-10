@@ -2,7 +2,7 @@ name: Update .NET Dependencies
 
 on:
   schedule:
-    - cron: '0 20 * * *' # 2 PM Mountain Time during daylight saving
+    - cron: '0 20 * * *' # 2 PM Mountain Daylight Time / 1 PM Mountain Standard Time
   workflow_dispatch:
 
 permissions:
