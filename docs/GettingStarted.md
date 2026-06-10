@@ -118,7 +118,7 @@ more details:
 ## Samples
 
 A variety of sample projects are available in the `samples` directory. Be sure to read the information on the index page
-of each sample and the code comments in the `Startup` class. Note that many older samples have been removed as .NET
+of each sample and the code comments in `Program.cs`. Note that many older samples have been removed as .NET
 versions are end-of-lifed by Microsoft, such as .NET Core 3.0 and .NET 5. These samples are still available in earlier
 tagged release commits if needed.
 

@@ -44,7 +44,7 @@ public class MyOptions
 }
 ```
 
-In the app configuration, `services.Configure<MyOptions>` is called with a delegate
+In the app configuration, `builder.Services.Configure<MyOptions>` is called with a delegate
 or `IConfiguration` parameter to set the option values:
 
 ```csharp

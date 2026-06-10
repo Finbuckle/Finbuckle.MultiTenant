@@ -25,7 +25,7 @@ define `TryAddAsync`, `TryUpdateAsync`
 and `TryGetAsync` should return null if there is no suitable tenant match.
 
 A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>`
-after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
+after `AddMultiTenant<TTenantInfo>` in `Program.cs`. `WithStore<TStore>` uses
 dependency
 injection along with any passed parameters to construct the implementation instance. An alternative overload accepts
 a `Func<IServiceProvider, TStore>` factory method for even more customization. Both methods also require a service
@@ -265,11 +265,11 @@ expiration:
 
 ```csharp
 // use the default configuration with no sliding expiration.
-services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo>()
         .WithDistributedCacheStore()...
 
 // or set a 5 minute sliding expiration.
-services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo>()
         .WithDistributedCacheStore(TimeSpan.FromMinutes(5));
 ```
 
@@ -287,6 +287,6 @@ a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync
 Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
 
 ```csharp
-services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo>()
     .WithEchoStore();
 ```

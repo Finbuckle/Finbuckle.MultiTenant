@@ -114,14 +114,15 @@ For web apps these convenience methods are also available:
   possible.
 
   ```csharp
-  var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
+  var tenantInfo = HttpContext.GetMultiTenantContext<MyAppTenantInfo>().TenantInfo;
   
   if(tenantInfo != null)
   {
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
     var name = tenantInfo.Name;
-    var something = tenantInfo.Items["something"];
+    // access a custom property on MyAppTenantInfo
+    var something = tenantInfo.SomeCustomProperty;
   }
   ```
 
