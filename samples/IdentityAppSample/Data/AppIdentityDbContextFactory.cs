@@ -7,6 +7,11 @@ public class AppIdentityDbContextFactory : IDbContextFactory<AppIdentityDbContex
 {
     public AppIdentityDbContext CreateDbContext()
     {
-        return MultiTenantDbContext.Create<AppIdentityDbContext, AppTenantInfo>(new AppTenantInfo("dummy", "dummy", "dummy"));
+        return MultiTenantDbContext.Create<AppIdentityDbContext, AppTenantInfo>(new AppTenantInfo
+        {
+            Id = "dummy",
+            Identifier = "dummy",
+            Name = "dummy"
+        });
     }
 }
