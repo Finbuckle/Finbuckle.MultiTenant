@@ -2,7 +2,7 @@ name: Update .NET Dependencies
 
 on:
   schedule:
-    - cron: '0 20 * * *' # 2 PM Mountain Daylight Time / 1 PM Mountain Standard Time
+    - cron: '0 20 * * *' # 8 PM UTC (2 PM MDT / 1 PM MST)
   workflow_dispatch:
 
 permissions:
