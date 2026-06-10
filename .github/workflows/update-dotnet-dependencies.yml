@@ -1,0 +1,69 @@
+name: Update .NET Dependencies
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.2.0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # v5.3.0
+        with:
+          dotnet-version: 10
+
+      - name: Install dotnet-outdated
+        run: dotnet tool install --global dotnet-outdated-tool
+
+      - name: Update dependencies
+        run: dotnet outdated --upgrade Finbuckle.MultiTenant.slnx
+
+      - name: Regenerate lock files
+        run: dotnet restore --force-evaluate
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push branch
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B update-dotnet-dependencies
+          git add -A
+          git commit -m "fix: update .NET dependencies"
+          git push --force origin update-dotnet-dependencies
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR only if one doesn't already exist for this branch
+          EXISTING=$(gh pr list --head update-dotnet-dependencies --json number --jq length)
+          if [ "$EXISTING" -eq 0 ]; then
+            gh pr create \
+              --title "fix: update .NET dependencies" \
+              --body "Automated dependency update using [dotnet-outdated](https://github.com/dotnet-outdated/dotnet-outdated).
+
+          Please review the changes and ensure CI passes before merging." \
+              --label dependencies \
+              --base main \
+              --head update-dotnet-dependencies
+          fi
+
