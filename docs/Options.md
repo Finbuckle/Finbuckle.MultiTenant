@@ -39,7 +39,7 @@ correct values for the current tenant are used.
 
 ## Options Basics
 
-Consider a typical scenario in ASP.Net Core, starting with a simple class:
+Consider a typical scenario in ASP.NET Core, starting with a simple class:
 
 ```csharp
 public class MyOptions
