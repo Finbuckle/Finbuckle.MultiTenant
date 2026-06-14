@@ -189,4 +189,28 @@ public class EfCoreStoreShould
     {
         await base.GetAllTenantsFromStoreAsyncSkip1Take1();
     }
+
+    [Fact]
+    public async Task ReturnFalseWhenRemovingNonExistentTenant()
+    {
+        var store = await CreateTestStore();
+        var result = await store.RemoveAsync("identifier-that-does-not-exist");
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task ThrowWhenAddingTenantWithDuplicateId()
+    {
+        var store = await CreateTestStore();
+        var duplicate = new TenantInfo { Id = "initech-id", Identifier = "unique-new-identifier" };
+        await Assert.ThrowsAnyAsync<Exception>(() => store.AddAsync(duplicate));
+    }
+
+    [Fact]
+    public async Task ThrowWhenUpdatingNonExistentTenant()
+    {
+        var store = await CreateTestStore();
+        var nonExistent = new TenantInfo { Id = "does-not-exist", Identifier = "does-not-exist" };
+        await Assert.ThrowsAnyAsync<Exception>(() => store.UpdateAsync(nonExistent));
+    }
 }

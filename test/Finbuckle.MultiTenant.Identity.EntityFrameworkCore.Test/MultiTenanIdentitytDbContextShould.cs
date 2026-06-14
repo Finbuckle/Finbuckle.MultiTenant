@@ -7,6 +7,7 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -279,5 +280,39 @@ public class MultiTenantIdentityDbContextShould
         var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
+    }
+
+    [Fact]
+    public void QueryFilterIsolatesUsersByTenant()
+    {
+        using var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
+
+        var tenant1 = new TenantInfo { Id = "t1", Identifier = "t1", Name = "t1" };
+        var tenant2 = new TenantInfo { Id = "t2", Identifier = "t2", Name = "t2" };
+
+        using var setup = new MultiTenantIdentityDbContext(options);
+        setup.TenantInfo = tenant1;
+        setup.Database.EnsureCreated();
+        setup.Users.Add(new IdentityUser { UserName = "tenant1-user", NormalizedUserName = "TENANT1-USER" });
+        setup.SaveChanges();
+
+        using var asT2 = new MultiTenantIdentityDbContext(options);
+        asT2.TenantInfo = tenant2;
+        Assert.Equal(0, asT2.Users.Count());
+
+        using var asT1 = new MultiTenantIdentityDbContext(options);
+        asT1.TenantInfo = tenant1;
+        Assert.Equal(1, asT1.Users.Count());
+    }
+
+    [Fact]
+    public void ThrowWhenTenantInfoIsNullAndIdentityEntitiesChanged()
+    {
+        using var db = new TestIdentityDbContext();
+        db.Users.Add(new IdentityUser { UserName = "null-tenant-user", NormalizedUserName = "NULL-TENANT-USER" });
+
+        Assert.Throws<MultiTenantException>(() => db.SaveChanges());
     }
 }
