@@ -1,9 +1,8 @@
 name: Copy Docs to Website
 
 on:
+    workflow_call:
     workflow_dispatch:
-    release:
-        types: [published]
 
 permissions:
   contents: read

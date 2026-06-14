@@ -7,11 +7,12 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.changes.outputs.has_changes }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.2.0
@@ -39,31 +40,32 @@ jobs:
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit and push branch
+      - name: Commit and push
         if: steps.changes.outputs.has_changes == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B update-dotnet-dependencies
           git add -A
           git commit -m "fix: update .NET dependencies"
-          git push --force origin update-dotnet-dependencies
+          git push origin HEAD
 
-      - name: Create Pull Request
-        if: steps.changes.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Create PR only if one doesn't already exist for this branch
-          EXISTING=$(gh pr list --head update-dotnet-dependencies --json number --jq length)
-          if [ "$EXISTING" -eq 0 ]; then
-            gh pr create \
-              --title "fix: update .NET dependencies" \
-              --body "Automated dependency update using [dotnet-outdated](https://github.com/dotnet-outdated/dotnet-outdated).
+  release:
+    needs: update-dependencies
+    if: needs.update-dependencies.outputs.has_changes == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      draft: 'auto'
+    secrets: inherit
 
-          Please review the changes and ensure CI passes before merging." \
-              --label dependencies \
-              --base main \
-              --head update-dotnet-dependencies
-          fi
+  publish-nuget:
+    needs: release
+    if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
+    uses: ./.github/workflows/nuget-push-public.yml
+    secrets: inherit
+
+  copy-docs:
+    needs: release
+    if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
+    uses: ./.github/workflows/copy-docs.yml
+    secrets: inherit
 

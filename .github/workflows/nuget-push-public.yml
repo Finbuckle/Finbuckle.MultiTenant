@@ -1,9 +1,8 @@
 name: NuGet Push Public
 
 on: 
+  workflow_call:
   workflow_dispatch:
-  release:
-    types: [published]
 
 permissions:
   contents: read

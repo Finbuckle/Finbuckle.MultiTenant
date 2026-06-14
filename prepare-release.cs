@@ -117,6 +117,7 @@ if (githubOutput is not null)
 
     File.AppendAllText(githubOutput, $"new_version={newVersion.ToTag()}\n");
     File.AppendAllText(githubOutput, $"release_notes_file={notesFile}\n");
+    File.AppendAllText(githubOutput, $"bump_level={bumpLevel}\n");
 }
 }
 catch (Exception ex)
