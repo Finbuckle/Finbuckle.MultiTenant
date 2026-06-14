@@ -60,6 +60,9 @@ jobs:
   publish-nuget:
     needs: release
     if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/nuget-push-public.yml
     secrets: inherit
 
@@ -68,4 +71,3 @@ jobs:
     if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
     uses: ./.github/workflows/copy-docs.yml
     secrets: inherit
-
