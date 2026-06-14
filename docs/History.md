@@ -10,7 +10,7 @@
 
 ### Features
 
-* add functionalliy to conditionally bypass middleware in ASP.NET Core ([#1134](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1134)) (([fd2e0f6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd2e0f62c63fe1c69722448eb0b3e7493f02c84b)))
+* add functionality to conditionally bypass middleware in ASP.NET Core ([#1134](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1134)) (([fd2e0f6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd2e0f62c63fe1c69722448eb0b3e7493f02c84b)))
 
 ### Bug Fixes
 
