@@ -19,7 +19,7 @@
 //
 // Conventional Commits and version bump rules:
 //   MAJOR bump  - any commit with `!` after the type, e.g. `feat!:` or `fix(scope)!:`
-//                 OR a `BREAKING CHANGE:` token in the commit footer
+//                 OR one or more `BREAKING CHANGE:`/`BREAKING-CHANGE:` footer tokens
 //   MINOR bump  - `feat:` commits (new features, no breaking change)
 //   PATCH bump  - `fix:` or `perf:` commits (bug fixes, performance improvements)
 //   NO bump     - `docs:`, `style:`, `refactor:`, `test:`, `chore:`, `ci:`, `build:`, `revert:`
@@ -296,15 +296,15 @@ static List<(string FullHash, string ShortHash, string Subject, string Body)> Co
 // STEP 3 - Parse the raw commit tuples against the Conventional Commits spec:
 //   type(scope)!: description
 // Non-conventional commits are silently skipped.
-// Breaking changes are detected by `!` in the subject or a BREAKING CHANGE footer token.
+// Breaking changes are detected by `!` in the subject or BREAKING CHANGE footers.
 static List<ConventionalCommit> ParseCommits(
     List<(string FullHash, string ShortHash, string Subject, string Body)> raw)
 {
     Console.WriteLine("Step 3: Parse commits (Conventional Commits spec)");
     Console.WriteLine();
 
-    const string ccPattern  = @"^(?<type>feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(?:\((?<scope>[^)]+)\))?(?<breaking>!)?:\s+(?<desc>.+)$";
-    const string brkPattern = @"^BREAKING[- ]CHANGE:\s+(?<note>.+)";
+    const string ccPattern        = @"^(?<type>feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(?:\((?<scope>[^)]+)\))?(?<breaking>!)?:\s+(?<desc>.+)$";
+    const string brkHeaderPattern = @"^(?:BREAKING CHANGE|BREAKING-CHANGE):\s*(?<note>.*)$";
 
     var parsed  = new List<ConventionalCommit>();
     int skipped = 0;
@@ -323,21 +323,43 @@ static List<ConventionalCommit> ParseCommits(
         string scope = m.Groups["scope"].Value;  // empty string when no scope present
         string desc  = m.Groups["desc"].Value;
 
-        // Breaking if the subject contains `!` before the colon
-        bool   isBreaking   = m.Groups["breaking"].Success;
-        string breakingNote = string.Empty;
+        // Breaking if the subject contains `!` before the colon or footer contains BREAKING CHANGE.
+        var breakingNotes = new List<string>();
+        bool isBreaking   = m.Groups["breaking"].Success;
 
-        // Also scan footer lines for BREAKING CHANGE / BREAKING-CHANGE
-        foreach (var line in body.Split('\n'))
+        var bodyLines = body.Split('\n')
+            .Select(l => l.TrimEnd('\r'))
+            .ToList();
+
+        for (int i = 0; i < bodyLines.Count; i++)
         {
-            var bm = Regex.Match(line.Trim(), brkPattern);
+            var line = bodyLines[i];
+            var bm   = Regex.Match(line, brkHeaderPattern);
             if (!bm.Success) continue;
-            isBreaking   = true;
-            breakingNote = bm.Groups["note"].Value;
-            break;
+
+            var noteBuilder = new StringBuilder(bm.Groups["note"].Value.Trim());
+
+            // Conventional Commits allows footer values to continue on following indented lines.
+            int j = i + 1;
+            while (j < bodyLines.Count && (bodyLines[j].StartsWith(' ') || bodyLines[j].StartsWith('\t')))
+            {
+                if (noteBuilder.Length > 0)
+                    noteBuilder.Append('\n');
+                noteBuilder.Append(bodyLines[j].TrimStart());
+                j++;
+            }
+
+            var note = noteBuilder.ToString().Trim();
+            if (!string.IsNullOrEmpty(note))
+                breakingNotes.Add(note);
+
+            i = j - 1;
         }
 
-        parsed.Add(new ConventionalCommit(shortHash, fullHash, type, scope, desc, isBreaking, breakingNote));
+        if (breakingNotes.Count > 0)
+            isBreaking = true;
+
+        parsed.Add(new ConventionalCommit(shortHash, fullHash, type, scope, desc, isBreaking, breakingNotes));
 
         string label = isBreaking ? "[BREAKING]" : $"[{type}]";
         string sc    = string.IsNullOrEmpty(scope) ? "" : $"({scope}) ";
@@ -446,8 +468,11 @@ static string BuildReleaseNotes(
             // No scopes in this section — flat list.
             foreach (var c in items)
             {
-                if (!string.IsNullOrEmpty(c.BreakingNote))
-                    sb.AppendLine($"* {c.BreakingNote}");
+                if (c.BreakingNotes.Count > 0)
+                {
+                    foreach (var note in c.BreakingNotes)
+                        sb.AppendLine($"* {note}");
+                }
                 else
                     sb.AppendLine(FormatBullet(c));
             }
@@ -467,8 +492,11 @@ static string BuildReleaseNotes(
                 sb.AppendLine();
                 foreach (var c in items.Where(c => c.Scope == scope))
                 {
-                    if (!string.IsNullOrEmpty(c.BreakingNote))
-                        sb.AppendLine($"* {c.BreakingNote}");
+                    if (c.BreakingNotes.Count > 0)
+                    {
+                        foreach (var note in c.BreakingNotes)
+                            sb.AppendLine($"* {note}");
+                    }
                     else
                         sb.AppendLine(FormatBullet(c));
                 }
@@ -483,8 +511,11 @@ static string BuildReleaseNotes(
                 sb.AppendLine();
                 foreach (var c in unscoped)
                 {
-                    if (!string.IsNullOrEmpty(c.BreakingNote))
-                        sb.AppendLine($"* {c.BreakingNote}");
+                    if (c.BreakingNotes.Count > 0)
+                    {
+                        foreach (var note in c.BreakingNotes)
+                            sb.AppendLine($"* {note}");
+                    }
                     else
                         sb.AppendLine(FormatBullet(c));
                 }
@@ -693,7 +724,6 @@ record ConventionalCommit(
     string Type,         // feat | fix | docs | chore | ...
     string Scope,        // the (scope) part, or empty string if not specified
     string Description,  // the commit subject/description
-    bool   IsBreaking,   // true when `!` in subject or BREAKING CHANGE in footer
-    string BreakingNote  // the note from "BREAKING CHANGE: <note>", or ""
+    bool IsBreaking, // true when `!` in subject or BREAKING CHANGE footer(s)
+    IReadOnlyList<string> BreakingNotes // notes from BREAKING CHANGE footer tokens (possibly multiple)
 );
-
