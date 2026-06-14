@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Extensions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -26,20 +27,14 @@ public class MultiTenantDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca);
-
+        var c = new TestBlogDbContext();
         Assert.NotNull(c);
     }
 
     [Fact]
     public void WorkWithTwoParamCtor()
     {
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        var mca = new StaticMultiTenantContextAccessor<TenantInfo>(tenant1);
-        var c = new TestBlogDbContext(mca, new DbContextOptions<TestBlogDbContext>());
-
+        var c = new TestBlogDbContext(new DbContextOptions<TestBlogDbContext>());
         Assert.NotNull(c);
     }
 
@@ -77,6 +72,7 @@ public class MultiTenantDbContextShould
             EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, sp);
 
         Assert.NotNull(c);
+        Assert.Same(tenant1, c.TenantInfo);
     }
 
     [Fact]
@@ -91,9 +87,35 @@ public class MultiTenantDbContextShould
     [Fact]
     public void ThrowOnInvalidDbContext()
     {
+        // Passing args that no constructor accepts should throw ArgumentException.
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
 
         Assert.Throws<ArgumentException>(() =>
-            EntityFrameworkCore.MultiTenantDbContext.Create<DbContext, TenantInfo>(tenant1));
+            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object(), new object()));
+    }
+
+    [Fact]
+    public void QueryFilterIsolatesDataByTenant()
+    {
+        using var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
+
+        var tenant1 = new TenantInfo { Id = "t1", Identifier = "t1", Name = "t1" };
+        var tenant2 = new TenantInfo { Id = "t2", Identifier = "t2", Name = "t2" };
+
+        using var setup = new TestBlogDbContext(options);
+        setup.TenantInfo = tenant1;
+        setup.Database.EnsureCreated();
+        setup.Blogs?.Add(new Blog { Title = "tenant1 blog" });
+        setup.SaveChanges();
+
+        using var asT2 = new TestBlogDbContext(options);
+        asT2.TenantInfo = tenant2;
+        Assert.Equal(0, asT2.Blogs?.Count());
+
+        using var asT1 = new TestBlogDbContext(options);
+        asT1.TenantInfo = tenant1;
+        Assert.Equal(1, asT1.Blogs?.Count());
     }
 }

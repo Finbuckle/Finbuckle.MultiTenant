@@ -7,6 +7,7 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,16 +17,16 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class MultiTenantIdentityDbContextShould
 {
-    private TContext CreateDbContextViaDi<TContext>(int schemaVersion = 3) where TContext : DbContext
+    private TContext CreateDbContextViaDi<TContext>(int schemaVersion = 3) where TContext : DbContext, IMultiTenantDbContext
     {
         var services = new ServiceCollection();
         services.AddOptions();
-        services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion,0));
-        services.AddMultiTenant<TenantInfo>();
-        // override the generic accessor with a static one bound to a test tenant
+        services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion, 0));
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
-        services.AddSingleton<IMultiTenantContextAccessor<TenantInfo>>(new StaticMultiTenantContextAccessor<TenantInfo>(tenant));
-        services.AddDbContext<TContext>(o =>
+        services.AddMultiTenant<TenantInfo>()
+            .WithStaticStrategy(tenant.Identifier)
+            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+        services.AddMultiTenantDbContext<TContext>(o =>
         {
             o.UseSqlite("DataSource=:memory:");
             o.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
@@ -39,8 +40,11 @@ public class MultiTenantIdentityDbContextShould
     public void WorkWithDependencyInjection()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.AddDbContext<TestIdentityDbContext>();
+        var tenant = new TenantInfo { Id = "abc", Identifier = "abc", Name = "abc" };
+        services.AddMultiTenant<TenantInfo>()
+            .WithStaticStrategy(tenant.Identifier)
+            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+        services.AddMultiTenantDbContext<TestIdentityDbContext>();
         var scope = services.BuildServiceProvider().CreateScope();
 
         var context = scope.ServiceProvider.GetService<TestIdentityDbContext>();
@@ -50,7 +54,7 @@ public class MultiTenantIdentityDbContextShould
     [Fact]
     public void WorkWithSingleParamCtor()
     {
-        var c = CreateDbContextViaDi<TestIdentityDbContext>();
+        var c = new TestIdentityDbContext();
         Assert.NotNull(c);
     }
 
@@ -276,5 +280,39 @@ public class MultiTenantIdentityDbContextShould
         var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
 
         Assert.NotNull(c);
+    }
+
+    [Fact]
+    public void QueryFilterIsolatesUsersByTenant()
+    {
+        using var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
+
+        var tenant1 = new TenantInfo { Id = "t1", Identifier = "t1", Name = "t1" };
+        var tenant2 = new TenantInfo { Id = "t2", Identifier = "t2", Name = "t2" };
+
+        using var setup = new MultiTenantIdentityDbContext(options);
+        setup.TenantInfo = tenant1;
+        setup.Database.EnsureCreated();
+        setup.Users.Add(new IdentityUser { UserName = "tenant1-user", NormalizedUserName = "TENANT1-USER" });
+        setup.SaveChanges();
+
+        using var asT2 = new MultiTenantIdentityDbContext(options);
+        asT2.TenantInfo = tenant2;
+        Assert.Equal(0, asT2.Users.Count());
+
+        using var asT1 = new MultiTenantIdentityDbContext(options);
+        asT1.TenantInfo = tenant1;
+        Assert.Equal(1, asT1.Users.Count());
+    }
+
+    [Fact]
+    public void ThrowWhenTenantInfoIsNullAndIdentityEntitiesChanged()
+    {
+        using var db = new TestIdentityDbContext();
+        db.Users.Add(new IdentityUser { UserName = "null-tenant-user", NormalizedUserName = "NULL-TENANT-USER" });
+
+        Assert.Throws<MultiTenantException>(() => db.SaveChanges());
     }
 }
