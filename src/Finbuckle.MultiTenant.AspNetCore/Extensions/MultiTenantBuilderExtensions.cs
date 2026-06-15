@@ -306,14 +306,14 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
             options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType ==
+                if (resolutionCompletedContext.TenantContext.StrategyInfo?.StrategyType ==
                     typeof(BasePathStrategy) &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)
                 {
                     httpContext.Request.Path.StartsWithSegments(
-                        $"/{resolutionCompletedContext.MultiTenantContext.TenantInfo?.Identifier}",
+                        $"/{resolutionCompletedContext.TenantContext.TenantInfo?.Identifier}",
                         out var matched, out var
                             newPath);
                     httpContext.Request.PathBase = httpContext.Request.PathBase.Add(matched);

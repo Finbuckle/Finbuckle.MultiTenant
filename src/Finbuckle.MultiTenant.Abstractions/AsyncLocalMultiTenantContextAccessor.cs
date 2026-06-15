@@ -4,27 +4,27 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Provides access to the current <see cref="IMultiTenantContext{TTenantInfo}"/> via an <see cref="AsyncLocal{T}"/> variable.
+/// Provides access to the current <see cref="ITenantContext{TTenantInfo}"/> via an <see cref="AsyncLocal{T}"/> variable.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
 public class AsyncLocalMultiTenantContextAccessor<TTenantInfo> : IMultiTenantContextSetter,
     IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
-    private static readonly AsyncLocal<IMultiTenantContext<TTenantInfo>> AsyncLocalContext = new();
+    private static readonly AsyncLocal<ITenantContext<TTenantInfo>> AsyncLocalContext = new();
 
     /// <inheritdoc />
-    public IMultiTenantContext<TTenantInfo> MultiTenantContext
+    public ITenantContext<TTenantInfo> MultiTenantContext
     {
-        get => AsyncLocalContext.Value ?? (AsyncLocalContext.Value = new MultiTenantContext<TTenantInfo>(default));
+        get => AsyncLocalContext.Value ?? (AsyncLocalContext.Value = new TenantContext<TTenantInfo>(default));
         private set => AsyncLocalContext.Value = value;
     }
 
     /// <inheritdoc />
-    IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
+    ITenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
 
-    IMultiTenantContext IMultiTenantContextSetter.MultiTenantContext
+    ITenantContext IMultiTenantContextSetter.MultiTenantContext
     {
-        set => MultiTenantContext = (IMultiTenantContext<TTenantInfo>)value;
+        set => MultiTenantContext = (ITenantContext<TTenantInfo>)value;
     }
 }

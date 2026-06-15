@@ -44,7 +44,7 @@ public class MultiTenantMiddlewareShould
 
         await mw.Invoke(context.Object);
 
-        var mtc = (IMultiTenantContext<TenantInfo>?)context.Object.Items[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
 
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
@@ -79,7 +79,7 @@ public class MultiTenantMiddlewareShould
 
         await mw.Invoke(context.Object);
 
-        var mtc = (IMultiTenantContext<TenantInfo>?)context.Object.Items[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
 
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
@@ -103,7 +103,7 @@ public class MultiTenantMiddlewareShould
         var itemsDict = new Dictionary<object, object?>();
         context.Setup(c => c.Items).Returns(itemsDict);
 
-        IMultiTenantContext<TenantInfo>? mtc = null;
+        ITenantContext<TenantInfo>? mtc = null;
 
         var mw = CreateMiddleware(_ =>
         {
@@ -137,7 +137,7 @@ public class MultiTenantMiddlewareShould
         var itemsDict = new Dictionary<object, object?>();
         context.Setup(c => c.Items).Returns(itemsDict);
 
-        IMultiTenantContext<TenantInfo>? mtc = null;
+        ITenantContext<TenantInfo>? mtc = null;
 
         var mw = CreateMiddleware(_ =>
         {
@@ -184,7 +184,7 @@ public class MultiTenantMiddlewareShould
 
         await mw.Invoke(context.Object);
 
-        var mtc = (IMultiTenantContext<TenantInfo>?)context.Object.Items[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
 
         Assert.NotNull(mtc);
         Assert.False(mtc.IsResolved);
@@ -226,7 +226,7 @@ public class MultiTenantMiddlewareShould
 
         await mw.Invoke(context.Object);
 
-        var mtc = (IMultiTenantContext<TenantInfo>?)context.Object.Items[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
 
         Assert.NotNull(mtc);
         Assert.False(mtc.IsResolved);
@@ -265,7 +265,7 @@ public class MultiTenantMiddlewareShould
 
         // next should have been called, but resolution should have been bypassed
         Assert.True(calledNext);
-        Assert.False(itemsDict.ContainsKey(typeof(IMultiTenantContext)));
+        Assert.False(itemsDict.ContainsKey(typeof(ITenantContext)));
     }
 
     [Fact]
@@ -304,7 +304,7 @@ public class MultiTenantMiddlewareShould
 
         // Endpoint exists, so resolution should proceed normally.
         Assert.True(calledNext);
-        var mtc = (IMultiTenantContext<TenantInfo>?)itemsDict[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)itemsDict[typeof(ITenantContext)];
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
     }
@@ -338,7 +338,7 @@ public class MultiTenantMiddlewareShould
 
         // No predicate set, so resolution should proceed as normal even with no endpoint.
         Assert.True(calledNext);
-        var mtc = (IMultiTenantContext<TenantInfo>?)itemsDict[typeof(IMultiTenantContext)];
+        var mtc = (ITenantContext<TenantInfo>?)itemsDict[typeof(ITenantContext)];
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
     }

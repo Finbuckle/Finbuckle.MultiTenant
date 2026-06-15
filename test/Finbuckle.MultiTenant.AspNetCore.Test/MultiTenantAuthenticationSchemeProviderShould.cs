@@ -34,7 +34,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
 
         var tenant2 = new TenantInfo { Id = "tenant2", Identifier = "tenant2" };
 
-        var mtc = new MultiTenantContext<TenantInfo>(tenant1);
+        var mtc = new TenantContext<TenantInfo>(tenant1);
         var setter = sp.GetRequiredService<IMultiTenantContextSetter>();
         setter.MultiTenantContext = mtc;
 
@@ -45,7 +45,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
         Assert.NotNull(option);
         Assert.Equal("tenant1Scheme", option.Name);
 
-        mtc = new MultiTenantContext<TenantInfo>(tenant2);
+        mtc = new TenantContext<TenantInfo>(tenant2);
         setter.MultiTenantContext = mtc;
         option = await schemeProvider.GetDefaultChallengeSchemeAsync();
 

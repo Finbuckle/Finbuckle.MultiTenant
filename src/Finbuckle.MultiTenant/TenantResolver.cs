@@ -57,9 +57,9 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
 
     /// <inheritdoc />
-    public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
+    public async Task<ITenantContext<TTenantInfo>> ResolveAsync(object context)
     {
-        var mtc = new MultiTenantContext<TTenantInfo>(default);
+        var mtc = new TenantContext<TTenantInfo>(default);
         var tenantResolverLogger = _loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance;
 
         foreach (var strategy in Strategies)
@@ -112,7 +112,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 {
                     var storeInfo = new StoreInfo<TTenantInfo> { Store = store };
                     var strategyInfo = new StrategyInfo { Strategy = strategy };
-                    mtc = new MultiTenantContext<TTenantInfo>(tenantInfo, strategyInfo, storeInfo);
+                    mtc = new TenantContext<TTenantInfo>(tenantInfo, strategyInfo, storeInfo);
                 }
 
                 // no longer check stores if tenant is resolved
@@ -126,13 +126,13 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
         }
 
         var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>
-            { MultiTenantContext = mtc, Context = context };
+            { TenantContext = mtc, Context = context };
         await _options.CurrentValue.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
-        return resolutionCompletedContext.MultiTenantContext;
+        return resolutionCompletedContext.TenantContext;
     }
 
     /// <inheritdoc />
-    async Task<IMultiTenantContext> ITenantResolver.ResolveAsync(object context)
+    async Task<ITenantContext> ITenantResolver.ResolveAsync(object context)
     {
         return await ResolveAsync(context).ConfigureAwait(false);
     }

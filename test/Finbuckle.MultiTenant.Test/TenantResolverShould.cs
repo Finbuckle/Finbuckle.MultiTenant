@@ -146,9 +146,9 @@ public class TenantResolverShould
         await resolver.ResolveAsync(new object());
 
         Assert.NotNull(resolvedContext);
-        Assert.Equal("initech", resolvedContext.MultiTenantContext.TenantInfo!.Identifier);
-        Assert.Equal(typeof(StaticStrategy), resolvedContext.MultiTenantContext.StrategyInfo!.StrategyType);
-        Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.MultiTenantContext.StoreInfo!.StoreType);
+        Assert.Equal("initech", resolvedContext.TenantContext.TenantInfo!.Identifier);
+        Assert.Equal(typeof(StaticStrategy), resolvedContext.TenantContext.StrategyInfo!.StrategyType);
+        Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.TenantContext.StoreInfo!.StoreType);
     }
 
     [Fact]

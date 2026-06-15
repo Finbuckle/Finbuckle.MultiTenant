@@ -25,7 +25,7 @@ public class MultiTenantEvents<TTenantInfo>
         context => Task.CompletedTask;
 
     /// <summary>
-    /// Called after tenant resolution has completed for all strategies and stores. The resulting <see cref="MultiTenantContext{TTenantInfo}"/> can be modified if desired.
+    /// Called after tenant resolution has completed for all strategies and stores. The resulting <see cref="TenantContext{TTenantInfo}"/> can be modified if desired.
     /// </summary>
     public Func<TenantResolveCompletedContext<TTenantInfo>, Task> OnTenantResolveCompleted { get; set; } =
         context => Task.CompletedTask;

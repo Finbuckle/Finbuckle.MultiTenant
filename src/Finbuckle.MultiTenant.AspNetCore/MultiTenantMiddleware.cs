@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant.AspNetCore;
 
 /// <summary>
-/// Middleware for resolving the <see cref="IMultiTenantContext"/> and storing it in <see cref="HttpContext"/>.
+/// Middleware for resolving the <see cref="ITenantContext"/> and storing it in <see cref="HttpContext"/>.
 /// </summary>
 public class MultiTenantMiddleware
 {
@@ -60,7 +60,7 @@ public class MultiTenantMiddleware
 
         var multiTenantContext = await resolver.ResolveAsync(context).ConfigureAwait(false);
         mtcSetter.MultiTenantContext = multiTenantContext;
-        context.Items[typeof(IMultiTenantContext)] = multiTenantContext;
+        context.Items[typeof(ITenantContext)] = multiTenantContext;
 
         if (options?.Predicate is null || !options.Predicate(multiTenantContext))
             await next(context);

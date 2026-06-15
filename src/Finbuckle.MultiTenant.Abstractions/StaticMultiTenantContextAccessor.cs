@@ -9,10 +9,10 @@ public class StaticMultiTenantContextAccessor<TTenantInfo>(TTenantInfo? tenantIn
     : IMultiTenantContextAccessor<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
-    IMultiTenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
+    ITenantContext IMultiTenantContextAccessor.MultiTenantContext => MultiTenantContext;
 
 
     /// <inheritdoc />
-    public IMultiTenantContext<TTenantInfo> MultiTenantContext { get; } =
-        new MultiTenantContext<TTenantInfo>(tenantInfo: tenantInfo);
+    public ITenantContext<TTenantInfo> MultiTenantContext { get; } =
+        new TenantContext<TTenantInfo>(tenantInfo: tenantInfo);
 }
