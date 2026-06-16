@@ -28,17 +28,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
 
-        services.AddScoped<TenantContext<TTenantInfo>>();
+        services.AddScoped<TenantContext<TTenantInfo>>(_ => new TenantContext<TTenantInfo>(default));
         services.AddScoped<ITenantContext<TTenantInfo>>(sp => sp.GetRequiredService<TenantContext<TTenantInfo>>());
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TTenantInfo>>());
-
-        services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
-            AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
-        services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
-
-        services.AddSingleton<IMultiTenantContextSetter>(sp =>
-            (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
 
         services.Configure<MultiTenantOptions<TTenantInfo>>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
@@ -148,7 +140,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers an action used to configure a particular type of options per tenant.
+    /// Registers an action used to configure an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
@@ -165,12 +157,12 @@ public static class ServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IConfigureOptions<TOptions>>(sp =>
-            new ConfigureNamedOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
+            new ConfigureNamedOptions<TOptions, ITenantContext<TTenantInfo>>(
                 name,
-                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
-                (options, mtcAccessor) =>
+                sp.GetRequiredService<ITenantContext<TTenantInfo>>(),
+                (options, tenantContext) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
+                    var tenantInfo = tenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -179,7 +171,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers an action used to configure a particular type of options.
+    /// Registers an action used to configure an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
@@ -196,7 +188,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers an action used to configure all instances of a particular type of options per tenant.
+    /// Registers an action used to configure all instances of an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
@@ -213,7 +205,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers a post configure action used to configure a particular type of options per tenant.
+    /// Registers an action used to post-configure an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
@@ -230,12 +222,12 @@ public static class ServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
-            new PostConfigureOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
+            new PostConfigureOptions<TOptions, ITenantContext<TTenantInfo>>(
                 name,
-                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
-                (options, mtcAccessor) =>
+                sp.GetRequiredService<ITenantContext<TTenantInfo>>(),
+                (options, tenantContext) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
+                    var tenantInfo = tenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -244,7 +236,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers a post configure action used to configure a particular type of options per tenant.
+    /// Registers an action used to post-configure an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
@@ -261,7 +253,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers a post configure action used to configure all instances of a particular type of options per tenant.
+    /// Registers an action used to post-configure all instances of an options type per tenant.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
