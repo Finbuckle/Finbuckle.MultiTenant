@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Extensions;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -51,7 +52,7 @@ public class ServiceCollectionExtensionsShould
 
     public class TestOptions
     {
-        public string? Prop1 { get; set; }
+        public string? Prop1;
     }
 
     [Fact]
@@ -106,6 +107,104 @@ public class ServiceCollectionExtensionsShould
         Assert.Single(config);
         Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>>)c)
             .Single().Name);
+    }
+
+    [Fact]
+    public void RegisterPerTenantOptionsWithExpectedLifetimes()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+
+        var cache = services.LastOrDefault(s => s.ServiceType == typeof(MultiTenantOptionsCache<TestOptions>));
+        Assert.NotNull(cache);
+        Assert.Equal(ServiceLifetime.Singleton, cache.Lifetime);
+
+        var monitor = services.LastOrDefault(s => s.ServiceType == typeof(IOptionsMonitor<TestOptions>));
+        Assert.NotNull(monitor);
+        Assert.Equal(ServiceLifetime.Scoped, monitor.Lifetime);
+
+        var snapshot = services.LastOrDefault(s => s.ServiceType == typeof(IOptionsSnapshot<TestOptions>));
+        Assert.NotNull(snapshot);
+        Assert.Equal(ServiceLifetime.Scoped, snapshot.Lifetime);
+
+        var options = services.LastOrDefault(s => s.ServiceType == typeof(IOptions<TestOptions>));
+        Assert.NotNull(options);
+        Assert.Equal(ServiceLifetime.Scoped, options.Lifetime);
+    }
+
+    [Fact]
+    public void ReuseCacheAcrossScopesButScopeOptionsServices()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+        var provider = services.BuildServiceProvider();
+
+        using var scope1 = provider.CreateScope();
+        using var scope2 = provider.CreateScope();
+
+        var cache1 = scope1.ServiceProvider.GetRequiredService<MultiTenantOptionsCache<TestOptions>>();
+        var cache2 = scope2.ServiceProvider.GetRequiredService<MultiTenantOptionsCache<TestOptions>>();
+        Assert.Same(cache1, cache2);
+
+        var options1 = scope1.ServiceProvider.GetRequiredService<IOptions<TestOptions>>();
+        var options1Again = scope1.ServiceProvider.GetRequiredService<IOptions<TestOptions>>();
+        var options2 = scope2.ServiceProvider.GetRequiredService<IOptions<TestOptions>>();
+        Assert.Same(options1, options1Again);
+        Assert.NotSame(options1, options2); // Service is scoped.
+
+        // IOptions service is scoped, but underlying value is shared via keyed singleton manager cache.
+        var optionsValue1 = options1.Value;
+        var optionsValue2 = options2.Value;
+        Assert.Same(optionsValue1, optionsValue2); // Value cache for IOptions is singleton via keyed cache.
+
+        var snapshot1 = scope1.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>();
+        var snapshot1Again = scope1.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>();
+        var snapshot2 = scope2.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>();
+        Assert.Same(snapshot1, snapshot1Again);
+        Assert.NotSame(snapshot1, snapshot2);
+
+        // Snapshot keeps a scope-local cache and should not share value instances across scopes.
+        var snapshotValue1 = snapshot1.Value;
+        var snapshotValue2 = snapshot2.Value;
+        Assert.NotSame(snapshotValue1, snapshotValue2);
+
+        var monitor1 = scope1.ServiceProvider.GetRequiredService<IOptionsMonitor<TestOptions>>();
+        var monitor1Again = scope1.ServiceProvider.GetRequiredService<IOptionsMonitor<TestOptions>>();
+        var monitor2 = scope2.ServiceProvider.GetRequiredService<IOptionsMonitor<TestOptions>>();
+        Assert.Same(monitor1, monitor1Again);
+        Assert.NotSame(monitor1, monitor2);
+    }
+
+    [Fact]
+    public void ShareOptionsAcrossScopesForSameTenantWhenUsingSingletonIOptionsCache()
+    {
+        var services = new ServiceCollection();
+        var tenantHolder = new TenantInfoHolder();
+        services.AddMultiTenant<TenantInfo>();
+        services.AddSingleton(tenantHolder);
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>().Current));
+        services.ConfigurePerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+        var provider = services.BuildServiceProvider();
+
+        tenantHolder.Current = new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" };
+
+        // Same tenant in different scopes should receive the same IOptions value instance.
+        using var scope1 = provider.CreateScope();
+        var options1 = scope1.ServiceProvider.GetRequiredService<IOptions<TestOptions>>().Value;
+
+        using var scope2 = provider.CreateScope();
+        var options2 = scope2.ServiceProvider.GetRequiredService<IOptions<TestOptions>>().Value;
+
+        Assert.Same(options1, options2);
+        Assert.Equal(tenantHolder.Current!.Id, options1.Prop1);
+        Assert.Equal(tenantHolder.Current!.Id, options2.Prop1);
+    }
+
+    private sealed class TenantInfoHolder
+    {
+        public TenantInfo? Current { get; set; }
     }
 
     [Fact]

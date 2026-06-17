@@ -4,7 +4,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -25,47 +24,45 @@ public class MultiTenantOptionsCacheShould
     [InlineData("name")]
     public void AddNamedOptionsForCurrentTenantOnlyOnAdd(string? name)
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
+        const string tenantId = "test-id-123";
 
         // Add new options.
-        var result = cache.TryAdd(name, options);
+        var result = cache.TryAdd(name, tenantId, options);
         Assert.True(result);
 
         // Fail adding options under same name.
-        result = cache.TryAdd(name, options);
+        result = cache.TryAdd(name, tenantId, options);
         Assert.False(result);
 
         // Change the tenant id and confirm options can be added again.
-        tc = new TenantContext<TenantInfo>(new TenantInfo { Id = "diff", Identifier = "" });
-        result = cache.TryAdd(name, options);
+        result = cache.TryAdd(name, "diff", options);
         Assert.True(result);
     }
 
     [Fact]
-    public void HandleNullMultiTenantContextOnAdd()
+    public void HandleNullTenantIdOnAdd()
     {
-        var cache = new MultiTenantOptionsCache<TestOptions>(null!);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
 
-        // Add new options, ensure no exception caused by null MultiTenantContext.
-        var result = cache.TryAdd("", options);
+        // Add new options for the default (null) tenant id bucket.
+        var result = cache.TryAdd("", null, options);
         Assert.True(result);
     }
 
     [Fact]
-    public void HandleNullMultiTenantContextOnGetOrAdd()
+    public void HandleNullTenantIdOnGetOrAdd()
     {
-        var cache = new MultiTenantOptionsCache<TestOptions>(null!);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
 
-        // Add new options, ensure no exception caused by null MultiTenantContext.
-        var result = cache.GetOrAdd("", () => options);
+        // Add new options for the default (null) tenant id bucket.
+        var result = cache.GetOrAdd("", null, () => options);
         Assert.NotNull(result);
     }
 
@@ -75,40 +72,39 @@ public class MultiTenantOptionsCacheShould
     [InlineData("name")]
     public void GetOrAddNamedOptionForCurrentTenantOnly(string? name)
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
         var options2 = new TestOptions();
+        const string tenantId = "test-id-123";
 
         // Add new options.
-        var result = cache.GetOrAdd(name, () => options);
+        var result = cache.GetOrAdd(name, tenantId, () => options);
         Assert.Same(options, result);
 
         // Get the existing options if exists.
-        result = cache.GetOrAdd(name, () => options2);
+        result = cache.GetOrAdd(name, tenantId, () => options2);
         Assert.NotSame(options2, result);
 
         // Confirm different tenant on same object is an add (ie it didn't exist there).
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        result = cache.GetOrAdd(name, () => options2);
+        result = cache.GetOrAdd(name, "diff_id", () => options2);
         Assert.Same(options2, result);
     }
 
     [Fact]
     public void ThrowsIfGetOrAddFactoryIsNull()
     {
-        var cache = new MultiTenantOptionsCache<TestOptions>(null!);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
-        Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("", null!));
+        Assert.Throws<ArgumentNullException>(() => { cache.GetOrAdd("", "tenant", null!); });
     }
 
     [Fact]
-    public void ThrowIfConstructorParamIsNull()
+    public void AllowParameterlessConstructor()
     {
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions>(null!));
+        var cache = new MultiTenantOptionsCache<TestOptions>();
+
+        Assert.NotNull(cache);
     }
 
     [Theory]
@@ -117,105 +113,90 @@ public class MultiTenantOptionsCacheShould
     [InlineData("name")]
     public void RemoveNamedOptionsForCurrentTenantOnly(string? name)
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
+        const string tenant1Id = "test-id-123";
+        const string tenant2Id = "diff_id";
 
         // Add new options.
-        var result = cache.TryAdd(name, options);
+        var result = cache.TryAdd(name, tenant1Id, options);
         Assert.True(result);
 
         // Add under a different tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        result = cache.TryAdd(name, options);
+        result = cache.TryAdd(name, tenant2Id, options);
         Assert.True(result);
-        result = cache.TryAdd("diffName", options);
+        result = cache.TryAdd("diffName", tenant2Id, options);
         Assert.True(result);
 
-        // Remove named options for current tenant.
-        result = cache.TryRemove(name);
+        // Remove named options for tenant2.
+        result = cache.TryRemove(name, tenant2Id);
         Assert.True(result);
         var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
             .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
+        dynamic? tenantInternalCache = tenantCache?[tenant2Id].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache[tenant2Id]);
 
-        // Assert named options removed and other options on tenant left as-is.
+        // Assert named options removed and other options on tenant2 left as-is.
         Assert.False(tenantInternalCache!.Keys.Contains(name));
         Assert.True(tenantInternalCache.Keys.Contains("diffName"));
 
-        // Assert other tenant not affected.
-        ti = new TenantInfo { Id = "test-id-123", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
+        // Assert tenant1 not affected.
+        tenantInternalCache = tenantCache?[tenant1Id].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache[tenant1Id]);
         Assert.True(tenantInternalCache!.ContainsKey(name ?? Microsoft.Extensions.Options.Options.DefaultName));
     }
 
     [Fact]
-    public void ClearOptionsForCurrentTenantOnly()
+    public void ClearOptionsForNullTenantIdOnly()
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
 
         // Add new options.
-        var result = cache.TryAdd("", options);
+        var result = cache.TryAdd("", null, options);
         Assert.True(result);
 
         // Add under a different tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        result = cache.TryAdd("", options);
+        result = cache.TryAdd("", "diff_id", options);
         Assert.True(result);
 
-        // Clear options on first tenant.
-        ti = new TenantInfo { Id = "test-id-123", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        cache.Clear();
+        // Clear options on null tenant id bucket only.
+        cache.Clear(null);
 
-        // Assert options cleared on this tenant.
+        // Assert options cleared on null tenant id bucket.
         var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
             .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
+        dynamic? tenantInternalCache = tenantCache?[""].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache[""]);
         Assert.True(tenantInternalCache!.IsEmpty);
 
         // Assert options still exist on other tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
+        tenantInternalCache = tenantCache?["diff_id"].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache["diff_id"]);
         Assert.False(tenantInternalCache!.IsEmpty);
     }
 
     [Fact]
     public void ClearOptionsForTenantIdOnly()
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
 
         // Add new options.
-        var result = cache.TryAdd("", options);
+        var result = cache.TryAdd("", "test-id-123", options);
         Assert.True(result);
 
         // Add under a different tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        result = cache.TryAdd("", options);
+        result = cache.TryAdd("", "diff_id", options);
         Assert.True(result);
 
         // Clear options on first tenant.
@@ -225,7 +206,7 @@ public class MultiTenantOptionsCacheShould
         var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
             .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
 
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
+        dynamic? tenantInternalCache = tenantCache?["test-id-123"].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
             .GetValue(tenantCache["test-id-123"]);
         Assert.True(tenantInternalCache!.IsEmpty);
@@ -240,20 +221,16 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ClearAllOptionsForClearAll()
     {
-        var ti = new TenantInfo { Id = "test-id-123", Identifier = "" };
-        var tc = new TenantContext<TenantInfo>(ti);
-        var cache = new MultiTenantOptionsCache<TestOptions>(tc);
+        var cache = new MultiTenantOptionsCache<TestOptions>();
 
         var options = new TestOptions();
 
         // Add new options.
-        var result = cache.TryAdd("", options);
+        var result = cache.TryAdd("", "test-id-123", options);
         Assert.True(result);
 
         // Add under a different tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        result = cache.TryAdd("", options);
+        result = cache.TryAdd("", "diff_id", options);
         Assert.True(result);
 
         // Clear all options.
@@ -263,18 +240,15 @@ public class MultiTenantOptionsCacheShould
         var tenantCache = (ConcurrentDictionary<string, IOptionsMonitorCache<TestOptions>>?)cache.GetType()
             .GetField("map", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(cache);
 
-        ti = new TenantInfo { Id = "test-id-123", Identifier = ti.Identifier };
-        dynamic? tenantInternalCache = tenantCache?[ti.Id].GetType()
+        dynamic? tenantInternalCache = tenantCache?["test-id-123"].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache["test-id-123"]);
         Assert.True(tenantInternalCache!.IsEmpty);
 
         // Assert options cleared on other tenant.
-        ti = new TenantInfo { Id = "diff_id", Identifier = ti.Identifier };
-        tc = new TenantContext<TenantInfo>(ti);
-        tenantInternalCache = tenantCache?[ti.Id].GetType()
+        tenantInternalCache = tenantCache?["diff_id"].GetType()
             .GetField("_cache", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(tenantCache[ti.Id]);
+            .GetValue(tenantCache["diff_id"]);
         Assert.True(tenantInternalCache!.IsEmpty);
     }
 }

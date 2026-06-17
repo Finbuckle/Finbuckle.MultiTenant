@@ -278,21 +278,35 @@ public static class ServiceCollectionExtensions
         where TOptions : class
     {
         ArgumentNullException.ThrowIfNull(services);
+        const string optionsManagerCacheKey = "finbuckle.options.manager.cache";
 
         // Required infrastructure.
         services.AddOptions();
 
-        // TODO: Add check for success
-        services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
-        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager);
-        services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager);
+        // Infrastructure for IOptionsMonitor<TOptions>
+        services.TryAddSingleton<MultiTenantOptionsCache<TOptions>>();
+        services.TryAddSingleton<MultiTenantOptionsChangeTokenHub<TOptions>>();
+        services.TryAddScoped<IOptionsMonitor<TOptions>, MultiTenantOptionsMonitor<TOptions>>();
+        
+        // Infrastructure for IOptionsSnapshot<TOptions>
+        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsSnapshotManagerWithPrivateCache);
+        
+        // Infrastructure for IOptions<TOptions>
+        services.TryAddKeyedSingleton<MultiTenantOptionsCache<TOptions>>(optionsManagerCacheKey);
+        services.TryAddScoped<IOptions<TOptions>>(BuildOptionsManagerWithSingletonCache);
+        
         return;
 
-        MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
+        MultiTenantOptionsManager<TOptions> BuildOptionsSnapshotManagerWithPrivateCache(IServiceProvider sp)
         {
-            IOptionsMonitorCache<TOptions> cache =
-                ActivatorUtilities.CreateInstance<MultiTenantOptionsCache<TOptions>>(sp);
-            return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp, cache);
+            return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp,
+                new MultiTenantOptionsCache<TOptions>());
+        }
+
+        MultiTenantOptionsManager<TOptions> BuildOptionsManagerWithSingletonCache(IServiceProvider sp)
+        {
+            return ActivatorUtilities.CreateInstance<MultiTenantOptionsManager<TOptions>>(sp,
+                sp.GetRequiredKeyedService<MultiTenantOptionsCache<TOptions>>(optionsManagerCacheKey));
         }
     }
 }

@@ -3,7 +3,8 @@
 > Add the `Finbuckle.MultiTenant.Options` package to your project to use this functionality.
 
 MultiTenant is designed to emphasize using per-tenant options in your app to drive per-tenant behavior. This
-approach allows your app logic to be written without having to add tenant-dependent or tenant-specific logic directly to the code.
+approach allows your app logic to be written without having to add tenant-dependent or tenant-specific logic directly to
+the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -167,9 +168,8 @@ normally supports up to five dependencies, MultiTenant support only supports fou
 // use OptionsBuilder API to configure per-tenant options with dependencies
 builder.Services.AddOptions<MyOptions>("optionalName")
     .ConfigurePerTenant<ExampleService, TenantInfo>(
-        (options, es, tenantInfo) =>
-            options.Property = DoSomethingWith(es, tenantInfo));
-```
+        (options, exampleService, tenantInfo) =>
+            options.Property = DoSomethingWith(exampleService, tenantInfo));```
 
 ## Options and Caching
 
@@ -177,24 +177,26 @@ Internally .NET caches options, and MultiTenant extends this to cache options pe
 occurs when a `TOptions` instance is retrieved via `Value` or `Get` on the injected `IOptions<TOptions>` (or derived)
 instance for the first time for a tenant.
 
-`IOptions<TOptions>` instances are always regenerated when injected so any caching only lasts as long as the specific
-instance.
+`IOptions<TOptions>` instances are scoped, but use a shared singleton per-tenant cache similar to how the standard .NET
+`IOptions<TOptions>` work. Options are generated when first requested and cached until cleared.
 
-`IOptionsSnapshot<TOptions>` instances are generated once per HTTP request and caching will last throughout the entire
-request.
+`IOptionsSnapshot<TOptions>` instances are scoped and options are generated and cached for each scope lifetime. In
+ASP.NET Core this means that options will be generated and cached for the duration of a request.
 
-`IOptionsMonitor<TOptions>` instances persist across HTTP requests and caching can persist for long periods of time.
+`IOptionsMonitor<TOptions>` accessor instances are scoped unlike in standard .NET where they are singletons. However,
+the caching and source change tracking behavior are preserved. Options are generated at first request and cached in a
+singleton. If a source change triggers all impacted options are cleared from the cache and any registered change
+listeners are notified with updated options values.
 
 In some situations cached options may need to be cleared so that the options can be regenerated.
 
-When using per-tenant options via `IOptions<TOptions>` and `IOptionsSnapshot<TOptions>` the injected instance is of
+When using per-tenant options with `IOptions<TOptions>` and `IOptionsSnapshot<TOptions>` the injected instance is of
 type `MultiTenantOptionsManager<TOptions>`. Casting to this type exposes the `Reset()` method which clears any internal
 caching for the current tenant and cause the options to be regenerated when next accessed via `Value`
 or `Get(string name)`.
 
-When using per-tenant options with `IOptionsMonitor<TOptions>` each injected instance uses a shared persistent cache.
-This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>` which has
-a `Clear()` method that will clear the cache for the current tenant. Casting the `IOptionsMonitorCache<TOptions>`
-instance to `MultiTenantOptionsCache<TOptions>` exposes the `Clear(string tenantId)` and `ClearAll()`
-methods. `Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
-the parameter is empty or null). `ClearAll()` clears all cached options (including regular non per-tenant options).
+When using per-tenant options with `IOptionsMonitor<TOptions>`, the shared monitor cache is
+`MultiTenantOptionsCache<TOptions>`. Its `Clear(string tenantId)` and `ClearAll()` methods can be used to invalidate
+cached entries manually. `Clear(string tenantId)` clears cached options for a specific tenant (or regular non
+per-tenant options if the parameter is empty or null). `ClearAll()` clears all cached options (including regular
+non per-tenant options).
