@@ -2,23 +2,7 @@ name: Release
 
 on:
   workflow_call:
-    inputs:
-      draft:
-        description: "Draft mode: 'auto' (Patch=release, Minor/Major=draft), 'true', or 'false'"
-        type: string
-        default: 'auto'
-    outputs:
-      bump_level:
-        value: ${{ jobs.build-test-prep-release.outputs.bump_level }}
-      drafted:
-        value: ${{ jobs.build-test-prep-release.outputs.drafted }}
   workflow_dispatch:
-    inputs:
-      draft:
-        description: "Draft mode: 'auto' (Patch=release, Minor/Major=draft), 'true', or 'false'"
-        type: choice
-        options: ['auto', 'true', 'false']
-        default: 'auto'
 
 permissions:
   contents: write
@@ -26,9 +10,6 @@ permissions:
 jobs:
   build-test-prep-release:
     runs-on: ubuntu-latest
-    outputs:
-      bump_level: ${{ steps.prepare.outputs.bump_level }}
-      drafted: ${{ steps.release.outputs.drafted }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
         with:
@@ -56,25 +37,11 @@ jobs:
           git push origin HEAD
           git push origin ${{ steps.prepare.outputs.new_version }}
       - name: create github release
-        id: release
         if: steps.prepare.outputs.bump_level != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          DRAFT_INPUT="${{ inputs.draft }}"
-          BUMP_LEVEL="${{ steps.prepare.outputs.bump_level }}"
-
-          DRAFT_FLAG="--draft"
-          if [ "$DRAFT_INPUT" = "false" ]; then
-            DRAFT_FLAG=""
-          elif [ "$DRAFT_INPUT" = "auto" ] && [ "$BUMP_LEVEL" = "Patch" ]; then
-            DRAFT_FLAG=""
-          fi
-
           gh release create ${{ steps.prepare.outputs.new_version }} \
             --title "${{ steps.prepare.outputs.new_version }}" \
             --notes-file "${{ steps.prepare.outputs.release_notes_file }}" \
-            $DRAFT_FLAG
-
-          echo "drafted=$( [ -n "$DRAFT_FLAG" ] && echo 'true' || echo 'false' )" >> "$GITHUB_OUTPUT"
-
+            --draft

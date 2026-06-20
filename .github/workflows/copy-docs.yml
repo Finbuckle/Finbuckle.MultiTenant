@@ -1,8 +1,8 @@
 name: Copy Docs to Website
 
 on:
-    workflow_call:
-    workflow_dispatch:
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -14,6 +14,7 @@ jobs:
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
         with:
+          ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
       - name: Get Current Version
         run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV

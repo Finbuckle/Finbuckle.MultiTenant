@@ -7,12 +7,11 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
-    outputs:
-      has_changes: ${{ steps.changes.outputs.has_changes }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
@@ -26,7 +25,7 @@ jobs:
         run: dotnet tool install --global dotnet-outdated-tool
 
       - name: Update dependencies
-        run: dotnet outdated --upgrade Finbuckle.MultiTenant.slnx
+        run: dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx
 
       - name: Regenerate lock files
         run: dotnet restore --force-evaluate
@@ -42,32 +41,18 @@ jobs:
 
       - name: Commit and push
         if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="fix/update-dotnet-dependencies-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
           git add -A
-          git commit -m "fix: update .NET dependencies"
-          git push origin HEAD
-
-  release:
-    needs: update-dependencies
-    if: needs.update-dependencies.outputs.has_changes == 'true'
-    uses: ./.github/workflows/release.yml
-    with:
-      draft: 'auto'
-    secrets: inherit
-
-  publish-nuget:
-    needs: release
-    if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
-    permissions:
-      contents: read
-      id-token: write
-    uses: ./.github/workflows/nuget-push-public.yml
-    secrets: inherit
-
-  copy-docs:
-    needs: release
-    if: needs.release.outputs.bump_level != '' && needs.release.outputs.drafted == 'false'
-    uses: ./.github/workflows/copy-docs.yml
-    secrets: inherit
+          git commit -m "fix(deps): update .NET dependencies"
+          git push origin "$BRANCH"
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "fix(deps): update .NET dependencies" \
+            --body "Automated dependency updates from \`update-dotnet-dependencies\` workflow."
