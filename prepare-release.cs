@@ -89,7 +89,7 @@ Console.WriteLine(new string('-', 60));
 Console.WriteLine();
 
 // --- Step 6: Prepend the notes to CHANGELOG.md ---
-PrependToChangelog(releaseNotes, repoRoot);
+PrependToChangelog(releaseNotes, newVersion, repoRoot);
 
 // --- Step 7: Update <Version> in src/Directory.Build.props ---
 UpdateBuildPropsVersion(newVersion, repoRoot);
@@ -101,7 +101,7 @@ UpdateVersionSpans(newVersion, repoRoot);
 UpdateReleaseNotesBlocks(releaseNotes, repoRoot);
 
 // --- Step 11: Insert release notes into <!--_history--> block in docs/History.md ---
-UpdateHistoryBlock(releaseNotes, repoRoot);
+UpdateHistoryBlock(releaseNotes, newVersion, repoRoot);
 
 Console.WriteLine();
 Console.WriteLine($"Previous version : {currentVersion!.ToTag()}");
@@ -539,13 +539,16 @@ static string BuildReleaseNotes(
 // STEP 6 - Prepend releaseNotes to CHANGELOG.md, preserving any top-level
 // "# Changelog" heading that already exists at the top of the file.
 // Creates the file if it does not yet exist.
-static void PrependToChangelog(string releaseNotes, string repoRoot)
+static void PrependToChangelog(string releaseNotes, SemanticVersion newVersion, string repoRoot)
 {
     Console.WriteLine("Step 6: Prepend to CHANGELOG.md");
     Console.WriteLine();
 
     string path     = Path.Combine(repoRoot, "CHANGELOG.md");
     string existing = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+
+    // Remove any existing section for this version so re-runs don't create duplicates.
+    existing = RemoveExistingVersionSection(existing, newVersion);
 
     // If the file starts with a top-level heading (e.g. "# Changelog"), keep
     // it first and insert the new release notes directly below it.
@@ -656,7 +659,7 @@ static void UpdateReleaseNotesBlocks(string releaseNotes, string repoRoot)
 
 // STEP 11 - Prepend the release notes to docs/History.md, preserving any
 // top-level "# …" heading that already exists at the top of the file.
-static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
+static void UpdateHistoryBlock(string releaseNotes, SemanticVersion newVersion, string repoRoot)
 {
     Console.WriteLine("Step 11: Prepend release notes to docs/History.md");
     Console.WriteLine();
@@ -668,6 +671,9 @@ static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
 
     string existing = File.ReadAllText(historyPath);
 
+    // Remove any existing section for this version so re-runs don't create duplicates.
+    existing = RemoveExistingVersionSection(existing, newVersion);
+
     var headerMatch = Regex.Match(existing, @"^(#[^#][^\n]*\n+)", RegexOptions.Multiline);
     string newContent = (headerMatch.Success && existing.StartsWith(headerMatch.Value))
         ? headerMatch.Value + releaseNotes + existing[headerMatch.Length..]
@@ -675,6 +681,19 @@ static void UpdateHistoryBlock(string releaseNotes, string repoRoot)
 
     File.WriteAllText(historyPath, newContent);
     Console.WriteLine($"{historyPath} updated.");
+}
+
+// Removes the ## [version]... section from content if it already exists,
+// so repeated script runs replace rather than duplicate the section.
+static string RemoveExistingVersionSection(string content, SemanticVersion version)
+{
+    string escaped = Regex.Escape(version.ToString());
+    // Match from the version heading to just before the next ## heading or end of string.
+    var match = Regex.Match(content,
+        $@"^## \[{escaped}\].*?(?=^## |\z)",
+        RegexOptions.Multiline | RegexOptions.Singleline);
+
+    return match.Success ? content.Remove(match.Index, match.Length) : content;
 }
 
 
