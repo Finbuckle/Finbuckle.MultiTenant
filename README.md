@@ -36,10 +36,8 @@ Table of Contents
 > This section only lists release update details specific to v<span class="_version">10.1.1</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
-### Bug Fixes
 
-* Bump the microsoft-packages group with 16 updates ([#1144](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1144)) (([635d350](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/635d3507c27f177a8b22d8f91fb09fa792e248c3)))
-
+### Placeholder for next release
 
 <!--_release-notes-->
 
