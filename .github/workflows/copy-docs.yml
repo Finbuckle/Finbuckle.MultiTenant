@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   checkout-copy-checkin:
+    if: github.event.release.tag_name != 'autodraft'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Finbuckle.MultiTenant

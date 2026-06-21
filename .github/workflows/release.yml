@@ -1,7 +1,8 @@
 name: Release
 
 on:
-  workflow_call:
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -9,6 +10,7 @@ permissions:
 
 jobs:
   build-test-prep-release:
+    if: github.event_name == 'workflow_dispatch' || github.event.release.tag_name == 'autodraft'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
@@ -36,12 +38,23 @@ jobs:
           git tag ${{ steps.prepare.outputs.new_version }}
           git push origin HEAD
           git push origin ${{ steps.prepare.outputs.new_version }}
-      - name: create github release
-        if: steps.prepare.outputs.bump_level != ''
+      - name: create release and clean up draft
+        if: steps.prepare.outputs.bump_level != '' && github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ steps.prepare.outputs.new_version }} \
             --title "${{ steps.prepare.outputs.new_version }}" \
             --notes-file "${{ steps.prepare.outputs.release_notes_file }}" \
-            --draft
+            --latest
+          gh release delete autodraft --yes
+          git push origin :autodraft
+      - name: create release
+        if: steps.prepare.outputs.bump_level != '' && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ steps.prepare.outputs.new_version }} \
+            --title "${{ steps.prepare.outputs.new_version }}" \
+            --notes-file "${{ steps.prepare.outputs.release_notes_file }}" \
+            --latest

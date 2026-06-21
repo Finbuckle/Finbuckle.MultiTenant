@@ -1,4 +1,4 @@
-name: Update .NET Dependencies
+name: Update Dependencies
 
 on:
   schedule:
@@ -25,7 +25,13 @@ jobs:
         run: dotnet tool install --global dotnet-outdated-tool
 
       - name: Update dependencies
-        run: dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx
+        id: update_deps
+        run: |
+          {
+            echo "report<<EOF"
+            dotnet outdated --upgrade --version-lock Major --no-color Finbuckle.MultiTenant.slnx
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Regenerate lock files
         run: dotnet restore --force-evaluate
@@ -43,16 +49,19 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          UPDATE_REPORT: ${{ steps.update_deps.outputs.report }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          BRANCH="fix/update-dotnet-dependencies-${{ github.run_id }}"
+          BRANCH="fix/update-dependencies-${{ github.run_id }}"
           git checkout -b "$BRANCH"
           git add -A
-          git commit -m "fix(deps): update .NET dependencies"
+          git commit -m "fix(deps): update dependencies"
           git push origin "$BRANCH"
+          BODY_FILE=$(mktemp)
+          printf 'Automated dependency updates from `update-dependencies` workflow.\n\n<details>\n<summary>dotnet-outdated report</summary>\n\n```\n%s\n```\n\n</details>' "$UPDATE_REPORT" > "$BODY_FILE"
           gh pr create \
             --base main \
             --head "$BRANCH" \
-            --title "fix(deps): update .NET dependencies" \
-            --body "Automated dependency updates from \`update-dotnet-dependencies\` workflow."
+            --title "fix(deps): update dependencies" \
+            --body-file "$BODY_FILE"
