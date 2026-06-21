@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.1</span>
 
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.1.0</span>](#whats-new)
+1. [What's New in v<span class="_version">10.1.1</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,19 +31,14 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.1.0</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.1.1</span>
 
-> This section only lists release update details specific to v<span class="_version">10.1.0</span>. See
+> This section only lists release update details specific to v<span class="_version">10.1.1</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
-### Features
-
-* add functionality to conditionally bypass middleware in ASP.NET Core ([#1134](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1134)) (([fd2e0f6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd2e0f62c63fe1c69722448eb0b3e7493f02c84b)))
-
 ### Bug Fixes
 
-* prevent multiple event handlers being registered for EnforceMultiTenantOnTracking ([#1133](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1133)) (([b179b6e](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b179b6ec5738aba4e6f81e6c99762a9f1ad2f861)))
-
+* Bump the microsoft-packages group with 16 updates ([#1144](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1144)) (([635d350](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/635d3507c27f177a8b22d8f91fb09fa792e248c3)))
 
 <!--_release-notes-->
 
