@@ -29,7 +29,7 @@ jobs:
         run: |
           {
             echo "report<<EOF"
-            dotnet outdated --upgrade --version-lock Major --no-color Finbuckle.MultiTenant.slnx
+            dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
