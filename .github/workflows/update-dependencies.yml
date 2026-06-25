@@ -27,10 +27,11 @@ jobs:
       - name: Update dependencies
         id: update_deps
         run: |
+          DELIMITER=$(openssl rand -hex 16)
           {
-            echo "report<<EOF"
-            dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx
-            echo "EOF"
+            echo "report<<${DELIMITER}"
+            dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx || true
+            echo "${DELIMITER}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Regenerate lock files
