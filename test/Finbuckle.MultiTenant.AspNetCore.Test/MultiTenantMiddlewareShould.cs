@@ -24,8 +24,11 @@ public class MultiTenantMiddlewareShould
             MsOptions.Create(bypassOptions ?? new BypassWhenOptions()),
             MsOptions.Create(shortCircuitOptions ?? new ShortCircuitWhenOptions()));
 
+    private static Task InvokeMiddleware(MultiTenantMiddleware mw, HttpContext context, IServiceProvider sp) =>
+        mw.Invoke(context, sp.GetRequiredService<ITenantContext>(), sp.GetRequiredService<ITenantResolver>());
+
     [Fact]
-    public async Task SetHttpContextItemIfTenantFound()
+    public async Task ResolveTenantContextIfTenantFound()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
@@ -42,9 +45,9 @@ public class MultiTenantMiddlewareShould
 
         var mw = CreateMiddleware(_ => Task.CompletedTask);
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
-        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
@@ -77,9 +80,9 @@ public class MultiTenantMiddlewareShould
             },
             shortCircuitOptions: new ShortCircuitWhenOptions { Predicate = mtc => !mtc.IsResolved });
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
-        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
@@ -88,7 +91,7 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public async Task SetTenantAccessor()
+    public async Task SetTenantContext()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
@@ -103,18 +106,11 @@ public class MultiTenantMiddlewareShould
         var itemsDict = new Dictionary<object, object?>();
         context.Setup(c => c.Items).Returns(itemsDict);
 
-        ITenantContext<TenantInfo>? mtc = null;
+        var mw = CreateMiddleware(_ => Task.CompletedTask);
 
-        var mw = CreateMiddleware(_ =>
-        {
-            // have to check in this Async chain...
-            var accessor = context.Object.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            mtc = accessor.MultiTenantContext;
+        await InvokeMiddleware(mw, context.Object, sp);
 
-            return Task.CompletedTask;
-        });
-
-        await mw.Invoke(context.Object);
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc);
         Assert.True(mtc.IsResolved);
@@ -122,7 +118,7 @@ public class MultiTenantMiddlewareShould
     }
 
     [Fact]
-    public async Task NotSetTenantAccessorIfNoTenant()
+    public async Task NotResolveTenantIfNoTenantFound()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo>().WithStaticStrategy("not_initech").WithInMemoryStore();
@@ -137,18 +133,11 @@ public class MultiTenantMiddlewareShould
         var itemsDict = new Dictionary<object, object?>();
         context.Setup(c => c.Items).Returns(itemsDict);
 
-        ITenantContext<TenantInfo>? mtc = null;
+        var mw = CreateMiddleware(_ => Task.CompletedTask);
 
-        var mw = CreateMiddleware(_ =>
-        {
-            // have to check in this Async chain...
-            var accessor = context.Object.RequestServices.GetRequiredService<IMultiTenantContextAccessor<TenantInfo>>();
-            mtc = accessor.MultiTenantContext;
+        await InvokeMiddleware(mw, context.Object, sp);
 
-            return Task.CompletedTask;
-        });
-
-        await mw.Invoke(context.Object);
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc);
         Assert.False(mtc.IsResolved);
@@ -182,9 +171,9 @@ public class MultiTenantMiddlewareShould
             },
             shortCircuitOptions: new ShortCircuitWhenOptions { Predicate = mtc => !mtc.IsResolved });
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
-        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc);
         Assert.False(mtc.IsResolved);
@@ -224,9 +213,9 @@ public class MultiTenantMiddlewareShould
                 RedirectTo = new Uri("/tenant/notfound", UriKind.Relative)
             });
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
-        var mtc = (ITenantContext<TenantInfo>?)context.Object.Items[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
 
         Assert.NotNull(mtc);
         Assert.False(mtc.IsResolved);
@@ -261,11 +250,11 @@ public class MultiTenantMiddlewareShould
             },
             bypassOptions: new BypassWhenOptions { Predicate = ctx => ctx.GetEndpoint() is null });
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
         // next should have been called, but resolution should have been bypassed
         Assert.True(calledNext);
-        Assert.False(itemsDict.ContainsKey(typeof(ITenantContext)));
+        Assert.False(sp.GetRequiredService<ITenantContext<TenantInfo>>().IsResolved);
     }
 
     [Fact]
@@ -300,11 +289,11 @@ public class MultiTenantMiddlewareShould
             },
             bypassOptions: new BypassWhenOptions { Predicate = ctx => ctx.GetEndpoint() is null });
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
         // Endpoint exists, so resolution should proceed normally.
         Assert.True(calledNext);
-        var mtc = (ITenantContext<TenantInfo>?)itemsDict[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
     }
@@ -334,11 +323,11 @@ public class MultiTenantMiddlewareShould
             });
         // No bypassOptions = null predicate = no bypass applied
 
-        await mw.Invoke(context.Object);
+        await InvokeMiddleware(mw, context.Object, sp);
 
         // No predicate set, so resolution should proceed as normal even with no endpoint.
         Assert.True(calledNext);
-        var mtc = (ITenantContext<TenantInfo>?)itemsDict[typeof(ITenantContext)];
+        var mtc = sp.GetRequiredService<ITenantContext<TenantInfo>>();
         Assert.NotNull(mtc?.TenantInfo);
         Assert.Equal("initech", mtc.TenantInfo.Id);
     }
