@@ -24,7 +24,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>(Microsoft.Extensions.Options.Options.DefaultName);
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = name });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var options = monitor.Get(null);
 
@@ -38,8 +38,8 @@ public class MultiTenantOptionsMonitorShould
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
         var cache = new MultiTenantOptionsCache<TestOptions>();
-        var tenant1Monitor = BuildMonitor(factory, new[] { source }, "tenant-1", cache);
-        var tenant2Monitor = BuildMonitor(factory, Array.Empty<IOptionsChangeTokenSource<TestOptions>>(), "tenant-2", cache);
+        var tenant1Monitor = BuildMonitor(factory, [source], "tenant-1", cache);
+        var tenant2Monitor = BuildMonitor(factory, [], "tenant-2", cache);
 
         var tenant1First = tenant1Monitor.Get("name");
         var tenant1Second = tenant1Monitor.Get("name");
@@ -58,8 +58,8 @@ public class MultiTenantOptionsMonitorShould
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
         var cache = new MultiTenantOptionsCache<TestOptions>();
-        var tenant1Monitor = BuildMonitor(factory, new[] { source }, "tenant-1", cache);
-        var tenant2Monitor = BuildMonitor(factory, Array.Empty<IOptionsChangeTokenSource<TestOptions>>(), "tenant-2", cache);
+        var tenant1Monitor = BuildMonitor(factory, [source], "tenant-1", cache);
+        var tenant2Monitor = BuildMonitor(factory, [], "tenant-2", cache);
 
         var tenant1Before = tenant1Monitor.Get("name");
         var tenant2Before = tenant2Monitor.Get("name");
@@ -80,7 +80,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("changed-name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var before = monitor.Get("changed-name");
         TestOptions? changedOptions = null;
@@ -103,7 +103,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = name });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var calls = 0;
         var listener = monitor.OnChange((_, _) => calls++);
@@ -120,7 +120,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var before = monitor.Get("name");
         // Monitor disposal is a no-op; hub-owned token handling should still invalidate cache entries.
@@ -140,7 +140,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         TestOptions? changedOptions = null;
         using var registration = monitor.OnChange((options, _) => changedOptions = options);
@@ -160,19 +160,19 @@ public class MultiTenantOptionsMonitorShould
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
         var cache = new MultiTenantOptionsCache<TestOptions>();
-        var hub = new MultiTenantOptionsChangeTokenHub<TestOptions>(new[] { source }, cache, factory);
+        var hub = new MultiTenantOptionsChangeTokenHub<TestOptions>([source], cache, factory);
 
         var tenant1Monitor = new MultiTenantOptionsMonitor<TestOptions>(
             factory,
             hub,
             cache,
-            new TenantContext<TenantInfo>(new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" }));
+            new TenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" } });
 
         var tenant2Monitor = new MultiTenantOptionsMonitor<TestOptions>(
             factory,
             hub,
             cache,
-            new TenantContext<TenantInfo>(new TenantInfo { Id = "tenant-2", Identifier = "tenant-2" }));
+            new TenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = "tenant-2", Identifier = "tenant-2" } });
 
         TestOptions? tenant1Changed = null;
         TestOptions? tenant2Changed = null;
@@ -195,7 +195,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("name");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var calls = 0;
         var registration = monitor.OnChange((_, _) => calls++);
@@ -215,7 +215,7 @@ public class MultiTenantOptionsMonitorShould
     {
         var source = new TestChangeTokenSource<TestOptions>("named");
         var factory = new CountingFactory<TestOptions>(name => new TestOptions { Value = $"{name}-{Guid.NewGuid()}" });
-        var monitor = BuildMonitor(factory, new[] { source }, "tenant-1");
+        var monitor = BuildMonitor(factory, [source], "tenant-1");
 
         var namedBefore = monitor.Get("named");
         var defaultBefore = monitor.Get(Microsoft.Extensions.Options.Options.DefaultName);
@@ -239,7 +239,7 @@ public class MultiTenantOptionsMonitorShould
         var source = new TestChangeTokenSource<TestOptions>(Microsoft.Extensions.Options.Options.DefaultName);
 
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantHolder>().Current));
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>{ TenantInfo = sp.GetRequiredService<TenantHolder>().Current });
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
         services.AddSingleton<IOptionsFactory<TestOptions>>(new CountingFactory<TestOptions>(name => new TestOptions { Value = name }));
         services.AddSingleton<IOptionsChangeTokenSource<TestOptions>>(source);
@@ -254,16 +254,14 @@ public class MultiTenantOptionsMonitorShould
         tenantHolder.Current = new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" };
 
         TestOptions? changed = null;
-        using (var scope = provider.CreateScope())
-        {
-            var monitor = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<TestOptions>>();
-            using var registration = monitor.OnChange((options, _) => changed = options);
+        using var scope = provider.CreateScope();
+        var monitor = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<TestOptions>>();
+        using var registration = monitor.OnChange((options, _) => changed = options);
 
-            _ = monitor.Get(Microsoft.Extensions.Options.Options.DefaultName);
-            source.Trigger();
+        _ = monitor.Get(Microsoft.Extensions.Options.Options.DefaultName);
+        source.Trigger();
 
-            Assert.True(SpinWait.SpinUntil(() => changed is not null, TimeSpan.FromSeconds(1)));
-        }
+        Assert.True(SpinWait.SpinUntil(() => changed is not null, TimeSpan.FromSeconds(1)));
     }
 
     private static MultiTenantOptionsMonitor<TestOptions> BuildMonitor(
@@ -278,7 +276,7 @@ public class MultiTenantOptionsMonitorShould
             factory,
             hub,
             cache,
-            new TenantContext<TenantInfo>(new TenantInfo { Id = tenantId, Identifier = tenantId }));
+            new TenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = tenantId, Identifier = tenantId } });
     }
 
     private sealed class CountingFactory<TOptions>(Func<string, TOptions> create)

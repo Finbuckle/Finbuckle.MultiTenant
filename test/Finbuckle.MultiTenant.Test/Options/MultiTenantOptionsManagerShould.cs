@@ -100,6 +100,6 @@ public class MultiTenantOptionsManagerShould
 
     private static ITenantContext BuildTenantContext(string tenantId)
     {
-        return new TenantContext<TenantInfo>(new TenantInfo { Id = tenantId, Identifier = tenantId });
+        return new TenantContext<TenantInfo>{ TenantInfo = new TenantInfo { Id = tenantId, Identifier = tenantId } };
     }
 }

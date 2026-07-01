@@ -30,7 +30,7 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>().Current));
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>{ TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
         services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TenantInfo>((options, tenantInfo) => options.Prop1 = tenantInfo.Id);
         var provider = services.BuildServiceProvider();
@@ -55,7 +55,7 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>().Current));
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>{ TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
         services.AddSingleton(new TestDependency("prefix-"));
         services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TestDependency, TenantInfo>((options, dep, tenantInfo) =>
@@ -82,7 +82,7 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>().Current));
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>{ TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
         services.AddOptions<TestOptions>()
             .Configure(options => options.Prop1 = "base")

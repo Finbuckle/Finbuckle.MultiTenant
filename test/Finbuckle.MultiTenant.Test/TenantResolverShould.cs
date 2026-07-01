@@ -54,7 +54,7 @@ public class TenantResolverShould
     }
 
     [Fact]
-    public async Task ReturnMultiTenantContext()
+    public async Task ReturnTenantContext()
     {
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
@@ -74,8 +74,6 @@ public class TenantResolverShould
         var result = await resolver.ResolveAsync(new object());
 
         Assert.Equal("initech", result.TenantInfo!.Identifier);
-        Assert.IsType<StaticStrategy>(result.StrategyInfo!.Strategy);
-        Assert.IsType<ConfigurationStore<TenantInfo>>(result.StoreInfo!.Store);
     }
 
     [Fact]
@@ -120,8 +118,6 @@ public class TenantResolverShould
         var result = await resolver.ResolveAsync(new object());
 
         Assert.Equal("initech", result.TenantInfo!.Identifier);
-        Assert.IsType<StaticStrategy>(result.StrategyInfo!.Strategy);
-        Assert.IsType<ConfigurationStore<TenantInfo>>(result.StoreInfo!.Store);
     }
 
     [Fact]
@@ -147,8 +143,6 @@ public class TenantResolverShould
 
         Assert.NotNull(resolvedContext);
         Assert.Equal("initech", resolvedContext.TenantContext.TenantInfo!.Identifier);
-        Assert.Equal(typeof(StaticStrategy), resolvedContext.TenantContext.StrategyInfo!.StrategyType);
-        Assert.Equal(typeof(ConfigurationStore<TenantInfo>), resolvedContext.TenantContext.StoreInfo!.StoreType);
     }
 
     [Fact]

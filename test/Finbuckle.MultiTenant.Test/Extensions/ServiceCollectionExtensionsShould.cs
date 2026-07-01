@@ -184,7 +184,7 @@ public class ServiceCollectionExtensionsShould
         var tenantHolder = new TenantInfoHolder();
         services.AddMultiTenant<TenantInfo>();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>().Current));
+        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TenantContext<TenantInfo>{ TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
         services.ConfigurePerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
         var provider = services.BuildServiceProvider();
 
@@ -273,6 +273,43 @@ public class ServiceCollectionExtensionsShould
         Assert.Contains(instance2, inners);
     }
 
+    [Fact]
+    public void DecorateService_WithLifetimeOverride_UsesSpecifiedLifetimeRegardlessOfInner()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+        bool result = services.DecorateService<ITestService, DecoratedTestService>(ServiceLifetime.Scoped);
+        Assert.True(result);
+
+        var descriptor = services.Single(s => s.ServiceType == typeof(ITestService));
+        Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
+
+        var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        using var scope1 = provider.CreateScope();
+        using var scope2 = provider.CreateScope();
+
+        var service1 = scope1.ServiceProvider.GetRequiredService<ITestService>();
+        var service2 = scope2.ServiceProvider.GetRequiredService<ITestService>();
+
+        Assert.IsType<DecoratedTestService>(service1);
+        Assert.NotSame(service1, service2);
+    }
+
+    [Fact]
+    public void DecorateService_WithLifetimeOverride_PassesAdditionalParameters()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+        bool result = services.DecorateService<ITestService, DecoratedTestServiceWithExtraParam>(ServiceLifetime.Transient, "extra-value");
+        Assert.True(result);
+
+        var provider = services.BuildServiceProvider();
+        var service = (DecoratedTestServiceWithExtraParam)provider.GetRequiredService<ITestService>();
+
+        Assert.IsType<TestService>(service.Inner);
+        Assert.Equal("extra-value", service.Extra);
+    }
+
     public interface ITestService
     {
     }
@@ -285,5 +322,16 @@ public class ServiceCollectionExtensionsShould
     {
         public ITestService Inner { get; }
         public DecoratedTestService(ITestService inner) => Inner = inner;
+    }
+
+    public class DecoratedTestServiceWithExtraParam : ITestService
+    {
+        public ITestService Inner { get; }
+        public string Extra { get; }
+        public DecoratedTestServiceWithExtraParam(ITestService inner, string extra)
+        {
+            Inner = inner;
+            Extra = extra;
+        }
     }
 }
