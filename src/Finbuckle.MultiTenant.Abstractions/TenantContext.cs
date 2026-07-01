@@ -7,49 +7,31 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// Contains contextual multi-tenant information.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <remarks>The <see cref="TenantInfo"/> property can only be set once. If you attempt to set it more than once, a <see cref="MultiTenantException"/> will be thrown.</remarks>
 public class TenantContext<TTenantInfo> : ITenantContext<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TenantContext{TTenantInfo}"/> class
-    /// with the specified tenant information.
-    /// </summary>
-    /// <param name="tenantInfo">The tenant information (may be null if not resolved).</param>
-    public TenantContext(TTenantInfo? tenantInfo)
+    /// <inheritdoc />
+    /// <remarks>This property can only be set once. If you attempt to set it more than once, a <see cref="MultiTenantException"/> will be thrown. Setting this property will clear the <see cref="Items"/> dictionary.</remarks>
+    public TTenantInfo? TenantInfo
     {
-        TenantInfo = tenantInfo;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TenantContext{TTenantInfo}"/> class
-    /// with the specified tenant information, strategy information, and store information.
-    /// </summary>
-    /// <param name="tenantInfo">The tenant information (may be null if not resolved).</param>
-    /// <param name="strategyInfo">The strategy that resolved the tenant (may be null).</param>
-    /// <param name="storeInfo">The store that provided the tenant information (may be null).</param>
-    public TenantContext(TTenantInfo? tenantInfo, StrategyInfo? strategyInfo, StoreInfo<TTenantInfo>? storeInfo)
-    {
-        TenantInfo = tenantInfo;
-        StrategyInfo = strategyInfo;
-        StoreInfo = storeInfo;
+        get;
+        set
+        {
+            if (TenantInfo != null)
+                throw new MultiTenantException("TenantInfo is already set. It cannot be set more than once.");
+            field = value;
+            Items.Clear();
+        }
     }
 
     /// <inheritdoc />
-    public TTenantInfo? TenantInfo { get; init; }
-
-    /// <inheritdoc />
-    public bool IsResolved => TenantInfo != null;
-
-    /// <inheritdoc />
-    public StrategyInfo? StrategyInfo { get; init; }
-
-    /// <inheritdoc />
-    public StoreInfo<TTenantInfo>? StoreInfo { get; init; }
+    public IDictionary<object, object> Items { get; } = new Dictionary<object, object>();
 
     /// <inheritdoc />
     ITenantInfo? ITenantContext.TenantInfo
     {
         get => TenantInfo;
-        init => TenantInfo = (TTenantInfo?)value;
+        set => TenantInfo = (TTenantInfo?)value;
     }
 }
