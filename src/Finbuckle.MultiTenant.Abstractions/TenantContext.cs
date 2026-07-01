@@ -26,6 +26,9 @@ public class TenantContext<TTenantInfo> : ITenantContext<TTenantInfo>
     }
 
     /// <inheritdoc />
+    public bool IsResolved => TenantInfo != null;
+
+    /// <inheritdoc />
     public IDictionary<object, object> Items { get; } = new Dictionary<object, object>();
 
     /// <inheritdoc />
