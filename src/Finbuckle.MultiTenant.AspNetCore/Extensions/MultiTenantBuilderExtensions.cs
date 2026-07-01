@@ -151,7 +151,7 @@ public static class MultiTenantBuilderExtensions
                 if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
-                var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo?.Identifier;
+                var currentTenant = context.HttpContext.GetTenantContext<TTenantInfo>().TenantInfo?.Identifier;
                 string? authTenant = null;
                 if (context.Properties.Items.TryGetValue(Constants.TenantToken, out var item))
                 {
@@ -236,8 +236,10 @@ public static class MultiTenantBuilderExtensions
                 "WithPerTenantAuthenticationCore() must be called after AddAuthentication().");
         builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo>>();
 
-        // We need to "decorate" IAuthenticationScheme provider.
-        builder.Services.DecorateService<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>();
+        // We need to "decorate" IAuthenticationScheme provider. It must be registered as Scoped (rather than
+        // matching the inner provider's typically-Singleton lifetime) so that its IOptions<AuthenticationOptions>
+        // dependency can safely be per-tenant/Scoped as well; see MultiTenantAuthenticationSchemeProvider for details.
+        builder.Services.DecorateService<IAuthenticationSchemeProvider, MultiTenantAuthenticationSchemeProvider>(ServiceLifetime.Scoped);
 
         return builder;
     }
@@ -306,7 +308,7 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
             options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (resolutionCompletedContext.TenantContext.StrategyInfo?.StrategyType ==
+                if (resolutionCompletedContext.Strategy.GetType() ==
                     typeof(BasePathStrategy) &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
