@@ -27,9 +27,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
-
-        services.AddScoped<TenantContext<TTenantInfo>>(_ => new TenantContext<TTenantInfo>(default));
-        services.AddScoped<ITenantContext<TTenantInfo>>(sp => sp.GetRequiredService<TenantContext<TTenantInfo>>());
+        
+        services.AddScoped<ITenantContext<TTenantInfo>>(_ => new TenantContext<TTenantInfo>());
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TTenantInfo>>());
 
         services.Configure<MultiTenantOptions<TTenantInfo>>(options => options.TenantInfoType = typeof(TTenantInfo));
@@ -53,6 +52,7 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Decorates an existing service registration with a new implementation that wraps the original.
+    /// The decorator is registered with the same lifetime as the existing registration.
     /// </summary>
     /// <typeparam name="TService">The service type to decorate.</typeparam>
     /// <typeparam name="TImpl">The decorator implementation type.</typeparam>
@@ -61,7 +61,30 @@ public static class ServiceCollectionExtensions
     /// <returns><c>true</c> if the service was successfully decorated.</returns>
     /// <exception cref="ArgumentException">Thrown when no service of type <typeparamref name="TService"/> is found.</exception>
     /// <exception cref="Exception">Thrown when the service cannot be instantiated.</exception>
-    public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
+    public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters) =>
+        services.DecorateService<TService, TImpl>(null, parameters);
+
+    /// <summary>
+    /// Decorates an existing service registration with a new implementation that wraps the original,
+    /// registering the decorator with the specified <paramref name="lifetime"/> instead of the existing
+    /// registration's lifetime. This is safe as long as <paramref name="lifetime"/> is the same as or
+    /// shorter-lived than the lifetime(s) of the existing registration(s) being decorated (e.g. decorating
+    /// a Singleton with a Scoped decorator is safe; the reverse is not).
+    /// </summary>
+    /// <typeparam name="TService">The service type to decorate.</typeparam>
+    /// <typeparam name="TImpl">The decorator implementation type.</typeparam>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <param name="lifetime">The <see cref="ServiceLifetime"/> to register the decorator with.</param>
+    /// <param name="parameters">Additional parameters to pass to the decorator constructor after the inner service.</param>
+    /// <returns><c>true</c> if the service was successfully decorated.</returns>
+    /// <exception cref="ArgumentException">Thrown when no service of type <typeparamref name="TService"/> is found.</exception>
+    /// <exception cref="Exception">Thrown when the service cannot be instantiated.</exception>
+    public static bool DecorateService<TService, TImpl>(this IServiceCollection services, ServiceLifetime lifetime,
+        params object[] parameters) =>
+        services.DecorateService<TService, TImpl>((ServiceLifetime?)lifetime, parameters);
+
+    private static bool DecorateService<TService, TImpl>(this IServiceCollection services, ServiceLifetime? lifetimeOverride,
+        object[] parameters)
     {
         var existingServices = services.Where(s => s.ServiceType == typeof(TService)).ToList();
         if (existingServices.Count == 0)
@@ -69,6 +92,7 @@ public static class ServiceCollectionExtensions
 
         foreach (var existingService in existingServices)
         {
+            var lifetime = lifetimeOverride ?? existingService.Lifetime;
             ServiceDescriptor? newService;
             if (existingService.ImplementationType is not null)
             {
@@ -88,7 +112,7 @@ public static class ServiceCollectionExtensions
 
                         return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                     },
-                    existingService.Lifetime);
+                    lifetime);
             }
             else if (existingService.ImplementationInstance is not null)
             {
@@ -106,7 +130,7 @@ public static class ServiceCollectionExtensions
 
                         return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                     },
-                    existingService.Lifetime);
+                    lifetime);
             }
             else if (existingService.ImplementationFactory is not null)
             {
@@ -124,7 +148,7 @@ public static class ServiceCollectionExtensions
 
                         return ActivatorUtilities.CreateInstance<TImpl>(sp, parameters2)!;
                     },
-                    existingService.Lifetime);
+                    lifetime);
             }
             else
             {
