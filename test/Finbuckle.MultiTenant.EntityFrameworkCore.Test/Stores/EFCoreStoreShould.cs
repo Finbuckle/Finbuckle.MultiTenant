@@ -103,7 +103,7 @@ public class EfCoreStoreShould
     public async Task NotTrackContextOnAdd()
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
-        var tenant = new TenantInfo { Id = "test-id", Identifier = "test-identifier", Name = "test" };
+        var tenant = new TenantInfo { Id = "test-id", Identifier = "test-identifier" };
         await store.AddAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -115,7 +115,7 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier };
         await store.UpdateAsync(tenant);
 
         var entity = store.dbContext.Entry(tenant);
@@ -127,7 +127,7 @@ public class EfCoreStoreShould
     {
         var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
-        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier, Name = "new name" };
+        tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier };
         await store.RemoveAsync(tenant.Id);
 
         var entity = store.dbContext.Entry(tenant);
@@ -188,5 +188,29 @@ public class EfCoreStoreShould
     public override async Task GetAllTenantsFromStoreAsyncSkip1Take1()
     {
         await base.GetAllTenantsFromStoreAsyncSkip1Take1();
+    }
+
+    [Fact]
+    public async Task ReturnFalseWhenRemovingNonExistentTenant()
+    {
+        var store = await CreateTestStore();
+        var result = await store.RemoveAsync("identifier-that-does-not-exist");
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task ThrowWhenAddingTenantWithDuplicateId()
+    {
+        var store = await CreateTestStore();
+        var duplicate = new TenantInfo { Id = "initech-id", Identifier = "unique-new-identifier" };
+        await Assert.ThrowsAnyAsync<Exception>(() => store.AddAsync(duplicate));
+    }
+
+    [Fact]
+    public async Task ThrowWhenUpdatingNonExistentTenant()
+    {
+        var store = await CreateTestStore();
+        var nonExistent = new TenantInfo { Id = "does-not-exist", Identifier = "does-not-exist" };
+        await Assert.ThrowsAnyAsync<Exception>(() => store.UpdateAsync(nonExistent));
     }
 }
