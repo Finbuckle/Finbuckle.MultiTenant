@@ -18,7 +18,7 @@ The examples in this documentation use the `TenantInfo` basic implementation.
 ## IMultiTenantStore and Custom Stores
 
 If the provided MultiTenant stores are not suitable then a custom store can be created by
-implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type
+implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter `TTenantInfo` to match the type
 parameter passed to `AddMultiTenant<TTenantInfo>` at compile time. The interface defines `AddAsync`, `UpdateAsync`,
 `RemoveAsync`, `GetByIdentifierAsync`, `GetAsync`, and `GetAllAsync` methods. `GetByIdentifierAsync`
 and `GetAsync` should return null if there is no suitable tenant match.
@@ -188,14 +188,14 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant
 
-Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object
+Sends the tenant identifier, provided by the multi-tenant strategy, to an http(s) endpoint to get a `TenantInfo` object
 in return.
 
 This store is usually case-insensitive when retrieving tenant information by tenant identifier, but the remote server
 might be more restrictive.
 
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This strategy will attempt to deserialize the tenant using
+This store will attempt to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 For a successful request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
@@ -250,7 +250,7 @@ Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/perfor
 mechanism. The distributed cache can use Redis, SQL Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported. The store does not interact with any other stores by default.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This strategy will attempt to deserialize the tenant using
+This store will attempt to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 Each tenant info instance is actually stored twice in the cache, once using the Tenant ID as the key and another using

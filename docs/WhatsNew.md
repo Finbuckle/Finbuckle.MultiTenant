@@ -9,4 +9,5 @@
 
 * Bump the microsoft-packages group with 16 updates ([#1144](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1144)) (([635d350](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/635d3507c27f177a8b22d8f91fb09fa792e248c3)))
 
+
 <!--_release-notes-->
