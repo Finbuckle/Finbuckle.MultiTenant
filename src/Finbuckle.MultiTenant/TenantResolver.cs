@@ -17,7 +17,7 @@ namespace Finbuckle.MultiTenant;
 public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
-    private readonly IOptionsMonitor<MultiTenantOptions<TTenantInfo>> _options;
+    private readonly MultiTenantOptions<TTenantInfo> _options;
     private readonly ILoggerFactory? _loggerFactory;
 
     /// <summary>
@@ -27,7 +27,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     /// <param name="stores">The collection of stores to use for tenant resolution.</param>
     /// <param name="options">The multi-tenant options.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options) :
+        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptions<MultiTenantOptions<TTenantInfo>> options) :
         this(strategies, stores, options, null)
     {
     }
@@ -40,11 +40,11 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     /// <param name="options">The multi-tenant options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options,
-        ILoggerFactory? loggerFactory)
+        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptions<MultiTenantOptions<TTenantInfo>> options,
+        ILoggerFactory? loggerFactory)  
     {
         Stores = stores;
-        this._options = options;
+        this._options = options.Value;
         this._loggerFactory = loggerFactory;
 
         Strategies = strategies.OrderByDescending(s => s.Priority);
@@ -57,10 +57,12 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
 
     /// <inheritdoc />
-    public async Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context)
+    public async Task<ITenantContext<TTenantInfo>> ResolveAsync(object context)
     {
-        var mtc = new MultiTenantContext<TTenantInfo>(default);
         var tenantResolverLogger = _loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance;
+        IMultiTenantStrategy finalStrategy = null!;
+        IMultiTenantStore<TTenantInfo> finalStore = null!;
+        ITenantContext<TTenantInfo> tc = new TenantContext<TTenantInfo>();
 
         foreach (var strategy in Strategies)
         {
@@ -71,13 +73,14 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
 
             var strategyResolveCompletedContext = new StrategyResolveCompletedContext
                 { Context = context, Strategy = strategy, Identifier = identifier };
-            await _options.CurrentValue.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext)
+            await _options.Events.OnStrategyResolveCompleted(strategyResolveCompletedContext)
                 .ConfigureAwait(false);
-            if (identifier is not null && strategyResolveCompletedContext.Identifier is null && tenantResolverLogger.IsEnabled(LogLevel.Debug))
+            if (identifier is not null && strategyResolveCompletedContext.Identifier is null &&
+                tenantResolverLogger.IsEnabled(LogLevel.Debug))
                 tenantResolverLogger.LogDebug("OnStrategyResolveCompleted set non-null Identifier to null");
             identifier = strategyResolveCompletedContext.Identifier;
 
-            if (_options.CurrentValue.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
+            if (_options.IgnoredIdentifiers.Contains(identifier, StringComparer.OrdinalIgnoreCase))
             {
                 if (tenantResolverLogger.IsEnabled(LogLevel.Debug))
                 {
@@ -102,7 +105,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                     Context = context, Store = store, Strategy = strategy, Identifier = identifier,
                     TenantInfo = tenantInfo
                 };
-                await _options.CurrentValue.Events.OnStoreResolveCompleted(storeResolveCompletedContext)
+                await _options.Events.OnStoreResolveCompleted(storeResolveCompletedContext)
                     .ConfigureAwait(false);
                 if (tenantInfo is not null && storeResolveCompletedContext.TenantInfo is null)
                     tenantResolverLogger.LogDebug("OnStoreResolveCompleted set non-null TenantInfo to null");
@@ -110,29 +113,29 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
 
                 if (tenantInfo != null)
                 {
-                    var storeInfo = new StoreInfo<TTenantInfo> { Store = store };
-                    var strategyInfo = new StrategyInfo { Strategy = strategy };
-                    mtc = new MultiTenantContext<TTenantInfo>(tenantInfo, strategyInfo, storeInfo);
+                    finalStore = store;
+                    finalStrategy = strategy;
+                    tc = new TenantContext<TTenantInfo> { TenantInfo = tenantInfo };
                 }
 
                 // no longer check stores if tenant is resolved
-                if (mtc.IsResolved)
+                if (tc.IsResolved)
                     break;
             }
 
             // no longer check strategies if tenant is resolved
-            if (mtc.IsResolved)
+            if (tc.IsResolved)
                 break;
         }
 
         var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>
-            { MultiTenantContext = mtc, Context = context };
-        await _options.CurrentValue.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
-        return resolutionCompletedContext.MultiTenantContext;
+            { TenantContext = tc, Context = context, Store = finalStore, Strategy = finalStrategy };
+        await _options.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
+        return resolutionCompletedContext.TenantContext;
     }
 
     /// <inheritdoc />
-    async Task<IMultiTenantContext> ITenantResolver.ResolveAsync(object context)
+    async Task<ITenantContext> ITenantResolver.ResolveAsync(object context)
     {
         return await ResolveAsync(context).ConfigureAwait(false);
     }
