@@ -12,8 +12,8 @@ public interface ITenantResolver
     /// Performs tenant resolution within the given context.
     /// </summary>
     /// <param name="context">The context for tenant resolution.</param>
-    /// <returns>The <see cref="IMultiTenantContext"/>.</returns>
-    Task<IMultiTenantContext> ResolveAsync(object context);
+    /// <returns>The <see cref="ITenantContext"/>.</returns>
+    Task<ITenantContext> ResolveAsync(object context);
 
     /// <summary>
     /// Contains a list of <see cref="IMultiTenantStrategy"/> instances used for tenant resolution.
@@ -32,8 +32,8 @@ public interface ITenantResolver<TTenantInfo> : ITenantResolver
     /// Performs tenant resolution within the given context.
     /// </summary>
     /// <param name="context">The context for tenant resolution.</param>
-    /// <returns>The <see cref="IMultiTenantContext{TTenantInfo}"/>.</returns>
-    new Task<IMultiTenantContext<TTenantInfo>> ResolveAsync(object context);
+    /// <returns>The <see cref="ITenantContext{TTenantInfo}"/>.</returns>
+    new Task<ITenantContext<TTenantInfo>> ResolveAsync(object context);
 
     /// <summary>
     /// Contains a list of <see cref="IMultiTenantStore{TTenantInfo}"/> instances used for tenant resolution.
