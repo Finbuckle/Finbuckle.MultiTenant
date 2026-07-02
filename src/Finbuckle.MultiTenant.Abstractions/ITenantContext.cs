@@ -4,40 +4,35 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Non-generic interface for the <see cref="MultiTenantContext{TTenantInfo}"/>.
+/// Non-generic interface for the tenant context.
 /// </summary>
-public interface IMultiTenantContext
+public interface ITenantContext
 {
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; init; }
-
+    ITenantInfo? TenantInfo { get; set; }
+    
     /// <summary>
     /// True if a tenant has been resolved and <see cref="ITenantInfo"/> is not null.
     /// </summary>
-    bool IsResolved { get; }
+    bool IsResolved => TenantInfo != null;
 
     /// <summary>
-    /// Information about the <see cref="IMultiTenantStrategy"/> for this context.
+    /// A collection of arbitrary items that can be used to store additional information about the tenant context.
     /// </summary>
-    StrategyInfo? StrategyInfo { get; init; }
+    IDictionary<object, object> Items { get; }
 }
 
 /// <summary>
-/// Generic interface for the multi-tenant context.
+/// Generic interface for the tenant context.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
+public interface ITenantContext<TTenantInfo> : ITenantContext
     where TTenantInfo : ITenantInfo
 {
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    new TTenantInfo? TenantInfo { get; }
-
-    /// <summary>
-    /// Information about the <see cref="IMultiTenantStore{ITenantInfo}"/> for this context.
-    /// </summary>
-    StoreInfo<TTenantInfo>? StoreInfo { get; }
+    new TTenantInfo? TenantInfo { get; set; }
 }
