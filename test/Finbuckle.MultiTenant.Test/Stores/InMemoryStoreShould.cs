@@ -20,8 +20,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
 
         var store = new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>());
 
-        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
-        var ti2 = new TenantInfo { Id = "lol", Identifier = "lol", Name = "lol" };
+        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech" };
+        var ti2 = new TenantInfo { Id = "lol", Identifier = "lol" };
         await store.AddAsync(ti1);
         await store.AddAsync(ti2);
 
@@ -47,8 +47,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     public async Task FailIfAddingDuplicateCaseSensitive()
     {
         var store = await CreateCaseSensitiveTestStore();
-        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
-        var ti2 = new TenantInfo { Id = "iNiTEch", Identifier = "iNiTEch", Name = "Initech" };
+        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech" };
+        var ti2 = new TenantInfo { Id = "iNiTEch", Identifier = "iNiTEch" };
         Assert.False(await store.AddAsync(ti1));
         Assert.True(await store.AddAsync(ti2));
     }
@@ -59,8 +59,8 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol" });
+            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol" });
         });
         var sp = services.BuildServiceProvider();
 
@@ -81,7 +81,7 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
         var services = new ServiceCollection();
         services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
         {
-            options.Tenants.Add(new TenantInfo { Id = id!, Identifier = identifier!, Name = "LOL" });
+            options.Tenants.Add(new TenantInfo { Id = id!, Identifier = identifier! });
         });
         var sp = services.BuildServiceProvider();
 
