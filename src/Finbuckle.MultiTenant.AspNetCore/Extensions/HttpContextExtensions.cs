@@ -10,23 +10,17 @@ namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 /// <summary>
 /// Finbuckle.MultiTenant.AspNetCore extensions to HttpContext.
 /// </summary>
-public static class FinbuckleHttpContextExtensions
+public static class HttpContextExtensions
 {
     /// <summary>
-    /// Returns the current <see cref="IMultiTenantContext{TTenantInfo}"/>.
+    /// Returns the current <see cref="ITenantContext{TTenantInfo}"/>.
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> instance.</param>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-    public static IMultiTenantContext<TTenantInfo> GetMultiTenantContext<TTenantInfo>(this HttpContext httpContext)
+    public static ITenantContext<TTenantInfo> GetTenantContext<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : ITenantInfo
     {
-        if (httpContext.Items.TryGetValue(typeof(IMultiTenantContext), out var mtc) && mtc is not null)
-            return (IMultiTenantContext<TTenantInfo>)mtc;
-
-        mtc = new MultiTenantContext<TTenantInfo>(default);
-        httpContext.Items[typeof(IMultiTenantContext)] = mtc;
-
-        return (IMultiTenantContext<TTenantInfo>)mtc;
+        return httpContext.RequestServices.GetRequiredService<ITenantContext<TTenantInfo>>();
     }
 
     /// <summary>
@@ -36,31 +30,35 @@ public static class FinbuckleHttpContextExtensions
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     public static TTenantInfo? GetTenantInfo<TTenantInfo>(this HttpContext httpContext)
         where TTenantInfo : ITenantInfo =>
-        httpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo;
-
-
+        httpContext.GetTenantContext<TTenantInfo>().TenantInfo;
+    
     /// <summary>
-    /// Sets the provided <typeparamref name="TTenantInfo"/> on the <see cref="IMultiTenantContext{TTenantInfo}"/>.
-    /// Sets <see cref="StrategyInfo"/> and <see cref="StoreInfo{TTenantInfo}"/> on the <see cref="IMultiTenantContext{TTenantInfo}"/> to null.
-    /// Optionally resets the current dependency injection service provider.
+    /// Sets the provided <typeparamref name="TTenantInfo"/> for the current request.
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> instance.</param>
     /// <param name="tenantInfo">The tenant info instance to set as current.</param>
-    /// <param name="resetServiceProviderScope">Creates a new service provider scope if true.</param>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-    public static void SetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo,
-        bool resetServiceProviderScope)
+    /// <remarks>This method will throw a <see cref="MultiTenantException"/> if the <see cref="ITenantContext{TTenantInfo}.TenantInfo"/> has already been set.</remarks>
+    public static void SetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo)
         where TTenantInfo : ITenantInfo
     {
-        if (resetServiceProviderScope)
-            httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
-
-        var multiTenantContext =
-            new MultiTenantContext<TTenantInfo>(tenantInfo: tenantInfo, strategyInfo: null, storeInfo: null);
-
-        var setter = httpContext.RequestServices.GetRequiredService<IMultiTenantContextSetter>();
-        setter.MultiTenantContext = multiTenantContext;
-
-        httpContext.Items[typeof(IMultiTenantContext)] = multiTenantContext;
+        var tenantContext = httpContext.GetTenantContext<TTenantInfo>();
+        tenantContext.TenantInfo = tenantInfo;
+    }
+    
+    /// <summary>
+    /// Sets the provided <typeparamref name="TTenantInfo"/> for the current request if it has not already been set.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> instance.</param>
+    /// <param name="tenantInfo">The tenant info instance to set as current.</param>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    public static void TrySetTenantInfo<TTenantInfo>(this HttpContext httpContext, TTenantInfo tenantInfo)
+        where TTenantInfo : ITenantInfo
+    {
+        var tenantContext = httpContext.GetTenantContext<TTenantInfo>();
+        if (!tenantContext.IsResolved)
+        {
+            tenantContext.TenantInfo = tenantInfo;
+        }
     }
 }
