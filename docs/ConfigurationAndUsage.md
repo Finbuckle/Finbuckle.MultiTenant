@@ -121,9 +121,12 @@ There are several ways your app can read the current tenant:
 ### Via Dependency Injection
 
 `ITenantContext<TTenantInfo>` (and its non-generic variant `ITenantContext`) are available via dependency injection
-and scoped to the current request or operation. In ASP.NET Core, prefer the `HttpContext` extension
-`GetTenantContext<TTenantInfo>` since it always reflects the state set by the middleware, even in post-endpoint
-processing.
+with a **scoped lifetime** (`AddScoped`). Each DI scope (e.g. each HTTP request in ASP.NET Core) gets its own
+`TenantContext<TTenantInfo>` instance. The middleware resolves the tenant and sets `TenantInfo` on this scoped
+instance early in the request pipeline, so all services resolved within the same scope see the same tenant.
+
+In ASP.NET Core, prefer the `HttpContext` extension `GetTenantContext<TTenantInfo>` since it always reflects the
+state set by the middleware, even in post-endpoint processing.
 
 ### Via `HttpContext` (ASP.NET Core)
 

@@ -86,6 +86,10 @@ Returns the `ITenantContext<TTenantInfo>` instance for the current request. This
 access the current tenant in ASP.NET Core because it always reflects the state set by the middleware, even
 in post-endpoint processing.
 
+Internally `ITenantContext<TTenantInfo>` is registered as a **scoped service**, so each HTTP request gets its own
+instance. Once the middleware resolves the tenant, `TenantInfo` is set on that instance and remains available
+throughout the request's DI scope.
+
 ```csharp
 var tenantInfo = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
 
