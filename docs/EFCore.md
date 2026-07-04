@@ -574,3 +574,25 @@ or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSet
   current `TenantInfo`. For updated entities a `MultiTenantException` is thrown (default).
 * `TenantNotSetMode.Overwrite` - The entity's `TenantId` is overwritten to match the database context's current
   `TenantInfo`.
+
+## Important Considerations
+
+- `AddMultiTenantDbContext<T>()` is the recommended approach for most apps. It registers the context as scoped,
+  binds `TenantInfo` automatically, and wires up `EnforceMultiTenantOnTracking`.
+- `AddPooledMultiTenantDbContext<T>()` reuses context instances across requests. `OnConfiguring` is called only
+  on initial creation — do not use it for per-tenant connection strings or providers.
+- For separate databases, inject `ITenantContext<TTenantInfo>` (not an accessor) into the DbContext constructor
+  to get the current tenant's `ConnectionString`.
+- The global query filter is automatically applied to entities marked with `[MultiTenant]` or configured via the
+  fluent API. Use `IgnoreQueryFilters()` to bypass it when needed.
+- `EnforceMultiTenantOnTracking` must be called in the constructor if not using `AddMultiTenantDbContext` or
+  `AddPooledMultiTenantDbContext`.
+- Multi-tenant unique indexes include `TenantId`. This means a value that must be unique per-tenant can be
+  reused across tenants without conflict.
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — service registration and resolver
+- [Core Concepts](CoreConcepts) — `ITenantContext` and `TenantInfo`
+- [Per-Tenant Data with Identity](Identity) — ASP.NET Core Identity integration
+- [Per-Tenant Options](Options) — options customization

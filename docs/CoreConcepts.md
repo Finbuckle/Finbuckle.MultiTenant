@@ -25,21 +25,32 @@ when needed via the tenant `Id`.
 > Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
 > `TenantInfo` derived class.
 
-## `TenantContext<TTenantInfo>`
+## `ITenantContext` and `TenantContext<TTenantInfo>`
 
 The `TenantContext<TTenantInfo>` contains information about the current tenant.
 
 * Implements `ITenantContext` and `ITenantContext<TTenantInfo>` which can be obtained from dependency injection.
-* Includes the `TenantInfo` property with details on the current tenant, and an `Items` property for storing
-  arbitrary additional information about the tenant context.
+* Registered as a **scoped service** (`AddScoped`), so each DI scope (e.g. each HTTP request in ASP.NET Core)
+  gets its own `TenantContext<TTenantInfo>` instance. All services resolved within the same scope see the
+  same tenant.
+* What constitutes a scope is application-specific: in ASP.NET Core it corresponds to a web request; in a
+  .NET Generic Host worker service it may correspond to a single message dequeued and processed; in a
+  console app it could be a manually created scope. The `TenantContext` lifecycle always matches the DI
+  scope it was resolved from.
+* The DI scope itself is **not** per-tenant — a single scope serves one request for whichever tenant was
+  resolved. The `TenantContext` is simply a scoped service within that scope, not a separate tenant-bound
+  container.
+* The `TenantInfo` property holds the current tenant info. It **can only be set once** — attempting to set it
+  a second time throws a `MultiTenantException`. Setting `TenantInfo` also clears the `Items` dictionary.
+* The `Items` property is a `Dictionary<object, object>` for storing arbitrary data scoped to the current
+  tenant context. Use it for per-request middleware data, tokens, or other transient state. Items are lost
+  when the scope ends or when `TenantInfo` is set.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
 * Can be obtained in ASP.NET Core by calling the `GetTenantContext<TTenantInfo>()` method on the current request's
   `HttpContext` object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
-* The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.
+* The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the
+  middleware handles this. Use `TrySetTenantInfo` if you need to set only when no tenant has been resolved yet.
 * A custom implementation can be defined for advanced use cases.
-
-> In the original v10 release the `TenantInfo` property was immutable, but this change was reverted. It is 
-> recommended that you only mutate the `TenantInfo` property with extreme care.
 
 ## MultiTenant Strategies
 
@@ -64,3 +75,12 @@ strategy).
 Exception type thrown when a serious problem occurs within MultiTenant.
 
 * Usually wraps an underlying exception.
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — service registration and resolution
+- [Getting Started](GettingStarted) — quick start walkthrough
+- [ASP.NET Core Integration](AspNetCore) — ASP.NET Core-specific details
+- [.NET Generic Host Integration](GenericHost) — non-web scenarios
+- [MultiTenant Strategies](Strategies) — all built-in strategies
+- [MultiTenant Stores](Stores) — all built-in stores

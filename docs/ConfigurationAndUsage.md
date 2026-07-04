@@ -41,8 +41,6 @@ chaining method calls.
 
 Adds and configures an `IMultiTenantStore` for your app. Multiple stores can be configured and each will be checked
 in the order registered. See [MultiTenant Stores](Stores) for more information on each type.
-Adds and configures an `IMultiTenantStore` for your app. Only the last store configured will be used.
-See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
 - `WithInMemoryStore`
@@ -50,6 +48,7 @@ See [MultiTenant Stores](Stores) for more information on each type.
 - `WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>`
 - `WithDistributedCacheStore`
 - `WithHttpRemoteStore`
+- `WithEchoStore`
 
 ### WithStrategy Variants
 
@@ -112,7 +111,9 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
       from trying additional strategies and stores.
     - `OnTenantResolveCompleted` - Called once after a tenant has been resolved. The `TenantContext` property
       contains the resolved tenant context and can be changed by the event handler to override the resolver's
-      result.
+      result. The `Store` and `Strategy` properties reference the store and strategy that were used, and
+      `Context` holds the runtime context object passed to the resolver. The `IsResolved` property indicates
+      whether a tenant was found.
 
 ## Getting the Current Tenant
 
@@ -142,10 +143,35 @@ options:
 ### Via Dependency Injection
 
 The injected `ITenantContext<TTenantInfo>` instance's `TenantInfo` property can be set directly to change the
-current tenant. This is useful in advanced scenarios and should be used with caution. Prefer the `HttpContext`
-extension method `SetTenantInfo<TTenantInfo>` when `HttpContext` is available.
+current tenant. **`TenantInfo` can only be set once** — attempting to set it again throws a
+`MultiTenantException`. This is useful in advanced scenarios and should be used with caution. Prefer the
+`HttpContext` extension method `SetTenantInfo<TTenantInfo>` or `TrySetTenantInfo<TTenantInfo>` when
+`HttpContext` is available.
 
 ### Via `HttpContext` (ASP.NET Core)
 
 For ASP.NET Core web apps the `SetTenantInfo<TTenantInfo>` extension method is available directly on `HttpContext`.
 See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
+
+## Important Considerations
+
+- `ITenantContext<TTenantInfo>` is registered as a **scoped** service. Its lifetime is tied to the DI scope,
+  not to a specific tenant. All services within the same scope see the same tenant.
+- `TenantInfo` can only be set once per scope. Attempting to set it a second time throws
+  `MultiTenantException`. Use the `HttpContext.TrySetTenantInfo<T>()` extension or check
+  `ITenantContext.IsResolved` to avoid this.
+- The `TenantResolver` tries strategies in order, then stores in order for each strategy. Resolution stops
+  at the first store returning a match. Plan your ordering accordingly.
+- Strategies from `Finbuckle.MultiTenant.AspNetCore` (Host, Route, Base Path, etc.) require `HttpContext`
+  and only work in web apps. Use [Delegate Strategy](Strategies#delegate-strategy) or
+  [Static Strategy](Strategies#static-strategy) in non-web scenarios.
+- `ITenantInfo` instances should be kept lightweight. Store heavy data externally and load it by tenant `Id`
+  when needed.
+
+## See Also
+
+- [ASP.NET Core Integration](AspNetCore) — middleware and `HttpContext` helpers
+- [.NET Generic Host Integration](GenericHost) — using MultiTenant in non-web apps
+- [Core Concepts](CoreConcepts) — `ITenantContext`, strategies, stores
+- [Per-Tenant Options](Options) — per-tenant configuration
+- [MultiTenant Strategies](Strategies) — all built-in strategies

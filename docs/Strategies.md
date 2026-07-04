@@ -333,3 +333,25 @@ OAuth2 (e.g. Log in via Facebook) are used.
 
 The strategy is configured internally when `WithPerTenantAuthentication` is called to
 configure [per-tenant authentication](Authentication).
+
+## Important Considerations
+
+- Multiple strategies can be registered and are tried in order. The first to return a non-null identifier stops
+  further strategy evaluation.
+- Most strategies are registered as singletons, so configuring the same type multiple times is not recommended.
+  The exception is `DelegateStrategy`, which can be registered multiple times with different logic.
+- Strategies from `Finbuckle.MultiTenant.AspNetCore` (Host, Route, Base Path, Header, Claim, Session,
+  HttpContext, Remote Authentication Callback) require `HttpContext` and only work in web apps.
+- For non-web apps, use [Delegate Strategy](#delegate-strategy), [Static Strategy](#static-strategy), or a
+  custom `IMultiTenantStrategy`. See [.NET Generic Host Integration](GenericHost) for patterns.
+- The `StaticStrategy` always runs last regardless of registration order. It's ideal as a default fallback.
+- [Ambient route value promotion](Strategies#ambient-route-value-promotion-link-generation) wraps the
+  `LinkGenerator` when `useTenantAmbientRouteValue: true`. Be aware of relative URL behavior with the
+  [Base Path Strategy](Strategies#base-path-strategy).
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — strategy registration
+- [MultiTenant Stores](Stores) — stores queried after strategy returns an identifier
+- [ASP.NET Core Integration](AspNetCore) — ASP.NET Core-specific strategies
+- [.NET Generic Host Integration](GenericHost) — using strategies in non-web apps
