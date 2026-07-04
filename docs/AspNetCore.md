@@ -12,7 +12,7 @@ dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
 This package depends on `Finbuckle.MultiTenant` and transitively brings in everything needed for
-ASP.NET Core integration, including [ASP.NET Core-specific strategies](#aspnet-core-strategies).
+ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp.net-core-strategies).
 
 ## Configuring the Middleware
 
