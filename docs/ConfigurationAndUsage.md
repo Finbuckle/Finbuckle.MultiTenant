@@ -110,8 +110,8 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
       will be `true` if the store resolved a tenant. The `TenantInfo` property contains the resolved tenant and can be
       changed by the event handler to override the store's result. A non-null `TenantInfo` object will stop the resolver
       from trying additional strategies and stores.
-    - `OnTenantResolveCompleted` - Called once after a tenant has been resolved. The `MultiTenantContext` property
-      contains the resolved multi-tenant context and can be changed by the event handler to override the resolver's
+    - `OnTenantResolveCompleted` - Called once after a tenant has been resolved. The `TenantContext` property
+      contains the resolved tenant context and can be changed by the event handler to override the resolver's
       result.
 
 ## Getting the Current Tenant
@@ -120,20 +120,14 @@ There are several ways your app can read the current tenant:
 
 ### Via Dependency Injection
 
-`IMultiTenantContextAccessor<TTenantInfo>` (and its non-generic variant `IMultiTenantContextAccessor`) are available
-via dependency injection and behave similarly to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track
-state. Note that in parent async contexts any changes in tenant will not be reflected — for example, the accessor will
-not reflect a tenant in the post-endpoint processing of ASP.NET Core middleware registered prior to `UseMultiTenant`.
-Use the `HttpContext` extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
-
-> Prior versions of MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations
-> via dependency injection. This was removed as these are not actual services, similar to
-> how [HttpContext is not a service](https://github.com/dotnet/aspnetcore/issues/47996#issuecomment-1529364233) and not
-> available directly via dependency injection.
+`ITenantContext<TTenantInfo>` (and its non-generic variant `ITenantContext`) are available via dependency injection
+and scoped to the current request or operation. In ASP.NET Core, prefer the `HttpContext` extension
+`GetTenantContext<TTenantInfo>` since it always reflects the state set by the middleware, even in post-endpoint
+processing.
 
 ### Via `HttpContext` (ASP.NET Core)
 
-For ASP.NET Core web apps the `GetMultiTenantContext<TTenantInfo>` extension method is available directly on
+For ASP.NET Core web apps the `GetTenantContext<TTenantInfo>` extension method is available directly on
 `HttpContext` and is the preferred approach. See
 [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
@@ -144,9 +138,9 @@ options:
 
 ### Via Dependency Injection
 
-`IMultiTenantContextSetter` is available via dependency injection and can be used to set the current tenant. This is
-useful in advanced scenarios and should be used with caution. Prefer the `HttpContext` extension method
-`SetTenantInfo<TTenantInfo>` when `HttpContext` is available.
+The injected `ITenantContext<TTenantInfo>` instance's `TenantInfo` property can be set directly to change the
+current tenant. This is useful in advanced scenarios and should be used with caution. Prefer the `HttpContext`
+extension method `SetTenantInfo<TTenantInfo>` when `HttpContext` is available.
 
 ### Via `HttpContext` (ASP.NET Core)
 
