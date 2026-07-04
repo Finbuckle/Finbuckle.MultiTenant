@@ -156,7 +156,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     })...
 ```
 
-> ⚠️ **Important**: When the `PathBase` is adjusted, be aware of the following implications:
+> ⚠️ **Important**: When using the `PathBase` is adjusted, be aware of the following implications:
 > 
 > - **Relative URLs**: Any relative URLs in your app (e.g. links, form actions) will be affected by the adjusted `PathBase`.
 > - **Tilde slash (`~/`) URLs**: ASP.NET Core's `~/` path resolution uses the `PathBase`, so `~/images/logo.png` will 
@@ -228,7 +228,7 @@ Uses the `__tenant__` route parameter (or a specified route parameter) to determ
 to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}`
 would use "initech" as the identifier when resolving the tenant. The tenant parameter can be placed anywhere in
 the route path configuration. If explicitly calling `UseRouting` in your app pipeline make sure to place it
-before `UseMultiTenant`.
+before `WithRouteStrategy`.
 
 By default the route parameter name is `__tenant__`, but a custom name can also be used via an overload. Also by
 default the strategy adds the tenant route value as an ambient value when generating links. This behavior can
@@ -246,7 +246,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 builder.Services.AddMultiTenant<TenantInfo>()
   .WithRouteStrategy("MyTenantRouteParam", false)...
 
-// UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy is used
+// UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy used
 app.UseRouting();
 app.UseMultiTenant();
 ```
@@ -333,3 +333,25 @@ OAuth2 (e.g. Log in via Facebook) are used.
 
 The strategy is configured internally when `WithPerTenantAuthentication` is called to
 configure [per-tenant authentication](Authentication).
+
+## Important Considerations
+
+- Multiple strategies can be registered and are tried in order. The first to return a non-null identifier stops
+  further strategy evaluation.
+- Most strategies are registered as singletons, so configuring the same type multiple times is not recommended.
+  The exception is `DelegateStrategy`, which can be registered multiple times with different logic.
+- Strategies from `Finbuckle.MultiTenant.AspNetCore` (Host, Route, Base Path, Header, Claim, Session,
+  HttpContext, Remote Authentication Callback) require `HttpContext` and only work in web apps.
+- For non-web apps, use [Delegate Strategy](#delegate-strategy), [Static Strategy](#static-strategy), or a
+  custom `IMultiTenantStrategy`. See [.NET Generic Host Integration](GenericHost) for patterns.
+- The `StaticStrategy` always runs last regardless of registration order. It's ideal as a default fallback.
+- [Ambient route value promotion](Strategies#ambient-route-value-promotion-link-generation) wraps the
+  `LinkGenerator` when `useTenantAmbientRouteValue: true`. Be aware of relative URL behavior with the
+  [Base Path Strategy](Strategies#base-path-strategy).
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — strategy registration
+- [MultiTenant Stores](Stores) — stores queried after strategy returns an identifier
+- [ASP.NET Core Integration](AspNetCore) — ASP.NET Core-specific strategies
+- [.NET Generic Host Integration](GenericHost) — using strategies in non-web apps

@@ -202,3 +202,21 @@ builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(Coo
     options.Cookie.Name = $"SignInCookie-{tenantInfo.Identifier}";
   });
 ```
+
+## Important Considerations
+
+- `WithPerTenantAuthentication()` requires `Finbuckle.MultiTenant.AspNetCore` and only works in ASP.NET Core apps.
+- A tenant claim is added to the user during sign-in and validated on subsequent requests. If the current
+  request's tenant changes, existing sign-in sessions are rejected for the new tenant.
+- By default only one tenant can be signed in per browser. Use [per-tenant cookie names](#other-authentication-options)
+  if you need concurrent tenant sessions.
+- The [Claim Strategy](Strategies#claim-strategy) does not work well with per-tenant cookie names since the
+  cookie name must be known before the tenant is resolved.
+- Place `UseMultiTenant()` before `UseAuthentication()` so the middleware resolves the tenant before
+  authentication runs.
+
+## See Also
+
+- [ASP.NET Core Integration](AspNetCore) — middleware setup and `HttpContext` helpers
+- [Per-Tenant Options](Options) — customizing any authentication options per tenant
+- [MultiTenant Strategies](Strategies) — all built-in strategies

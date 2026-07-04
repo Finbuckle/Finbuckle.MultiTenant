@@ -133,3 +133,24 @@ more details:
 
 A variety of sample projects are available in
 the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) directory.
+
+## Important Considerations
+
+- The type parameter passed to `AddMultiTenant<TTenantInfo>()` determines the `ITenantInfo` implementation used
+  throughout the app. Choose or define a class that fits your tenant data model.
+- `ITenantContext<TTenantInfo>` is registered as a scoped service. In ASP.NET Core the middleware populates it
+  automatically per request. In other app models you must manage scope creation and tenant resolution manually
+  (see [.NET Generic Host Integration](GenericHost)).
+- `TenantInfo` can only be set once per scope. The middleware handles this in web apps, but be aware of the
+  constraint if you call `SetTenantInfo` manually.
+- Middleware ordering is critical: `UseMultiTenant()` must come before `UseAuthentication()`, `UseAuthorization()`,
+  and any middleware that reads per-tenant options or services.
+- For web apps, prefer the `HttpContext` extension methods (`GetTenantContext<T>()`, `GetTenantInfo<T>()`)
+  over injecting `ITenantContext` directly, as they always reflect the middleware's state.
+
+## See Also
+
+- [Core Concepts](CoreConcepts) — `ITenantInfo`, strategies, stores
+- [Configuration and Usage](ConfigurationAndUsage) — all registration options
+- [ASP.NET Core Integration](AspNetCore) — middleware and `HttpContext` helpers
+- [.NET Generic Host Integration](GenericHost) — non-web scenarios

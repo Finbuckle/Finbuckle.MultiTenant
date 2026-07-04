@@ -12,7 +12,23 @@ dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
 This package depends on `Finbuckle.MultiTenant` and transitively brings in everything needed for
-ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp.net-core-strategies).
+ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp-net-core-strategies).
+
+## How the Middleware Works
+
+When `UseMultiTenant()` is added to the pipeline, the middleware automatically handles tenant resolution
+for each HTTP request:
+
+1. For every request, the middleware calls `ITenantResolver.ResolveAsync(HttpContext)`.
+2. The resolver iterates through registered strategies (which receive the `HttpContext`) to find a tenant
+   identifier, then queries stores to find a matching `TenantInfo`.
+3. If a tenant is found, the middleware sets `TenantInfo` on the scoped `ITenantContext<TTenantInfo>` for
+   that request.
+4. All services resolved within the request's DI scope — including `IOptions<T>`, `IOptionsSnapshot<T>`,
+   `IOptionsMonitor<T>`, and `IMultiTenantDbContext` — automatically see the resolved tenant.
+
+This means you never need to manually call `ITenantResolver` or populate `ITenantContext` in an ASP.NET Core
+app — the middleware wires everything together.
 
 ## Configuring the Middleware
 
@@ -101,12 +117,30 @@ if (tenantInfo != null)
 }
 ```
 
+#### `GetTenantInfo<TTenantInfo>`
+
+A convenience shorthand for `GetTenantContext<TTenantInfo>().TenantInfo`. Returns the current `TTenantInfo`
+instance, or null if no tenant was resolved.
+
+```csharp
+var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
+
+if (tenantInfo != null)
+{
+    Console.WriteLine($"Current tenant: {tenantInfo.Name}");
+}
+```
+
 #### `SetTenantInfo<TTenantInfo>`
 
 For most cases the middleware sets the `TenantInfo` automatically and this method is not needed. Use only if
 explicitly overriding the `TenantInfo` set by the middleware.
 
 Sets the current tenant to the provided `TenantInfo` on the request's `ITenantContext<TTenantInfo>`.
+
+> **Important:** `TenantInfo` can only be set once. Attempting to call `SetTenantInfo` after the tenant has
+> already been resolved will throw a `MultiTenantException`. Use `TrySetTenantInfo` if you need to conditionally
+> set the tenant only when none has been resolved yet.
 
 ```csharp
 var newTenantInfo = new TenantInfo { Id = "new-id", Identifier = "new-identifier" };
@@ -115,6 +149,18 @@ HttpContext.SetTenantInfo(newTenantInfo);
 
 // This will be the new tenant.
 var tenant = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
+```
+
+#### `TrySetTenantInfo<TTenantInfo>`
+
+Sets the current tenant only if one has not already been resolved. This is useful when your code may be called
+from multiple paths and you want to avoid the exception thrown by `SetTenantInfo` when a tenant already exists.
+
+```csharp
+var fallbackTenant = new TenantInfo { Id = "default", Identifier = "default" };
+
+// Only takes effect if no tenant was resolved by the middleware.
+HttpContext.TrySetTenantInfo(fallbackTenant);
 ```
 
 > For dependency injection-based access to the current tenant outside of a controller or middleware, see
@@ -209,8 +255,6 @@ or when some custom condition is met.
 
 > Short-circuiting the request pipeline does not return an HTTP error code — it simply stops calling further middleware.
 
-> Bypassing runs **before** tenant resolution. [Short circuiting](#short-circuiting) runs **after** resolution.
-
 ### Short Circuit When Tenant Not Resolved
 
 Call `ShortCircuitWhenTenantNotResolved()` after `AddMultiTenant<TTenantInfo>` to halt further processing
@@ -265,13 +309,41 @@ MultiTenant provides built-in support for isolating tenant authentication so tha
 scoped to the current tenant. This includes per-tenant cookie validation, challenge schemes, login/logout
 paths, and OpenID Connect settings.
 
-See [Per-Tenant Authentication](Authentication) for full details.
+Authentication is configured by calling `WithPerTenantAuthentication()` after `AddMultiTenant<TTenantInfo>()`:
+
+```csharp
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie()
+    .AddOpenIdConnect();
+
+builder.Services.AddMultiTenant<TenantInfo>()
+    .WithRouteStrategy()
+    .WithConfigurationStore()
+    .WithPerTenantAuthentication();
+```
+
+> Place `UseMultiTenant()` **before** `UseAuthentication()` so the tenant is resolved before authentication
+> runs.
+
+See [Per-Tenant Authentication](Authentication) for full details, including OpenID Connect configuration,
+per-tenant cookie names, and JWT bearer customization.
 
 ## Per-Tenant Options
 
 MultiTenant integrates with the standard ASP.NET Core Options pattern so that options can be configured
-differently for each tenant. Any options class used by ASP.NET Core or your own code can be customized
-per tenant with minimal changes.
+differently for each tenant. Once the middleware sets the tenant for a request, `IOptions<T>`,
+`IOptionsSnapshot<T>`, and `IOptionsMonitor<T>` all return the correct per-tenant values automatically.
+Any options class used by ASP.NET Core or your own code can be customized per tenant with minimal changes.
+
+> `IOptionsMonitor<T>` is registered as a **scoped** service in MultiTenant (unlike standard .NET where it
+> is a singleton), but it preserves the same change-notification and cache-invalidation behavior.
+
+```csharp
+builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+{
+    options.Setting = tenantInfo.SomeProperty;
+});
+```
 
 See [Per-Tenant Options](Options) for full details.
 
@@ -280,7 +352,13 @@ See [Per-Tenant Options](Options) for full details.
 ### Entity Framework Core
 
 MultiTenant can automatically filter EF Core queries by tenant using a global query filter. This removes
-the need to add `WHERE TenantId = ...` clauses throughout your app.
+the need to add `WHERE TenantId = ...` clauses throughout your app. Use `AddMultiTenantDbContext<T>()` for
+scoped contexts or `AddPooledMultiTenantDbContext<T>()` for high-throughput pooled contexts:
+
+```csharp
+builder.Services.AddMultiTenantDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+```
 
 See [Data Isolation with Entity Framework Core](EFCore) for full details.
 
@@ -290,4 +368,30 @@ MultiTenant has dedicated support for data isolation when using ASP.NET Core Ide
 including multi-tenant identity context base classes and support for passkeys (WebAuthn).
 
 See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
+
+## Important Considerations
+
+- **Middleware ordering matters.** Place `UseMultiTenant()` before `UseAuthentication()`, `UseAuthorization()`,
+  and any middleware that reads per-tenant options or services.
+- **`TenantInfo` can only be set once** per request. The middleware sets it early in the pipeline. If you
+  need to override it, use `HttpContext.SetTenantInfo()` or `TrySetTenantInfo()` before any tenant-aware
+  services are resolved.
+- **`ITenantContext` is scoped.** Each HTTP request gets its own instance. A new scope is created
+  per request by the ASP.NET Core framework, so this happens automatically.
+- **`IOptionsMonitor<T>` is scoped** in MultiTenant. Do not capture it in a singleton service.
+- **Not all strategies work for all scenarios.** The [Claim Strategy](Strategies#claim-strategy) needs
+  authentication middleware to run first. The [Route Strategy](Strategies#route-strategy) requires
+  `UseRouting()` before `UseMultiTenant()`.
+- **Per-tenant options require `ITenantContext.TenantInfo` to be set.** If tenant resolution fails (no
+  strategy finds an identifier or no store matches), the `TenantInfo` will be null and default (non-tenant)
+  options will be used.
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — registration and resolver details
+- [Core Concepts](CoreConcepts) — `ITenantContext`, `TenantContext`, and scoped lifetime
+- [.NET Generic Host Integration](GenericHost) — using MultiTenant in non-web apps
+- [Per-Tenant Authentication](Authentication) — full authentication setup
+- [Per-Tenant Options](Options) — options customization
+- [EF Core Data Isolation](EFCore) — shared and separate database patterns
 
