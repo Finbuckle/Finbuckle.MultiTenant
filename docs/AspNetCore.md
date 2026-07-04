@@ -80,14 +80,14 @@ general-purpose strategies available in the base package.
 
 The following extension methods are available on `HttpContext` for web apps:
 
-#### `GetMultiTenantContext<TTenantInfo>`
+#### `GetTenantContext<TTenantInfo>`
 
-Returns the `MultiTenantContext<TTenantInfo>` instance for the current request. This is the preferred way to
-access the current tenant in ASP.NET Core (rather than `IMultiTenantContextAccessor`) because it always
-reflects the state set by the middleware, even in post-endpoint processing.
+Returns the `ITenantContext<TTenantInfo>` instance for the current request. This is the preferred way to
+access the current tenant in ASP.NET Core because it always reflects the state set by the middleware, even
+in post-endpoint processing.
 
 ```csharp
-var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
+var tenantInfo = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
 
 if (tenantInfo != null)
 {
@@ -102,25 +102,19 @@ if (tenantInfo != null)
 For most cases the middleware sets the `TenantInfo` automatically and this method is not needed. Use only if
 explicitly overriding the `TenantInfo` set by the middleware.
 
-Sets the current tenant to the provided `TenantInfo`. Optionally resets the service provider scope so that
-any scoped services already resolved will be resolved again under the current tenant. This has no effect on
-singleton or transient services. Setting the `TenantInfo` with this method sets both the `StoreInfo` and
-`StrategyInfo` properties on the `MultiTenantContext<TTenantInfo>` to `null`.
+Sets the current tenant to the provided `TenantInfo` on the request's `ITenantContext<TTenantInfo>`.
 
 ```csharp
 var newTenantInfo = new TenantInfo { Id = "new-id", Identifier = "new-identifier" };
 
-HttpContext.SetTenantInfo(newTenantInfo, resetServiceProviderScope: true);
+HttpContext.SetTenantInfo(newTenantInfo);
 
 // This will be the new tenant.
-var tenant = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
-
-// This will regenerate the options class.
-var optionsProvider = HttpContext.RequestServices.GetService<IOptions<MyScopedOptions>>();
+var tenant = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
 ```
 
 > For dependency injection-based access to the current tenant outside of a controller or middleware, see
-> `IMultiTenantContextAccessor` in [Configuration and Usage](ConfigurationAndUsage#getting-the-current-tenant).
+> `ITenantContext` in [Configuration and Usage](ConfigurationAndUsage#getting-the-current-tenant).
 
 ## Bypassing Tenant Resolution
 
@@ -241,13 +235,13 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Use the `ShortCircuitWhen()` extension on `MultiTenantBuilder<TTenantInfo>` for advanced short-circuiting:
 
 ```csharp
-// Advanced short circuiting: if an obsolete strategy was used or when tenant not resolved.
+// Advanced short circuiting: if tenant not resolved.
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithHostStrategy()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
     {
-        config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+        config.Predicate = context => !context.IsResolved;
     });
 
 // Including a redirect.
@@ -256,7 +250,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
     {
-        config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+        config.Predicate = context => !context.IsResolved;
         config.RedirectTo = new Uri("/tenant/notfound", UriKind.Relative);
     });
 ```

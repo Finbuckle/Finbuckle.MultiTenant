@@ -97,10 +97,10 @@ settings. Be sure to call it before other middleware which will use per-tenant f
 ## Basic Usage
 
 With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `MultiTenantContext<TTenantInfo>` object accessed from the `GetMultiTenantContext<TTenantInfo>` extension method:
+the `ITenantContext<TTenantInfo>` object accessed from the `GetTenantContext<TTenantInfo>` extension method:
 
 ```csharp
-var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
+var tenantInfo = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
 
 if(tenantInfo != null)
 {
@@ -114,7 +114,7 @@ The type of the `TenantInfo` property depends on the type passed when calling `A
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
 The `TenantInfo` instance and the typed instance are also available using the
-`IMultiTenantContextAccessor<TTenantInfo>` interface which is available via dependency injection.
+`ITenantContext<TTenantInfo>` interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 

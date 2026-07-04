@@ -10,7 +10,7 @@ supports each of these models by associating a connection string with each tenan
 
 If each tenant uses a separate database then add a `ConnectionString` property to the app's `TenantInfo`
 implementation and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
-by injecting an `IMultiTenantContextAccessor<TTenantInfo>` into the database context class constructor.
+by injecting an `ITenantContext<TTenantInfo>` into the database context class constructor.
 
 ```csharp
 public class AppTenantInfo : ITenantInfo
@@ -25,10 +25,10 @@ public class MyAppDbContext : DbContext
 {
    private AppTenantInfo? TenantInfo { get; set; }
 
-   public MyAppDbContext(IMultiTenantContextAccessor<AppTenantInfo> multiTenantContextAccessor)
+   public MyAppDbContext(ITenantContext<AppTenantInfo> tenantContext)
    {
        // get the current tenant info at the time of construction
-       TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
+       TenantInfo = tenantContext.TenantInfo;
    } 
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -344,8 +344,7 @@ If the connection string or provider varies per tenant, use the overload that pr
 ```csharp
 builder.Services.AddMultiTenantDbContext<BloggingDbContext>((sp, options) =>
 {
-    var tenantInfo = sp.GetRequiredService<IMultiTenantContextAccessor<AppTenantInfo>>()
-                       .MultiTenantContext.TenantInfo;
+    var tenantInfo = sp.GetRequiredService<ITenantContext<AppTenantInfo>>().TenantInfo;
     options.UseSqlServer(tenantInfo?.ConnectionString);
 });
 ```

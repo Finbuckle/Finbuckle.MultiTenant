@@ -25,16 +25,16 @@ when needed via the tenant `Id`.
 > Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
 > `TenantInfo` derived class.
 
-## `MultiTenantContext<TTenantInfo>`
+## `TenantContext<TTenantInfo>`
 
-The `MultiTenantContext<TTenantInfo>` contains information about the current tenant.
+The `TenantContext<TTenantInfo>` contains information about the current tenant.
 
-* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from dependency injection.
-* Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
-  determined, and from where its information was retrieved.
+* Implements `ITenantContext` and `ITenantContext<TTenantInfo>` which can be obtained from dependency injection.
+* Includes the `TenantInfo` property with details on the current tenant, and an `Items` property for storing
+  arbitrary additional information about the tenant context.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
-* Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`
-  object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
+* Can be obtained in ASP.NET Core by calling the `GetTenantContext<TTenantInfo>()` method on the current request's
+  `HttpContext` object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.
 * A custom implementation can be defined for advanced use cases.
 
