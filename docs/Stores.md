@@ -292,3 +292,21 @@ Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
 services.AddMultiTenant<TenantInfo>()
     .WithEchoStore();
 ```
+
+## Important Considerations
+
+- Stores are queried in registration order for each strategy. The first store to return a match wins.
+- `ConfigurationStore`, `HttpRemoteStore`, and `EchoStore` are read-only. `AddAsync`, `UpdateAsync`, and
+  `RemoveAsync` throw `NotImplementedException`.
+- `DistributedCacheStore` stores each tenant twice (by `Id` and by `Identifier`). Both entries are kept in sync
+  automatically.
+- `GetAllAsync` is not implemented by all stores. Check individual store documentation before relying on it.
+- Custom stores implementing `IMultiTenantStore<TTenantInfo>` should avoid extensive logging or validation —
+  the runtime decorator handles these.
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — store registration
+- [MultiTenant Strategies](Strategies) — identifiers to query stores with
+- [Getting Started](GettingStarted) — quick start configuration
+- [.NET Generic Host Integration](GenericHost) — using stores in non-web apps

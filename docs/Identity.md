@@ -117,3 +117,23 @@ only when the Identity schema version is set to 3.
 When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]`
 attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the
 base class `OnModelCreating`.
+
+## Important Considerations
+
+- In v10, all Identity entity types are configured as multi-tenant by default when deriving from a
+  `MultiTenantIdentityDbContext` variant.
+- Multi-tenant unique indexes include `TenantId`. This allows the same email or username to be reused across
+  tenants.
+- Passkey support (`IdentityUserPasskey<TKey>`) requires Identity schema version 3 and is automatically
+  configured when that version is detected.
+- If not deriving from `MultiTenantIdentityDbContext`, implement `IMultiTenantDbContext` and call the multi-tenant
+  extension methods in `OnModelCreating` **after** calling the base class method.
+- Per-tenant authentication must be configured separately via `WithPerTenantAuthentication()`. See
+  [Per-Tenant Authentication](Authentication) for details.
+
+## See Also
+
+- [Data Isolation with Entity Framework Core](EFCore) — shared and separate database patterns
+- [Per-Tenant Authentication](Authentication) — tenant-scoped login sessions
+- [Configuration and Usage](ConfigurationAndUsage) — service registration
+- [Getting Started](GettingStarted) — quick start walkthrough

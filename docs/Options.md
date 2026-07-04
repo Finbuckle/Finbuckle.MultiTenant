@@ -29,6 +29,10 @@ code internal to ASP.NET Core or other libraries that use the Options pattern.
 > ⚠️ Avoid storing an options instance in a static field or singleton. Always resolve options from the provided accessor
 > so the tenant-specific cache can refresh correctly.
 
+> ⚠️ `IOptionsMonitor<TOptions>` instances are registered as **scoped** in MultiTenant, unlike standard .NET where
+> they are singletons. Do not capture an `IOptionsMonitor<T>` in a singleton service — it will become tied to the
+> scope in which it was captured and will not reflect tenant changes on subsequent requests.
+
 A potential issue arises when code internally stores or caches options values from
 an `IOptions<TOptions>`, `IOptionsSnapshot<TOptions>`, or `IOptionsMonitor<TOptions>` instance. This is usually
 unnecessary because the options are already cached within the .NET options infrastructure, and in these cases the
@@ -200,3 +204,23 @@ When using per-tenant options with `IOptionsMonitor<TOptions>`, the shared monit
 cached entries manually. `Clear(string tenantId)` clears cached options for a specific tenant (or regular non
 per-tenant options if the parameter is empty or null). `ClearAll()` clears all cached options (including regular
 non per-tenant options).
+
+## Important Considerations
+
+- `IOptions<T>`, `IOptionsSnapshot<T>`, and `IOptionsMonitor<T>` are all scoped in MultiTenant. Do not capture
+  them in singleton services.
+- `IOptionsMonitor<T>` preserves standard change-notification behavior despite being scoped — source changes
+  still trigger listener callbacks.
+- Per-tenant options only work after `ITenantContext.TenantInfo` is populated. If tenant resolution fails,
+  default (non-tenant) options are used.
+- Always access options via the accessor (`Value` or `Get()`) rather than storing the options instance in a
+  field, so tenant-specific caching works correctly.
+- The `OptionsBuilder` API supports up to four dependencies in the per-tenant overloads (standard .NET supports
+  five).
+
+## See Also
+
+- [Configuration and Usage](ConfigurationAndUsage) — service registration
+- [Core Concepts](CoreConcepts) — `ITenantContext` and scoped lifetime
+- [ASP.NET Core Integration](AspNetCore) — middleware integration
+- [Per-Tenant Authentication](Authentication) — authentication options
