@@ -32,6 +32,24 @@ public class HttpContextExtensionShould
     }
 
     [Fact]
+    public void GetExistingNonGenericTenantContext()
+    {
+        var ti = new TenantInfo { Id = "test", Identifier = "" };
+
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+        sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo = ti;
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+
+        var returnedMtc = httpContextMock.Object.TenantContext;
+
+        Assert.Same(sp.GetRequiredService<ITenantContext>(), returnedMtc);
+    }
+
+    [Fact]
     public void GetEmptyTenantContextIfNoneSet()
     {
         var services = new ServiceCollection();
@@ -76,6 +94,39 @@ public class HttpContextExtensionShould
         httpContextMock.Setup(c => c.RequestServices).Returns(sp);
 
         var returnedTi = httpContextMock.Object.GetTenantInfo<TenantInfo>();
+
+        Assert.Null(returnedTi);
+    }
+
+    [Fact]
+    public void ReturnCurrentTenant()
+    {
+        var ti = new TenantInfo { Id = "test", Identifier = "" };
+
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+        sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo = ti;
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+
+        var returnedTi = httpContextMock.Object.TenantInfo;
+
+        Assert.Equal(ti, returnedTi);
+    }
+
+    [Fact]
+    public void ReturnNullCurrentTenantIfNoTenantInfo()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+
+        var returnedTi = httpContextMock.Object.TenantInfo;
 
         Assert.Null(returnedTi);
     }
