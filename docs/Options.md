@@ -70,7 +70,7 @@ access to the options values. A service provider instance can also provide acces
 
 ```csharp
 // access options via dependency injection in a class constructor
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
     
@@ -90,8 +90,7 @@ With standard options each tenant would see the same exact options.
 ## Customizing Options Per Tenant
 
 This section assumes a standard web application builder is configured and MultiTenant is configured with
-a `TTenantInfo` type of `TenantInfo`.
-See [Getting Started](GettingStarted) for details.
+a `TTenantInfo` type of `TenantInfo`. See [Getting Started](GettingStarted) for details.
 
 Make sure your project references the `Finbuckle.MultiTenant` package.
 
@@ -105,48 +104,48 @@ using Finbuckle.MultiTenant.Extensions;
 // configure options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 
 // or configure named options per tenant
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 
 // ConfigureAll options variant
 builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 
 // can also configure post options, named post options, and all post options variants
 builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 
 builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 
 builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.MyOption1 = tenantInfo.Id;
+        options.MyOption2 = tenantInfo.Identifier;
     });
 ```
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
 ```csharp
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
 

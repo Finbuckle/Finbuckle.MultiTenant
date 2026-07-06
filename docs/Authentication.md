@@ -91,7 +91,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        .AddOpenIdConnect();
 
 // add MultiTenant services
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
        .WithRouteStrategy()
        .WithConfigurationStore()
        .WithPerTenantAuthentication();
@@ -104,6 +104,19 @@ app.UseMultiTenant();
 // ...add other middleware
 
 app.Run();
+
+public class AppTenantInfo : TenantInfo
+{
+    public string? Name { get; init; }
+    public string? ChallengeScheme { get; init; }
+    public string? CookieLoginPath { get; init; }
+    public string? CookieLogoutPath { get; init; }
+    public string? CookieAccessDeniedPath { get; init; }
+    public string? OpenIdConnectAuthority { get; init; }
+    public string? OpenIdConnectClientId { get; init; }
+    public string? OpenIdConnectClientSecret { get; init; }
+    public string? JwtAuthority { get; init; }
+}
 ```
 
 The code above paired with the `appsettings.json` tenant configuration below
@@ -160,7 +173,7 @@ different recognized authority for token validation we can add a field to the
 configurations:
 
 ```csharp 
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -169,7 +182,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 // Note the default JwtBearer authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
-builder.Services.ConfigurePerTenant<JwtBearerOptions, TenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
+builder.Services.ConfigurePerTenant<JwtBearerOptions, AppTenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
 tenantInfo) =>
     {
         // assume tenants are configured with an authority string to use here.
@@ -188,7 +201,7 @@ existing tenant sign-ins when switching between requests on the same browser or
 agent because new sign-ins are not replacing the existing cookie:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -197,7 +210,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 // Note the default cookie authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
-builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, AppTenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
   {
     options.Cookie.Name = $"SignInCookie-{tenantInfo.Identifier}";
   });
