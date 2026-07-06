@@ -126,13 +126,13 @@ with a **scoped lifetime** (`AddScoped`). Each DI scope (e.g. each HTTP request 
 `TenantContext<TTenantInfo>` instance. The middleware resolves the tenant and sets `TenantInfo` on this scoped
 instance early in the request pipeline, so all services resolved within the same scope see the same tenant.
 
-In ASP.NET Core, prefer the `HttpContext` extension `GetTenantContext<TTenantInfo>` since it always reflects the
-state set by the middleware, even in post-endpoint processing.
+In ASP.NET Core, prefer the `HttpContext` extension members such as `GetTenantContext<TTenantInfo>` or
+`TenantContext` since they always reflect the state set by the middleware, even in post-endpoint processing.
 
 ### Via `HttpContext` (ASP.NET Core)
 
-For ASP.NET Core web apps the `GetTenantContext<TTenantInfo>` extension method is available directly on
-`HttpContext` and is the preferred approach. See
+For ASP.NET Core web apps the `GetTenantContext<TTenantInfo>`, `GetTenantInfo<TTenantInfo>`, `TenantContext`, and
+`CurrentTenant` extension members are available directly on `HttpContext`. See
 [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
 ## Setting the Current Tenant

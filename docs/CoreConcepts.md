@@ -7,7 +7,7 @@ However, there are a few important specifics to be aware of. The items below mak
 
 A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context of an
 app. The type of these instances must implement `ITenantInfo` which defines properties
-for `Id` and `Identifier`. `TenantInfo` is a basic implementation provided by the library which also includes a `Name` property.
+for `Id` and `Identifier`. `TenantInfo` is a basic implementation provided by the library with those two properties.
 
 When calling `AddMultiTenant<TTenantInfo>` the type passed into the
 type parameter defines the `ITenantInfo` implementation used throughout the library and app.
@@ -46,8 +46,9 @@ The `TenantContext<TTenantInfo>` contains information about the current tenant.
   tenant context. Use it for per-request middleware data, tokens, or other transient state. Items are lost
   when the scope ends or when `TenantInfo` is set.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
-* Can be obtained in ASP.NET Core by calling the `GetTenantContext<TTenantInfo>()` method on the current request's
-  `HttpContext` object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
+* Can be obtained in ASP.NET Core from the current request's `HttpContext` object with
+  `GetTenantContext<TTenantInfo>()` or the non-generic `TenantContext` extension property. See
+  [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the
   middleware handles this. Use `TrySetTenantInfo` if you need to set only when no tenant has been resolved yet.
 * A custom implementation can be defined for advanced use cases.

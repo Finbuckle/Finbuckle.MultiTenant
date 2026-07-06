@@ -198,9 +198,8 @@ Make sure the tenant info type will support basic JSON serialization and deseria
 This store will attempt to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
-For a successful request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
-, `Name`, and other properties which will be mapped into a `TenantInfo` object with the type
-passed to `AddMultiTenant<TTenantInfo>`.
+For a successful request, the store expects a 200 response code and a json body with properties `Id` and `Identifier`.
+Any additional properties supported by the type passed to `AddMultiTenant<TTenantInfo>` will also be mapped.
 
 Any non-200 response code results in a null `TenantInfo`.
 
