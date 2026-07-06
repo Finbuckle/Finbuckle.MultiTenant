@@ -92,9 +92,9 @@ general-purpose strategies available in the base package.
 
 ## Getting the Current Tenant in ASP.NET Core
 
-### `HttpContext` Extension Methods
+### `HttpContext` Extension Members
 
-The following extension methods are available on `HttpContext` for web apps:
+The following extension members are available on `HttpContext` for web apps:
 
 #### `GetTenantContext<TTenantInfo>`
 
@@ -113,7 +113,20 @@ if (tenantInfo != null)
 {
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
-    var name = tenantInfo.Name;
+}
+```
+
+#### `TenantContext`
+
+Returns the non-generic `ITenantContext` instance for the current request. This is useful when code does not need
+the concrete tenant info type, or when working with shared infrastructure that only depends on `ITenantInfo`.
+
+```csharp
+var tenantContext = HttpContext.TenantContext;
+
+if (tenantContext.IsResolved)
+{
+    var tenantId = tenantContext.TenantInfo?.Id;
 }
 ```
 
@@ -127,7 +140,21 @@ var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
 
 if (tenantInfo != null)
 {
-    Console.WriteLine($"Current tenant: {tenantInfo.Name}");
+    Console.WriteLine($"Current tenant: {tenantInfo.Identifier}");
+}
+```
+
+#### `CurrentTenant`
+
+A convenience shorthand for `TenantContext.TenantInfo`. Returns the current `ITenantInfo` instance, or null if
+no tenant was resolved.
+
+```csharp
+var tenantInfo = HttpContext.CurrentTenant;
+
+if (tenantInfo != null)
+{
+    Console.WriteLine($"Current tenant: {tenantInfo.Identifier}");
 }
 ```
 
@@ -341,7 +368,7 @@ Any options class used by ASP.NET Core or your own code can be customized per te
 ```csharp
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
 {
-    options.Setting = tenantInfo.SomeProperty;
+    options.Setting = tenantInfo.Identifier;
 });
 ```
 
@@ -394,4 +421,3 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 - [Per-Tenant Authentication](Authentication) — full authentication setup
 - [Per-Tenant Options](Options) — options customization
 - [EF Core Data Isolation](EFCore) — shared and separate database patterns
-

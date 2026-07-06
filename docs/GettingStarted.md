@@ -106,15 +106,17 @@ if(tenantInfo != null)
 {
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
-    var name = tenantInfo.Name;
 }
 ```
 
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `TenantInfo` instance and the typed instance are also available using the
-`ITenantContext<TTenantInfo>` interface which is available via dependency injection.
+For non-generic access in ASP.NET Core, use the `HttpContext.TenantContext` extension property. To read only the
+current tenant as `ITenantInfo`, use `HttpContext.CurrentTenant`.
+
+The `TenantInfo` instance and the typed instance are also available using the `ITenantContext<TTenantInfo>` interface
+which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
@@ -145,7 +147,8 @@ the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/sampl
   constraint if you call `SetTenantInfo` manually.
 - Middleware ordering is critical: `UseMultiTenant()` must come before `UseAuthentication()`, `UseAuthorization()`,
   and any middleware that reads per-tenant options or services.
-- For web apps, prefer the `HttpContext` extension methods (`GetTenantContext<T>()`, `GetTenantInfo<T>()`)
+- For web apps, prefer the `HttpContext` extension members (`GetTenantContext<T>()`, `GetTenantInfo<T>()`,
+  `TenantContext`, `CurrentTenant`)
   over injecting `ITenantContext` directly, as they always reflect the middleware's state.
 
 ## See Also

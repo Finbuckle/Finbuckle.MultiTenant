@@ -101,8 +101,7 @@ services.AddMultiTenant<TenantInfo>()
         options.Tenants.Add(new TenantInfo
         {
             Id = Guid.NewGuid().ToString(),
-            Identifier = "tenant-a",
-            Name = "Tenant A"
+            Identifier = "tenant-a"
         });
     });
 ```
@@ -190,7 +189,7 @@ if (result.TenantInfo is not null)
 
 // All services resolved from scopedProvider now see the tenant.
 var options = scopedProvider.GetRequiredService<IOptions<MyOptions>>();
-Console.WriteLine($"Tenant: {tenantContext.TenantInfo?.Name}");
+Console.WriteLine($"Tenant: {tenantContext.TenantInfo?.Identifier}");
 ```
 
 ### Handling Unresolved Tenants
@@ -249,7 +248,7 @@ is that `ITenantContext.TenantInfo` is populated within the current scope. Once 
 // Register per-tenant options.
 builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
 {
-    options.Setting = tenantInfo.SomeProperty;
+    options.Setting = tenantInfo.Identifier;
 });
 
 // In your handler, resolved within a tenant scope:
