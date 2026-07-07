@@ -29,7 +29,8 @@ when needed via the tenant `Id`.
 
 The `MultiTenantContext<TTenantInfo>` contains information about the current tenant.
 
-* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` which can be obtained from dependency injection.
+* Implements `IMultiTenantContext` and `IMultiTenantContext<TTenantInfo>` and can be accessed through
+  `IMultiTenantContextAccessor` from dependency injection.
 * Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
   determined, and from where its information was retrieved.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
@@ -55,8 +56,8 @@ Responsible for returning a `TenantInfo` object based on a tenant string identif
 strategy).
 
 * Has methods for adding, removing, updating, and retrieving `TenantInfo` objects.
-* Two implementations are provided: a basic `InMemoryTenantStore` based on `ConcurrentDictionary<string, TenantInfo>`
-  and a more advanced Entity Framework Core based implementation.
+* Several implementations are provided, including in-memory, configuration, EF Core, distributed cache, HTTP remote,
+  and echo stores. See [MultiTenant Stores](Stores) for more information.
 * Custom stores implementing `IMultiTenantStore` can be used as well.
 
 ## MultiTenantException

@@ -156,7 +156,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     })...
 ```
 
-> ⚠️ **Important**: When using the `PathBase` is adjusted, be aware of the following implications:
+> ⚠️ **Important**: When the `PathBase` is adjusted, be aware of the following implications:
 > 
 > - **Relative URLs**: Any relative URLs in your app (e.g. links, form actions) will be affected by the adjusted `PathBase`.
 > - **Tilde slash (`~/`) URLs**: ASP.NET Core's `~/` path resolution uses the `PathBase`, so `~/images/logo.png` will 
@@ -228,7 +228,7 @@ Uses the `__tenant__` route parameter (or a specified route parameter) to determ
 to "https://www.example.com/initech/home/" and a route configuration of `{__tenant__}/{controller=Home}/{action=Index}`
 would use "initech" as the identifier when resolving the tenant. The tenant parameter can be placed anywhere in
 the route path configuration. If explicitly calling `UseRouting` in your app pipeline make sure to place it
-before `WithRouteStrategy`.
+before `UseMultiTenant`.
 
 By default the route parameter name is `__tenant__`, but a custom name can also be used via an overload. Also by
 default the strategy adds the tenant route value as an ambient value when generating links. This behavior can
@@ -246,7 +246,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 builder.Services.AddMultiTenant<TenantInfo>()
   .WithRouteStrategy("MyTenantRouteParam", false)...
 
-// UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy used
+// UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy is used
 app.UseRouting();
 app.UseMultiTenant();
 ```
@@ -311,7 +311,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used,
 but a custom key can also be used.
 
-Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type
+Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom header key
 is also available:
 
 ```csharp

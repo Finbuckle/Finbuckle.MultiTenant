@@ -69,7 +69,7 @@ MultiTenant is designed to be easy to use and follows standard .NET conventions 
 
 ## Documentation
 
-The library builds on on basic multi-tenant functionality to provide a variety of higher level features. See
+The library builds on basic multi-tenant functionality to provide a variety of higher level features. See
 the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
 
 * [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
@@ -112,7 +112,6 @@ From the command line clone the git repository, `cd` into the new directory, and
 
 ```bash
 git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
-cd Finbuckle.MultiTenant
 cd Finbuckle.MultiTenant
 dotnet build
 ```
