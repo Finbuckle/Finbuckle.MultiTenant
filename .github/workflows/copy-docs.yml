@@ -3,22 +3,28 @@ name: Copy Docs to Website
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to copy docs from (for example, v10.1.1)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   checkout-copy-checkin:
-    if: github.event.release.tag_name != 'autodraft'
+    if: github.event_name == 'workflow_dispatch' || github.event.release.tag_name != 'autodraft'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
           fetch-depth: 0
       - name: Get Current Version
-        run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*')" >> $GITHUB_ENV
+        run: echo "tag=${{ github.event.release.tag_name || inputs.tag }}" >> $GITHUB_ENV
       - name: Checkout Website
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
         with:
