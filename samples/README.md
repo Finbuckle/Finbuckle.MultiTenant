@@ -14,7 +14,7 @@ A minimal multi-tenant Web API demonstrating the base path strategy and in-memor
 - Custom tenant properties
 - Localized content per tenant
 
-### [Identity Sample App](IdentitySampleApp/)
+### [Identity Sample App](IdentityAppSample/)
 
 An ASP.NET Core MVC application with ASP.NET Core Identity integration showing per-tenant authentication and user management. Each tenant maintains isolated users in separate database contexts.
 
