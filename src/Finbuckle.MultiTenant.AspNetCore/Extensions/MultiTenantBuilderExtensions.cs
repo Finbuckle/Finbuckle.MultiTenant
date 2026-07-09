@@ -308,8 +308,7 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
             options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (resolutionCompletedContext.Strategy.GetType() ==
-                    typeof(BasePathStrategy) &&
+                if (resolutionCompletedContext.Strategy is BasePathStrategy &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)

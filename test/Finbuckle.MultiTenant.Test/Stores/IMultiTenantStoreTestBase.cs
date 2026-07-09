@@ -75,7 +75,16 @@ public abstract class MultiTenantStoreTestBase
     {
         var store = await CreateTestStore();
         Assert.NotNull(await store.GetByIdentifierAsync("initech"));
-        Assert.True(await store.RemoveAsync("initech"));
+        Assert.True(await store.RemoveAsync("initech-id"));
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
+    }
+
+    //[Fact]
+    public virtual async Task RemoveTenantInfoFromStoreByIdentifier()
+    {
+        var store = await CreateTestStore();
+        Assert.NotNull(await store.GetByIdentifierAsync("initech"));
+        Assert.True(await store.RemoveByIdentifierAsync("initech"));
         Assert.Null(await store.GetByIdentifierAsync("initech"));
     }
 

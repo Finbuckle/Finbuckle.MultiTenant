@@ -11,9 +11,9 @@ namespace Finbuckle.MultiTenant;
 public class StrategyResolveCompletedContext
 {
     /// <summary>
-    /// Gets or sets the context used for attempted tenant resolution.
+    /// The context used for attempted tenant resolution.
     /// </summary>
-    public object? Context { get; set; }
+    public required object Context { get; init; }
 
     /// <summary>
     /// The <see cref="IMultiTenantStrategy"/> instance that was run.
