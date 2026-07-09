@@ -36,7 +36,12 @@ public interface ITenantResolver<TTenantInfo> : ITenantResolver
     new Task<ITenantContext<TTenantInfo>> ResolveAsync(object context);
 
     /// <summary>
-    /// Contains a list of <see cref="IMultiTenantStore{TTenantInfo}"/> instances used for tenant resolution.
+    /// The primary <see cref="IMultiTenantStore{TTenantInfo}"/> instance used for tenant resolution.
     /// </summary>
-    public IEnumerable<IMultiTenantStore<TTenantInfo>> Stores { get; set; }
+    public IMultiTenantStore<TTenantInfo> Store { get; }
+
+    /// <summary>
+    /// Contains a list of <see cref="IMultiTenantStoreCache{TTenantInfo}"/> instances used for tenant resolution.
+    /// </summary>
+    public IEnumerable<IMultiTenantStoreCache<TTenantInfo>> StoreCaches { get; }
 }

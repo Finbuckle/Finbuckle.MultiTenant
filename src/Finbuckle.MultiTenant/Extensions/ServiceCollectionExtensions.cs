@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
+        services.AddScoped<TenantManager<TTenantInfo>>();
         
         services.AddScoped<ITenantContext<TTenantInfo>>(_ => new TenantContext<TTenantInfo>());
         services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TTenantInfo>>());

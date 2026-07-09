@@ -15,14 +15,19 @@ public record TenantResolveCompletedContext<TTenantInfo>
     public required ITenantContext<TTenantInfo> TenantContext { get; set; }
     
     /// <summary>
-    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that was run.
+    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that resolved the tenant, if resolved by the primary store.
     /// </summary>
-    public required IMultiTenantStore<TTenantInfo> Store { get; init; }
+    public IMultiTenantStore<TTenantInfo>? Store { get; init; }
 
     /// <summary>
-    /// The <see cref="IMultiTenantStrategy"/> instance that was run.
+    /// The <see cref="IMultiTenantStoreCache{TTenantInfo}"/> instance that resolved the tenant, if resolved by a cache.
     /// </summary>
-    public required IMultiTenantStrategy Strategy { get; init; }
+    public IMultiTenantStoreCache<TTenantInfo>? Cache { get; init; }
+
+    /// <summary>
+    /// The <see cref="IMultiTenantStrategy"/> instance that resolved the tenant, if a tenant was resolved.
+    /// </summary>
+    public IMultiTenantStrategy? Strategy { get; init; }
 
     /// <summary>
     /// The context used to resolve the tenant.

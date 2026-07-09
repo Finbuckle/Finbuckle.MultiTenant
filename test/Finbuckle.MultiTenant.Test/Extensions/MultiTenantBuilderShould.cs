@@ -128,6 +128,35 @@ public class MultiTenantBuilderShould
             builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
     }
 
+    [Fact]
+    public void ThrowIfAddingMultiplePrimaryStores()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton));
+    }
+
+    [Fact]
+    public void AddMultipleStoreCachesInOrder()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "first");
+        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "second");
+
+        var sp = services.BuildServiceProvider();
+        var caches = sp.GetRequiredService<IEnumerable<IMultiTenantStoreCache<TenantInfo>>>()
+            .Cast<TestStoreCache<TenantInfo>>()
+            .ToArray();
+
+        Assert.Equal(2, caches.Length);
+        Assert.Equal("first", caches[0].Name);
+        Assert.Equal("second", caches[1].Name);
+    }
+
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]
     [InlineData(ServiceLifetime.Scoped)]
@@ -258,37 +287,78 @@ public class MultiTenantBuilderShould
             _testParam = testParam;
         }
 
-        public Task<bool> AddAsync(TTenant tenantInfo)
+        public Task<bool> AddAsync(TTenant tenantInfo, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TTenant?> GetAsync(string id)
+        public Task<TTenant?> GetAsync(string id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TTenant>> GetAllAsync()
+        public Task<IEnumerable<TTenant>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<TTenant>> GetAllAsync(int take, int skip)
+        public Task<IEnumerable<TTenant>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TTenant?> GetByIdentifierAsync(string identifier)
+        public Task<TTenant?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> RemoveAsync(string identifier)
+        public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateAsync(TTenant tenantInfo)
+        public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateAsync(TTenant tenantInfo, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private class TestStoreCache<TTenant> : IMultiTenantStoreCache<TTenant>
+        where TTenant : TenantInfo
+    {
+        public TestStoreCache(string name)
+        {
+            Name = name;
+        }
+
+        public string Name { get; }
+
+        public Task<TTenant?> GetAsync(string id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TTenant?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetAsync(TTenant tenantInfo, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAsync(string id, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

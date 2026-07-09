@@ -16,9 +16,6 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
 
-    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private readonly InMemoryStoreOptions<TTenantInfo> _options;
-
     /// <summary>
     /// Constructor for InMemoryStore.
     /// </summary>
@@ -26,14 +23,14 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <exception cref="MultiTenantException">Thrown when tenant configuration is invalid.</exception>
     public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
     {
-        _options = options.Value;
+        var options1 = options.Value;
 
         var stringComparer = StringComparer.OrdinalIgnoreCase;
-        if (_options.IsCaseSensitive)
+        if (options1.IsCaseSensitive)
             stringComparer = StringComparer.Ordinal;
 
         _tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
-        foreach (var tenant in _options.Tenants)
+        foreach (var tenant in options1.Tenants)
         {
             if (String.IsNullOrWhiteSpace(tenant.Id))
                 throw new MultiTenantException("Missing tenant id in options.");
@@ -47,14 +44,14 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetAsync(string id)
+    public async Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
         var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
         return await Task.FromResult(result).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         _tenantMap.TryGetValue(identifier, out var result);
 
@@ -62,7 +59,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList()).ConfigureAwait(false);
     }
@@ -71,13 +68,13 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public async Task<bool> AddAsync(TTenantInfo tenantInfo)
+    public async Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         var result = _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
 
@@ -85,7 +82,18 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> RemoveAsync(string identifier)
+    public async Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var existingTenantInfo = await GetAsync(id, cancellationToken).ConfigureAwait(false);
+
+        if (existingTenantInfo?.Identifier is null)
+            return await Task.FromResult(false).ConfigureAwait(false);
+
+        return await RemoveByIdentifierAsync(existingTenantInfo.Identifier, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         var result = _tenantMap.TryRemove(identifier, out var _);
 
@@ -93,9 +101,9 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo)
+    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
-        var existingTenantInfo = await GetAsync(tenantInfo.Id).ConfigureAwait(false);
+        var existingTenantInfo = await GetAsync(tenantInfo.Id, cancellationToken).ConfigureAwait(false);
 
         if (existingTenantInfo?.Identifier != null)
         {
