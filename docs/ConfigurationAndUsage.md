@@ -37,18 +37,21 @@ chaining method calls.
 
 ## Configuring the Service
 
-### WithStore Variants
+### WithStore and WithStoreCache Variants
 
-Adds and configures an `IMultiTenantStore` for your app. Multiple stores can be configured and each will be checked
-in the order registered. See [MultiTenant Stores](Stores) for more information on each type.
+Adds and configures an `IMultiTenantStore` primary store for your app. Exactly one primary store can be configured.
+Store caches can also be configured and each cache will be checked in the order registered before the primary store.
+See [MultiTenant Stores](Stores) for more information on each type.
 
 - `WithStore<TStore>`
 - `WithInMemoryStore`
 - `WithConfigurationStore`
 - `WithEFCoreStore<TEFCoreStoreDbContext, TTenantInfo>`
-- `WithDistributedCacheStore`
 - `WithHttpRemoteStore`
 - `WithEchoStore`
+- `WithStoreCache<TStoreCache>`
+- `WithMemoryCacheStoreCache`
+- `WithDistributedCacheStoreCache`
 
 ### WithStrategy Variants
 
@@ -67,8 +70,8 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 - `WithSessionStrategy`
 - `WithStaticStrategy`
 
-> Need fallbacks? Chain several strategies and more than one store; the resolver will keep trying strategies in order
-> and run through the configured stores until a `TenantInfo` is found.
+> Need fallbacks? Chain several strategies and configure store caches; the resolver will keep trying strategies in order
+> and query configured caches before the primary store until a `TenantInfo` is found.
 
 ### WithPerTenantAuthentication
 
@@ -90,12 +93,12 @@ request and a tenant will be resolved for each request. For other types of apps 
 example, a console app might resolve the tenant once at startup or a background service monitoring a queue might resolve
 the tenant for each message it receives.
 
-Tenant resolution is performed by the `TenantResolver` class. The class requires a list of strategies and a list of
-stores as well as some options. The class will try each strategy generally in the order added, but static and per-tenant
-authentication strategies will run at a lower priority. If a strategy returns a tenant identifier then each store will
-be queried in the order they were added. The first store to return a `TenantInfo`
-object will determine the resolved tenant. If no store returns a `TenantInfo` object then the next strategy will be
-tried and so on. The `UseMultiTenant` middleware for ASP.NET Core uses `TenantResolver`
+Tenant resolution is performed by the `TenantResolver` class. The class requires a list of strategies and a
+`TenantManager` as well as some options. The class will try each strategy generally in the order added, but static and
+per-tenant authentication strategies will run at a lower priority. If a strategy returns a tenant identifier then the
+tenant manager will query configured store caches in order before the primary store. The first source to return a
+`TenantInfo` object will determine the resolved tenant. If no source returns a `TenantInfo` object then the next
+strategy will be tried and so on. The `UseMultiTenant` middleware for ASP.NET Core uses `TenantResolver`
 internally.
 
 The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>` method with the following properties:
@@ -105,15 +108,22 @@ The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>`
     - `OnStrategyResolveCompleted` - Called after each strategy has attempted to resolve a tenant identifier. The
       `IdentifierFound` property will be `true` if the strategy resolved a tenant identifier. The `Identifier` property
       contains the resolved tenant identifier and can be changed by the event handler to override the strategy's result.
-    - `OnStoreResolveCompleted` - Called after each store has attempted to resolve a tenant. The `TenantFound` property
-      will be `true` if the store resolved a tenant. The `TenantInfo` property contains the resolved tenant and can be
-      changed by the event handler to override the store's result. A non-null `TenantInfo` object will stop the resolver
-      from trying additional strategies and stores.
+    - `OnStoreCacheResolveCompleted` - Called after each store cache has attempted to resolve a tenant. The
+      `TenantFound` property will be `true` if the cache resolved a tenant. The `TenantInfo` property contains the
+      resolved tenant and can be changed by the event handler to override the cache result. Setting `TenantInfo` to
+      null causes resolution to continue to the next cache or the primary store. A non-null `TenantInfo` object will
+      stop the resolver from trying additional strategies and sources.
+    - `OnStoreResolveCompleted` - Called after the primary store has attempted to resolve a tenant. The `TenantFound`
+      property will be `true` if the store resolved a tenant. The `TenantInfo` property contains the resolved tenant
+      and can be changed by the event handler to override the store result. Setting `TenantInfo` to null causes
+      resolution to continue to the next strategy. A non-null `TenantInfo` object will stop the resolver from trying
+      additional strategies.
     - `OnTenantResolveCompleted` - Called once after a tenant has been resolved. The `TenantContext` property
       contains the resolved tenant context and can be changed by the event handler to override the resolver's
-      result. The `Store` and `Strategy` properties reference the store and strategy that were used, and
-      `Context` holds the runtime context object passed to the resolver. The `IsResolved` property indicates
-      whether a tenant was found.
+      result. The `Store` or `Cache` property references the source that resolved the tenant, `Strategy` references the
+      strategy that was used, and `Context` holds the runtime context object passed to the resolver. If no tenant was
+      resolved then `Store`, `Cache`, and `Strategy` are null. The `IsResolved` property indicates whether a tenant was
+      found.
 
 ## Getting the Current Tenant
 
