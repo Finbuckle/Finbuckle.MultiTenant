@@ -30,12 +30,15 @@ jobs:
           DELIMITER=$(openssl rand -hex 16)
           {
             echo "report<<${DELIMITER}"
-            dotnet outdated --upgrade --version-lock Major Finbuckle.MultiTenant.slnx || true
+            find src -name '*.csproj' -print0 |
+              while IFS= read -r -d '' project; do
+                dotnet outdated --upgrade --version-lock Major "$project" || true
+              done
             echo "${DELIMITER}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Regenerate lock files
-        run: dotnet restore --force-evaluate
+        run: find src -name '*.csproj' -print0 | xargs -0 -n1 dotnet restore --force-evaluate
 
       - name: Check for changes
         id: changes
