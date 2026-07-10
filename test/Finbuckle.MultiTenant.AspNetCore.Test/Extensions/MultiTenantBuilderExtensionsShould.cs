@@ -52,7 +52,7 @@ public class MultiTenantBuilderExtensionsShould
 
         await options.Events.ValidatePrincipal(cookieValidationContext);
 
-        Assert.True(true);
+        Assert.Same(principal, cookieValidationContext.Principal);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class MultiTenantBuilderExtensionsShould
 
         await options.Events.ValidatePrincipal(cookieValidationContext);
 
-        Assert.NotNull(cookieValidationContext);
+        Assert.Same(principal, cookieValidationContext.Principal);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public async Task RejectPrincipalValidationIfTenantMatch()
+    public async Task RejectPrincipalValidationIfTenantMismatch()
     {
         var services = new ServiceCollection();
         services.AddLogging();
