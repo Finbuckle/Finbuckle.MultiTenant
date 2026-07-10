@@ -158,6 +158,9 @@ public static class ServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configureOptions);
+
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IConfigureOptions<TOptions>>(sp =>
@@ -223,6 +226,9 @@ public static class ServiceCollectionExtensions
         where TOptions : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(configureOptions);
+
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
@@ -286,10 +292,14 @@ public static class ServiceCollectionExtensions
         // Required infrastructure.
         services.AddOptions();
 
-        // TODO: Add check for success
-        services.TryAddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
-        services.TryAddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager);
-        services.TryAddSingleton<IOptions<TOptions>>(BuildOptionsManager);
+        // Per-tenant options require these closed registrations. Leave the standard open generic
+        // registrations in place for all other options types.
+        services.RemoveAll<IOptionsMonitorCache<TOptions>>();
+        services.RemoveAll<IOptionsSnapshot<TOptions>>();
+        services.RemoveAll<IOptions<TOptions>>();
+        services.AddSingleton<IOptionsMonitorCache<TOptions>, MultiTenantOptionsCache<TOptions>>();
+        services.AddScoped<IOptionsSnapshot<TOptions>>(BuildOptionsManager);
+        services.AddSingleton<IOptions<TOptions>>(BuildOptionsManager);
         return;
 
         MultiTenantOptionsManager<TOptions> BuildOptionsManager(IServiceProvider sp)
