@@ -99,6 +99,7 @@ Run the narrowest relevant tests while iterating, then run `dotnet test` or the 
 
 ## Git Workflow
 
+- Do not stage, commit, amend, rebase, reset, or push unless the user explicitly requests that Git action. Preparing a commit message or reporting the exact command is allowed, but leave the worktree unchanged from the user's perspective until approval is given.
 - Prefer squash and rebase for branch cleanup.
 - Keep multiple version-changing commits separate when they exist in the same branch, so release automation can calculate and document the intended version impact.
 - Use Conventional Commit messages in the form `<type>(<scope>)!: <imperative summary>`. Omit the optional scope only for genuinely repository-wide work such as `ci:` or `build:`.
