@@ -36,16 +36,27 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <param name="identifier">The tenant identifier.</param>
     /// <returns>The tenant information if found, otherwise null.</returns>
     public async Task<TTenantInfo?> GetByIdentifierAsync(string endpointTemplate, string identifier)
+        => await GetByIdentifierAsync(endpointTemplate, identifier, CancellationToken.None).ConfigureAwait(false);
+
+    /// <summary>
+    /// Attempts to retrieve tenant information by identifier from the remote endpoint.
+    /// </summary>
+    /// <param name="endpointTemplate">The endpoint template containing the identifier token.</param>
+    /// <param name="identifier">The tenant identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The tenant information if found, otherwise null.</returns>
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string endpointTemplate, string identifier,
+        CancellationToken cancellationToken)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
             identifier);
-        var response = await client.GetAsync(uri).ConfigureAwait(false);
+        var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
             return default;
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var result = JsonSerializer.Deserialize<TTenantInfo>(json, _defaultSerializerOptions);
 
         return result;
@@ -58,11 +69,22 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <returns>An IEnumerable of all tenant information.</returns>
     /// <exception cref="NotImplementedException">Thrown when the remote endpoint returns a 404 status code.</exception>
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate)
+        => await GetAllAsync(endpointTemplate, CancellationToken.None).ConfigureAwait(false);
+
+    /// <summary>
+    /// Retrieves all tenants from the remote endpoint.
+    /// </summary>
+    /// <param name="endpointTemplate">The endpoint template.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>An IEnumerable of all tenant information.</returns>
+    /// <exception cref="NotImplementedException">Thrown when the remote endpoint returns a 404 status code.</exception>
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate,
+        CancellationToken cancellationToken)
     {
         var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
         var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
             string.Empty);
-        var response = await client.GetAsync(uri).ConfigureAwait(false);
+        var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 
 
         if (!response.IsSuccessStatusCode)
@@ -76,7 +98,7 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
             return Enumerable.Empty<TTenantInfo>();
         }
 
-        var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var result = JsonSerializer.Deserialize<IEnumerable<TTenantInfo>>(json, _defaultSerializerOptions);
 
         return result!;
