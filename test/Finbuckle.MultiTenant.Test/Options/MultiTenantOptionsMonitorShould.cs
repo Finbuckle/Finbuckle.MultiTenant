@@ -66,7 +66,6 @@ public class MultiTenantOptionsMonitorShould
 
         // A source change is global for the options type, so all tenant entries are invalidated.
         source.Trigger();
-        Thread.Sleep(20);
 
         var tenant1After = tenant1Monitor.Get("name");
         var tenant2After = tenant2Monitor.Get("name");
@@ -93,7 +92,7 @@ public class MultiTenantOptionsMonitorShould
 
         source.Trigger();
 
-        Assert.True(SpinWait.SpinUntil(() => changedOptions is not null, TimeSpan.FromSeconds(1)));
+        Assert.NotNull(changedOptions);
         Assert.Equal("changed-name", changedName);
         Assert.NotSame(before, changedOptions);
     }
@@ -110,7 +109,6 @@ public class MultiTenantOptionsMonitorShould
         listener.Dispose();
 
         source.Trigger();
-        Thread.Sleep(20);
 
         Assert.Equal(0, calls);
     }
@@ -127,7 +125,6 @@ public class MultiTenantOptionsMonitorShould
         monitor.Dispose();
 
         source.Trigger();
-        Thread.Sleep(20);
 
         var after = monitor.Get("name");
 
@@ -151,7 +148,7 @@ public class MultiTenantOptionsMonitorShould
 
         source.Trigger();
 
-        Assert.True(SpinWait.SpinUntil(() => changedOptions is not null, TimeSpan.FromSeconds(1)));
+        Assert.NotNull(changedOptions);
     }
 
     [Fact]
@@ -186,7 +183,8 @@ public class MultiTenantOptionsMonitorShould
         // Each registration carries its tenant id, so callback options should be tenant-specific.
         source.Trigger();
 
-        Assert.True(SpinWait.SpinUntil(() => tenant1Changed is not null && tenant2Changed is not null, TimeSpan.FromSeconds(1)));
+        Assert.NotNull(tenant1Changed);
+        Assert.NotNull(tenant2Changed);
         Assert.NotSame(tenant1Changed, tenant2Changed);
     }
 
@@ -205,7 +203,6 @@ public class MultiTenantOptionsMonitorShould
         registration.Dispose();
 
         source.Trigger();
-        Thread.Sleep(20);
 
         Assert.Equal(0, calls);
     }
@@ -222,7 +219,6 @@ public class MultiTenantOptionsMonitorShould
 
         // Current hub strategy clears all cached names when any source token fires.
         source.Trigger();
-        Thread.Sleep(20);
 
         var namedAfter = monitor.Get("named");
         var defaultAfter = monitor.Get(Microsoft.Extensions.Options.Options.DefaultName);
@@ -261,7 +257,7 @@ public class MultiTenantOptionsMonitorShould
         _ = monitor.Get(Microsoft.Extensions.Options.Options.DefaultName);
         source.Trigger();
 
-        Assert.True(SpinWait.SpinUntil(() => changed is not null, TimeSpan.FromSeconds(1)));
+        Assert.NotNull(changed);
     }
 
     private static MultiTenantOptionsMonitor<TestOptions> BuildMonitor(
@@ -318,5 +314,4 @@ public class MultiTenantOptionsMonitorShould
         public TenantInfo? Current { get; set; }
     }
 }
-
 

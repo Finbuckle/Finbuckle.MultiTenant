@@ -33,7 +33,8 @@ public class MultiTenantOptionsChangeTokenHubShould
 
         source.Trigger();
 
-        Assert.True(SpinWait.SpinUntil(() => tenant1Options is not null && tenant2Options is not null, TimeSpan.FromSeconds(1)));
+        Assert.NotNull(tenant1Options);
+        Assert.NotNull(tenant2Options);
         Assert.NotSame(tenant1Options, tenant2Options);
         Assert.Equal(2, factory.CreateCountByName["name"]);
     }
@@ -51,7 +52,6 @@ public class MultiTenantOptionsChangeTokenHubShould
 
         registration.Dispose();
         source.Trigger();
-        Thread.Sleep(20);
 
         Assert.Equal(0, calls);
     }
@@ -69,7 +69,6 @@ public class MultiTenantOptionsChangeTokenHubShould
 
         // There are no registrations, but source changes should still invalidate cached options.
         source.Trigger();
-        Thread.Sleep(20);
 
         var defaultAfter = cache.GetOrAdd(Microsoft.Extensions.Options.Options.DefaultName, "tenant-1", () => factory.Create(Microsoft.Extensions.Options.Options.DefaultName));
         var namedAfter = cache.GetOrAdd("named", "tenant-1", () => factory.Create("named"));
@@ -110,5 +109,4 @@ public class MultiTenantOptionsChangeTokenHubShould
         }
     }
 }
-
 
