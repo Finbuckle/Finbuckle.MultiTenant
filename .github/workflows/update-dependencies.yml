@@ -30,10 +30,9 @@ jobs:
           DELIMITER=$(openssl rand -hex 16)
           {
             echo "report<<${DELIMITER}"
-            find src -name '*.csproj' -print0 |
-              while IFS= read -r -d '' project; do
-                dotnet outdated --upgrade --version-lock Major "$project" || true
-              done
+            dotnet outdated --upgrade --version-lock Major --recursive "$GITHUB_WORKSPACE/src" || true
+            dotnet outdated --upgrade --version-lock Major --recursive "$GITHUB_WORKSPACE/samples" || true
+            dotnet outdated --upgrade --version-lock Major --recursive "$GITHUB_WORKSPACE/test" || true
             echo "${DELIMITER}"
           } >> "$GITHUB_OUTPUT"
 
@@ -43,7 +42,7 @@ jobs:
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet; then
+          if git diff --quiet -- src samples test; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
@@ -59,13 +58,24 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           BRANCH="fix/update-dependencies-${{ github.run_id }}"
           git checkout -b "$BRANCH"
-          git add -A
-          git commit -m "fix(deps): update dependencies"
+          PR_TITLE=""
+          if ! git diff --quiet -- src; then
+            git add src
+            git commit -m "fix(deps): update source dependencies"
+            PR_TITLE="fix(deps): update dependencies"
+          fi
+          if ! git diff --quiet -- samples test; then
+            git add samples test
+            git commit -m "chore(deps): update sample and test dependencies"
+            if [ -z "$PR_TITLE" ]; then
+              PR_TITLE="chore(deps): update sample and test dependencies"
+            fi
+          fi
           git push origin "$BRANCH"
           BODY_FILE=$(mktemp)
           printf 'Automated dependency updates from `update-dependencies` workflow.\n\n<details>\n<summary>dotnet-outdated report</summary>\n\n```\n%s\n```\n\n</details>' "$UPDATE_REPORT" > "$BODY_FILE"
           gh pr create \
             --base main \
             --head "$BRANCH" \
-            --title "fix(deps): update dependencies" \
+            --title "$PR_TITLE" \
             --body-file "$BODY_FILE"
