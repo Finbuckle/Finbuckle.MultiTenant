@@ -24,12 +24,22 @@ jobs:
       - name: build
         run: dotnet build -p:ContinuousIntegrationBuild=true
       - name: test Finbuckle.MultiTenant
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
+        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenant.AspNetCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
+        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenant.EntityFrameworkCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
+        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
-        
+      - name: test Finbuckle.MultiTenant.Identity.EntityFrameworkCore
+        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        working-directory: ./test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
+      - name: upload coverage results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-${{ runner.os }}
+          path: test/**/TestResults/Coverage/coverage.cobertura.xml
+          if-no-files-found: error
+          retention-days: 14

@@ -4,5 +4,37 @@
         <PackageReference Include="xunit" Version="2.9.0"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0"/>
         <PackageReference Include="Moq" Version="4.20.70"/>
+        <PackageReference Include="coverlet.msbuild" Version="10.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
+
+    <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+        <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+        <CoverletOutput>$(MSBuildProjectDirectory)/TestResults/Coverage/coverage</CoverletOutput>
+        <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+        <ThresholdType>line,branch</ThresholdType>
+        <ThresholdStat>total</ThresholdStat>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CollectCoverage)' == 'true' and '$(MSBuildProjectName)' == 'Finbuckle.MultiTenant.Test'">
+        <Include>[Finbuckle.MultiTenant]*</Include>
+        <Threshold>75,79</Threshold>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CollectCoverage)' == 'true' and '$(MSBuildProjectName)' == 'Finbuckle.MultiTenant.AspNetCore.Test'">
+        <Include>[Finbuckle.MultiTenant.AspNetCore]*</Include>
+        <Threshold>87,86</Threshold>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CollectCoverage)' == 'true' and '$(MSBuildProjectName)' == 'Finbuckle.MultiTenant.EntityFrameworkCore.Test'">
+        <Include>[Finbuckle.MultiTenant.EntityFrameworkCore]*</Include>
+        <Threshold>96,92</Threshold>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CollectCoverage)' == 'true' and '$(MSBuildProjectName)' == 'Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test'">
+        <Include>[Finbuckle.MultiTenant.Identity.EntityFrameworkCore]*</Include>
+        <Threshold>91,100</Threshold>
+    </PropertyGroup>
 </Project>
