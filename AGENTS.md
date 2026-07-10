@@ -101,6 +101,18 @@ Run the narrowest relevant tests while iterating, then run `dotnet test` or the 
 
 - Prefer squash and rebase for branch cleanup.
 - Keep multiple version-changing commits separate when they exist in the same branch, so release automation can calculate and document the intended version impact.
+- Use Conventional Commit messages in the form `<type>(<scope>)!: <imperative summary>`. Omit the optional scope only for genuinely repository-wide work such as `ci:` or `build:`.
+- Use the package-oriented scopes already established in history:
+  - `finbuckle` for `Finbuckle.MultiTenant` and its core behavior, stores, options, and abstractions.
+  - `aspnetcore` for `Finbuckle.MultiTenant.AspNetCore`.
+  - `efcore` for `Finbuckle.MultiTenant.EntityFrameworkCore`.
+  - `efcoreidentity` for `Finbuckle.MultiTenant.Identity.EntityFrameworkCore`.
+  - `samples`, `docs`, `ci`, and `build` for changes primarily affecting those areas.
+- Make each commit one reviewable intent. Include the production change with its focused tests and required documentation/sample update; do not combine unrelated refactors, formatting, dependency upgrades, or generated artifacts.
+- Use `!` and a `BREAKING CHANGE:` footer for intentional public API or behavior breaks. Keep breaking changes separate from unrelated feature or fix commits.
+- Before each commit, inspect `git diff`, stage only the files belonging to that intent, then run `git diff --cached --check` and the narrowest relevant tests. Do not stage `bin/`, `obj/`, `TestResults/`, coverage reports, or package output.
+- Preserve any pre-existing user changes in the worktree. Do not amend, reorder, squash, or rewrite commits outside the current task without explicit user direction.
+- Rewriting local branch history to improve commit messages or split commits requires explicit user direction. After a rewrite, verify `git log <base>..HEAD`, remove temporary rewrite refs, and clearly report that a force-push is required if the branch was previously published.
 
 ## Agent Workflow
 
