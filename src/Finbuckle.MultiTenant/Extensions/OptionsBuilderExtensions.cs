@@ -28,6 +28,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -61,6 +62,7 @@ public static class OptionsBuilderExtensions
         where TDep : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -97,6 +99,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -137,6 +140,7 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -180,6 +184,7 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -252,6 +257,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -285,6 +291,7 @@ public static class OptionsBuilderExtensions
         where TDep : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -321,6 +328,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -361,6 +369,7 @@ public static class OptionsBuilderExtensions
         where TDep3 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);
@@ -404,6 +413,7 @@ public static class OptionsBuilderExtensions
         where TDep4 : class
         where TTenantInfo : ITenantInfo
     {
+        ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
 
         ServiceCollectionExtensions.ConfigurePerTenantReqs<TOptions>(optionsBuilder.Services);

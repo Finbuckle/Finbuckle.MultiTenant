@@ -176,8 +176,8 @@ Internally .NET caches options, and MultiTenant extends this to cache options pe
 occurs when a `TOptions` instance is retrieved via `Value` or `Get` on the injected `IOptions<TOptions>` (or derived)
 instance for the first time for a tenant.
 
-`IOptions<TOptions>` instances are always regenerated when injected so any caching only lasts as long as the specific
-instance.
+`IOptions<TOptions>` is registered as a singleton. Its per-tenant cache can therefore persist for the lifetime of the
+application service provider.
 
 `IOptionsSnapshot<TOptions>` instances are generated once per HTTP request and caching will last throughout the entire
 request.
@@ -197,3 +197,15 @@ a `Clear()` method that will clear the cache for the current tenant. Casting the
 instance to `MultiTenantOptionsCache<TOptions>` exposes the `Clear(string tenantId)` and `ClearAll()`
 methods. `Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
 the parameter is empty or null). `ClearAll()` clears all cached options (including regular non per-tenant options).
+
+When an `IOptionsMonitor<TOptions>` change token fires, the named option associated with that token is removed from
+the cache for every tenant and for the regular non per-tenant context. Other named options remain cached. The changed
+option is recreated for each tenant when it is next accessed. An `OnChange` callback is a notification that the named
+option was invalidated globally; the options value supplied to the callback is created using the ambient tenant context
+of the change-token callback (often no tenant) and does not represent the value for every tenant.
+
+Enabling per-tenant options for a `TOptions` type replaces any exact closed registrations for
+`IOptionsMonitorCache<TOptions>`, `IOptions<TOptions>`, and `IOptionsSnapshot<TOptions>` with the Finbuckle
+implementations required for tenant isolation. The standard open generic registrations remain available for other
+options types. Registering a custom exact closed implementation after configuring per-tenant options is unsupported and
+may disable tenant isolation.
