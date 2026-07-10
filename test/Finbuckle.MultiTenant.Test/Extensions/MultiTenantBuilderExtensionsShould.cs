@@ -141,36 +141,20 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void ThrowIfNullParamAddingInMemoryStore()
+    public async Task AddCaseInsensitiveInMemoryStore()
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        Assert.Throws<ArgumentNullException>(()
-            => builder.WithInMemoryStore(null!));
-    }
-
-    [Fact]
-    public async Task AddInMemoryStoreWithCaseSensitivity()
-    {
-        var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithInMemoryStore(options =>
-        {
-            options.IsCaseSensitive = true;
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol" });
-        });
+        builder.WithInMemoryStore();
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<InMemoryStore<TenantInfo>>(store);
+        await store.AddAsync(new TenantInfo { Id = "lol", Identifier = "lol" });
 
-        var tc = await store.GetByIdentifierAsync("lol");
+        var tc = await store.GetByIdentifierAsync("LOL");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
-
-        // Case sensitive test.
-        tc = await store.GetByIdentifierAsync("LOL");
-        Assert.Null(tc);
     }
 
     [Fact]

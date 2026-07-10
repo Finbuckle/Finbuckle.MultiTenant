@@ -53,8 +53,7 @@ public class AuthenticationPipelineShould
                         .AddScheme<AuthenticationSchemeOptions, CaptureChallengeHandler>("capture", _ => { });
                     services.AddMultiTenant<TenantInfo>()
                         .WithStaticStrategy("initech")
-                        .WithInMemoryStore(options => options.Tenants.Add(
-                            new TenantInfo { Id = "initech-id", Identifier = "initech" }))
+                        .WithInMemoryStore()
                         .WithPerTenantAuthenticationCore();
                 })
                 .Configure(app =>
@@ -66,6 +65,11 @@ public class AuthenticationPipelineShould
                         endpoints.Map("/challenge", context => context.ChallengeAsync("capture")));
                 }))
             .StartAsync();
+        using (var scope = host.Services.CreateScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+                .AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
+        }
 
         var response = await host.GetTestClient().GetStringAsync("/challenge");
 
@@ -105,8 +109,7 @@ public class AuthenticationPipelineShould
                         optionsMonitor.Object);
                     services.AddMultiTenant<TenantInfo>()
                         .WithRemoteAuthenticationCallbackStrategy()
-                        .WithInMemoryStore(storeOptions => storeOptions.Tenants.Add(
-                            new TenantInfo { Id = "initech-id", Identifier = "initech" }));
+                        .WithInMemoryStore();
                 })
                 .Configure(app =>
                 {
@@ -115,6 +118,11 @@ public class AuthenticationPipelineShould
                         context.GetTenantInfo<TenantInfo>()?.Identifier ?? "unresolved"));
                 }))
             .StartAsync();
+        using (var scope = host.Services.CreateScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+                .AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
+        }
 
         var response = await host.GetTestClient().GetStringAsync("/signin-remote?state=protected-state");
 
