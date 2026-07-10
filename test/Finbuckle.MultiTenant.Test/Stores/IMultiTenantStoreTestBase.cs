@@ -68,6 +68,9 @@ public abstract class MultiTenantStoreTestBase
 
         var result = await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" });
         Assert.True(result);
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
+        Assert.Equal("initech2", (await store.GetByIdentifierAsync("initech2"))?.Identifier);
+        Assert.Equal("initech2", (await store.GetAsync("initech-id"))?.Identifier);
     }
 
     //[Fact]

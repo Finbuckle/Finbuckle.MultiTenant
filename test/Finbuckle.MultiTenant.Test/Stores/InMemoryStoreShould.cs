@@ -89,6 +89,58 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
             new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
     }
 
+    [Fact]
+    public async Task NotUpdateIfNewIdentifierAlreadyExists()
+    {
+        var store = await CreateTestStore();
+
+        Assert.False(await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "lol" }));
+        Assert.Equal("initech", (await store.GetAsync("initech-id"))?.Identifier);
+        Assert.Equal("lol-id", (await store.GetByIdentifierAsync("lol"))?.Id);
+    }
+
+    [Fact]
+    public async Task ReturnFalseIfUpdatingMissingTenant()
+    {
+        var store = await CreateTestStore();
+
+        Assert.False(await store.UpdateAsync(new TenantInfo { Id = "missing", Identifier = "missing" }));
+    }
+
+    [Fact]
+    public async Task AllowCaseOnlyIdentifierUpdateWhenCaseInsensitive()
+    {
+        var store = await CreateTestStore();
+
+        Assert.True(await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "INITECH" }));
+        Assert.Equal("INITECH", (await store.GetByIdentifierAsync("initech"))?.Identifier);
+    }
+
+    [Fact]
+    public async Task MoveCaseOnlyIdentifierWhenCaseSensitive()
+    {
+        var store = await CreateCaseSensitiveTestStore();
+
+        Assert.True(await store.UpdateAsync(new TenantInfo { Id = "initech", Identifier = "INITECH" }));
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
+        Assert.Equal("INITECH", (await store.GetByIdentifierAsync("INITECH"))?.Identifier);
+    }
+
+    [Fact]
+    public async Task KeepIdLookupAvailableDuringConcurrentIdentifierUpdates()
+    {
+        var store = await CreateTestStore();
+        var updates = Enumerable.Range(0, 100)
+            .Select(i => Task.Run(async () =>
+            {
+                var identifier = i % 2 == 0 ? "initech" : "initech2";
+                await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = identifier });
+                Assert.NotNull(await store.GetAsync("initech-id"));
+            }));
+
+        await Task.WhenAll(updates);
+    }
+
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()

@@ -15,6 +15,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
+    private readonly Lock _tenantMapLock = new();
 
     /// <summary>
     /// Constructor for InMemoryStore.
@@ -44,24 +45,31 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
-        var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
-        return await Task.FromResult(result).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id == id));
+        }
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
-        _tenantMap.TryGetValue(identifier, out var result);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            _tenantMap.TryGetValue(identifier, out var result);
+            return Task.FromResult(result);
+        }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList()).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult<IEnumerable<TTenantInfo>>(_tenantMap.Select(x => x.Value).ToList());
+        }
     }
 
     /// <summary>
@@ -74,43 +82,58 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
-        var result = _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
-    {
-        var existingTenantInfo = await GetAsync(id, cancellationToken).ConfigureAwait(false);
-
-        if (existingTenantInfo?.Identifier is null)
-            return await Task.FromResult(false).ConfigureAwait(false);
-
-        return await RemoveByIdentifierAsync(existingTenantInfo.Identifier, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
-    {
-        var result = _tenantMap.TryRemove(identifier, out var _);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
-    {
-        var existingTenantInfo = await GetAsync(tenantInfo.Id, cancellationToken).ConfigureAwait(false);
-
-        if (existingTenantInfo?.Identifier != null)
+        lock (_tenantMapLock)
         {
-            var result = _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
-            return await Task.FromResult(result).ConfigureAwait(false);
+            return Task.FromResult(_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo));
         }
+    }
 
-        return await Task.FromResult(false).ConfigureAwait(false);
+    /// <inheritdoc />
+    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    {
+        lock (_tenantMapLock)
+        {
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
+            return Task.FromResult(existingTenantInfo?.Identifier is not null &&
+                                   _tenantMap.TryRemove(existingTenantInfo.Identifier, out _));
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+    {
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult(_tenantMap.TryRemove(identifier, out _));
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
+    {
+        lock (_tenantMapLock)
+        {
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == tenantInfo.Id);
+            if (existingTenantInfo?.Identifier is null)
+                return Task.FromResult(false);
+
+            if (_tenantMap.Comparer.Equals(existingTenantInfo.Identifier, tenantInfo.Identifier))
+                return Task.FromResult(
+                    _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo));
+
+            if (_tenantMap.ContainsKey(tenantInfo.Identifier))
+                return Task.FromResult(false);
+
+            if (!_tenantMap.TryRemove(existingTenantInfo.Identifier, out var removedTenantInfo))
+                return Task.FromResult(false);
+
+            if (_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo))
+                return Task.FromResult(true);
+
+            _tenantMap.TryAdd(existingTenantInfo.Identifier, removedTenantInfo);
+            return Task.FromResult(false);
+        }
     }
 }
