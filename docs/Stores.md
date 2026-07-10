@@ -119,28 +119,26 @@ support if needed when iterating through a large number of tenants or retrieving
 
 > NuGet package: Finbuckle.MultiTenant
 
-Uses a `ConcurrentDictionary<string, TenantInfo>` as the underlying store. See the
+Uses a lock-protected `Dictionary<string, TenantInfo>` as the underlying store. See the
 [web api sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for an example of 
 using the in-memory store.
 
-Configure by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. By default, the store is empty and the
-tenant identifier matching is case-insensitive. Case-insensitive is generally preferred. An overload
-of `WithInMemoryStore` accepts an `Action<InMemoryStoreOptions>` delegate to configure the store further:
+Configure an empty store by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. Tenant identifier
+matching is always case-insensitive. Add initial tenants through `TenantManager<TTenantInfo>` after the service
+provider is built and before the application begins handling requests:
 
 ```csharp
-// set up a case-insensitive in-memory store.
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithInMemoryStore()...
+    .WithInMemoryStore();
 
-// or make it case sensitive and/or add some tenants.
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithInMemoryStore(options =>
-    {
-        options.IsCaseSensitive = true;
-        options.Tenants.Add(new TenantInfo{...});
-        options.Tenants.Add(new TenantInfo{...});
-        options.Tenants.Add(new TenantInfo{...});
-    })...
+var app = builder.Build();
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var tenantManager = scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>();
+    await tenantManager.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
+    await tenantManager.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol" });
+}
 ```
 
 ## Configuration Store

@@ -152,26 +152,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : ITenantInfo
-        => builder.WithInMemoryStore(_ => { });
-
-    /// <summary>
-    /// Adds and configures <see cref="InMemoryStore{TTenantInfo}"/> to the application using the provided action.
-    /// </summary>
-    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
-    /// <param name="config">An action for configuring the store.</param>
-    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
-    public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder,
-        Action<InMemoryStoreOptions<TTenantInfo>> config)
-        where TTenantInfo : ITenantInfo
-    {
-        ArgumentNullException.ThrowIfNull(config);
-
-        builder.Services.Configure(config);
-
-        return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
-    }
+        => builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
     /// <summary>
     /// Adds an <see cref="EchoStore{TTenantInfo}"/> to the application.

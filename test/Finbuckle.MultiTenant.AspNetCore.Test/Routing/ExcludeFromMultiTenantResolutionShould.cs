@@ -28,10 +28,7 @@ public class ExcludeFromMultiTenantResolutionShould
                     services.AddRouting();
                     services.AddMultiTenant<TenantInfo>()
                         .WithStaticStrategy(identifier)
-                        .WithInMemoryStore(options =>
-                        {
-                            options.Tenants.Add(new TenantInfo { Id = identifier, Identifier = identifier });
-                        });
+                        .WithInMemoryStore();
                 })
                 .Configure(app =>
                 {
@@ -46,6 +43,9 @@ public class ExcludeFromMultiTenantResolutionShould
                 }));
 
         var host = await hostBuilder.StartAsync();
+        using var scope = host.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            .AddAsync(new TenantInfo { Id = identifier, Identifier = identifier });
         return host;
     }
 

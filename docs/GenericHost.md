@@ -96,13 +96,15 @@ services.AddMultiTenant<TenantInfo>()
         // ctx is whatever you pass in
         return ctx as string; // e.g., tenant identifier string
     })
-    .WithInMemoryStore(options =>
+    .WithInMemoryStore();
+
+var provider = services.BuildServiceProvider();
+await using var scope = provider.CreateAsyncScope();
+await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+    .AddAsync(new TenantInfo
     {
-        options.Tenants.Add(new TenantInfo
-        {
-            Id = Guid.NewGuid().ToString(),
-            Identifier = "tenant-a"
-        });
+        Id = Guid.NewGuid().ToString(),
+        Identifier = "tenant-a"
     });
 ```
 
@@ -171,13 +173,16 @@ using Finbuckle.MultiTenant;
 var services = new ServiceCollection();
 services.AddMultiTenant<TenantInfo>()
     .WithDelegateStrategy(async ctx => ctx as string)
-    .WithInMemoryStore(/* ... */);
+    .WithInMemoryStore();
 
 var provider = services.BuildServiceProvider();
 
 // Create a scope for the app lifetime.
 using var scope = provider.CreateScope();
 var scopedProvider = scope.ServiceProvider;
+
+await scopedProvider.GetRequiredService<TenantManager<TenantInfo>>()
+    .AddAsync(new TenantInfo { Id = "tenant-a-id", Identifier = "tenant-a" });
 
 // Resolve and set the tenant.
 var resolver = scopedProvider.GetRequiredService<ITenantResolver<TenantInfo>>();

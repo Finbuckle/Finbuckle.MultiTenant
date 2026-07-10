@@ -67,8 +67,8 @@ Responsible for returning a `TenantInfo` object based on a tenant string identif
 strategy).
 
 * Has methods for adding, removing, updating, and retrieving `TenantInfo` objects.
-* Two implementations are provided: a basic `InMemoryTenantStore` based on `ConcurrentDictionary<string, TenantInfo>`
-  and a more advanced Entity Framework Core based implementation.
+* Several implementations are provided, including a basic lock-protected `InMemoryStore` and a more advanced Entity
+  Framework Core based implementation.
 * Custom stores implementing `IMultiTenantStore` can be used as well.
 
 ## MultiTenantException

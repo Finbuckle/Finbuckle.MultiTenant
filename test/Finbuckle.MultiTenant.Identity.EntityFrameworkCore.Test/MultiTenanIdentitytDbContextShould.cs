@@ -24,7 +24,7 @@ public class MultiTenantIdentityDbContextShould
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc" };
         services.AddMultiTenant<TenantInfo>()
             .WithStaticStrategy(tenant.Identifier)
-            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+            .WithInMemoryStore();
         services.AddMultiTenantDbContext<TContext>(o =>
         {
             o.UseSqlite("DataSource=:memory:");
@@ -42,7 +42,7 @@ public class MultiTenantIdentityDbContextShould
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc" };
         services.AddMultiTenant<TenantInfo>()
             .WithStaticStrategy(tenant.Identifier)
-            .WithInMemoryStore(options => options.Tenants.Add(tenant));
+            .WithInMemoryStore();
         services.AddMultiTenantDbContext<TestIdentityDbContext>();
         var scope = services.BuildServiceProvider().CreateScope();
 

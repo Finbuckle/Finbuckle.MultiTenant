@@ -28,12 +28,11 @@ public class BasePathStrategyShould
     public async Task RebaseAspNetCoreBasePathIfOptionTrue()
     {
         var services = new ServiceCollection();
-        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
-        {
-            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base" });
-        });
+        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore();
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();
+        await serviceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            .AddAsync(new TenantInfo { Id = "base123", Identifier = "base" });
         var httpContext = CreateHttpContextMock("/base/notBase");
         httpContext.RequestServices = serviceProvider;
 
@@ -51,12 +50,11 @@ public class BasePathStrategyShould
     public async Task NotRebaseAspNetCoreBasePathIfOptionFalse()
     {
         var services = new ServiceCollection();
-        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
-        {
-            options.Tenants.Add(new TenantInfo { Id = "base123", Identifier = "base" });
-        });
+        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore();
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = false);
         var serviceProvider = services.BuildServiceProvider();
+        await serviceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            .AddAsync(new TenantInfo { Id = "base123", Identifier = "base" });
         var httpContext = CreateHttpContextMock("/base/notBase");
         httpContext.RequestServices = serviceProvider;
 
@@ -99,12 +97,11 @@ public class BasePathStrategyShould
     public async Task AppendTenantToExistingBase()
     {
         var services = new ServiceCollection();
-        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore(options =>
-        {
-            options.Tenants.Add(new TenantInfo { Id = "tenant", Identifier = "tenant" });
-        });
+        services.AddOptions().AddMultiTenant<TenantInfo>().WithBasePathStrategy().WithInMemoryStore();
         services.Configure<BasePathStrategyOptions>(options => options.RebaseAspNetCorePathBase = true);
         var serviceProvider = services.BuildServiceProvider();
+        await serviceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            .AddAsync(new TenantInfo { Id = "tenant", Identifier = "tenant" });
         var httpContext = CreateHttpContextMock("/tenant/path", "/base");
         httpContext.RequestServices = serviceProvider;
 
