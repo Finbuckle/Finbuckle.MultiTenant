@@ -79,6 +79,7 @@ public class MultiTenantOptionsCache<
     /// <returns>True if the options was added to the cache for the current tenant.</returns>
     public bool TryAdd(string? name, TOptions options)
     {
+        ArgumentNullException.ThrowIfNull(options);
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, static _ => new OptionsCache<TOptions>());
