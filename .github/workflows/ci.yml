@@ -31,4 +31,7 @@ jobs:
       - name: test Finbuckle.MultiTenant.EntityFrameworkCore
         run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
+      - name: test Finbuckle.MultiTenant.Identity.EntityFrameworkCore
+        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }}
+        working-directory: ./test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
         
