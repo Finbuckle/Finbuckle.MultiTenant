@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -125,78 +126,164 @@ public class ServiceCollectionExtensionsShould
             Assert.Single(config);
             Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, IMultiTenantContextAccessor<TenantInfo>>)c).Single().Name);
         }
-        
     [Fact]
-    public void DecorateService_WithImplementationType_WrapsService()
+    public void ReplaceExactClosedOptionsRegistrationsAndKeepOpenGenericDefaults()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        services.AddOptions();
+        services.AddSingleton<IOptionsMonitorCache<TestOptions>, OptionsCache<TestOptions>>();
+        services.AddSingleton<IOptions<TestOptions>>(Microsoft.Extensions.Options.Options.Create(new TestOptions()));
+        services.AddScoped<IOptionsSnapshot<TestOptions>, CustomOptionsSnapshot>();
+
+        services.ConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOptions<>));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<>));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOptionsMonitorCache<>));
+        Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptions<TestOptions>));
+        Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<TestOptions>));
+        var cacheDescriptor = Assert.Single(services,
+            descriptor => descriptor.ServiceType == typeof(IOptionsMonitorCache<TestOptions>));
+        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions>), cacheDescriptor.ImplementationType);
+
+        using var provider = services.BuildServiceProvider();
+        Assert.IsType<MultiTenantOptionsManager<TestOptions>>(provider.GetRequiredService<IOptions<TestOptions>>());
+        using var scope = provider.CreateScope();
+        Assert.IsType<MultiTenantOptionsManager<TestOptions>>(
+            scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>());
+    }
+
+    [Fact]
+    public void LeaveOneClosedRegistrationAfterRepeatedPerTenantConfiguration()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+        services.AddSingleton<IOptionsMonitorCache<TestOptions>, OptionsCache<TestOptions>>();
+
+        services.PostConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+
+        Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptions<TestOptions>));
+        Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<TestOptions>));
+        var cacheDescriptor = Assert.Single(services,
+            descriptor => descriptor.ServiceType == typeof(IOptionsMonitorCache<TestOptions>));
+        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions>), cacheDescriptor.ImplementationType);
+    }
+
+    [Fact]
+    public void DecorateImplementationTypeInstanceAndFactoryRegistrations()
+    {
+        var services = new ServiceCollection();
+        var instance = new TestService();
+        services.AddSingleton<ITestService, TestService>();
+        services.AddSingleton<ITestService>(instance);
+        services.AddSingleton<ITestService>(_ => new TestService());
+
+        Assert.True(services.DecorateService<ITestService, DecoratedTestService>());
+
+        using var provider = services.BuildServiceProvider();
+        var decorated = provider.GetServices<ITestService>().Cast<DecoratedTestService>().ToList();
+        Assert.Equal(3, decorated.Count);
+        Assert.All(decorated, service => Assert.IsType<TestService>(service.Inner));
+        Assert.Same(instance, decorated[1].Inner);
+    }
+
+    [Fact]
+    public void PreserveRegistrationOrderAndStackDecorators()
+    {
+        var services = new ServiceCollection();
+        var first = new TestService();
+        var second = new TestService();
+        services.AddSingleton<IOtherService, OtherService>();
+        services.AddSingleton<ITestService>(first);
+        services.AddSingleton<IOtherService, OtherService>();
+        services.AddSingleton<ITestService>(second);
+        var serviceTypesBefore = services.Select(s => s.ServiceType).ToArray();
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+        services.DecorateService<ITestService, SecondDecoratedTestService>();
+
+        Assert.Equal(serviceTypesBefore, services.Select(s => s.ServiceType).ToArray());
+        using var provider = services.BuildServiceProvider();
+        var outer = Assert.IsType<SecondDecoratedTestService>(provider.GetRequiredService<ITestService>());
+        var inner = Assert.IsType<DecoratedTestService>(outer.Inner);
+        Assert.Same(second, inner.Inner);
+    }
+
+#if NET8_0_OR_GREATER
+    [Fact]
+    public void LeaveKeyedRegistrationsUntouched()
+    {
+        var services = new ServiceCollection();
+        var unkeyed = new TestService();
+        services.AddKeyedSingleton<ITestService, TestService>("key");
+        services.AddSingleton<ITestService>(unkeyed);
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        using var provider = services.BuildServiceProvider();
+        var decorated = Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>());
+        Assert.Same(unkeyed, decorated.Inner);
+        Assert.IsType<TestService>(provider.GetKeyedService<ITestService>("key"));
+    }
+#endif
+
+    [Fact]
+    public void RejectInvalidDecoratorArgumentsBeforeChangingRegistrations()
     {
         var services = new ServiceCollection();
         services.AddSingleton<ITestService, TestService>();
-        bool result = services.DecorateService<ITestService, DecoratedTestService>();
-        Assert.True(result);
-        var provider = services.BuildServiceProvider();
-        var service = provider.GetRequiredService<ITestService>();
-        Assert.IsType<DecoratedTestService>(service);
-        Assert.IsType<TestService>(((DecoratedTestService)service).Inner);
+        var serviceCount = services.Count;
+
+        Assert.Throws<ArgumentException>(() => services.DecorateService<ITestService, IncompatibleDecorator>());
+        Assert.Equal(serviceCount, services.Count);
+        Assert.Equal(typeof(TestService), services.Single().ImplementationType);
+        Assert.Throws<ArgumentNullException>(() =>
+            FinbuckleServiceCollectionExtensions.DecorateService<ITestService, DecoratedTestService>(
+                null!, Array.Empty<object>()));
+        Assert.Throws<ArgumentNullException>(() =>
+            FinbuckleServiceCollectionExtensions.DecorateService<ITestService, DecoratedTestService>(
+                services, (object[])null!));
     }
 
-    [Fact]
-    public void DecorateService_WithImplementationInstance_WrapsService()
+    private sealed class CustomOptionsSnapshot : IOptionsSnapshot<TestOptions>
     {
-        var instance = new TestService();
-        var services = new ServiceCollection();
-        services.AddSingleton<ITestService>(instance);
-        bool result = services.DecorateService<ITestService, DecoratedTestService>();
-        Assert.True(result);
-        var provider = services.BuildServiceProvider();
-        var service = provider.GetRequiredService<ITestService>();
-        Assert.IsType<DecoratedTestService>(service);
-        Assert.Same(instance, ((DecoratedTestService)service).Inner);
+        public TestOptions Value { get; } = new();
+        public TestOptions Get(string? name) => Value;
     }
 
-    [Fact]
-    public void DecorateService_WithImplementationFactory_WrapsService()
+    public interface ITestService
     {
-        var services = new ServiceCollection();
-        services.AddSingleton<ITestService>(sp => new TestService());
-        bool result = services.DecorateService<ITestService, DecoratedTestService>();
-        Assert.True(result);
-        var provider = services.BuildServiceProvider();
-        var service = provider.GetRequiredService<ITestService>();
-        Assert.IsType<DecoratedTestService>(service);
-        Assert.IsType<TestService>(((DecoratedTestService)service).Inner);
     }
 
-    [Fact]
-    public void DecorateService_ThrowsIfNoServiceFound()
+    public sealed class TestService : ITestService
     {
-        var services = new ServiceCollection();
-        Assert.Throws<ArgumentException>(() => services.DecorateService<ITestService, DecoratedTestService>());
     }
 
-    [Fact]
-    public void DecorateService_WrapsAllServicesOfSameType()
-    {
-        var services = new ServiceCollection();
-        var instance1 = new TestService();
-        var instance2 = new TestService();
-        services.AddSingleton<ITestService>(instance1);
-        services.AddSingleton<ITestService>(instance2);
-        bool result = services.DecorateService<ITestService, DecoratedTestService>();
-        Assert.True(result);
-        var provider = services.BuildServiceProvider();
-        var all = provider.GetServices<ITestService>().ToList();
-        Assert.Equal(2, all.Count);
-        Assert.All(all, s => Assert.IsType<DecoratedTestService>(s));
-        var inners = all.Cast<DecoratedTestService>().Select(d => d.Inner).ToList();
-        Assert.Contains(instance1, inners);
-        Assert.Contains(instance2, inners);
-    }
-
-    public interface ITestService { }
-    public class TestService : ITestService { }
-    public class DecoratedTestService : ITestService
+    public sealed class DecoratedTestService : ITestService
     {
         public ITestService Inner { get; }
         public DecoratedTestService(ITestService inner) => Inner = inner;
+    }
+    public sealed class SecondDecoratedTestService : ITestService
+    {
+        public ITestService Inner { get; }
+        public SecondDecoratedTestService(ITestService inner) => Inner = inner;
+    }
+
+    public sealed class IncompatibleDecorator
+    {
+        public IncompatibleDecorator(ITestService inner)
+        {
+        }
+    }
+
+    public interface IOtherService
+    {
+    }
+
+    public sealed class OtherService : IOtherService
+    {
     }
 }
