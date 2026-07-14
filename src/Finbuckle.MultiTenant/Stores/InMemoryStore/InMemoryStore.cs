@@ -15,6 +15,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : class, ITenantInfo, new()
 {
     private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
+    private readonly object _tenantMapLock = new();
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly InMemoryStoreOptions<TTenantInfo> _options;
 
@@ -46,24 +47,31 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetAsync(string id)
+    public Task<TTenantInfo?> TryGetAsync(string id)
     {
-        var result = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
-        return await Task.FromResult(result).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id == id));
+        }
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier)
     {
-        _tenantMap.TryGetValue(identifier, out var result);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            _tenantMap.TryGetValue(identifier, out var result);
+            return Task.FromResult(result);
+        }
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
     {
-        return await Task.FromResult(_tenantMap.Select(x => x.Value).ToList()).ConfigureAwait(false);
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult<IEnumerable<TTenantInfo>>(_tenantMap.Select(x => x.Value).ToList());
+        }
     }
 
     /// <summary>
@@ -76,32 +84,51 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryAddAsync(TTenantInfo tenantInfo)
+    public Task<bool> TryAddAsync(TTenantInfo tenantInfo)
     {
-        var result = tenantInfo.Identifier != null && _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> TryRemoveAsync(string identifier)
-    {
-        var result = _tenantMap.TryRemove(identifier, out var _);
-
-        return await Task.FromResult(result).ConfigureAwait(false);
-    }
-
-    /// <inheritdoc />
-    public async Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
-    {
-        var existingTenantInfo = tenantInfo.Id != null ? await TryGetAsync(tenantInfo.Id).ConfigureAwait(false) : null;
-
-        if (existingTenantInfo?.Identifier != null)
+        lock (_tenantMapLock)
         {
-            var result =  _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo);
-            return await Task.FromResult(result).ConfigureAwait(false);
+            return Task.FromResult(tenantInfo.Identifier != null &&
+                                   _tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo));
         }
+    }
 
-        return await Task.FromResult(false).ConfigureAwait(false);
+    /// <inheritdoc />
+    public Task<bool> TryRemoveAsync(string identifier)
+    {
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult(_tenantMap.TryRemove(identifier, out _));
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<bool> TryUpdateAsync(TTenantInfo tenantInfo)
+    {
+        lock (_tenantMapLock)
+        {
+            if (tenantInfo.Id is null || tenantInfo.Identifier is null)
+                return Task.FromResult(false);
+
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == tenantInfo.Id);
+            if (existingTenantInfo?.Identifier is null)
+                return Task.FromResult(false);
+
+            if (_tenantMap.Comparer.Equals(existingTenantInfo.Identifier, tenantInfo.Identifier))
+                return Task.FromResult(
+                    _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo));
+
+            if (_tenantMap.ContainsKey(tenantInfo.Identifier))
+                return Task.FromResult(false);
+
+            if (!_tenantMap.TryRemove(existingTenantInfo.Identifier, out var removedTenantInfo))
+                return Task.FromResult(false);
+
+            if (_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo))
+                return Task.FromResult(true);
+
+            _tenantMap.TryAdd(existingTenantInfo.Identifier, removedTenantInfo);
+            return Task.FromResult(false);
+        }
     }
 }

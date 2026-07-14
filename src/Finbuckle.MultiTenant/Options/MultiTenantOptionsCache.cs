@@ -34,9 +34,7 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     public void Clear()
     {
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
-        var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
-
-        cache.Clear();
+        map.TryRemove(tenantId, out _);
     }
 
     /// <summary>
@@ -45,19 +43,13 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     /// <param name="tenantId">The Id of the tenant which will have its options cleared.</param>
     public void Clear(string tenantId)
     {
-        var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
-
-        cache.Clear();
+        map.TryRemove(tenantId, out _);
     }
 
     /// <summary>
     /// Clears all cached options for all tenants and no tenant.
     /// </summary>
-    public void ClearAll()
-    {
-        foreach (var cache in map.Values)
-            cache.Clear();
-    }
+    public void ClearAll() => map.Clear();
 
     /// <summary>
     /// Gets a named options instance for the current tenant, or adds a new instance created with createOptions.
@@ -84,7 +76,9 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     /// <returns>True if the options was added to the cache for the current tenant.</returns>
     public bool TryAdd(string? name, TOptions options)
     {
-        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
+        ArgumentNullException.ThrowIfNull(options);
+
+        name ??= Microsoft.Extensions.Options.Options.DefaultName;
         var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
 
@@ -92,16 +86,18 @@ public class MultiTenantOptionsCache<TOptions> : IOptionsMonitorCache<TOptions>
     }
 
     /// <summary>
-    /// Try to remove an options instance for the current tenant.
+    /// Tries to remove a named options instance for all tenants and no tenant.
     /// </summary>
     /// <param name="name">The options name.</param>
-    /// <returns>True if the options was removed from the cache for the current tenant.</returns>
+    /// <returns>True if the options was removed from at least one tenant cache.</returns>
     public bool TryRemove(string? name)
     {
-        name = name ?? Microsoft.Extensions.Options.Options.DefaultName;
-        var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
-        var cache = map.GetOrAdd(tenantId, new OptionsCache<TOptions>());
+        name ??= Microsoft.Extensions.Options.Options.DefaultName;
+        var removed = false;
 
-        return cache.TryRemove(name);
+        foreach (var cache in map.Values)
+            removed |= cache.TryRemove(name);
+
+        return removed;
     }
 }

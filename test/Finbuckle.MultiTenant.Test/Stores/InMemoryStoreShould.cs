@@ -54,6 +54,37 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     }
 
     [Fact]
+    public async Task MoveIdentifierWhenUpdatingTenant()
+    {
+        var store = CreateTestStore();
+
+        Assert.True(await store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" }));
+        Assert.Null(await store.TryGetByIdentifierAsync("initech"));
+        Assert.Equal("initech2", (await store.TryGetByIdentifierAsync("initech2"))?.Identifier);
+        Assert.Equal("initech2", (await store.TryGetAsync("initech-id"))?.Identifier);
+    }
+
+    [Fact]
+    public async Task RejectIdentifierCollisionWhenUpdatingTenant()
+    {
+        var store = CreateTestStore();
+
+        Assert.False(await store.TryUpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "lol" }));
+        Assert.Equal("initech", (await store.TryGetAsync("initech-id"))?.Identifier);
+        Assert.Equal("lol-id", (await store.TryGetByIdentifierAsync("lol"))?.Id);
+    }
+
+    [Fact]
+    public async Task MoveCaseOnlyIdentifierWhenCaseSensitive()
+    {
+        var store = CreateCaseSensitiveTestStore();
+
+        Assert.True(await store.TryUpdateAsync(new TenantInfo { Id = "initech", Identifier = "INITECH" }));
+        Assert.Null(await store.TryGetByIdentifierAsync("initech"));
+        Assert.Equal("INITECH", (await store.TryGetByIdentifierAsync("INITECH"))?.Identifier);
+    }
+
+    [Fact]
     public async Task FailIfAddingDuplicateCaseSensitive()
     {
         var store = CreateCaseSensitiveTestStore();
