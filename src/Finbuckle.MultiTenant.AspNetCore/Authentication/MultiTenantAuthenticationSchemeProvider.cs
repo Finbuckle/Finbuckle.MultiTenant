@@ -4,14 +4,21 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Core/src/AuthenticationSchemeProvider.cs
 
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace Finbuckle.MultiTenant.AspNetCore;
+namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 
 /// <summary>
-/// Implements <see cref="IAuthenticationSchemeProvider"/>.
+/// Implements <see cref="IAuthenticationSchemeProvider"/> as a decorator over an existing
+/// <see cref="IAuthenticationSchemeProvider"/> registration (e.g. the default ASP.NET Core provider, or a
+/// third-party dynamic provider such as Duende IdentityServer's). Scheme storage and lookup are fully
+/// delegated to the decorated <c>inner</c> provider, which already owns that state at whatever lifetime it
+/// was registered with. This class only adds per-tenant aware "default scheme" resolution on top, which is
+/// why it reads <see cref="AuthenticationOptions"/> on every call. The options implementation remains
+/// singleton-registered, with the ambient singleton <see cref="ITenantContext"/> selecting the current tenant.
 /// </summary>
 public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
 {
@@ -25,40 +32,12 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
     public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner,
         IOptions<AuthenticationOptions> options)
-        : this(inner, options, new Dictionary<string, AuthenticationScheme>(StringComparer.Ordinal))
-    {
-    }
-
-    /// <summary>
-    /// Creates an instance of <see cref="MultiTenantAuthenticationSchemeProvider"/>
-    /// using the specified <paramref name="options"/> and <paramref name="schemes"/>. This instance decorates the existing <paramref name="inner"/>.
-    /// </summary>
-    /// <param name="inner">The <see cref="IAuthenticationSchemeProvider"/> to decorate.</param>
-    /// <param name="options">The <see cref="AuthenticationOptions"/> options.</param>
-    /// <param name="schemes">The dictionary used to store authentication schemes.</param>
-    public MultiTenantAuthenticationSchemeProvider(IAuthenticationSchemeProvider inner,
-        IOptions<AuthenticationOptions> options, IDictionary<string, AuthenticationScheme> schemes)
     {
         _inner = inner;
         _optionsProvider = options;
-
-        _schemes = schemes ?? throw new ArgumentNullException(nameof(schemes));
-        _requestHandlers = [];
-
-        foreach (var builder in _optionsProvider.Value.Schemes)
-        {
-            var scheme = builder.Build();
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // As-is from MS source.
-            AddScheme(scheme);
-        }
     }
 
     private readonly IOptions<AuthenticationOptions> _optionsProvider;
-    private readonly Lock _lock = new();
-
-    private readonly IDictionary<string, AuthenticationScheme> _schemes;
-    private readonly HashSet<AuthenticationScheme> _requestHandlers;
 
     private Task<AuthenticationScheme?> GetDefaultSchemeAsync()
         => _optionsProvider.Value.DefaultScheme != null
@@ -125,84 +104,34 @@ public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProv
     /// </summary>
     /// <param name="name">The name of the authenticationScheme.</param>
     /// <returns>The scheme or null if not found.</returns>
-    public virtual async Task<AuthenticationScheme?> GetSchemeAsync(string name)
-    {
-        AuthenticationScheme? scheme = null;
-
-        if (_inner != null)
-        {
-            scheme = await _inner.GetSchemeAsync(name).ConfigureAwait(false);
-        }
-
-        if (scheme == null)
-        {
-            _schemes.TryGetValue(name, out scheme);
-        }
-
-        return scheme;
-    }
+    public virtual Task<AuthenticationScheme?> GetSchemeAsync(string name)
+        => _inner.GetSchemeAsync(name);
 
     /// <summary>
     /// Returns the scheme for this tenants in priority order for request handling.
     /// </summary>
     /// <returns>The schemes in priority order for request handling</returns>
     public virtual Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync()
-        // ReSharper disable once InconsistentlySynchronizedField
-        // As-is from MS source
-        => Task.FromResult<IEnumerable<AuthenticationScheme>>(_requestHandlers);
+        => _inner.GetRequestHandlerSchemesAsync();
 
     /// <summary>
     /// Registers a scheme for use by <see cref="IAuthenticationService"/>.
     /// </summary>
     /// <param name="scheme">The scheme.</param>
     public virtual void AddScheme(AuthenticationScheme scheme)
-    {
-        if (_schemes.ContainsKey(scheme.Name))
-        {
-            throw new InvalidOperationException("Scheme already exists: " + scheme.Name);
-        }
-
-        lock (_lock)
-        {
-            if (_schemes.ContainsKey(scheme.Name))
-            {
-                throw new InvalidOperationException("Scheme already exists: " + scheme.Name);
-            }
-
-            if (typeof(IAuthenticationRequestHandler).IsAssignableFrom(scheme.HandlerType))
-            {
-                _requestHandlers.Add(scheme);
-            }
-
-            _schemes[scheme.Name] = scheme;
-        }
-    }
+        => _inner.AddScheme(scheme);
 
     /// <summary>
     /// Removes a scheme, preventing it from being used by <see cref="IAuthenticationService"/>.
     /// </summary>
     /// <param name="name">The name of the authenticationScheme being removed.</param>
     public virtual void RemoveScheme(string name)
-    {
-        if (!_schemes.ContainsKey(name))
-        {
-            return;
-        }
-
-        lock (_lock)
-        {
-            if (_schemes.TryGetValue(name, out var scheme))
-            {
-                _requestHandlers.Remove(scheme);
-                _schemes.Remove(name);
-            }
-        }
-    }
+        => _inner.RemoveScheme(name);
 
     /// <summary>
     /// Returns all registered authentication schemes for this tenant.
     /// </summary>
     /// <returns>All registered authentication schemes.</returns>
     public virtual Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
-        => Task.FromResult<IEnumerable<AuthenticationScheme>>(_schemes.Values);
+        => _inner.GetAllSchemesAsync();
 }
