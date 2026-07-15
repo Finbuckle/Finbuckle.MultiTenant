@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -11,8 +10,7 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 {
     private readonly Action<ModelBuilder> _config;
 
-    public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) :
-        base(new StaticMultiTenantContextAccessor<TenantInfo>(new TenantInfo { Id = "dummy", Identifier = "" }), options)
+    public TestDbContext(Action<ModelBuilder> config, DbContextOptions options) : base(options)
     {
         _config = config;
     }

@@ -8,9 +8,16 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBuilderExtensions;
 
-public class TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, DbContextOptions options)
-    : EntityFrameworkCore.MultiTenantDbContext(new StaticMultiTenantContextAccessor<TenantInfo>(tenantInfo), options)
+public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
 {
+    private readonly Action<ModelBuilder>? _config;
+
+    public TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, DbContextOptions options)
+        : base(options)
+    {
+        _config = config;
+        TenantInfo = tenantInfo;
+    }
     public DbSet<MyMultiTenantThing>? MyMultiTenantThings { get; set; }
     public DbSet<MyThingWithTenantId>? MyThingsWithTenantIds { get; set; }
     public DbSet<MyThingWithIntTenantId>? MyThingsWithIntTenantId { get; set; }
@@ -20,8 +27,8 @@ public class TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // if the test passed in a custom builder use it
-        if (config != null)
-            config(modelBuilder);
+        if (_config != null)
+            _config(modelBuilder);
         // or use the standard builder configuration
         else
         {

@@ -188,4 +188,22 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         // Non-multi-tenant entities should not be filtered (both should be visible)
         Assert.Equal(2, db.MyNonMultiTenantThings!.Count());
     }
+
+    [Fact]
+    public void IsMultiTenantIsIdempotent()
+    {
+        // Calling IsMultiTenant() twice on the same entity should be a no-op the second time.
+        using var db = GetDbContext(b =>
+        {
+            b.Entity<MyMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyMultiTenantThing>().IsMultiTenant();
+        });
+
+        var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));
+        Assert.True(entityType.IsMultiTenant());
+
+        // TenantId shadow property should exist exactly once
+        var tenantIdProps = entityType?.GetProperties().Where(p => p.Name == "TenantId").ToList();
+        Assert.Single(tenantIdProps!);
+    }
 }
