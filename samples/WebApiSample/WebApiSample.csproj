@@ -8,8 +8,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
-        <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="10.1.2" />
         <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
+        <ProjectReference Include="..\..\src\Finbuckle.MultiTenant.AspNetCore\Finbuckle.MultiTenant.AspNetCore.csproj" />
     </ItemGroup>
     
 </Project>
