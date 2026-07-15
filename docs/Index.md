@@ -14,6 +14,8 @@
 
 [ASP.NET Core Integration](AspNetCore)
 
+[.NET Generic Host Integration](GenericHost)
+
 [Per-Tenant Authentication](Authentication)
 
 [Per-Tenant Data with EFCore](EFCore)
