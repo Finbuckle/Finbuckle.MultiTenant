@@ -11,9 +11,12 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 public interface IMultiTenantDbContext
 {
     /// <summary>
-    /// Gets the current tenant information for this context.
+    /// Gets or sets the current tenant information for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; }
+    /// <remarks>
+    /// Setting the <see cref="ITenantInfo"/> may cause conflicts for entities already being tracked. Use with caution.
+    /// </remarks>
+    ITenantInfo? TenantInfo { get; set; }
 
     /// <summary>
     /// Gets the mode used to handle entities where TenantId does not match the current tenant.
