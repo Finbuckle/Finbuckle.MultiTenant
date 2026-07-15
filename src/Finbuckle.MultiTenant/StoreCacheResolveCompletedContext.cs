@@ -6,10 +6,10 @@ using Finbuckle.MultiTenant.Abstractions;
 namespace Finbuckle.MultiTenant;
 
 /// <summary>
-/// Context for when the primary tenant store has attempted to look up a tenant identifier.
+/// Context for when a tenant store cache has attempted to look up a tenant identifier.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class StoreResolveCompletedContext<TTenantInfo>
+public class StoreCacheResolveCompletedContext<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
     /// <summary>
@@ -18,9 +18,9 @@ public class StoreResolveCompletedContext<TTenantInfo>
     public required object Context { get; init; }
 
     /// <summary>
-    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that was run.
+    /// The <see cref="IMultiTenantStoreCache{TTenantInfo}"/> instance that was run.
     /// </summary>
-    public required IMultiTenantStore<TTenantInfo> Store { get; init; }
+    public required IMultiTenantStoreCache<TTenantInfo> Cache { get; init; }
 
     /// <summary>
     /// The <see cref="IMultiTenantStrategy"/> instance that was run.
@@ -28,12 +28,12 @@ public class StoreResolveCompletedContext<TTenantInfo>
     public required IMultiTenantStrategy Strategy { get; init; }
 
     /// <summary>
-    /// The identifier used for tenant resolution by the store.
+    /// The identifier used for tenant resolution by the store cache.
     /// </summary>
     public required string Identifier { get; init; }
 
     /// <summary>
-    /// The resolved <see cref="TenantInfo"/>. Setting to null will cause the next store to run.
+    /// The resolved <see cref="TenantInfo"/>. Setting to null will cause the next cache or store to run.
     /// </summary>
     public TTenantInfo? TenantInfo { get; set; }
 

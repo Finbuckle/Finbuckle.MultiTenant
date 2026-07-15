@@ -2,8 +2,11 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.StoreCaches;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,32 +19,69 @@ namespace Finbuckle.MultiTenant.Extensions;
 public static class MultiTenantBuilderExtensions
 {
     /// <summary>
-    /// Adds a <see cref="DistributedCacheStore{TTenantInfo}"/> to the application with maximum sliding expiration.
+    /// Adds a <see cref="DistributedCacheStoreCache{TTenantInfo}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
-    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(
+    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStoreCache<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : ITenantInfo
-        => builder.WithDistributedCacheStore(TimeSpan.MaxValue);
+        => builder.WithDistributedCacheStoreCache(_ => { });
 
     /// <summary>
-    /// Adds a <see cref="DistributedCacheStore{TTenantInfo}"/> to the application.
+    /// Adds a <see cref="DistributedCacheStoreCache{TTenantInfo}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
-    /// <param name="slidingExpiration">The timespan for a cache entry's sliding expiration.</param>
+    /// <param name="configureOptions">An action for configuring cache entry options.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
-    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStore<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder, TimeSpan? slidingExpiration)
+    public static MultiTenantBuilder<TTenantInfo> WithDistributedCacheStoreCache<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder,
+        Action<DistributedCacheEntryOptions> configureOptions)
         where TTenantInfo : ITenantInfo
     {
-        var storeParams = slidingExpiration is null
-            ? new object[] { Constants.TenantToken }
-            : new object[] { Constants.TenantToken, slidingExpiration };
+        ArgumentNullException.ThrowIfNull(configureOptions);
 
-        return builder.WithStore<DistributedCacheStore<TTenantInfo>>(ServiceLifetime.Transient, storeParams);
+        var options = new DistributedCacheEntryOptions();
+        configureOptions(options);
+
+        return builder.WithStoreCache<DistributedCacheStoreCache<TTenantInfo>>(ServiceLifetime.Transient,
+            Constants.TenantToken, options);
+    }
+
+    /// <summary>
+    /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo}"/> to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> WithMemoryCacheStoreCache<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder)
+        where TTenantInfo : ITenantInfo
+        => builder.WithMemoryCacheStoreCache(_ => { });
+
+    /// <summary>
+    /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo}"/> to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="configureOptions">An action for configuring cache entry options.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> WithMemoryCacheStoreCache<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder,
+        Action<MemoryCacheEntryOptions> configureOptions)
+        where TTenantInfo : ITenantInfo
+    {
+        ArgumentNullException.ThrowIfNull(configureOptions);
+
+        var options = new MemoryCacheEntryOptions();
+        configureOptions(options);
+
+        builder.Services.AddMemoryCache();
+
+        return builder.WithStoreCache<MemoryCacheStoreCache<TTenantInfo>>(ServiceLifetime.Singleton,
+            Constants.TenantToken, options);
     }
 
     /// <summary>
@@ -112,26 +152,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : ITenantInfo
-        => builder.WithInMemoryStore(_ => { });
-
-    /// <summary>
-    /// Adds and configures <see cref="InMemoryStore{TTenantInfo}"/> to the application using the provided action.
-    /// </summary>
-    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
-    /// <param name="config">An action for configuring the store.</param>
-    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
-    public static MultiTenantBuilder<TTenantInfo> WithInMemoryStore<TTenantInfo>(
-        this MultiTenantBuilder<TTenantInfo> builder,
-        Action<InMemoryStoreOptions<TTenantInfo>> config)
-        where TTenantInfo : ITenantInfo
-    {
-        ArgumentNullException.ThrowIfNull(config);
-
-        builder.Services.Configure(config);
-
-        return builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
-    }
+        => builder.WithStore<InMemoryStore<TTenantInfo>>(ServiceLifetime.Singleton);
 
     /// <summary>
     /// Adds an <see cref="EchoStore{TTenantInfo}"/> to the application.

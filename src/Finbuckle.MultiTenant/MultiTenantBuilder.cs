@@ -50,9 +50,42 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : ITenantInfo
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        // Note: can't use TryAddEnumerable here because ServiceDescriptor.Describe with a factory can't set implementation type.
+        if (Services.Any(sd => sd.ServiceType == typeof(IMultiTenantStore<TTenantInfo>)))
+            throw new InvalidOperationException(
+                $"Only one primary {nameof(IMultiTenantStore<TTenantInfo>)} can be registered.");
+
         Services.Add(
             ServiceDescriptor.Describe(typeof(IMultiTenantStore<TTenantInfo>), sp => factory(sp), lifetime));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds and configures an <see cref="IMultiTenantStoreCache{TTenantInfo}"/> to the application using default dependency injection.
+    /// </summary>
+    /// <param name="lifetime">The service lifetime.</param>
+    /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
+    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    public MultiTenantBuilder<TTenantInfo> WithStoreCache<TStoreCache>(ServiceLifetime lifetime,
+        params object[] parameters)
+        where TStoreCache : IMultiTenantStoreCache<TTenantInfo>
+        => WithStoreCache<TStoreCache>(lifetime,
+            sp => ActivatorUtilities.CreateInstance<TStoreCache>(sp, parameters));
+
+    /// <summary>
+    /// Adds and configures an <see cref="IMultiTenantStoreCache{TTenantInfo}"/> to the application using a factory method.
+    /// </summary>
+    /// <param name="lifetime">The service lifetime.</param>
+    /// <param name="factory">A delegate that will create and configure the store cache.</param>
+    /// <returns>The same <see cref="MultiTenantBuilder{TTenantInfo}"/> passed into the method.</returns>
+    public MultiTenantBuilder<TTenantInfo> WithStoreCache<TStoreCache>(ServiceLifetime lifetime,
+        Func<IServiceProvider, TStoreCache> factory)
+        where TStoreCache : IMultiTenantStoreCache<TTenantInfo>
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+
+        Services.Add(
+            ServiceDescriptor.Describe(typeof(IMultiTenantStoreCache<TTenantInfo>), sp => factory(sp), lifetime));
 
         return this;
     }
