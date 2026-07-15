@@ -27,14 +27,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ITenantResolver<TTenantInfo>, TenantResolver<TTenantInfo>>();
         services.AddScoped<ITenantResolver>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo>>());
+        services.AddScoped<TenantManager<TTenantInfo>>();
 
-        services.AddSingleton<IMultiTenantContextAccessor<TTenantInfo>,
-            AsyncLocalMultiTenantContextAccessor<TTenantInfo>>();
-        services.AddSingleton<IMultiTenantContextAccessor>(sp =>
-            sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>());
-
-        services.AddSingleton<IMultiTenantContextSetter>(sp =>
-            (IMultiTenantContextSetter)sp.GetRequiredService<IMultiTenantContextAccessor>());
+        services.AddSingleton<AmbientTenantContext<TTenantInfo>>(new AmbientTenantContext<TTenantInfo>());
+        services.AddSingleton<ITenantScopeProvider>(sp => sp.GetRequiredService<AmbientTenantContext<TTenantInfo>>());
+        services.AddSingleton<ITenantContext<TTenantInfo>>(sp => sp.GetRequiredService<AmbientTenantContext<TTenantInfo>>());
+        services.AddSingleton<ITenantContext>(sp => sp.GetRequiredService<AmbientTenantContext<TTenantInfo>>());
 
         services.Configure<MultiTenantOptions<TTenantInfo>>(options => options.TenantInfoType = typeof(TTenantInfo));
         services.Configure(config);
@@ -157,12 +155,12 @@ public static class ServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IConfigureOptions<TOptions>>(sp =>
-            new ConfigureNamedOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
+            new ConfigureNamedOptions<TOptions, ITenantContext<TTenantInfo>>(
                 name,
-                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
-                (options, mtcAccessor) =>
+                sp.GetRequiredService<ITenantContext<TTenantInfo>>(),
+                (options, tenantContext) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
+                    var tenantInfo = tenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));
@@ -225,12 +223,12 @@ public static class ServiceCollectionExtensions
         ConfigurePerTenantReqs<TOptions>(services);
 
         services.AddTransient<IPostConfigureOptions<TOptions>>(sp =>
-            new PostConfigureOptions<TOptions, IMultiTenantContextAccessor<TTenantInfo>>(
+            new PostConfigureOptions<TOptions, ITenantContext<TTenantInfo>>(
                 name,
-                sp.GetRequiredService<IMultiTenantContextAccessor<TTenantInfo>>(),
-                (options, mtcAccessor) =>
+                sp.GetRequiredService<ITenantContext<TTenantInfo>>(),
+                (options, tenantContext) =>
                 {
-                    var tenantInfo = mtcAccessor.MultiTenantContext.TenantInfo;
+                    var tenantInfo = tenantContext.TenantInfo;
                     if (tenantInfo is not null)
                         configureOptions(options, tenantInfo);
                 }));

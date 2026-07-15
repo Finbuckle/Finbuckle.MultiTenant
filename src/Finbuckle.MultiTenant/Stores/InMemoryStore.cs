@@ -1,9 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Collections.Concurrent;
 using Finbuckle.MultiTenant.Abstractions;
-using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Stores;
 
@@ -14,41 +12,18 @@ namespace Finbuckle.MultiTenant.Stores;
 public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
-    private readonly ConcurrentDictionary<string, TTenantInfo> _tenantMap;
+    private readonly Dictionary<string, TTenantInfo> _tenantMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Lock _tenantMapLock = new();
-
-    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private readonly InMemoryStoreOptions<TTenantInfo> _options;
 
     /// <summary>
     /// Constructor for InMemoryStore.
     /// </summary>
-    /// <param name="options"><see cref="InMemoryStoreOptions{TTenantInfo}"/> instance for desired behavior.</param>
-    /// <exception cref="MultiTenantException">Thrown when tenant configuration is invalid.</exception>
-    public InMemoryStore(IOptions<InMemoryStoreOptions<TTenantInfo>> options)
+    public InMemoryStore()
     {
-        _options = options.Value;
-
-        var stringComparer = StringComparer.OrdinalIgnoreCase;
-        if (_options.IsCaseSensitive)
-            stringComparer = StringComparer.Ordinal;
-
-        _tenantMap = new ConcurrentDictionary<string, TTenantInfo>(stringComparer);
-        foreach (var tenant in _options.Tenants)
-        {
-            if (String.IsNullOrWhiteSpace(tenant.Id))
-                throw new MultiTenantException("Missing tenant id in options.");
-            if (String.IsNullOrWhiteSpace(tenant.Identifier))
-                throw new MultiTenantException("Missing tenant identifier in options.");
-            if (_tenantMap.ContainsKey(tenant.Identifier))
-                throw new MultiTenantException("Duplicate tenant identifier in options.");
-
-            _tenantMap.TryAdd(tenant.Identifier, tenant);
-        }
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
@@ -57,7 +32,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
@@ -67,7 +42,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
@@ -79,32 +54,51 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip,
+        CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public Task<bool> AddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        ValidateTenantInfo(tenantInfo);
+
         lock (_tenantMapLock)
         {
+            if (_tenantMap.Values.Any(existing => existing.Id == tenantInfo.Id))
+                return Task.FromResult(false);
+
             return Task.FromResult(_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo));
         }
     }
 
     /// <inheritdoc />
-    public Task<bool> RemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
-            return Task.FromResult(_tenantMap.TryRemove(identifier, out _));
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
+            return Task.FromResult(existingTenantInfo?.Identifier is not null &&
+                                   _tenantMap.Remove(existingTenantInfo.Identifier));
         }
     }
 
     /// <inheritdoc />
-    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
+        lock (_tenantMapLock)
+        {
+            return Task.FromResult(_tenantMap.Remove(identifier));
+        }
+    }
+
+    /// <inheritdoc />
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
+    {
+        ValidateTenantInfo(tenantInfo);
+
         lock (_tenantMapLock)
         {
             var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == tenantInfo.Id);
@@ -112,21 +106,27 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
                 return Task.FromResult(false);
 
             if (_tenantMap.Comparer.Equals(existingTenantInfo.Identifier, tenantInfo.Identifier))
-                return Task.FromResult(
-                    _tenantMap.TryUpdate(existingTenantInfo.Identifier, tenantInfo, existingTenantInfo));
+            {
+                _tenantMap[existingTenantInfo.Identifier] = tenantInfo;
+                return Task.FromResult(true);
+            }
 
             if (_tenantMap.ContainsKey(tenantInfo.Identifier))
                 return Task.FromResult(false);
 
-            if (!_tenantMap.TryRemove(existingTenantInfo.Identifier, out var removedTenantInfo))
-                return Task.FromResult(false);
-
-            if (_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo))
-                return Task.FromResult(true);
-
-            _tenantMap.TryAdd(existingTenantInfo.Identifier, removedTenantInfo);
-            return Task.FromResult(false);
+            _tenantMap.Remove(existingTenantInfo.Identifier);
+            _tenantMap.Add(tenantInfo.Identifier, tenantInfo);
+            return Task.FromResult(true);
         }
+    }
 
+    private static void ValidateTenantInfo(TTenantInfo tenantInfo)
+    {
+        ArgumentNullException.ThrowIfNull(tenantInfo);
+
+        if (string.IsNullOrWhiteSpace(tenantInfo.Id))
+            throw new MultiTenantException("Missing tenant id.");
+        if (string.IsNullOrWhiteSpace(tenantInfo.Identifier))
+            throw new MultiTenantException("Missing tenant identifier.");
     }
 }
