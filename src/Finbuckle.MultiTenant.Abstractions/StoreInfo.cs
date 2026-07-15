@@ -12,10 +12,20 @@ public class StoreInfo<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <summary>
     /// Gets or sets the type of the store used.
     /// </summary>
-    public Type? StoreType => Store?.GetType();
+    public Type? StoreType => Source?.GetType();
 
     /// <summary>
-    /// Gets or sets the store instance used.
+    /// Gets or sets the source instance used.
     /// </summary>
-    public IMultiTenantStore<TTenantInfo>? Store { get; init; }
+    public object? Source { get; init; }
+
+    /// <summary>
+    /// Gets or sets the primary store instance used.
+    /// </summary>
+    public IMultiTenantStore<TTenantInfo>? Store => Source as IMultiTenantStore<TTenantInfo>;
+
+    /// <summary>
+    /// Gets or sets the store cache instance used.
+    /// </summary>
+    public IMultiTenantStoreCache<TTenantInfo>? Cache => Source as IMultiTenantStoreCache<TTenantInfo>;
 }

@@ -13,9 +13,4 @@ public class TenantInfo : ITenantInfo
 
     /// <inheritdoc />
     public required string Identifier { get; init; }
-    
-    /// <summary>
-    /// A friendly name for the tenant.
-    /// </summary>
-    public string? Name { get; init; }
 }
