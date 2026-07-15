@@ -1,3 +1,4 @@
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using WebApiSample;
@@ -12,12 +13,16 @@ builder.Services.AddOpenApi();
 var tenantList = SampleHelper.BuildTenantList();
 builder.Services.AddMultiTenant<AppTenantInfo>()
     .WithBasePathStrategy()
-    .WithInMemoryStore(options =>
-    {
-        options.Tenants = tenantList;
-    });
+    .WithInMemoryStore();
 
 var app = builder.Build();
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var tenantManager = scope.ServiceProvider.GetRequiredService<TenantManager<AppTenantInfo>>();
+    foreach (var tenant in tenantList)
+        await tenantManager.AddAsync(tenant);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
