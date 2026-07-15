@@ -81,32 +81,32 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> AddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(id);
         return Task.FromResult(tenantMap.Values.SingleOrDefault(v => v.Id == id));
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return Task.FromResult(tenantMap.Values.ToList().AsEnumerable());
     }
 
     /// <inheritdoc />
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(tenantMap.Values.Skip(skip).Take(take).ToList().AsEnumerable());
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(identifier);
         return Task.FromResult(tenantMap.GetValueOrDefault(identifier));
@@ -116,7 +116,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -125,7 +125,16 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

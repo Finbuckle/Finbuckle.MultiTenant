@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.Stores;
 public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
     
@@ -28,7 +28,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
         var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
         
@@ -45,7 +45,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> AddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -54,7 +54,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -63,7 +63,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -72,7 +72,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -81,7 +81,16 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
