@@ -3,6 +3,7 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Extensions;
+using Finbuckle.MultiTenant.StoreCaches;
 using Finbuckle.MultiTenant.Stores;
 using Finbuckle.MultiTenant.Strategies;
 using Microsoft.Extensions.Configuration;
@@ -14,27 +15,49 @@ namespace Finbuckle.MultiTenant.Test.Extensions;
 public class MultiTenantBuilderExtensionsShould
 {
     [Fact]
-    public void AddDistributedCacheStoreDefault()
+    public void AddDistributedCacheStoreCacheDefault()
     {
         var services = new ServiceCollection();
         services.AddDistributedMemoryCache();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDistributedCacheStore();
+        builder.WithDistributedCacheStoreCache();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
+        Assert.IsType<DistributedCacheStoreCache<TenantInfo>>(cache);
     }
 
     [Fact]
-    public void AddDistributedCacheStoreWithSlidingExpiration()
+    public void AddDistributedCacheStoreCacheWithOptions()
     {
         var services = new ServiceCollection();
         services.AddDistributedMemoryCache();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDistributedCacheStore(TimeSpan.FromMinutes(5));
+        builder.WithDistributedCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5));
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<DistributedCacheStore<TenantInfo>>(store);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
+        Assert.IsType<DistributedCacheStoreCache<TenantInfo>>(cache);
+    }
+
+    [Fact]
+    public void AddMemoryCacheStoreCacheDefault()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithMemoryCacheStoreCache();
+        var sp = services.BuildServiceProvider();
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
+        Assert.IsType<MemoryCacheStoreCache<TenantInfo>>(cache);
+    }
+
+    [Fact]
+    public void AddMemoryCacheStoreCacheWithOptions()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithMemoryCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5));
+        var sp = services.BuildServiceProvider();
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
+        Assert.IsType<MemoryCacheStoreCache<TenantInfo>>(cache);
     }
 
     [Fact]
@@ -118,36 +141,20 @@ public class MultiTenantBuilderExtensionsShould
     }
 
     [Fact]
-    public void ThrowIfNullParamAddingInMemoryStore()
+    public async Task AddCaseInsensitiveInMemoryStore()
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo>(services);
-        Assert.Throws<ArgumentNullException>(()
-            => builder.WithInMemoryStore(null!));
-    }
-
-    [Fact]
-    public async Task AddInMemoryStoreWithCaseSensitivity()
-    {
-        var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithInMemoryStore(options =>
-        {
-            options.IsCaseSensitive = true;
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol" });
-        });
+        builder.WithInMemoryStore();
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
         Assert.IsType<InMemoryStore<TenantInfo>>(store);
+        await store.AddAsync(new TenantInfo { Id = "lol", Identifier = "lol" });
 
-        var tc = await store.GetByIdentifierAsync("lol");
+        var tc = await store.GetByIdentifierAsync("LOL");
         Assert.Equal("lol", tc!.Id);
         Assert.Equal("lol", tc.Identifier);
-
-        // Case sensitive test.
-        tc = await store.GetByIdentifierAsync("LOL");
-        Assert.Null(tc);
     }
 
     [Fact]

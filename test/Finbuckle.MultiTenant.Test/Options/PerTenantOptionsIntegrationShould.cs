@@ -109,9 +109,7 @@ public class PerTenantOptionsIntegrationShould
 
     private static void SetTenant(IServiceProvider provider, string tenantId)
     {
-        var setter = provider.GetRequiredService<IMultiTenantContextSetter>();
-        setter.MultiTenantContext = new MultiTenantContext<TenantInfo>(
-            new TenantInfo { Id = tenantId, Identifier = tenantId });
+        provider.BeginTenantScope(new TenantInfo { Id = tenantId, Identifier = tenantId });
     }
 
     public class TestOptions
