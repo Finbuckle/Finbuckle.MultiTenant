@@ -14,8 +14,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
 {
     /// <inheritdoc />
-    // internal set for testing
-    public ITenantInfo? TenantInfo { get; internal set; }
+    public ITenantInfo? TenantInfo { get; set; }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -24,19 +23,19 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
     /// <summary>
-    /// Creates a new instance of a <see cref="DbContext"/> that accepts an <see cref="TenantInfo"/> instance.
+    /// Creates a new instance of a <see cref="DbContext"/> bound to the given tenant.
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo)
-        where TContext : DbContext
+        where TContext : DbContext, IMultiTenantDbContext
         where TTenantInfo : ITenantInfo
         => Create<TContext, TTenantInfo>(tenantInfo, []);
 
     /// <summary>
-    /// Creates a new instance of a <see cref="DbContext"/> that accepts an <see cref="TenantInfo"/> instance and optional dependencies.
+    /// Creates a new instance of a <see cref="DbContext"/> bound to the given tenant, with optional constructor dependencies.
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <param name="args">Additional dependencies for the <see cref="DbContext"/> constructor.</param>
@@ -44,17 +43,14 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, params object[] args)
-        where TContext : DbContext
+        where TContext : DbContext, IMultiTenantDbContext
         where TTenantInfo : ITenantInfo
     {
         try
         {
-            var mca = new StaticMultiTenantContextAccessor<TTenantInfo>(tenantInfo);
-
             args ??= [];
-            object?[] argsList = [mca, ..args];
-
-            var context = (TContext)Activator.CreateInstance(typeof(TContext), argsList)!;
+            var context = (TContext)Activator.CreateInstance(typeof(TContext), args)!;
+            context.TenantInfo = tenantInfo;
             return context;
         }
         catch (MissingMethodException e)
@@ -65,7 +61,7 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     }
 
     /// <summary>
-    /// Creates a new instance of a <see cref="DbContext"/> that accepts an <see cref="TenantInfo"/> instance, a service provider, and optional dependencies.
+    /// Creates a new instance of a <see cref="DbContext"/> bound to the given tenant, resolving dependencies from the provided service provider.
     /// </summary>
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to resolve <see cref="DbContext"/> constructor dependencies.</param>
@@ -75,17 +71,14 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo>(TTenantInfo tenantInfo, IServiceProvider serviceProvider,
         params object[] args)
-        where TContext : DbContext
+        where TContext : DbContext, IMultiTenantDbContext
         where TTenantInfo : ITenantInfo
     {
         try
         {
-            var mca = new StaticMultiTenantContextAccessor<TTenantInfo>(tenantInfo);
-
             args ??= [];
-            object[] argsList = [mca, ..args];
-
-            var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, argsList);
+            var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, args);
+            context.TenantInfo = tenantInfo;
             return context;
         }
         catch (MissingMethodException e)
@@ -96,23 +89,18 @@ public abstract class MultiTenantDbContext : DbContext, IMultiTenantDbContext
     }
 
     /// <summary>
-    /// Constructs the database context instance and binds to the current tenant.
+    /// Constructs the database context instance.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
-    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
+    protected MultiTenantDbContext()
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
 
     /// <summary>
-    /// Constructs the database context instance and binds to the current tenant.
+    /// Constructs the database context instance with the provided options.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
     /// <param name="options">The <see cref="DbContextOptions"/> instance.</param>
-    protected MultiTenantDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) :
-        base(options)
+    protected MultiTenantDbContext(DbContextOptions options) : base(options)
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
 
     /// <inheritdoc />
