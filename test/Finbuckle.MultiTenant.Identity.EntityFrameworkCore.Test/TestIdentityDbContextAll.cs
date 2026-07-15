@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,13 +10,11 @@ public class TestIdentityDbContextAll : MultiTenantIdentityDbContext<IdentityUse
     IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>,
     IdentityUserToken<string>, IdentityUserPasskey<string>>
 {
-    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
-        multiTenantContextAccessor)
+    public TestIdentityDbContextAll()
     {
     }
 
-    public TestIdentityDbContextAll(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) :
-        base(multiTenantContextAccessor, options)
+    public TestIdentityDbContextAll(DbContextOptions options) : base(options)
     {
     }
 
