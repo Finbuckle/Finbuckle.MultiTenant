@@ -14,8 +14,8 @@ public abstract class MultiTenantStoreTestBase
 
     protected virtual async Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
     {
-        await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech", Name = "Initech" });
-        await store.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol", Name = "Lol, Inc." });
+        await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
+        await store.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol" });
 
         return store;
     }
@@ -57,7 +57,7 @@ public abstract class MultiTenantStoreTestBase
         var store = await CreateTestStore();
 
         Assert.Null(await store.GetByIdentifierAsync("identifier"));
-        Assert.True(await store.AddAsync(new TenantInfo { Id = "id", Identifier = "identifier", Name = "name" }));
+        Assert.True(await store.AddAsync(new TenantInfo { Id = "id", Identifier = "identifier" }));
         Assert.NotNull(await store.GetByIdentifierAsync("identifier"));
     }
 
@@ -68,6 +68,9 @@ public abstract class MultiTenantStoreTestBase
 
         var result = await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" });
         Assert.True(result);
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
+        Assert.Equal("initech2", (await store.GetByIdentifierAsync("initech2"))?.Identifier);
+        Assert.Equal("initech2", (await store.GetAsync("initech-id"))?.Identifier);
     }
 
     //[Fact]
@@ -75,7 +78,16 @@ public abstract class MultiTenantStoreTestBase
     {
         var store = await CreateTestStore();
         Assert.NotNull(await store.GetByIdentifierAsync("initech"));
-        Assert.True(await store.RemoveAsync("initech"));
+        Assert.True(await store.RemoveAsync("initech-id"));
+        Assert.Null(await store.GetByIdentifierAsync("initech"));
+    }
+
+    //[Fact]
+    public virtual async Task RemoveTenantInfoFromStoreByIdentifier()
+    {
+        var store = await CreateTestStore();
+        Assert.NotNull(await store.GetByIdentifierAsync("initech"));
+        Assert.True(await store.RemoveByIdentifierAsync("initech"));
         Assert.Null(await store.GetByIdentifierAsync("initech"));
     }
 

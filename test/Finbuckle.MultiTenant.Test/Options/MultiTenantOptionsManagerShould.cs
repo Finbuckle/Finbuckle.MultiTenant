@@ -1,6 +1,7 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
+using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Options;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -15,79 +16,93 @@ public class MultiTenantOptionsManagerShould
     [InlineData("OptionName2")]
     public void GetOptionByName(string optionName)
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
-
-        var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
+        var factory = new Mock<IOptionsFactory<object>>();
+        factory.Setup(f => f.Create(optionName)).Returns(new object());
+        var context = BuildTenantContext("tenant-1");
+        var cache = new MultiTenantOptionsCache<object>(context);
+        var manager = new MultiTenantOptionsManager<object>(factory.Object, cache);
 
         manager.Get(optionName);
+        manager.Get(optionName);
 
-        mock.Verify(c => c.GetOrAdd(It.Is<String>(p => p == optionName), It.IsAny<Func<Object>>()), Times.Once);
+        factory.Verify(f => f.Create(It.Is<string>(p => p == optionName)), Times.Once);
     }
 
     [Fact]
     public void GetOptionByDefaultNameIfNameNull()
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
-
-        var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
+        var factory = new Mock<IOptionsFactory<object>>();
+        factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(new object());
+        var context = BuildTenantContext("tenant-1");
+        var manager = new MultiTenantOptionsManager<object>(factory.Object,
+            new MultiTenantOptionsCache<object>(context));
 
         manager.Get(null!);
 
-        mock.Verify(
-            c => c.GetOrAdd(It.Is<String>(p => p == Microsoft.Extensions.Options.Options.DefaultName),
-                It.IsAny<Func<Object>>()), Times.Once);
+        factory.Verify(f => f.Create(It.Is<string>(p => p == Microsoft.Extensions.Options.Options.DefaultName)), Times.Once);
     }
 
     [Fact]
     public void GetOptionByDefaultNameIfGettingValueProp()
     {
-        var mock = new Mock<IOptionsMonitorCache<Object>>();
-        mock.Setup(c => c.GetOrAdd(It.IsAny<string>(), It.IsAny<Func<Object>>())).Returns(new Object());
+        var factory = new Mock<IOptionsFactory<object>>();
+        factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(new object());
+        var context = BuildTenantContext("tenant-1");
+        var manager = new MultiTenantOptionsManager<object>(factory.Object,
+            new MultiTenantOptionsCache<object>(context));
 
-        var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
+        _ = manager.Value;
 
-        var dummy = manager.Value;
-
-        mock.Verify(
-            c => c.GetOrAdd(It.Is<String>(p => p == Microsoft.Extensions.Options.Options.DefaultName),
-                It.IsAny<Func<Object>>()), Times.Once);
+        factory.Verify(f => f.Create(It.Is<string>(p => p == Microsoft.Extensions.Options.Options.DefaultName)), Times.Once);
     }
 
     [Fact]
     public void ClearCacheOnReset()
     {
-        var mock = new Mock<TestOptionsCache<Object>>();
-        mock.Setup(i => i.Clear());
+        var factory = new Mock<IOptionsFactory<object>>();
+        factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(() => new object());
+        var context = BuildTenantContext("tenant-1");
+        var manager = new MultiTenantOptionsManager<object>(factory.Object,
+            new MultiTenantOptionsCache<object>(context));
 
-        var manager = new MultiTenantOptionsManager<Object>(null!, mock.Object);
+        var first = manager.Value;
         manager.Reset();
+        var second = manager.Value;
 
-        mock.Verify(i => i.Clear(), Times.Once);
+        Assert.NotSame(first, second);
+        factory.Verify(f => f.Create(It.Is<string>(p => p == Microsoft.Extensions.Options.Options.DefaultName)), Times.Exactly(2));
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class TestOptionsCache<TOptions> : IOptionsMonitorCache<TOptions> where TOptions : class
+    [Fact]
+    public void UseTenantIdFromTenantContextForCachePartitioning()
     {
-        public virtual void Clear()
-        {
-            throw new NotImplementedException();
-        }
+        var factory = new Mock<IOptionsFactory<object>>();
+        factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(() => new object());
+        var context = new AmbientTenantContext<TenantInfo>();
+        var manager = new MultiTenantOptionsManager<object>(factory.Object,
+            new MultiTenantOptionsCache<object>(context));
 
-        public virtual TOptions GetOrAdd(string? name, Func<TOptions> createOptions)
-        {
-            throw new NotImplementedException();
-        }
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" };
+        var tenant1First = manager.Value;
+        var tenant1Second = manager.Value;
 
-        public virtual bool TryAdd(string? name, TOptions options)
-        {
-            throw new NotImplementedException();
-        }
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo { Id = "tenant-2", Identifier = "tenant-2" };
+        var tenant2First = manager.Value;
+        var tenant2Second = manager.Value;
 
-        public virtual bool TryRemove(string? name)
-        {
-            throw new NotImplementedException();
-        }
+        Assert.Same(tenant1First, tenant1Second);
+        Assert.Same(tenant2First, tenant2Second);
+        Assert.NotSame(tenant1First, tenant2First);
+        factory.Verify(f => f.Create(It.IsAny<string>()), Times.Exactly(2));
+    }
+
+    private static AmbientTenantContext<TenantInfo> BuildTenantContext(string tenantId)
+    {
+        var context = new AmbientTenantContext<TenantInfo>();
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo { Id = tenantId, Identifier = tenantId };
+        return context;
     }
 }
