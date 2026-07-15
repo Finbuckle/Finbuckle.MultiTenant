@@ -55,7 +55,7 @@ app.Run();
 > read per-tenant options or services.
 
 If `UseRouting()` is explicitly called in the pipeline it must come **before** `UseMultiTenant()` when
-using the [Route Strategy](#route-strategy).
+using the [Route Strategy](Strategies#route-strategy).
 
 ## ASP.NET Core Strategies
 
@@ -292,4 +292,3 @@ MultiTenant has dedicated support for data isolation when using ASP.NET Core Ide
 including multi-tenant identity context base classes and support for passkeys (WebAuthn).
 
 See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
-

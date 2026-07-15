@@ -123,7 +123,7 @@
 * Identity entity types are all multi-tenant by default on `MultiTenantIdentityDbContext` variants. ([4e1bd9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4e1bd9faf111344499fcf4feb0eee1636737eef7))
 * immutable IMultiTenantContext ([#1018](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1018)) ([03ddeb0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/03ddeb067654c23e3747f7d2c90b33f7ca0ceeb9))
 * improve folder structure ([#1040](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1040)) ([d46ce8c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d46ce8c9fb6e6b1cc30c09f6fd4fbb05e076a0bc))
-* improved depedency structure with `Finbuckle.MultiTenant.Abstractions` and `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` ([#1006](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1006)) ([e191d83](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e191d83dfe2b161aeafcf08bcca5978d23bcd783))
+* improved dependency structure with `Finbuckle.MultiTenant.Abstractions` and `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` ([#1006](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1006)) ([e191d83](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e191d83dfe2b161aeafcf08bcca5978d23bcd783))
 * improved store interface ([#1020](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1020)) ([c6a16c4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c6a16c44880ac1edcf5b7c09da9986091efe3a52))
 * improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([fdd59b9](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fdd59b980d9209296d7e4af6a3bb73211e9aa91c))
 * improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([8ee6597](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/8ee65977088989cfb16936fbd70999789cca9d90))
@@ -484,7 +484,7 @@
 
 ### Bug Fixes
 
-* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* change delegate strategy func return type as nullable and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
 * remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)

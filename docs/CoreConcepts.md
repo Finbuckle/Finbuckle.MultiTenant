@@ -5,8 +5,8 @@ However, there are a few important specifics to be aware of. The items below mak
 
 ## `ITenantInfo` and `TenantInfo`
 
-A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context an
-app. These instances' type must implement `ITenantInfo` which defines properties
+A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context of
+an app. The type of these instances must implement `ITenantInfo`, which defines properties
 for `Id` and `Identifier`. `TenantInfo` is a basic implementation provided by the library which also includes a `Name` property.
 
 When calling `AddMultiTenant<TTenantInfo>` the type passed into the
@@ -34,7 +34,7 @@ The `MultiTenantContext<TTenantInfo>` contains information about the current ten
 * Includes `TenantInfo`, `StrategyInfo`, and `StoreInfo` properties with details on the current tenant, how it was
   determined, and from where its information was retrieved.
 * The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
-* Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext()` method on the current request's `HttpContext`
+* Can be obtained in ASP.NET Core by calling the `GetMultiTenantContext<TTenantInfo>()` method on the current request's `HttpContext`
   object. See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.
 * A custom implementation can be defined for advanced use cases.

@@ -65,7 +65,7 @@ access to the options values. A service provider instance can also provide acces
 
 ```csharp
 // access options via dependency injection in a class constructor
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
     
@@ -77,15 +77,25 @@ public MyController : Controller
 }
 
 // or with a service provider
-httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>>();
+var options = httpContext.RequestServices.GetRequiredService<IOptionsSnapshot<MyOptions>>().Value;
 ```
 
 With standard options each tenant would see the same exact options.
 
 ## Customizing Options Per Tenant
 
-This section assumes a standard web application builder is configured and MultiTenant is configured with
-a `TTenantInfo` type of `TenantInfo`.
+This section assumes a standard web application builder is configured and MultiTenant is configured with a custom
+`TTenantInfo` type that derives from `TenantInfo`:
+
+```csharp
+using Finbuckle.MultiTenant.Abstractions;
+
+public class AppTenantInfo : TenantInfo
+{
+    public int Option1Value { get; set; }
+    public int Option2Value { get; set; }
+}
+```
 See [Getting Started](GettingStarted) for details.
 
 Make sure your project references the `Finbuckle.MultiTenant` package.
@@ -98,56 +108,56 @@ runtime the delegate will be called with the current tenant details.
 using Finbuckle.MultiTenant.Extensions;
 
 // configure options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // or configure named options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, AppTenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // ConfigureAll options variant
-builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigureAllPerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // can also configure post options, named post options, and all post options variants
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, AppTenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigureAllPerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 ```
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
 ```csharp
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
 
     public MyController(IOptionsMonitor<MyOptions> optionsAccessor)
     {
-        // _myOptions.MyOptions1 and .MyOptions2 will be specific to the current tenant.
+        // _myOptions.Option1 and .Option2 will be specific to the current tenant.
         _myOptions = optionsAccessor.Value;
     }
 }
@@ -165,7 +175,7 @@ normally supports up to five dependencies, MultiTenant support only supports fou
 ```csharp
 // use OptionsBuilder API to configure per-tenant options with dependencies
 builder.Services.AddOptions<MyOptions>("optionalName")
-    .ConfigurePerTenant<ExampleService, TenantInfo>(
+    .ConfigurePerTenant<ExampleService, AppTenantInfo>(
         (options, es, tenantInfo) =>
             options.Property = DoSomethingWith(es, tenantInfo));
 ```
@@ -188,14 +198,14 @@ In some situations cached options may need to be cleared so that the options can
 
 When using per-tenant options via `IOptions<TOptions>` and `IOptionsSnapshot<TOptions>` the injected instance is of
 type `MultiTenantOptionsManager<TOptions>`. Casting to this type exposes the `Reset()` method which clears any internal
-caching for the current tenant and cause the options to be regenerated when next accessed via `Value`
+caching for the current tenant and causes the options to be regenerated when next accessed via `Value`
 or `Get(string name)`.
 
 When using per-tenant options with `IOptionsMonitor<TOptions>` each injected instance uses a shared persistent cache.
-This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>` which has
-a `Clear()` method that will clear the cache for the current tenant. Casting the `IOptionsMonitorCache<TOptions>`
-instance to `MultiTenantOptionsCache<TOptions>` exposes the `Clear(string tenantId)` and `ClearAll()`
-methods. `Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
+This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>`. The standard
+interface does not expose a method to clear the cache for the current tenant; casting it to
+`MultiTenantOptionsCache<TOptions>` exposes the `Clear()`, `Clear(string tenantId)`, and `ClearAll()` methods.
+`Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
 the parameter is empty or null). `ClearAll()` clears all cached options (including regular non per-tenant options).
 
 When an `IOptionsMonitor<TOptions>` change token fires, the named option associated with that token is removed from

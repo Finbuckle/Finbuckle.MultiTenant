@@ -18,7 +18,7 @@ The examples in this documentation use the `TenantInfo` basic implementation.
 ## IMultiTenantStore and Custom Stores
 
 If the provided MultiTenant stores are not suitable then a custom store can be created by
-implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter`TTenantInfo` to match the type
+implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter `TTenantInfo` to match the type
 parameter passed to `AddMultiTenant<TTenantInfo>` at compile time. The interface defines `AddAsync`, `UpdateAsync`,
 `RemoveAsync`, `GetByIdentifierAsync`, `GetAsync`, and `GetAllAsync` methods. `GetByIdentifierAsync`
 and `GetAsync` should return null if there is no suitable tenant match.
@@ -198,16 +198,16 @@ Make sure the tenant info type will support basic JSON serialization and deseria
 This strategy will attempt to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
-For a successful request, the store expects a 200 response code and a json body with properties `Id`, `Identifier`
-, `Name`, and other properties which will be mapped into a `TenantInfo` object with the type
+For a successful request, the store expects a 2xx response code and a JSON body with properties `Id`, `Identifier`,
+`Name`, and other properties which will be mapped into a `TenantInfo` object with the type
 passed to `AddMultiTenant<TTenantInfo>`.
 
-Any non-200 response code results in a null `TenantInfo`.
+Any non-2xx response code results in a null `TenantInfo`.
 
 This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
 a `NotImplementedException`.
 
-Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo>` uri template string must be passed to the
+Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo>`. A URI template string must be passed to the
 method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri template. If the template
 provided does not contain `{__tenant__}`, the identifier is appended to the template. An overload
 of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`:

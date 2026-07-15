@@ -161,11 +161,13 @@ builder.Services.AddMultiTenant<TenantInfo>()
 > - **Relative URLs**: Any relative URLs in your app (e.g. links, form actions) will be affected by the adjusted `PathBase`.
 > - **Tilde slash (`~/`) URLs**: ASP.NET Core's `~/` path resolution uses the `PathBase`, so `~/images/logo.png` will 
 >   resolve to `/mytenant/images/logo.png` instead of `/images/logo.png`. 
-> - **Static File Middleware**: If using the static file middleware, in these cases it will need to come after
->   `UseMultiTenant` in your pipeline to serve the files correctly. The template projects use these types of URLs extensively in layouts and views, i.e. for CSS and JavaScript references.
+> - **Static File Middleware**: If you use relative or tilde-slash URLs with the rebased paths, place the static file
+>   middleware after `UseMultiTenant` so it sees the adjusted `Path`. The template projects use these types of URLs
+>   extensively in layouts and views, for example for CSS and JavaScript references.
 > 
 > **Recommendations**:
-> - For resources such as css and images use absolute paths (e.g., `/images/logo.png`) and use the static file middleware before `UseMultiTenant`.
+> - For tenant-independent resources using root-absolute paths (e.g., `/images/logo.png`), place the static file
+>   middleware before `UseMultiTenant` so those paths are served without tenant resolution.
 > - Consider using the `RouteStrategy` instead of the `BasePathStrategy` if these implications are problematic for your app.
 >
 > **Note**: APIs are not affected by these implications since they typically do not use relative URLs.

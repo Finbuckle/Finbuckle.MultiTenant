@@ -32,7 +32,7 @@ The following happens when `WithPerTenantAuthentication()` is called:
 - Cookie sign-in events are modified to add a tenant claim during sign-in. Existing
   sign-in events are preserved.
 - Cookie validation events are modified to validate that a tenant claim exists
-  which matches the current requests tenant. Existing validation events are
+  which matches the current request's tenant. Existing validation events are
   preserved.
 
 The following also happens if the `TenantInfo` derived class has the appropriate property:
@@ -76,10 +76,27 @@ will be replaced with the identifier for each specific tenant. For example, a
 `CookieLoginPath` of "/\_\_tenant\_\_/Identity/Account/Login" will result in
 "/initech/Identity/Account/Login" for the Initech tenant.
 
-The code setup is straight-forward:
+The code setup is straightforward:
 
 ```csharp
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+
+public class AppTenantInfo : TenantInfo
+{
+    public string? ChallengeScheme { get; set; }
+    public string? CookieLoginPath { get; set; }
+    public string? CookieLogoutPath { get; set; }
+    public string? CookieAccessDeniedPath { get; set; }
+    public string? OpenIdConnectAuthority { get; set; }
+    public string? OpenIdConnectClientId { get; set; }
+    public string? OpenIdConnectClientSecret { get; set; }
+    public string? JwtAuthority { get; set; }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,7 +108,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        .AddOpenIdConnect();
 
 // add MultiTenant services
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
        .WithRouteStrategy()
        .WithConfigurationStore()
        .WithPerTenantAuthentication();
@@ -160,7 +177,7 @@ different recognized authority for token validation we can add a field to the
 configurations:
 
 ```csharp 
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -169,7 +186,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 // Note the default JwtBearer authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
-builder.Services.ConfigurePerTenant<JwtBearerOptions, TenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options, 
+builder.Services.ConfigurePerTenant<JwtBearerOptions, AppTenantInfo>(JwtBearerDefaults.AuthenticationScheme, (options,
 tenantInfo) =>
     {
         // assume tenants are configured with an authority string to use here.
@@ -188,7 +205,7 @@ existing tenant sign-ins when switching between requests on the same browser or
 agent because new sign-ins are not replacing the existing cookie:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -197,7 +214,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 // Note the default cookie authentication scheme is used for the options name per ASP.NET Core defaults,
 // but you can use a custom authentication scheme name to scope the options or use ConfigureAllPerTenant
 // to impact all authentication schemes.
-builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, TenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, AppTenantInfo>(CookieAuthenticationDefaults.AuthenticationScheme, (options, tenantInfo) =>
   {
     options.Cookie.Name = $"SignInCookie-{tenantInfo.Identifier}";
   });

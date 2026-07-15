@@ -63,7 +63,7 @@ See [Strategies](Strategies) for more information.
 
 `.WithConfigurationStore()`
 
-This line tells the app that information for all tenants are in the `appsettings.json` file used for app configuration.
+This line tells the app that information for all tenants is in the `appsettings.json` file used for app configuration.
 If a tenant in the store has the identifier found by the strategy, the tenant will be successfully resolved for the
 current request.
 
