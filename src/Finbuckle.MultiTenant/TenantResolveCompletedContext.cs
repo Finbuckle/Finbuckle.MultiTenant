@@ -10,9 +10,24 @@ public record TenantResolveCompletedContext<TTenantInfo>
     where TTenantInfo : ITenantInfo
 {
     /// <summary>
-    /// The resolved <see cref="MultiTenantContext{TTenantInfo}"/>.
+    /// The resolved tenant information, or <see langword="null"/> if no tenant was resolved.
     /// </summary>
-    public required MultiTenantContext<TTenantInfo> MultiTenantContext { get; set; }
+    public TTenantInfo? TenantInfo { get; set; }
+
+    /// <summary>
+    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that resolved the tenant, if resolved by the primary store.
+    /// </summary>
+    public IMultiTenantStore<TTenantInfo>? Store { get; init; }
+
+    /// <summary>
+    /// The <see cref="IMultiTenantStoreCache{TTenantInfo}"/> instance that resolved the tenant, if resolved by a cache.
+    /// </summary>
+    public IMultiTenantStoreCache<TTenantInfo>? Cache { get; init; }
+
+    /// <summary>
+    /// The <see cref="IMultiTenantStrategy"/> instance that resolved the tenant, if a tenant was resolved.
+    /// </summary>
+    public IMultiTenantStrategy? Strategy { get; init; }
 
     /// <summary>
     /// The context used to resolve the tenant.
@@ -22,5 +37,5 @@ public record TenantResolveCompletedContext<TTenantInfo>
     /// <summary>
     /// Returns true if a tenant was resolved.
     /// </summary>
-    public bool IsResolved => MultiTenantContext.IsResolved;
+    public bool IsResolved => TenantInfo is not null;
 }

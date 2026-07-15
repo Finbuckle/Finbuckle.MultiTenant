@@ -19,13 +19,19 @@ public class MultiTenantEvents<TTenantInfo>
         context => Task.CompletedTask;
 
     /// <summary>
-    /// Called after each <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to advance to the next store.
+    /// Called after each <see cref="IMultiTenantStoreCache{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to advance to the next cache or store.
+    /// </summary>
+    public Func<StoreCacheResolveCompletedContext<TTenantInfo>, Task> OnStoreCacheResolveCompleted { get; set; } =
+        context => Task.CompletedTask;
+
+    /// <summary>
+    /// Called after the primary <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to continue tenant resolution.
     /// </summary>
     public Func<StoreResolveCompletedContext<TTenantInfo>, Task> OnStoreResolveCompleted { get; set; } =
         context => Task.CompletedTask;
 
     /// <summary>
-    /// Called after tenant resolution has completed for all strategies and stores. The resulting <see cref="MultiTenantContext{TTenantInfo}"/> can be modified if desired.
+    /// Called after tenant resolution has completed for all strategies and stores. The resulting tenant information can be modified if desired.
     /// </summary>
     public Func<TenantResolveCompletedContext<TTenantInfo>, Task> OnTenantResolveCompleted { get; set; } =
         context => Task.CompletedTask;

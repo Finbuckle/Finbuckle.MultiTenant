@@ -16,19 +16,18 @@ public class MultiTenantOptionsCache<
     : IOptionsMonitorCache<TOptions>
     where TOptions : class
 {
-    private readonly IMultiTenantContextAccessor multiTenantContextAccessor;
+    private readonly ITenantContext tenantContext;
 
     private readonly ConcurrentDictionary<string, OptionsCache<TOptions>> map = new();
 
     /// <summary>
     /// Constructs a new instance of MultiTenantOptionsCache.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The multi-tenant context accessor.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="multiTenantContextAccessor"/> is null.</exception>
-    public MultiTenantOptionsCache(IMultiTenantContextAccessor multiTenantContextAccessor)
+    /// <param name="tenantContext">The tenant context.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="tenantContext"/> is null.</exception>
+    public MultiTenantOptionsCache(ITenantContext tenantContext)
     {
-        this.multiTenantContextAccessor = multiTenantContextAccessor ??
-                                          throw new ArgumentNullException(nameof(multiTenantContextAccessor));
+        this.tenantContext = tenantContext ?? throw new ArgumentNullException(nameof(tenantContext));
     }
 
     /// <summary>
@@ -36,7 +35,7 @@ public class MultiTenantOptionsCache<
     /// </summary>
     public void Clear()
     {
-        var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo?.Id ?? "";
         map.TryRemove(tenantId, out _);
     }
 
@@ -65,7 +64,7 @@ public class MultiTenantOptionsCache<
         ArgumentNullException.ThrowIfNull(createOptions);
 
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
-        var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, static _ => new OptionsCache<TOptions>());
 
         return cache.GetOrAdd(name, createOptions);
@@ -81,7 +80,7 @@ public class MultiTenantOptionsCache<
     {
         ArgumentNullException.ThrowIfNull(options);
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
-        var tenantId = multiTenantContextAccessor.MultiTenantContext?.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo?.Id ?? "";
         var cache = map.GetOrAdd(tenantId, static _ => new OptionsCache<TOptions>());
 
         return cache.TryAdd(name, options);
