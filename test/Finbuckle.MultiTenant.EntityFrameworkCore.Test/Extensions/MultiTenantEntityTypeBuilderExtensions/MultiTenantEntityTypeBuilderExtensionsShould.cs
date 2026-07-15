@@ -75,11 +75,13 @@ public class MultiTenantEntityTypeBuilderExtensionsShould
                 .IsUnique();
             builder.Entity<Blog>()
                 .HasIndex(e => e.Url, nameof(Blog.Url))
-                .HasDatabaseName(nameof(Blog.Url) + "DbName");
+                .HasDatabaseName(nameof(Blog.Url) + "DbName"); // non-unique
             builder.Entity<Blog>().IsMultiTenant().AdjustIndexes();
         });
-        var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
+        // AdjustIndexes adjusts ALL indexes (unique and non-unique), not only unique ones
+        var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().ToList();
+        Assert.NotEmpty(indexes!);
         foreach (var index in indexes!)
         {
             Assert.Contains("TenantId", index.Properties.Select(p => p.Name));

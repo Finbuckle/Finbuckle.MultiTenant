@@ -11,17 +11,15 @@ public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext
     public DbSet<Blog>? Blogs { get; set; }
     public DbSet<Post>? Posts { get; set; }
 
-    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(multiTenantContextAccessor)
+    public TestBlogDbContext()
     {
     }
 
-    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions options) : base(
-        multiTenantContextAccessor, options)
+    public TestBlogDbContext(DbContextOptions options) : base(options)
     {
     }
 
-    public TestBlogDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, object dependency) : base(
-        multiTenantContextAccessor)
+    public TestBlogDbContext(object dependency)
     {
     }
 }
