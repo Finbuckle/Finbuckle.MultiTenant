@@ -13,49 +13,64 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
     /// Try to add the TTenantInfo to the store.
     /// </summary>
     /// <param name="tenantInfo">New TTenantInfo instance to add.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if successfully added</returns>
-    Task<bool> AddAsync(TTenantInfo tenantInfo);
+    Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Try to update the TTenantInfo in the store.
     /// </summary>
     /// <param name="tenantInfo">Existing TTenantInfo instance to update.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if successfully updated.</returns>
-    Task<bool> UpdateAsync(TTenantInfo tenantInfo);
+    Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Try to remove the TTenantInfo from the store.
+    /// Try to remove the TTenantInfo from the store by tenant Id.
+    /// </summary>
+    /// <param name="id">TenantId for the tenant to remove.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
+    /// <returns>True if successfully removed.</returns>
+    Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Try to remove the TTenantInfo from the store by identifier.
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to remove.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if successfully removed.</returns>
-    Task<bool> RemoveAsync(string identifier);
+    Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given identifier.
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to retrieve.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    Task<TTenantInfo?> GetByIdentifierAsync(string identifier);
+    Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given tenant Id.
     /// </summary>
     /// <param name="id">TenantId for the tenant to retrieve.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    Task<TTenantInfo?> GetAsync(string id);
+    Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default);
 
 
     /// <summary>
     /// Retrieve all the TTenantInfo's from the store.
     /// </summary>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>An IEnumerable of all tenants in the store.</returns>
-    Task<IEnumerable<TTenantInfo>> GetAllAsync();
+    Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieve a subset of the TTenantInfo's from the store.
     /// </summary>
     /// <param name="take">Number of elements to take from the list.</param>
     /// <param name="skip">Number of elements to skip from the list.</param>
+    /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>An IEnumerable of applicable tenants in the store.</returns>
-    Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip);
+    Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default);
 }
