@@ -7,12 +7,12 @@ namespace Finbuckle.MultiTenant.AspNetCore.Options;
 /// </summary>
 public class ShortCircuitWhenOptions
 {
-    private Func<IMultiTenantContext, bool>? _predicate;
+    private Func<ITenantContext, bool>? _predicate;
 
     /// <summary>
     /// The callback that determines if the endpoint should be short circuited.
     /// </summary>
-    public Func<IMultiTenantContext, bool>? Predicate
+    public Func<ITenantContext, bool>? Predicate
     {
         get { return _predicate; }
         set

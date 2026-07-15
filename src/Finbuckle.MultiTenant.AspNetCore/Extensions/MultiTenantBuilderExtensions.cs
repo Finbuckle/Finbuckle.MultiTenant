@@ -151,7 +151,7 @@ public static class MultiTenantBuilderExtensions
                 if (context.HttpContext.Items.ContainsKey($"{Constants.TenantToken}__bypass_validate_principal__"))
                     return;
 
-                var currentTenant = context.HttpContext.GetMultiTenantContext<TTenantInfo>().TenantInfo?.Identifier;
+                var currentTenant = context.HttpContext.GetTenantContext<TTenantInfo>().TenantInfo?.Identifier;
                 string? authTenant = null;
                 if (context.Properties.Items.TryGetValue(Constants.TenantToken, out var item))
                 {
@@ -306,14 +306,13 @@ public static class MultiTenantBuilderExtensions
             var origOnTenantResolved = options.Events.OnTenantResolveCompleted;
             options.Events.OnTenantResolveCompleted = resolutionCompletedContext =>
             {
-                if (resolutionCompletedContext.MultiTenantContext.StrategyInfo?.StrategyType ==
-                    typeof(BasePathStrategy) &&
+                if (resolutionCompletedContext.Strategy is BasePathStrategy &&
                     resolutionCompletedContext.Context is HttpContext httpContext &&
                     httpContext.RequestServices.GetRequiredService<IOptions<BasePathStrategyOptions>>().Value
                         .RebaseAspNetCorePathBase)
                 {
                     httpContext.Request.Path.StartsWithSegments(
-                        $"/{resolutionCompletedContext.MultiTenantContext.TenantInfo?.Identifier}",
+                        $"/{resolutionCompletedContext.TenantInfo?.Identifier}",
                         out var matched, out var
                             newPath);
                     httpContext.Request.PathBase = httpContext.Request.PathBase.Add(matched);
