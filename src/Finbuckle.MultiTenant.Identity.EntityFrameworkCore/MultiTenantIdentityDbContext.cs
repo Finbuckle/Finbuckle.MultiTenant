@@ -19,14 +19,12 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 public class MultiTenantIdentityDbContext : MultiTenantIdentityDbContext<IdentityUser>
 {
     /// <inheritdoc />
-    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
-        multiTenantContextAccessor)
+    public MultiTenantIdentityDbContext()
     {
     }
 
     /// <inheritdoc />
-    public MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
-        DbContextOptions options) : base(multiTenantContextAccessor, options)
+    public MultiTenantIdentityDbContext(DbContextOptions options) : base(options)
     {
     }
 }
@@ -42,14 +40,12 @@ public class MultiTenantIdentityDbContext<TUser> : MultiTenantIdentityDbContext<
     where TUser : IdentityUser
 {
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
-        multiTenantContextAccessor)
+    protected MultiTenantIdentityDbContext()
     {
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
-        DbContextOptions options) : base(multiTenantContextAccessor, options)
+    protected MultiTenantIdentityDbContext(DbContextOptions options) : base(options)
     {
     }
 }
@@ -71,14 +67,12 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey> : MultiTe
     where TKey : IEquatable<TKey>
 {
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor) : base(
-        multiTenantContextAccessor)
+    protected MultiTenantIdentityDbContext()
     {
     }
 
     /// <inheritdoc />
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
-        DbContextOptions options) : base(multiTenantContextAccessor, options)
+    protected MultiTenantIdentityDbContext(DbContextOptions options) : base(options)
     {
     }
 }
@@ -113,7 +107,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TKey : IEquatable<TKey>
 {
     /// <inheritdoc />
-    public ITenantInfo? TenantInfo { get; }
+    public ITenantInfo? TenantInfo { get; set; }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;
@@ -122,23 +116,18 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     public TenantNotSetMode TenantNotSetMode { get; set; } = TenantNotSetMode.Throw;
 
     /// <summary>
-    /// Constructs the database context instance and binds to the current tenant.
+    /// Constructs the database context instance.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor)
+    protected MultiTenantIdentityDbContext()
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
 
     /// <summary>
-    /// Constructs the database context instance and binds to the current tenant.
+    /// Constructs the database context instance with the provided options.
     /// </summary>
-    /// <param name="multiTenantContextAccessor">The <see cref="IMultiTenantContextAccessor"/> instance used to bind the context instance to a tenant.</param>
     /// <param name="options">The <see cref="DbContextOptions"/> instance.</param>
-    protected MultiTenantIdentityDbContext(IMultiTenantContextAccessor multiTenantContextAccessor,
-        DbContextOptions options) : base(options)
+    protected MultiTenantIdentityDbContext(DbContextOptions options) : base(options)
     {
-        TenantInfo = multiTenantContextAccessor.MultiTenantContext.TenantInfo;
     }
 
     /// <inheritdoc />
