@@ -1,3 +1,4 @@
+using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using IdentitySampleApp.Data;
@@ -28,10 +29,9 @@ public abstract class SampleHelper
     /// </summary>
     public static void SeedIdentity(WebApplication app)
     {
-        var stores = app.Services.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
-        var mtcs = app.Services.GetRequiredService<IMultiTenantContextSetter>();
+        var tenantManager = app.Services.GetRequiredService<TenantManager<AppTenantInfo>>();
 
-        foreach (var tenant in stores.GetAllAsync().Result)
+        foreach (var tenant in tenantManager.GetAllAsync().Result)
         {
             using var scope = app.Services.CreateScope();
             using var db = MultiTenantDbContext.Create<AppIdentityDbContext, AppTenantInfo>(tenant, scope.ServiceProvider);
