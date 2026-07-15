@@ -3,44 +3,26 @@
 
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Stores;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Moq;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores;
 
 public class InMemoryStoreShould : MultiTenantStoreTestBase
 {
-    private async Task<IMultiTenantStore<TenantInfo>> CreateCaseSensitiveTestStore()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(o => o.IsCaseSensitive = true);
-        var sp = services.BuildServiceProvider();
-
-        var store = new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>());
-
-        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
-        var ti2 = new TenantInfo { Id = "lol", Identifier = "lol", Name = "lol" };
-        await store.AddAsync(ti1);
-        await store.AddAsync(ti2);
-
-        return store;
-    }
-
     [Fact]
-    public async Task GetTenantInfoFromStoreCaseInsensitiveByDefault()
+    public async Task GetTenantInfoFromStoreCaseInsensitive()
     {
         var store = await CreateTestStore();
         Assert.Equal("initech", (await store.GetByIdentifierAsync("iNitEch"))?.Identifier);
     }
 
     [Fact]
-    public async Task GetTenantInfoFromStoreCaseSensitive()
+    public async Task FailIfAddingDuplicateIdentifierIgnoringCase()
     {
-        var store = await CreateCaseSensitiveTestStore();
-        Assert.Equal("initech", (await store.GetByIdentifierAsync("initech"))?.Identifier);
-        Assert.Null(await store.GetByIdentifierAsync("iNitEch"));
+        var store = await CreateTestStore();
+
+        Assert.False(await store.AddAsync(new TenantInfo { Id = "other-id", Identifier = "INITECH" }));
+        Assert.Equal("initech-id", (await store.GetByIdentifierAsync("initech"))?.Id);
     }
 
     [Fact]
@@ -55,48 +37,12 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     }
 
     [Fact]
-    public async Task RejectIdentifierCollisionWhenUpdatingTenant()
+    public async Task FailIfAddingDuplicateId()
     {
         var store = await CreateTestStore();
 
-        Assert.False(await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "lol" }));
-        Assert.Equal("initech", (await store.GetAsync("initech-id"))?.Identifier);
-        Assert.Equal("lol-id", (await store.GetByIdentifierAsync("lol"))?.Id);
-    }
-
-    [Fact]
-    public async Task MoveCaseOnlyIdentifierWhenCaseSensitive()
-    {
-        var store = await CreateCaseSensitiveTestStore();
-
-        Assert.True(await store.UpdateAsync(new TenantInfo { Id = "initech", Identifier = "INITECH" }));
-        Assert.Null(await store.GetByIdentifierAsync("initech"));
-        Assert.Equal("INITECH", (await store.GetByIdentifierAsync("INITECH"))?.Identifier);
-    }
-
-    [Fact]
-    public async Task FailIfAddingDuplicateCaseSensitive()
-    {
-        var store = await CreateCaseSensitiveTestStore();
-        var ti1 = new TenantInfo { Id = "initech", Identifier = "initech", Name = "initech" };
-        var ti2 = new TenantInfo { Id = "iNiTEch", Identifier = "iNiTEch", Name = "Initech" };
-        Assert.False(await store.AddAsync(ti1));
-        Assert.True(await store.AddAsync(ti2));
-    }
-
-    [Fact]
-    public void ThrowIfDuplicateIdentifierInOptionsTenants()
-    {
-        var services = new ServiceCollection();
-        services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
-        {
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
-            options.Tenants.Add(new TenantInfo { Id = "lol", Identifier = "lol", Name = "LOL" });
-        });
-        var sp = services.BuildServiceProvider();
-
-        Assert.Throws<MultiTenantException>(() =>
-            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        Assert.False(await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "other" }));
+        Assert.Null(await store.GetByIdentifierAsync("other"));
     }
 
     [Theory]
@@ -107,31 +53,61 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     [InlineData("a", null)]
     [InlineData("", "a")]
     [InlineData(null, "a")]
-    public void ThrowIfMissingIdOrIdentifierInOptionsTenants(string? id, string? identifier)
+    public async Task ThrowIfAddingTenantWithMissingIdOrIdentifier(string? id, string? identifier)
     {
-        var services = new ServiceCollection();
-        services.AddOptions().Configure<InMemoryStoreOptions<TenantInfo>>(options =>
-        {
-            options.Tenants.Add(new TenantInfo { Id = id!, Identifier = identifier!, Name = "LOL" });
-        });
-        var sp = services.BuildServiceProvider();
+        var store = new InMemoryStore<TenantInfo>();
 
-        Assert.Throws<MultiTenantException>(() =>
-            new InMemoryStore<TenantInfo>(sp.GetRequiredService<IOptions<InMemoryStoreOptions<TenantInfo>>>()));
+        await Assert.ThrowsAsync<MultiTenantException>(() =>
+            store.AddAsync(new TenantInfo { Id = id!, Identifier = identifier! }));
+    }
+
+    [Fact]
+    public async Task NotUpdateIfNewIdentifierAlreadyExists()
+    {
+        var store = await CreateTestStore();
+
+        Assert.False(await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "lol" }));
+        Assert.Equal("initech", (await store.GetAsync("initech-id"))?.Identifier);
+        Assert.Equal("lol-id", (await store.GetByIdentifierAsync("lol"))?.Id);
+    }
+
+    [Fact]
+    public async Task ReturnFalseIfUpdatingMissingTenant()
+    {
+        var store = await CreateTestStore();
+
+        Assert.False(await store.UpdateAsync(new TenantInfo { Id = "missing", Identifier = "missing" }));
+    }
+
+    [Fact]
+    public async Task AllowCaseOnlyIdentifierUpdateWhenCaseInsensitive()
+    {
+        var store = await CreateTestStore();
+
+        Assert.True(await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "INITECH" }));
+        Assert.Equal("INITECH", (await store.GetByIdentifierAsync("initech"))?.Identifier);
+    }
+
+    [Fact]
+    public async Task KeepIdLookupAvailableDuringConcurrentIdentifierUpdates()
+    {
+        var store = await CreateTestStore();
+        var updates = Enumerable.Range(0, 100)
+            .Select(i => Task.Run(async () =>
+            {
+                var identifier = i % 2 == 0 ? "initech" : "initech2";
+                await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = identifier });
+                Assert.NotNull(await store.GetAsync("initech-id"));
+            }));
+
+        await Task.WhenAll(updates);
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
     {
-        var optionsMock = new Mock<IOptions<InMemoryStoreOptions<TenantInfo>>>();
-        var options = new InMemoryStoreOptions<TenantInfo>
-        {
-            IsCaseSensitive = false,
-            Tenants = new List<TenantInfo>()
-        };
-        optionsMock.Setup(o => o.Value).Returns(options);
-        var store = new InMemoryStore<TenantInfo>(optionsMock.Object);
+        var store = new InMemoryStore<TenantInfo>();
 
         return await PopulateTestStore(store);
     }
