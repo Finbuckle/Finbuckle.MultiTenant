@@ -11,10 +11,9 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
     public DbSet<Blog>? Blogs { get; set; }
     public DbSet<Post>? Posts { get; set; }
 
-    public TestDbContext(TenantInfo tenantInfo,
-        DbContextOptions options) :
-        base(new StaticMultiTenantContextAccessor<TenantInfo>(tenantInfo), options)
+    public TestDbContext(TenantInfo tenantInfo, DbContextOptions options) : base(options)
     {
+        TenantInfo = tenantInfo;
     }
 }
 
