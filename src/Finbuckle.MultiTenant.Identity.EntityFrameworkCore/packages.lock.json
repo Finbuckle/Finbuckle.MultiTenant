@@ -217,7 +217,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[10.1.1, )",
+          "Finbuckle.MultiTenant.Abstractions": "[10.1.2, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.0.10, )",
           "Microsoft.Extensions.Configuration": "[10.0.10, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.10, )",
@@ -233,7 +233,7 @@
       "finbuckle.multitenant.entityframeworkcore": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant": "[10.1.1, )",
+          "Finbuckle.MultiTenant": "[10.1.2, )",
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
         }
       }
