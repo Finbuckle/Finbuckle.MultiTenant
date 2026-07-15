@@ -52,7 +52,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> AddAsync(TTenantInfo tenantInfo)
+    public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -61,31 +61,32 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<TTenantInfo?> GetAsync(string id)
+    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
     /// <exception cref="NotImplementedException">When a not-found (404) status code is encountered</exception>
-    public async Task<IEnumerable<TTenantInfo>> GetAllAsync()
+    public async Task<IEnumerable<TTenantInfo>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _client.GetAllAsync(endpointTemplate).ConfigureAwait(false);
+        return await _client.GetAllAsync(endpointTemplate, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip)
+    public Task<IEnumerable<TTenantInfo>> GetAllAsync(int take, int skip, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier)
+    public async Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
     {
-        var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier).ConfigureAwait(false);
+        var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier, cancellationToken)
+            .ConfigureAwait(false);
         return result;
     }
 
@@ -93,7 +94,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string identifier)
+    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -102,7 +103,16 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> UpdateAsync(TTenantInfo tenantInfo)
+    public Task<bool> RemoveByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Not implemented in this implementation.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
