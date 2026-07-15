@@ -219,6 +219,7 @@
         "dependencies": {
           "Finbuckle.MultiTenant.Abstractions": "[10.1.2, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.0.10, )",
+          "Microsoft.Extensions.Caching.Memory": "[10.0.10, )",
           "Microsoft.Extensions.Configuration": "[10.0.10, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.10, )",
           "Microsoft.Extensions.Http": "[10.0.10, )",
