@@ -2,7 +2,7 @@
 
 ## Configuration
 
-MultiTenant uses the standard application builder pattern for its configuration. In addition to adding the
+MultiTenant uses the standard application builder pattern. In addition to registering the
 services, configuration for one or more [MultiTenant Stores](Stores) and [MultiTenant Strategies](Strategies) are
 required. A typical configuration for your ASP.NET Core app might look like this:
 
@@ -32,8 +32,8 @@ app.Run();
 
 Use the `AddMultiTenant<TTenantInfo>` extension method on `IServiceCollection` to register the basic dependencies needed
 by the library. It returns a `MultiTenantBuilder<TTenantInfo>` instance on which the methods below can be called for
-further configuration. Each of these methods returns the same `MultiTenantBuilder<TTenantInfo>` instance allowing for
-chaining method calls.
+further configuration. Each method returns the same `MultiTenantBuilder<TTenantInfo>` instance, so calls can be
+chained.
 
 ## Configuring the Service
 
@@ -52,8 +52,8 @@ See [MultiTenant Stores](Stores) for more information on each type.
 
 ### WithStrategy Variants
 
-Adds and configures an `IMultiTenantStrategy` for your app. Multiple strategies can be configured and each will be used
-in the order registered. See [MultiTenant Strategies](Strategies) for more information on each type.
+Adds and configures an `IMultiTenantStrategy` for your app. Multiple strategies can be configured and are tried in
+registration order. See [MultiTenant Strategies](Strategies) for more information on each type.
 
 - `WithStrategy<TStrategy>`
 - `WithBasePathStrategy`
@@ -85,17 +85,16 @@ lets apps customize options distinctly for each tenant. See [Per-Tenant Options]
 
 MultiTenant will perform tenant resolution using the context, strategies, and stores as configured.
 
-The context will depend on the type of app. For an ASP.NET Core web app the context is the `HttpContext` for each
-request and a tenant will be resolved for each request. For other types of apps the context will be different. For
+The context depends on the type of app. For an ASP.NET Core web app, the context is the `HttpContext` and a tenant is
+resolved for each request. For other app types, the context will differ. For
 example, a console app might resolve the tenant once at startup or a background service monitoring a queue might resolve
 the tenant for each message it receives.
 
-Tenant resolution is performed by the `TenantResolver` class. The class requires a list of strategies and a list of
-stores as well as some options. The class will try each strategy generally in the order added, but static and per-tenant
-authentication strategies will run at a lower priority. If a strategy returns a tenant identifier then each store will
-be queried in the order they were added. The first store to return a `TenantInfo`
-object will determine the resolved tenant. If no store returns a `TenantInfo` object then the next strategy will be
-tried and so on. The `UseMultiTenant` middleware for ASP.NET Core uses `TenantResolver`
+Tenant resolution is performed by the `TenantResolver` class. It requires a list of strategies, a list of stores, and
+options. It generally tries strategies in the order added, although static and per-tenant authentication strategies run
+at a lower priority. When a strategy returns a tenant identifier, each store is queried in registration order. The first
+store to return a `TenantInfo` determines the resolved tenant. If no store returns a `TenantInfo`, the resolver tries
+the next strategy. The `UseMultiTenant` middleware for ASP.NET Core uses `TenantResolver`
 internally.
 
 The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>` method with the following properties:
@@ -121,8 +120,8 @@ There are several ways your app can read the current tenant:
 
 `IMultiTenantContextAccessor<TTenantInfo>` (and its non-generic variant `IMultiTenantContextAccessor`) are available
 via dependency injection and behave similarly to `IHttpContextAccessor`. Internally an `AsyncLocal<T>` is used to track
-state. Note that in parent async contexts any changes in tenant will not be reflected — for example, the accessor will
-not reflect a tenant in the post-endpoint processing of ASP.NET Core middleware registered prior to `UseMultiTenant`.
+state. Changes made in a child async context do not flow back to its parent. For example, the accessor will not reflect
+a tenant during post-endpoint processing in ASP.NET Core middleware registered before `UseMultiTenant`.
 Use the `HttpContext` extension `GetMultiTenantContext<TTenantInfo>` to avoid this caveat.
 
 > Prior versions of MultiTenant also exposed `IMultiTenantContext`, `TenantInfo`, and their implementations

@@ -11,8 +11,8 @@ For most ASP.NET Core apps install the `Finbuckle.MultiTenant.AspNetCore` packag
 dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
-This package depends on `Finbuckle.MultiTenant` and transitively brings in everything needed for
-ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp.net-core-strategies).
+This package depends on `Finbuckle.MultiTenant` and includes everything needed for ASP.NET Core integration,
+including [ASP.NET Core-specific strategies](#asp.net-core-strategies).
 
 ## Configuring the Middleware
 
@@ -103,7 +103,7 @@ For most cases the middleware sets the `TenantInfo` automatically and this metho
 explicitly overriding the `TenantInfo` set by the middleware.
 
 Sets the current tenant to the provided `TenantInfo`. Optionally resets the service provider scope so that
-any scoped services already resolved will be resolved again under the current tenant. This has no effect on
+any scoped services that have already been resolved will be resolved again under the current tenant. This has no effect on
 singleton or transient services. Setting the `TenantInfo` with this method sets both the `StoreInfo` and
 `StrategyInfo` properties on the `MultiTenantContext<TTenantInfo>` to `null`.
 
@@ -247,7 +247,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
     {
-        config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+        config.Predicate = context => context.StrategyInfo?.Strategy is IMyCustomObsoleteStrategy || !context.IsResolved;
     });
 
 // Including a redirect.
@@ -256,7 +256,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
     {
-        config.Predicate = context => context.StrategyInfo is IMyCustomObsoleteStrategy || !context.IsResolved;
+        config.Predicate = context => context.StrategyInfo?.Strategy is IMyCustomObsoleteStrategy || !context.IsResolved;
         config.RedirectTo = new Uri("/tenant/notfound", UriKind.Relative);
     });
 ```

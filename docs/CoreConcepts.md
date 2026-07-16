@@ -1,24 +1,24 @@
 # Core Concepts
 
-The library uses standard .NET Core conventions and most of the internal details are abstracted away from app code.
+The library uses standard .NET conventions, and most internal details are abstracted away from app code.
 However, there are a few important specifics to be aware of. The items below make up the foundation of the library.
 
 ## `ITenantInfo` and `TenantInfo`
 
-A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context of
-an app. The type of these instances must implement `ITenantInfo`, which defines properties
-for `Id` and `Identifier`. `TenantInfo` is a basic implementation provided by the library which also includes a `Name` property.
+A `TenantInfo` instance contains information about a tenant, often the current tenant for an app. The type must implement
+`ITenantInfo`, which defines `Id` and `Identifier`. The library provides `TenantInfo`, a basic implementation that also
+includes `Name`.
 
-When calling `AddMultiTenant<TTenantInfo>` the type passed into the
-type parameter defines the `ITenantInfo` implementation used throughout the library and app.
+When calling `AddMultiTenant<TTenantInfo>`, the type parameter defines the `ITenantInfo` implementation used throughout
+the library and app.
 
 * `Id` is a unique id for a tenant in your app and should never change.
-* `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for your app (i.e. no
-  crazy symbols in a web app where the identifier will be part of the URL). Unlike `Id`, `Identifier` can be changed if
+* `Identifier` is the value used to resolve a tenant and should use a syntax appropriate for your app (for example, URL-safe
+  characters when it is part of a web address). Unlike `Id`, `Identifier` can be changed if
   necessary.
 
-The library provides `TenantInfo` as a base implementation. Your app can and should define a custom class implementing `ITenantInfo` (or inheriting from `TenantInfo`) and add custom 
-properties as needed. It is recommended to keep these
+The library provides `TenantInfo` as a base implementation. Your app can define a custom class that implements
+`ITenantInfo` or inherits from `TenantInfo`, adding properties as needed. Keep these
 classes lightweight since they are often queried. Keep heavier associated data in an external area that can be pulled in
 when needed via the tenant `Id`.
 

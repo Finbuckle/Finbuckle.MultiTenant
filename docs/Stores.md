@@ -9,8 +9,8 @@ implementing `IMultiTenantStore`.
 
 ## Custom TenantInfo Support
 
-MultiTenant stores support custom `ITenantInfo` implementations, but complex implementations may require special
-handling. For best results ensure the class works well with the underlying store approach—for example, that it can be
+MultiTenant stores support custom `ITenantInfo` implementations, but complex types may require special
+handling. For best results, ensure the type works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
 The examples in this documentation use the `TenantInfo` basic implementation.
@@ -37,7 +37,7 @@ decorates any `IMultiTenantStore<TTenantInfo>` at runtime with a wrapper providi
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithStore<MyStore>(ServiceLifetime.Singleton, myParam1, myParam2)...
 
-// or register a custom store with the non-templated method which accepts a factory method
+// or register a custom store with the non-generic method, which accepts a factory method
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithStore(ServiceLifetime.Singleton, sp => new MyStore())...
 ```
@@ -66,7 +66,7 @@ public MyService(IEnumerable<IMultiTenantStore<TenantInfo>> stores)
 ## Getting All Tenants from Store
 
 If implemented, `GetAllAsync` will return an `IEnumerable<TTenantInfo>` listing of all tenants in the store.
-Currently `InMemoryStore`, `ConfigurationStore`, and `EFCoreStore` implement `GetAllAsync`.
+Currently `InMemoryStore`, `ConfigurationStore`, `EFCoreStore`, and `HttpRemoteStore` implement `GetAllAsync`.
 
 ### Pagination of GetAllAsync
 
@@ -90,14 +90,13 @@ of `WithInMemoryStore` accepts an `Action<InMemoryStoreOptions>` delegate to con
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithInMemoryStore()...
 
-// or make it case sensitive and/or add some tenants.
+// or make it case-sensitive and add tenants.
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithInMemoryStore(options =>
     {
         options.IsCaseSensitive = true;
-        options.Tenants.Add(new TenantInfo{...});
-        options.Tenants.Add(new TenantInfo{...});
-        options.Tenants.Add(new TenantInfo{...});
+        options.Tenants.Add(new TenantInfo { Id = "1", Identifier = "initech" });
+        options.Tenants.Add(new TenantInfo { Id = "2", Identifier = "acme" });
     })...
 ```
 
@@ -134,7 +133,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
 automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
-of `TenantInfo` properties are mapped from the JSON automatically.
+of `TenantInfo`, its properties are mapped from the JSON automatically.
 
 ```json
 {
@@ -188,14 +187,14 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 > NuGet package: Finbuckle.MultiTenant
 
-Sends the tenant identifier, provided by the multitenant strategy, to an http(s) endpoint to get a `TenantInfo` object
+Sends the tenant identifier, provided by the multi-tenant strategy, to an HTTP(S) endpoint to get a `TenantInfo` object
 in return.
 
 This store is usually case-insensitive when retrieving tenant information by tenant identifier, but the remote server
 might be more restrictive.
 
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This strategy will attempt to deserialize the tenant using
+This store attempts to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 For a successful request, the store expects a 2xx response code and a JSON body with properties `Id`, `Identifier`,
@@ -204,11 +203,11 @@ passed to `AddMultiTenant<TTenantInfo>`.
 
 Any non-2xx response code results in a null `TenantInfo`.
 
-This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
-a `NotImplementedException`.
+This store is read-only. `AddAsync`, `GetAsync`, `UpdateAsync`, and `RemoveAsync` throw a
+`NotImplementedException`.
 
 Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo>`. A URI template string must be passed to the
-method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri template. If the template
+method. At runtime the tenant identifier replaces the substring `{__tenant__}` in the URI template. If the template
 provided does not contain `{__tenant__}`, the identifier is appended to the template. An overload
 of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`:
 
@@ -250,7 +249,7 @@ Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/perfor
 mechanism. The distributed cache can use Redis, SQL Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported. The store does not interact with any other stores by default.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This strategy will attempt to deserialize the tenant using
+This store attempts to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 Each tenant info instance is actually stored twice in the cache, once using the Tenant ID as the key and another using
@@ -283,8 +282,8 @@ without any additional settings. It's particularly suited for applications that 
 tenant identification without the need for persistence, such as during testing phases or in environments where tenant
 information is static and predefined elsewhere.
 
-This store is read-only and calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will throw
-a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync` will also throw an Exception.
+This store is read-only. `AddAsync`, `UpdateAsync`, `RemoveAsync`, and `GetAllAsync` throw a
+`NotImplementedException`.
 
 Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
 
