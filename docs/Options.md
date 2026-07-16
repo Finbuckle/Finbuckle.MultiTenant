@@ -3,7 +3,7 @@
 > This functionality is included in the `Finbuckle.MultiTenant` package.
 
 MultiTenant is designed to emphasize using per-tenant options in your app to drive per-tenant behavior. This
-approach allows your app logic to be written without having to add tenant-dependent or tenant-specific logic directly to the code.
+approach lets you write app logic without adding tenant-specific branching directly to the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -100,9 +100,9 @@ See [Getting Started](GettingStarted) for details.
 
 Make sure your project references the `Finbuckle.MultiTenant` package.
 
-To configure options per tenant, the standard `Configure` method variants on the service collection now all
-have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at
-runtime the delegate will be called with the current tenant details.
+To configure options per tenant, the standard `Configure` method variants on the service collection have `PerTenant`
+equivalents that accept an `Action<TOptions, TTenantInfo>` delegate. When options are created at runtime, the delegate
+is called with the current tenant details.
 
 ```csharp
 using Finbuckle.MultiTenant.Extensions;
@@ -177,7 +177,7 @@ normally supports up to five dependencies, MultiTenant support only supports fou
 builder.Services.AddOptions<MyOptions>("optionalName")
     .ConfigurePerTenant<ExampleService, AppTenantInfo>(
         (options, es, tenantInfo) =>
-            options.Property = DoSomethingWith(es, tenantInfo));
+            options.Option1 = DoSomethingWith(es, tenantInfo));
 ```
 
 ## Options and Caching

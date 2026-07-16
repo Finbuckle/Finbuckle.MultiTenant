@@ -21,7 +21,7 @@ from `IdentityDbContext`) and configure Identity to use the derived context.
 If for some reason you do not want an Identity entity to be multi-tenant you can override the behavior by
 calling the `IsNotMultiTenant` extension method in `OnModelCreating` after calling the base class method.
 
-If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the
+If not deriving from `MultiTenantIdentityDbContext`, make sure to implement `IMultiTenantDbContext` and call the
 appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is
 required that base class `OnModelCreating` method is called **before** any multi-tenant extension methods.
 
@@ -114,6 +114,6 @@ Deriving from
 will use all provided parameters. All entity types will be configured as multi-tenant, and `TUserPasskey` is configured
 only when the Identity schema version is set to 3.
 
-When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]`
-attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the
-base class `OnModelCreating`.
+When providing non-default parameters, the `MultiTenantIdentityDbContext` variants configure the supplied Identity
+entity types as multi-tenant by default. Use `[MultiTenant]` or `IsMultiTenant` only when configuring entities outside
+the supplied Identity types.

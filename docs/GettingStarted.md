@@ -15,7 +15,7 @@ dotnet add package Finbuckle.MultiTenant.AspNetCore
 
 ## Basic Configuration
 
-MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant
+MultiTenant is quick to set up. The following sample app uses the subdomain as the tenant
 identifier and the app's [configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) (
 most likely from an `appsettings.json` file) as the source of tenant details.
 
@@ -41,22 +41,22 @@ app.UseMultiTenant();
 app.Run();
 ```
 
-That's all that is needed to get going. Let's break down each line:
+That is all that is needed to get started. Here is what each part does:
 
 `builder.Services.AddMultiTenant<TenantInfo>()`
 
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must implement `ITenantInfo` and holds
-basic information about the tenant such as its id and an identifier. `TenantInfo` is provided as a basic
-implementation class, but any implementation of `ITenantInfo` can be used if more properties are needed.
+The type parameter for `AddMultiTenant<TTenantInfo>` must implement `ITenantInfo`. It holds
+basic tenant information such as an ID and identifier. `TenantInfo` is the provided basic
+implementation, but you can use any `ITenantInfo` implementation when you need additional properties.
 
 See [Core Concepts](CoreConcepts) for more information on `TenantInfo`.
 
 `.WithHostStrategy()`
 
-The line tells the app that our "strategy" to determine the request tenant will be to look at the request host, which
+This tells the app to use the request host as its tenant-resolution strategy, which
 defaults to extracting the subdomain as a tenant identifier.
 
 See [Strategies](Strategies) for more information.
@@ -96,13 +96,13 @@ settings. Be sure to call it before other middleware which will use per-tenant f
 
 ## Basic Usage
 
-With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `MultiTenantContext<TTenantInfo>` object accessed from the `GetMultiTenantContext<TTenantInfo>` extension method:
+With the services and middleware configured, use the `GetMultiTenantContext<TTenantInfo>` extension method to access the
+current tenant's `TenantInfo`:
 
 ```csharp
 var tenantInfo = HttpContext.GetMultiTenantContext<TenantInfo>().TenantInfo;
 
-if(tenantInfo != null)
+if (tenantInfo != null)
 {
     var tenantId = tenantInfo.Id;
     var identifier = tenantInfo.Identifier;
@@ -113,8 +113,8 @@ if(tenantInfo != null)
 The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
-The `TenantInfo` instance and the typed instance are also available using the
-`IMultiTenantContextAccessor<TTenantInfo>` interface which is available via dependency injection.
+The multi-tenant context and its typed `TenantInfo` are also available through the
+`IMultiTenantContextAccessor<TTenantInfo>` interface via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
