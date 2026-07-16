@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+        <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3"/>
         <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.10" />
 
         <ProjectReference Include="../../src/Finbuckle.MultiTenant.EntityFrameworkCore/Finbuckle.MultiTenant.EntityFrameworkCore.csproj" />
