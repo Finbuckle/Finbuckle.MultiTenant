@@ -19,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Finbuckle.MultiTenant
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
           fetch-depth: 0
       - name: Get Current Version
         run: echo "tag=${{ github.event.release.tag_name || inputs.tag }}" >> $GITHUB_ENV
       - name: Checkout Website
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
         with:
           repository: Finbuckle/Website
           token: ${{ secrets.workflow_pat }}
