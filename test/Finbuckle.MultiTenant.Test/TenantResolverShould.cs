@@ -295,7 +295,7 @@ public class TenantResolverShould
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+        services.Configure<MultiTenantOptions<TenantInfo, string>>(options =>
         {
             options.Events.OnStoreCacheResolveCompleted = context =>
             {
@@ -310,12 +310,12 @@ public class TenantResolverShould
                 return Task.CompletedTask;
             };
         });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithStaticStrategy("initech")
             .WithMemoryCacheStoreCache()
             .WithConfigurationStore();
         var sp = services.BuildServiceProvider();
-        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo,string>>();
 
         await resolver.ResolveAsync(new object());
 
@@ -326,7 +326,7 @@ public class TenantResolverShould
     [Fact]
     public async Task AllowStoreCacheResolveCompletedToNullTenantInfo()
     {
-        TenantResolveCompletedContext<TenantInfo>? resolvedContext = null;
+        TenantResolveCompletedContext<TenantInfo, string>? resolvedContext = null;
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("ConfigurationStoreTestSettings.json")
@@ -334,7 +334,7 @@ public class TenantResolverShould
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+        services.Configure<MultiTenantOptions<TenantInfo, string>>(options =>
         {
             options.Events.OnStoreCacheResolveCompleted = context =>
             {
@@ -347,14 +347,14 @@ public class TenantResolverShould
                 return Task.CompletedTask;
             };
         });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithStaticStrategy("initech")
             .WithMemoryCacheStoreCache()
             .WithConfigurationStore();
         var sp = services.BuildServiceProvider();
-        var manager = sp.GetRequiredService<TenantManager<TenantInfo>>();
+        var manager = sp.GetRequiredService<TenantManager<TenantInfo, string>>();
         await manager.GetByIdentifierAsync("initech");
-        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo, string>>();
 
         await resolver.ResolveAsync(new object());
 
@@ -366,7 +366,7 @@ public class TenantResolverShould
     [Fact]
     public async Task IncludeCacheSourceInTenantResolveCompletedWhenCacheResolves()
     {
-        TenantResolveCompletedContext<TenantInfo>? resolvedContext = null;
+        TenantResolveCompletedContext<TenantInfo, string>? resolvedContext = null;
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("ConfigurationStoreTestSettings.json")
@@ -374,20 +374,20 @@ public class TenantResolverShould
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+        services.Configure<MultiTenantOptions<TenantInfo, string>>(options =>
             options.Events.OnTenantResolveCompleted = context =>
             {
                 resolvedContext = context;
                 return Task.CompletedTask;
             });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithStaticStrategy("initech")
             .WithMemoryCacheStoreCache()
             .WithConfigurationStore();
         var sp = services.BuildServiceProvider();
-        var manager = sp.GetRequiredService<TenantManager<TenantInfo>>();
+        var manager = sp.GetRequiredService<TenantManager<TenantInfo, string>>();
         await manager.GetByIdentifierAsync("initech");
-        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo, string>>();
 
         await resolver.ResolveAsync(new object());
 
@@ -399,7 +399,7 @@ public class TenantResolverShould
     [Fact]
     public async Task IncludeStoreSourceInTenantResolveCompletedWhenPrimaryStoreResolves()
     {
-        TenantResolveCompletedContext<TenantInfo>? resolvedContext = null;
+        TenantResolveCompletedContext<TenantInfo, string>? resolvedContext = null;
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("ConfigurationStoreTestSettings.json")
@@ -407,18 +407,18 @@ public class TenantResolverShould
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
-        services.Configure<MultiTenantOptions<TenantInfo>>(options =>
+        services.Configure<MultiTenantOptions<TenantInfo, string>>(options =>
             options.Events.OnTenantResolveCompleted = context =>
             {
                 resolvedContext = context;
                 return Task.CompletedTask;
             });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithStaticStrategy("initech")
             .WithMemoryCacheStoreCache()
             .WithConfigurationStore();
         var sp = services.BuildServiceProvider();
-        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo>>();
+        var resolver = sp.GetRequiredService<ITenantResolver<TenantInfo, string>>();
 
         await resolver.ResolveAsync(new object());
 

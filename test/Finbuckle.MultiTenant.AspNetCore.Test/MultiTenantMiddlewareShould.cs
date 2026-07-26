@@ -29,12 +29,6 @@ public class MultiTenantMiddlewareShould
             sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
 
-    private static Task InvokeMiddleware(MultiTenantMiddleware mw, HttpContext context, IServiceProvider sp) =>
-        mw.Invoke(context,
-            sp.GetRequiredService<ITenantContext>(),
-            sp.GetRequiredService<ITenantResolver>(),
-            sp.GetRequiredService<ITenantScopeProvider>());
-
     [Fact]
     public async Task ResolveTenantContextIfTenantFound()
     {
