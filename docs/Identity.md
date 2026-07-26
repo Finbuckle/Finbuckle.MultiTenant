@@ -15,13 +15,13 @@ tenant Identity data and integrate the Identity UI to work with a route multi-te
 Configuring an Identity db context to be multi-tenant is identical to that of a regular db context as described
 in [Data Isolation With Entity Framework Core](EFCore) with a few extra specifics to keep in mind.
 
-The simplest approach is to derive a db context from `MultiTenantIdentityDbContext` (which itself derives
+The simplest approach is to derive a db context from `MultiTenantIdentityDbContext<TId>` (which itself derives
 from `IdentityDbContext`) and configure Identity to use the derived context.
 
 If for some reason you do not want an Identity entity to be multi-tenant you can override the behavior by
 calling the `IsNotMultiTenant` extension method in `OnModelCreating` after calling the base class method.
 
-If not deriving from `MultiTenantIdentityDbContext` make sure to implement `IMultiTenantDbContext` and call the
+If not deriving from `MultiTenantIdentityDbContext<TId>` make sure to implement `IMultiTenantDbContext<TId>` and call the
 appropriate extension methods as described in [Data Isolation with Entity Framework Core](EFCore). In this case it is
 required that base class `OnModelCreating` method is called **before** any multi-tenant extension methods.
 
@@ -31,7 +31,7 @@ When using a variant of `MultiTenantIdentityDbContext` any entity designated as 
 `TenantId` property added to its unique index.
 
 > Note: Starting in v10, all Identity entity types are configured as multi-tenant by default when you derive from one of
-> the `MultiTenantIdentityDbContext` variants. You generally do not need to add `[MultiTenant]` or call `IsMultiTenant`
+> the `MultiTenantIdentityDbContext<TId>` variants. You generally do not need to add `[MultiTenant]` or call `IsMultiTenant`
 > yourself unless you are explicitly overriding behavior on a specific type.
 
 ## Passkeys (WebAuthn) and Identity schema versions
@@ -56,7 +56,7 @@ services.Configure<IdentityOptions>(o =>
 });
 ```
 
-No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext` will detect the schema version
+No additional configuration is needed in your DbContext; `MultiTenantIdentityDbContext<TId>` will detect the schema version
 and configure passkey entities accordingly.
 
 ## Identity Options
@@ -103,19 +103,19 @@ entity types for the rest.
 Deriving an Identity database context from `MultiTenantIdentityDbContext` will use all the default entity types
 and `string` for `TKey`. All entity types will be configured as multi-tenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser>` will use the provided parameter for `TUser` and the defaults for the
+Deriving from `MultiTenantIdentityDbContext<TUser, TId>` will use the provided parameter for `TUser` and the defaults for the
 rest. All entity types will be configured as multi-tenant.
 
-Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey>` will use the provided parameters
+Deriving from `MultiTenantIdentityDbContext<TUser, TRole, TKey, TId>` will use the provided parameters
 for `<TUser>`, `TRole`, and `TKey` and the defaults for the rest. All entity types will be configured as multi-tenant.
 
 Deriving from
-`MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken, TUserPasskey>`
+`MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken, TUserPasskey, TId>`
 will use all provided parameters. All entity types will be configured as multi-tenant, and `TUserPasskey` is configured
 only when the Identity schema version is set to 3.
 
 When providing non-default parameters it is recommended that the provided entity types have the `[MultiTenant]`
-attribute or call the `IsMultiTenant` builder extension method for each type in `OnModelCreating` **after** calling the
+attribute or call the `IsMultiTenant<TId>` builder extension method for each type in `OnModelCreating` **after** calling the
 base class `OnModelCreating`.
 
 ## Important Considerations
@@ -126,7 +126,7 @@ base class `OnModelCreating`.
   tenants.
 - Passkey support (`IdentityUserPasskey<TKey>`) requires Identity schema version 3 and is automatically
   configured when that version is detected.
-- If not deriving from `MultiTenantIdentityDbContext`, implement `IMultiTenantDbContext` and call the multi-tenant
+- If not deriving from `MultiTenantIdentityDbContext`, implement `IMultiTenantDbContext<TId>` and call the multi-tenant
   extension methods in `OnModelCreating` **after** calling the base class method.
 - Per-tenant authentication must be configured separately via `WithPerTenantAuthentication()`. See
   [Per-Tenant Authentication](Authentication) for details.

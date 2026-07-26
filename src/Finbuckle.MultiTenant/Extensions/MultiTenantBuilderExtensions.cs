@@ -52,7 +52,7 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo, TId}"/> to the application.
+    /// Adds a <see cref="MemoryCacheGetTenantContextStoreCache{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>

@@ -102,40 +102,40 @@ runtime the delegate will be called with the current tenant details.
 using Finbuckle.MultiTenant.Extensions;
 
 // configure options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, TenantInfo, string>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
     });
 
 // or configure named options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, TenantInfo, string>("scheme2", (options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
     });
 
 // ConfigureAll options variant
-builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo, string>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
     });
 
 // can also configure post options, named post options, and all post options variants
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo, string>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
     });
 
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo, string>("scheme2", (options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
     });
 
-builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo, string>((options, tenantInfo) =>
     {
         options.MyOption1 = tenantInfo.Id;
         options.MyOption2 = tenantInfo.Identifier;
@@ -169,7 +169,7 @@ normally supports up to five dependencies, MultiTenant support only supports fou
 ```csharp
 // use OptionsBuilder API to configure per-tenant options with dependencies
 builder.Services.AddOptions<MyOptions>("optionalName")
-    .ConfigurePerTenant<ExampleService, TenantInfo>(
+    .ConfigurePerTenant<ExampleService, TenantInfo, string>(
         (options, exampleService, tenantInfo) =>
             options.Property = DoSomethingWith(exampleService, tenantInfo));```
 

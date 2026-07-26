@@ -27,7 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 // add app services...
 
 // add MultiTenant services
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore();
 
@@ -43,7 +43,7 @@ app.Run();
 
 That's all that is needed to get going. Let's break down each line:
 
-`builder.Services.AddMultiTenant<TenantInfo>()`
+`builder.Services.AddMultiTenant<TenantInfo, string>()`
 
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
 runtime.
@@ -88,7 +88,7 @@ See [Stores](Stores) for more information.
 MultiTenant comes with a collection of strategies and store types that can be mixed and matched in various
 ways.
 
-`app.UseMultiTenant()`
+`app.UseMultiTenant<TId>()`
 
 This line configures the middleware which resolves the tenant using the registered strategies, stores, and other
 settings. Be sure to call it before other middleware which will use per-tenant functionality, such as
@@ -97,10 +97,10 @@ settings. Be sure to call it before other middleware which will use per-tenant f
 ## Basic Usage
 
 With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `ITenantContext<TTenantInfo>` object accessed from the `GetTenantContext<TTenantInfo>` extension method:
+the `ITenantContext<TTenantInfo>` object accessed from the `GetTenantContext<TTenantInfo, TId>` extension method:
 
 ```csharp
-var tenantInfo = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
+var tenantInfo = HttpContext.GetTenantContext<TenantInfo, string>().TenantInfo;
 
 if(tenantInfo != null)
 {
@@ -109,7 +109,7 @@ if(tenantInfo != null)
 }
 ```
 
-The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo>` during
+The type of the `TenantInfo` property depends on the type passed when calling `AddMultiTenant<TTenantInfo, TId>` during
 configuration. If the current tenant could not be determined then `TenantInfo` will be null.
 
 For non-generic access in ASP.NET Core, use the `HttpContext.TenantContext` extension property. To read only the
@@ -138,22 +138,22 @@ the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/sampl
 
 ## Important Considerations
 
-- The type parameter passed to `AddMultiTenant<TTenantInfo>()` determines the `ITenantInfo` implementation used
+- The type parameter passed to `AddMultiTenant<TTenantInfo, TId>()` determines the `ITenantInfo<Tid>` implementation used
   throughout the app. Choose or define a class that fits your tenant data model.
-- `ITenantContext<TTenantInfo>` is registered as a scoped service. In ASP.NET Core the middleware populates it
+- `ITenantContext<TTenantInfo, TId>` is registered as a scoped service. In ASP.NET Core the middleware populates it
   automatically per request. In other app models you must manage scope creation and tenant resolution manually
   (see [.NET Generic Host Integration](GenericHost)).
 - `TenantInfo` can only be set once per scope. The middleware handles this in web apps, but be aware of the
   constraint if you call `SetTenantInfo` manually.
-- Middleware ordering is critical: `UseMultiTenant()` must come before `UseAuthentication()`, `UseAuthorization()`,
+- Middleware ordering is critical: `UseMultiTenant<TId>()` must come before `UseAuthentication()`, `UseAuthorization()`,
   and any middleware that reads per-tenant options or services.
-- For web apps, prefer the `HttpContext` extension members (`GetTenantContext<T>()`, `GetTenantInfo<T>()`,
+- For web apps, prefer the `HttpContext` extension members (`GetTenantContext<T, TId>()`, `GetTenantInfo<T, TId>()`,
   `TenantContext`, `CurrentTenant`)
   over injecting `ITenantContext` directly, as they always reflect the middleware's state.
 
 ## See Also
 
-- [Core Concepts](CoreConcepts) — `ITenantInfo`, strategies, stores
+- [Core Concepts](CoreConcepts) — `ITenantInfo<TId>`, strategies, stores
 - [Configuration and Usage](ConfigurationAndUsage) — all registration options
 - [ASP.NET Core Integration](AspNetCore) — middleware and `HttpContext` helpers
 - [.NET Generic Host Integration](GenericHost) — non-web scenarios

@@ -25,9 +25,9 @@ when needed via the tenant `Id`.
 > Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
 > `TenantInfo` derived class.
 
-## `ITenantContext` and `TenantContext<TTenantInfo>`
+## `ITenantContext` and `TenantContext<TTenantInfo, TId>`
 
-The `TenantContext<TTenantInfo>` contains information about the current tenant.
+The `TenantContext<TTenantInfo, TId>` contains information about the current tenant.
 
 * Implements `ITenantContext` and `ITenantContext<TTenantInfo>` which can be obtained from dependency injection.
 * Registered as a **scoped service** (`AddScoped`), so each DI scope (e.g. each HTTP request in ASP.NET Core)

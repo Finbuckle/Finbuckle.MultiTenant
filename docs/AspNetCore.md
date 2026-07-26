@@ -16,25 +16,25 @@ ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp-net-
 
 ## How the Middleware Works
 
-When `UseMultiTenant()` is added to the pipeline, the middleware automatically handles tenant resolution
+When `UseMultiTenant<TId>()` is added to the pipeline, the middleware automatically handles tenant resolution
 for each HTTP request:
 
 1. For every request, the middleware calls `ITenantResolver.ResolveAsync(HttpContext)`.
 2. The resolver iterates through registered strategies (which receive the `HttpContext`) to find a tenant
    identifier, then queries stores to find a matching `TenantInfo`.
-3. If a tenant is found, the middleware sets `TenantInfo` on the scoped `ITenantContext<TTenantInfo>` for
+3. If a tenant is found, the middleware sets `TenantInfo` on the scoped `ITenantContext<TTenantInfo, TId>` for
    that request.
 4. All services resolved within the request's DI scope — including `IOptions<T>`, `IOptionsSnapshot<T>`,
-   `IOptionsMonitor<T>`, and `IMultiTenantDbContext` — automatically see the resolved tenant.
+   `IOptionsMonitor<T>`, and `IMultiTenantDbContext<TId>` — automatically see the resolved tenant.
 
-This means you never need to manually call `ITenantResolver` or populate `ITenantContext` in an ASP.NET Core
+This means you never need to manually call `ITenantResolver<TId>` or populate `ITenantContext<TId>` in an ASP.NET Core
 app — the middleware wires everything together.
 
 ## Configuring the Middleware
 
 ### Service Registration
 
-Register MultiTenant services in `Program.cs` using `AddMultiTenant<TTenantInfo>` along with at least one
+Register MultiTenant services in `Program.cs` using `AddMultiTenant<TTenantInfo, TId>` along with at least one
 [strategy](Strategies) and one [store](Stores):
 
 ```csharp
@@ -44,7 +44,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ...add other app services
 
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore();
 
@@ -55,22 +55,22 @@ See [Configuration and Usage](ConfigurationAndUsage) for more details on `AddMul
 
 ### Adding the Middleware
 
-Call `UseMultiTenant()` to add the middleware to the request pipeline.
+Call `UseMultiTenant<TId>()` to add the middleware to the request pipeline.
 
 ```csharp
 // add the MultiTenant middleware
-app.UseMultiTenant();
+app.UseMultiTenant<string>();
 
 // ...add other middleware
 
 app.Run();
 ```
 
-> **Middleware ordering is important.** Place `UseMultiTenant()` **before** any middleware that requires
+> **Middleware ordering is important.** Place `UseMultiTenant<TId>()` **before** any middleware that requires
 > per-tenant behavior, such as `UseAuthentication()`, `UseAuthorization()`, and any other components that
 > read per-tenant options or services.
 
-If `UseRouting()` is explicitly called in the pipeline it must come **before** `UseMultiTenant()` when
+If `UseRouting()` is explicitly called in the pipeline it must come **before** `UseMultiTenant<TId>()` when
 using the [Route Strategy](#route-strategy).
 
 ## ASP.NET Core Strategies
@@ -96,14 +96,14 @@ general-purpose strategies available in the base package.
 
 The following extension members are available on `HttpContext` for web apps:
 
-#### `GetTenantContext<TTenantInfo>`
+#### `GetTenantContext<TTenantInfo, TId>`
 
-Returns the `ITenantContext<TTenantInfo>` instance for the current request. This is the preferred way to
+Returns the `ITenantContext<TTenantInfo, TId>` instance for the current request. This is the preferred way to
 access the current tenant in ASP.NET Core because it always reflects the state set by the middleware, even
 in post-endpoint processing.
 
 ```csharp
-var tenantInfo = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
+var tenantInfo = HttpContext.GetTenantContext<TenantInfo, TId>().TenantInfo;
 
 if (tenantInfo != null)
 {
@@ -126,13 +126,13 @@ if (tenantContext.IsResolved)
 }
 ```
 
-#### `GetTenantInfo<TTenantInfo>`
+#### `GetTenantInfo<TTenantInfo, TId>`
 
-A convenience shorthand for `GetTenantContext<TTenantInfo>().TenantInfo`. Returns the current `TTenantInfo`
+A convenience shorthand for `GetTenantContext<TTenantInfo, TId>().TenantInfo`. Returns the current `TTenantInfo`
 instance, or null if no tenant was resolved.
 
 ```csharp
-var tenantInfo = HttpContext.GetTenantInfo<TenantInfo>();
+var tenantInfo = HttpContext.GetTenantInfo<TenantInfo, string>();
 
 if (tenantInfo != null)
 {
@@ -154,12 +154,12 @@ if (tenantInfo != null)
 }
 ```
 
-#### `SetTenantInfo<TTenantInfo>`
+#### `SetTenantInfo<TTenantInfo, TId>`
 
 For most cases the middleware sets the `TenantInfo` automatically and this method is not needed. Use only if
 explicitly overriding the `TenantInfo` set by the middleware.
 
-Sets the current tenant to the provided `TenantInfo` on the request's `ITenantContext<TTenantInfo>`.
+Sets the current tenant to the provided `TenantInfo` on the request's `ITenantContext<TTenantInfo, TId>`.
 
 > **Important:** `TenantInfo` can only be set once. Attempting to call `SetTenantInfo` after the tenant has
 > already been resolved will throw a `MultiTenantException`. Use `TrySetTenantInfo` if you need to conditionally
@@ -171,10 +171,10 @@ var newTenantInfo = new TenantInfo { Id = "new-id", Identifier = "new-identifier
 HttpContext.SetTenantInfo(newTenantInfo);
 
 // This will be the new tenant.
-var tenant = HttpContext.GetTenantContext<TenantInfo>().TenantInfo;
+var tenant = HttpContext.GetTenantContext<TenantInfo, string>().TenantInfo;
 ```
 
-#### `TrySetTenantInfo<TTenantInfo>`
+#### `TrySetTenantInfo<TTenantInfo, TId>`
 
 Sets the current tenant only if one has not already been resolved. This is useful when your code may be called
 from multiple paths and you want to avoid the exception thrown by `SetTenantInfo` when a tenant already exists.
@@ -183,7 +183,7 @@ from multiple paths and you want to avoid the exception thrown by `SetTenantInfo
 var fallbackTenant = new TenantInfo { Id = "default", Identifier = "default" };
 
 // Only takes effect if no tenant was resolved by the middleware.
-HttpContext.TrySetTenantInfo(fallbackTenant);
+HttpContext.TrySetTenantInfo<TenantInfo, string>(fallbackTenant);
 ```
 
 > For dependency injection-based access to the current tenant outside of a controller or middleware, see
@@ -250,7 +250,7 @@ that do not match any route.
 > This bypass does **not** require the route strategy.
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithRouteStrategy()
     .WithConfigurationStore()
     .BypassWhenEndpointNotResolved();
@@ -262,7 +262,7 @@ Use `BypassWhen()` to bypass resolution based on any condition derived from `Htt
 
 ```csharp
 // Bypass resolution for health check requests.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo,string>()
     .WithRouteStrategy()
     .WithConfigurationStore()
     .BypassWhen(options =>
@@ -289,13 +289,13 @@ when no tenant can be found. An overload accepts a URI to redirect to when no te
 
 ```csharp
 // Simply short circuit the request, ending request handling.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore()
     .ShortCircuitWhenTenantNotResolved();
 
 // Short circuit and redirect to a specific Uri.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore()
     .ShortCircuitWhenTenantNotResolved(new Uri("/tenant/notfound", UriKind.Relative));
@@ -303,11 +303,11 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 ### Short Circuit When a Custom Condition Is Met
 
-Use the `ShortCircuitWhen()` extension on `MultiTenantBuilder<TTenantInfo>` for advanced short-circuiting:
+Use the `ShortCircuitWhen()` extension on `MultiTenantBuilder<TTenantInfo, TId>` for advanced short-circuiting:
 
 ```csharp
 // Advanced short circuiting: if tenant not resolved.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
@@ -316,7 +316,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
     });
 
 // Including a redirect.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore()
     .ShortCircuitWhen(config =>
@@ -332,20 +332,20 @@ MultiTenant provides built-in support for isolating tenant authentication so tha
 scoped to the current tenant. This includes per-tenant cookie validation, challenge schemes, login/logout
 paths, and OpenID Connect settings.
 
-Authentication is configured by calling `WithPerTenantAuthentication()` after `AddMultiTenant<TTenantInfo>()`:
+Authentication is configured by calling `WithPerTenantAuthentication()` after `AddMultiTenant<TTenantInfo, TId>()`:
 
 ```csharp
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie()
     .AddOpenIdConnect();
 
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithRouteStrategy()
     .WithConfigurationStore()
     .WithPerTenantAuthentication();
 ```
 
-> Place `UseMultiTenant()` **before** `UseAuthentication()` so the tenant is resolved before authentication
+> Place `UseMultiTenant<TId>()` **before** `UseAuthentication()` so the tenant is resolved before authentication
 > runs.
 
 See [Per-Tenant Authentication](Authentication) for full details, including OpenID Connect configuration,
@@ -375,11 +375,11 @@ See [Per-Tenant Options](Options) for full details.
 ### Entity Framework Core
 
 MultiTenant can automatically filter EF Core queries by tenant using a global query filter. This removes
-the need to add `WHERE TenantId = ...` clauses throughout your app. Use `AddMultiTenantDbContext<T>()` for
-scoped contexts or `AddPooledMultiTenantDbContext<T>()` for high-throughput pooled contexts:
+the need to add `WHERE TenantId = ...` clauses throughout your app. Use `AddMultiTenantDbContext<T, TId>()` for
+scoped contexts or `AddPooledMultiTenantDbContext<T, TId>()` for high-throughput pooled contexts:
 
 ```csharp
-builder.Services.AddMultiTenantDbContext<AppDbContext>(options =>
+builder.Services.AddMultiTenantDbContext<AppDbContext, string>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 ```
 
@@ -394,17 +394,17 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 
 ## Important Considerations
 
-- **Middleware ordering matters.** Place `UseMultiTenant()` before `UseAuthentication()`, `UseAuthorization()`,
+- **Middleware ordering matters.** Place `UseMultiTenant<TId>()` before `UseAuthentication()`, `UseAuthorization()`,
   and any middleware that reads per-tenant options or services.
 - **`TenantInfo` can only be set once** per request. The middleware sets it early in the pipeline. If you
-  need to override it, use `HttpContext.SetTenantInfo()` or `TrySetTenantInfo()` before any tenant-aware
+  need to override it, use `HttpContext.SetTenantInfo<TTenantInfo, TId>()` or `TrySetTenantInfo<TTenantInfo, TId>()` before any tenant-aware
   services are resolved.
 - **`ITenantContext` is scoped.** Each HTTP request gets its own instance. A new scope is created
   per request by the ASP.NET Core framework, so this happens automatically.
 - **`IOptionsMonitor<T>` is scoped** in MultiTenant. Do not capture it in a singleton service.
 - **Not all strategies work for all scenarios.** The [Claim Strategy](Strategies#claim-strategy) needs
   authentication middleware to run first. The [Route Strategy](Strategies#route-strategy) requires
-  `UseRouting()` before `UseMultiTenant()`.
+  `UseRouting()` before `UseMultiTenant<TId>()`.
 - **Per-tenant options require `ITenantContext.TenantInfo` to be set.** If tenant resolution fails (no
   strategy finds an identifier or no store matches), the `TenantInfo` will be null and default (non-tenant)
   options will be used.
@@ -412,7 +412,7 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 ## See Also
 
 - [Configuration and Usage](ConfigurationAndUsage) — registration and resolver details
-- [Core Concepts](CoreConcepts) — `ITenantContext`, `TenantContext`, and scoped lifetime
+- [Core Concepts](CoreConcepts) — `ITenantContext<TId>`, `TenantContext`, and scoped lifetime
 - [.NET Generic Host Integration](GenericHost) — using MultiTenant in non-web apps
 - [Per-Tenant Authentication](Authentication) — full authentication setup
 - [Per-Tenant Options](Options) — options customization
