@@ -157,6 +157,35 @@ public class MultiTenantBuilderShould
         Assert.Equal("second", caches[1].Name);
     }
 
+    [Fact]
+    public void ThrowIfAddingMultiplePrimaryStores()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton);
+
+        Assert.Throws<InvalidOperationException>(() =>
+            builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton));
+    }
+
+    [Fact]
+    public void AddMultipleStoreCachesInOrder()
+    {
+        var services = new ServiceCollection();
+        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "first");
+        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "second");
+
+        var sp = services.BuildServiceProvider();
+        var caches = sp.GetRequiredService<IEnumerable<IMultiTenantStoreCache<TenantInfo>>>()
+            .Cast<TestStoreCache<TenantInfo>>()
+            .ToArray();
+
+        Assert.Equal(2, caches.Length);
+        Assert.Equal("first", caches[0].Name);
+        Assert.Equal("second", caches[1].Name);
+    }
+
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]
     [InlineData(ServiceLifetime.Scoped)]

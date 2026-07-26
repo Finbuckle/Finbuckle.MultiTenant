@@ -135,6 +135,40 @@ public class HttpContextExtensionShould
     }
 
     [Fact]
+    public void ReturnCurrentTenant()
+    {
+        var ti = new TenantInfo { Id = "test", Identifier = "" };
+
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+        sp.BeginTenantScope(ti);
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+
+        var returnedTi = httpContextMock.Object.TenantInfo;
+
+        Assert.Equal(ti, returnedTi);
+    }
+
+    [Fact]
+    public void ReturnNullCurrentTenantIfNoTenantInfo()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo>();
+        var sp = services.BuildServiceProvider();
+        sp.BeginTenantScope();
+
+        var httpContextMock = new Mock<HttpContext>();
+        httpContextMock.Setup(c => c.RequestServices).Returns(sp);
+
+        var returnedTi = httpContextMock.Object.TenantInfo;
+
+        Assert.Null(returnedTi);
+    }
+
+    [Fact]
     public void SetTenantInfo()
     {
         var services = new ServiceCollection();

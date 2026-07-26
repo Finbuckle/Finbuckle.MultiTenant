@@ -75,7 +75,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenant
     public virtual async Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         var existing = await dbContext.TenantInfo
-            .Where(ti => ti.Id .Equals(id))
+            .Where(ti => ti.Id.Equals(id))
             .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         if (existing is null)

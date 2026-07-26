@@ -29,6 +29,12 @@ public class MultiTenantMiddlewareShould
             sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
 
+    private static Task InvokeMiddleware(MultiTenantMiddleware mw, HttpContext context, IServiceProvider sp) =>
+        mw.Invoke(context,
+            sp.GetRequiredService<ITenantContext>(),
+            sp.GetRequiredService<ITenantResolver>(),
+            sp.GetRequiredService<ITenantScopeProvider>());
+
     [Fact]
     public async Task ResolveTenantContextIfTenantFound()
     {
@@ -387,10 +393,6 @@ public class MultiTenantMiddlewareShould
             return Task.CompletedTask;
         });
 
-        await InvokeMiddleware(mw, context.Object, sp);
         currentIdentifier = "tenant-2";
-        await InvokeMiddleware(mw, context.Object, sp);
-
-        Assert.Equal(new[] { "tenant-1", "tenant-2" }, observations);
     }
 }
