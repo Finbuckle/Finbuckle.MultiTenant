@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// implemented. Any changes to the tenant store must occur on the server.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class HttpRemoteStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {

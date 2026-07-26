@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 /// A <see cref="DbContext"/> specialized for storing tenant information in Entity Framework Core.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class EFCoreStoreDbContext<TTenantInfo, TId> : DbContext
     where TTenantInfo : class, ITenantInfo<TId> where TId : IEquatable<TId>
 {

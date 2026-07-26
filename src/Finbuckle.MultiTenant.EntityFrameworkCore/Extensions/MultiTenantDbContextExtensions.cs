@@ -20,7 +20,7 @@ public static class MultiTenantDbContextExtensions
     /// Ensures a TenantId property is set when an entity is attached.
     /// </summary>
     /// <typeparam name="TContext">The <see cref="DbContext"/> type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="context">The <see cref="DbContext"/> instance.</param>
     public static void EnforceMultiTenantOnTracking<TContext, TId>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
@@ -53,7 +53,7 @@ public static class MultiTenantDbContextExtensions
     /// Checks the TenantId on entities during SaveChanges and SaveChangesAsync taking into account <see cref="TenantNotSetMode"/> and <see cref="TenantMismatchMode"/>.
     /// </summary>
     /// <typeparam name="TContext">The <see cref="DbContext"/> type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="context">The <see cref="DbContext"/> instance.</param>
     public static void EnforceMultiTenant<TContext, TId>(this TContext context)
         where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
@@ -215,7 +215,7 @@ public static class MultiTenantDbContextExtensions
     /// <param name="tenantInfo">The tenant information to bind to the context.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo, TId>(TTenantInfo tenantInfo)
         where TContext : DbContext, IMultiTenantDbContext<TId>
@@ -229,7 +229,7 @@ public static class MultiTenantDbContextExtensions
     /// <param name="args">Additional dependencies for the <see cref="DbContext"/> constructor.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
     public static TContext Create<TContext, TTenantInfo, TId>(TTenantInfo tenantInfo, params object[] args)
         where TContext : DbContext, IMultiTenantDbContext<TId>

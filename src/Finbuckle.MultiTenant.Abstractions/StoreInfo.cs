@@ -7,7 +7,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// Contains information about the store used for tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class StoreInfo<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>

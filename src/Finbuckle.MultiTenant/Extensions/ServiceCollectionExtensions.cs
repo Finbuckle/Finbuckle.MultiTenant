@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
     /// <param name="config">An action to configure the <see cref="MultiTenantOptions{TTenantInfo, TId}"/> instance.</param>
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo, TId}"/>.</returns>
@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
     /// Configure Finbuckle.MultiTenant services for the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo, TId}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> AddMultiTenant<TTenantInfo, TId>(this IServiceCollection services)
@@ -141,7 +141,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -177,7 +177,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -196,7 +196,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -215,7 +215,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="name">The name of the options instance.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
@@ -251,7 +251,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -270,7 +270,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The TTenantInfo derived type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The action used to configure the options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
@@ -288,7 +288,7 @@ public static class ServiceCollectionExtensions
     /// Configures the required services for per-tenant options support.
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     internal static void ConfigurePerTenantReqs<TOptions, TId>(IServiceCollection services)
         where TOptions : class where TId : IEquatable<TId>

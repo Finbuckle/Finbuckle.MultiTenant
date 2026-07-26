@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// implemented. If the underlying configuration supports reload-on-change, then this store will reflect such changes.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> derived type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";

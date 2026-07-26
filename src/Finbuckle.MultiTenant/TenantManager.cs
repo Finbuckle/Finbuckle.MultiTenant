@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant;
 /// Provides the main API for tenant store interaction.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class TenantManager<TTenantInfo, TId>
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {

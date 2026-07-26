@@ -37,7 +37,7 @@ public class MultiTenantIdentityDbContext<TId> : MultiTenantIdentityDbContext<Id
 /// </remarks>
 /// </summary>
 /// <typeparam name="TUser">The <see cref="IdentityUser"/> derived type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class MultiTenantIdentityDbContext<TUser, TId> : MultiTenantIdentityDbContext<TUser, IdentityRole, string, TId>
     where TUser : IdentityUser where TId : IEquatable<TId>
 {
@@ -61,7 +61,7 @@ public class MultiTenantIdentityDbContext<TUser, TId> : MultiTenantIdentityDbCon
 /// <typeparam name="TUser">The <see cref="IdentityUser{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TRole">The <see cref="IdentityRole{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TKey">The key type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TId> : MultiTenantIdentityDbContext<TUser, TRole,
     TKey, IdentityUserClaim<TKey>, IdentityUserRole<TKey>, IdentityUserLogin<TKey>, IdentityRoleClaim<TKey>,
     IdentityUserToken<TKey>, IdentityUserPasskey<TKey>, TId>
@@ -96,7 +96,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TId> : Mu
 /// <typeparam name="TRoleClaim">The <see cref="IdentityRoleClaim{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TUserToken">The <see cref="IdentityUserToken{TKey}"/> derived type.</typeparam>
 /// <typeparam name="TUserPasskey">The <see cref="IdentityUserPasskey{TKey}"/> derived type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim,
     TUserToken, TUserPasskey, TId> :
     IdentityDbContext<TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken, TUserPasskey>,

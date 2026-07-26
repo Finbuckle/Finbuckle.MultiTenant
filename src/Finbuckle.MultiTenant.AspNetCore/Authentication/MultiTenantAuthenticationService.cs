@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 /// Multi-tenant aware authentication service that decorates the default authentication service.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class MultiTenantAuthenticationService<TTenantInfo, TId> : IAuthenticationService
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {

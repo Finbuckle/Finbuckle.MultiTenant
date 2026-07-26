@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant;
 /// Events for successful and failed tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public class MultiTenantEvents<TTenantInfo, TId>
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {

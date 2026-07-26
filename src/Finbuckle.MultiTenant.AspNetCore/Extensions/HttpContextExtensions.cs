@@ -31,7 +31,7 @@ public static class HttpContextExtensions
         /// Returns the current <see cref="ITenantContext{TTenantInfo}"/>.
         /// </summary>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-        /// <typeparam name="TId"></typeparam>
+        /// <typeparam name="TId">The ID implementation type.</typeparam>
         public ITenantContext<TTenantInfo, TId> GetTenantContext<TTenantInfo, TId>()
             where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {
@@ -42,7 +42,7 @@ public static class HttpContextExtensions
         /// Returns the current generic <typeparamref name="TTenantInfo"/> instance or null if there is none.
         /// </summary>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-        /// <typeparam name="TId"></typeparam>
+        /// <typeparam name="TId">The ID implementation type.</typeparam>
         public TTenantInfo? GetTenantInfo<TTenantInfo, TId>()
             where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId> =>
             httpContext.GetTenantContext<TTenantInfo, TId>().TenantInfo;
@@ -52,7 +52,7 @@ public static class HttpContextExtensions
         /// </summary>
         /// <param name="tenantInfo">The tenant info instance to set as current.</param>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-        /// <typeparam name="TId"></typeparam>
+        /// <typeparam name="TId">The ID implementation type.</typeparam>
         /// <remarks>This method will throw a <see cref="MultiTenantException"/> if the <see cref="ITenantContext{TTenantInfo}.TenantInfo"/> has already been set.</remarks>
         public void SetTenantInfo<TTenantInfo, TId>(TTenantInfo tenantInfo)
             where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
@@ -66,7 +66,7 @@ public static class HttpContextExtensions
         /// </summary>
         /// <param name="tenantInfo">The tenant info instance to set as current.</param>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-        /// <typeparam name="TId"></typeparam>
+        /// <typeparam name="TId">The ID implementation type.</typeparam>
         public void TrySetTenantInfo<TTenantInfo, TId>(TTenantInfo tenantInfo)
             where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {

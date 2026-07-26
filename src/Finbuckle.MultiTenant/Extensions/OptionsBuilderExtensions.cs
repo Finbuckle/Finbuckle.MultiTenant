@@ -17,7 +17,7 @@ public static class OptionsBuilderExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -51,7 +51,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TDep">The dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -88,7 +88,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep1">The first dependency type.</typeparam>
     /// <typeparam name="TDep2">The second dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -128,7 +128,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep2">The second dependency type.</typeparam>
     /// <typeparam name="TDep3">The third dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -173,7 +173,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep3">The third dependency type.</typeparam>
     /// <typeparam name="TDep4">The fourth dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -215,7 +215,7 @@ public static class OptionsBuilderExtensions
     /// </summary>
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -250,7 +250,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TOptions">The options type to be configured.</typeparam>
     /// <typeparam name="TDep">The dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -287,7 +287,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep1">The first dependency type.</typeparam>
     /// <typeparam name="TDep2">The second dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -327,7 +327,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep2">The second dependency type.</typeparam>
     /// <typeparam name="TDep3">The third dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>
@@ -371,7 +371,7 @@ public static class OptionsBuilderExtensions
     /// <typeparam name="TDep3">The third dependency type.</typeparam>
     /// <typeparam name="TDep4">The fourth dependency type.</typeparam>
     /// <typeparam name="TTenantInfo">The tenant info type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="optionsBuilder">The options builder instance.</param>
     /// <param name="configureOptions">The action used to post-configure the options for each tenant.</param>
     /// <returns>The options builder for chaining.</returns>

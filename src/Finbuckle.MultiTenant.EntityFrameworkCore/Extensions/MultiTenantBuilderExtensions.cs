@@ -17,7 +17,7 @@ public static class MultiTenantBuilderExtensions
     /// </summary>
     /// <typeparam name="TEFCoreStoreDbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo, TId}"/> derived type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</returns>
     // ReSharper disable once InconsistentNaming

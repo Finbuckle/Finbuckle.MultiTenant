@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
     /// The <see cref="DbContext"/> type to resolve from the pool. Must implement
     /// <see cref="IMultiTenantDbContext{TId}"/> so tenant context can be applied.
     /// </typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddPooledMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
@@ -53,7 +53,7 @@ public static class ServiceCollectionExtensions
     /// The <see cref="DbContext"/> type to register. Must implement
     /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The service collection to add registrations to.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services)
@@ -68,7 +68,7 @@ public static class ServiceCollectionExtensions
     /// The <see cref="DbContext"/> type to register. Must implement
     /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction)
@@ -83,7 +83,7 @@ public static class ServiceCollectionExtensions
     /// The <see cref="DbContext"/> type to register. Must implement
     /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder> optionsAction)

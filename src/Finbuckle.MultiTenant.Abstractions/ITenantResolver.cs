@@ -25,7 +25,7 @@ public interface ITenantResolver<TId> where TId : IEquatable<TId>
 /// Resolves the current tenant.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
 public interface ITenantResolver<TTenantInfo, TId> : ITenantResolver<TId>
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {

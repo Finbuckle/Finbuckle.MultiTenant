@@ -22,7 +22,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="DistributedCacheStoreCache{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithDistributedCacheStoreCache<TTenantInfo, TId>(
@@ -33,7 +33,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="DistributedCacheStoreCache{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="configureOptions">An action for configuring cache entry options.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
@@ -55,7 +55,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithMemoryCacheStoreCache<TTenantInfo, TId>(
@@ -66,7 +66,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="configureOptions">An action for configuring cache entry options.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
@@ -90,7 +90,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="HttpRemoteStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="endpointTemplate">The endpoint URI template.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
@@ -103,7 +103,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="HttpRemoteStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="endpointTemplate">The endpoint URI template.</param>
     /// <param name="clientConfig">An action to configure the underlying <see cref="HttpClient"/>.</param>
@@ -125,7 +125,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="ConfigurationStore{TTenantInfo, TId}"/> to the application. Uses the default <see cref="IConfiguration"/> and section "Finbuckle:MultiTenant:Stores:ConfigurationStore".
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithConfigurationStore<TTenantInfo, TId>(
@@ -137,7 +137,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds a <see cref="ConfigurationStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> to load the section from.</param>
     /// <param name="sectionName">The configuration section to load.</param>
@@ -153,7 +153,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds an empty <see cref="InMemoryStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithInMemoryStore<TTenantInfo, TId>(
@@ -165,7 +165,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds an <see cref="EchoStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithEchoStore<TTenantInfo, TId>(
@@ -177,7 +177,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds and configures a <see cref="StaticStrategy"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="identifier">The tenant identifier to use for all tenant resolution.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
@@ -198,7 +198,7 @@ public static class MultiTenantBuilderExtensions
     /// Adds and configures a <see cref="DelegateStrategy"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="doStrategy">The delegate implementing the strategy.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
@@ -217,7 +217,7 @@ public static class MultiTenantBuilderExtensions
     /// </summary>
     /// <typeparam name="TContext">The strategy context type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TId"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <param name="doStrategy">The delegate implementing the strategy.</param>
     /// <remarks>
