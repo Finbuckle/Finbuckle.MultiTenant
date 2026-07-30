@@ -2,12 +2,28 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.Stores;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test;
 
 public class TenantManagerShould
 {
+    [Fact]
+    public async Task ManageTenantsWithIntTenantId()
+    {
+        var store = new InMemoryStore<TenantInfo<int>, int>();
+        var manager = new TenantManager<TenantInfo<int>, int>(store, []);
+
+        Assert.True(await manager.AddAsync(new TenantInfo<int> { Id = 1, Identifier = "initech" }));
+
+        Assert.Equal("initech", (await manager.GetAsync(1))!.Identifier);
+        Assert.Equal(1, (await manager.GetByIdentifierAsync("initech"))!.Id);
+
+        Assert.True(await manager.RemoveAsync(1));
+        Assert.Null(await manager.GetAsync(1));
+    }
+
     [Fact]
     public async Task ReturnTenantFromFirstCacheWithoutQueryingPrimaryStore()
     {

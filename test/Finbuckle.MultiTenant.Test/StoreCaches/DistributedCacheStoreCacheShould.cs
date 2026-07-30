@@ -110,6 +110,46 @@ public class DistributedCacheStoreCacheShould
         await cache.SetAsync(new TenantInfo { Id = "test-id", Identifier = "test" });
     }
 
+    [Fact]
+    public async Task RoundTripIntTenantId()
+    {
+        var services = new ServiceCollection();
+        services.AddOptions().AddDistributedMemoryCache();
+        var sp = services.BuildServiceProvider();
+
+        var cache = new DistributedCacheStoreCache<TenantInfo<int>, int>(sp.GetRequiredService<IDistributedCache>(),
+            Constants.TenantToken, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.MaxValue });
+
+        await cache.SetAsync(new TenantInfo<int> { Id = 42, Identifier = "initech" });
+
+        Assert.Equal(42, (await cache.GetAsync(42))!.Id);
+        Assert.Equal(42, (await cache.GetByIdentifierAsync("initech"))!.Id);
+
+        await cache.RemoveAsync(42);
+        Assert.Null(await cache.GetAsync(42));
+    }
+
+    [Fact]
+    public async Task RoundTripGuidTenantId()
+    {
+        var id = Guid.NewGuid();
+        var services = new ServiceCollection();
+        services.AddOptions().AddDistributedMemoryCache();
+        var sp = services.BuildServiceProvider();
+
+        var cache = new DistributedCacheStoreCache<TenantInfo<Guid>, Guid>(sp.GetRequiredService<IDistributedCache>(),
+            Constants.TenantToken, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.MaxValue });
+
+        await cache.SetAsync(new TenantInfo<Guid> { Id = id, Identifier = "initech" });
+
+        Assert.Equal(id, (await cache.GetAsync(id))!.Id);
+        Assert.Equal(id, (await cache.GetByIdentifierAsync("initech"))!.Id);
+
+        await cache.RemoveByIdentifierAsync("initech");
+        Assert.Null(await cache.GetAsync(id));
+        Assert.Null(await cache.GetByIdentifierAsync("initech"));
+    }
+
     private static async Task<IMultiTenantStoreCache<TenantInfo, string>> CreateTestCache()
     {
         var services = new ServiceCollection();

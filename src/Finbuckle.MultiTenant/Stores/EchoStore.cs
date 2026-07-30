@@ -15,18 +15,18 @@ namespace Finbuckle.MultiTenant.Stores;
 public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly Func<string, TId> idFromIdentifier;
-    private readonly Func<TId, string> identifierFromId;
 
     /// <summary>
     /// Constructor for EchoStore.
     /// </summary>
-    /// <param name="idFromIdentifier">Converts a tenant identifier to a tenant id.</param>
-    /// <param name="identifierFromId">Converts a tenant id to a tenant identifier.</param>
-    /// <exception cref="ArgumentNullException">Thrown when either conversion delegate is null.</exception>
-    public EchoStore(Func<string, TId> idFromIdentifier, Func<TId, string> identifierFromId)
+    /// <param name="idFromIdentifier">
+    /// Converts a tenant identifier to a tenant id. Required because there is no universal way to convert a string
+    /// identifier to an arbitrary <typeparamref name="TId"/>. For a string id this is simply <c>identifier => identifier</c>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="idFromIdentifier"/> is null.</exception>
+    public EchoStore(Func<string, TId> idFromIdentifier)
     {
         this.idFromIdentifier = idFromIdentifier ?? throw new ArgumentNullException(nameof(idFromIdentifier));
-        this.identifierFromId = identifierFromId ?? throw new ArgumentNullException(nameof(identifierFromId));
     }
 
     /// <inheritdoc />
@@ -51,8 +51,9 @@ public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> w
         // use reflection since the interfaces only has getters for id and identifier (design choice)
         var idProperty = typeof(TTenantInfo).GetProperty("Id");
         idProperty?.SetValue(tenantInfo, id);
+        // the identifier is just the string form of the id; ToString is the natural inverse of idFromIdentifier
         var identifierProperty = typeof(TTenantInfo).GetProperty("Identifier");
-        identifierProperty?.SetValue(tenantInfo, identifierFromId(id));
+        identifierProperty?.SetValue(tenantInfo, id.ToString() ?? string.Empty);
 
         return Task.FromResult(tenantInfo);
     }

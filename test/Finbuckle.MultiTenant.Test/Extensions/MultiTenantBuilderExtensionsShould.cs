@@ -162,7 +162,7 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         var builder = new MultiTenantBuilder<TenantInfo, string>(services);
-        builder.WithEchoStore();
+        builder.WithEchoStore(identifier => identifier);
         var sp = services.BuildServiceProvider();
 
         var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();

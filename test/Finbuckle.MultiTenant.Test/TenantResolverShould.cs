@@ -15,6 +15,25 @@ namespace Finbuckle.MultiTenant.Test;
 public class TenantResolverShould
 {
     [Fact]
+    public async Task ResolveTenantWithIntTenantId()
+    {
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo<int>, int>()
+            .WithStaticStrategy("initech")
+            .WithInMemoryStore();
+        var sp = services.BuildServiceProvider();
+
+        await sp.GetRequiredService<TenantManager<TenantInfo<int>, int>>()
+            .AddAsync(new TenantInfo<int> { Id = 42, Identifier = "initech" });
+
+        var result = await sp.GetRequiredService<ITenantResolver<TenantInfo<int>, int>>().ResolveAsync(new object());
+
+        Assert.NotNull(result);
+        Assert.Equal(42, result.Id);
+        Assert.Equal("initech", result.Identifier);
+    }
+
+    [Fact]
     public void InitializeSortedStrategiesFromDi()
     {
         var services = new ServiceCollection();

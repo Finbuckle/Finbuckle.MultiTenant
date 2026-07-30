@@ -237,6 +237,32 @@ public class MultiTenantOptionsCacheShould
         Assert.Equal("new", cache.GetOrAdd("name", () => new TestOptions { Value = "new" }).Value);
     }
 
+    [Fact]
+    public void CacheOptionsSeparatelyPerIntTenant()
+    {
+        var context = new AmbientTenantContext<TenantInfo<int>, int>();
+        context.BeginScope();
+        var cache = new MultiTenantOptionsCache<TestOptions, int>(context);
+
+        // tenant 1
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo<int> { Id = 1, Identifier = "t1" };
+        var opt1 = new TestOptions();
+        Assert.True(cache.TryAdd(null, opt1));
+
+        // tenant 2 gets its own cache slot (int id 2 keys separately from int id 1)
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo<int> { Id = 2, Identifier = "t2" };
+        var opt2 = new TestOptions();
+        Assert.True(cache.TryAdd(null, opt2));
+        Assert.Same(opt2, cache.GetOrAdd(null, () => new TestOptions()));
+
+        // back to tenant 1 -> original options still cached
+        context.BeginScope();
+        context.TenantInfo = new TenantInfo<int> { Id = 1, Identifier = "t1" };
+        Assert.Same(opt1, cache.GetOrAdd(null, () => new TestOptions()));
+    }
+
     private static (MultiTenantOptionsCache<TestOptions,string> Cache, AmbientTenantContext<TenantInfo,string> Context) CreateCache()
     {
         var context = new AmbientTenantContext<TenantInfo,string>();
