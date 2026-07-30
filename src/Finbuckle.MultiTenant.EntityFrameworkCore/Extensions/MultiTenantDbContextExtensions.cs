@@ -264,7 +264,7 @@ public static class MultiTenantDbContextExtensions
         params object[] args)
         where TContext : DbContext, IMultiTenantDbContext<TId>
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         try
         {
