@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
@@ -41,8 +42,11 @@ public static class MultiTenantDbContextExtensions
                 if (multiTenantDbContext.TenantInfo is null)
                     throw new MultiTenantException("MultiTenant Entity cannot be attached if TenantInfo is null.");
 
+                // TenantId is of type TId; a boxed default value-type id is non-null, so ??= would not fill it.
+                // Compare against default(TId) explicitly and assign when unset.
                 var tenantIdProperty = args.Entry.Property("TenantId");
-                tenantIdProperty.CurrentValue ??= multiTenantDbContext.TenantInfo.Id;
+                if (EqualityComparer<TId>.Default.Equals((TId)tenantIdProperty.CurrentValue!, default!))
+                    tenantIdProperty.CurrentValue = multiTenantDbContext.TenantInfo.Id;
             };
 
             TrackingHandlerRegistry.Add(context, null);
@@ -74,14 +78,24 @@ public static class MultiTenantDbContextExtensions
         if (tenantInfo is null)
             throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
 
+        // TenantId is a property of type TId, so compare with EqualityComparer rather than assuming string.
+        // A TenantId equal to default(TId) is treated as "not set" rather than a mismatch.
+        var comparer = EqualityComparer<TId>.Default;
+
+        bool IsNotSet(EntityEntry entry) =>
+            comparer.Equals((TId)entry.Property("TenantId").CurrentValue!, default!);
+
+        bool IsMismatch(EntityEntry entry)
+        {
+            var currentId = (TId)entry.Property("TenantId").CurrentValue!;
+            return !comparer.Equals(currentId, default!) && !comparer.Equals(currentId, tenantInfo.Id);
+        }
 
         // get list of all added entities with MultiTenant annotation
         var addedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Added).ToList();
 
         // handle Tenant ID mismatches for added entities
-        var mismatchedAdded = addedMultiTenantEntities.Where(e =>
-            e.Property("TenantId").CurrentValue != null &&
-            !e.Property("TenantId").CurrentValue!.Equals(tenantInfo.Id)).ToList();
+        var mismatchedAdded = addedMultiTenantEntities.Where(IsMismatch).ToList();
 
         if (mismatchedAdded.Count != 0)
         {
@@ -105,7 +119,7 @@ public static class MultiTenantDbContextExtensions
         }
 
         // for added entities TenantNotSetMode is always Overwrite
-        var notSetAdded = addedMultiTenantEntities.Where(e => (string?)e.Property("TenantId").CurrentValue == null);
+        var notSetAdded = addedMultiTenantEntities.Where(IsNotSet);
 
         foreach (var e in notSetAdded)
         {
@@ -117,9 +131,7 @@ public static class MultiTenantDbContextExtensions
             changedMultiTenantEntities.Where(e => e.State == EntityState.Modified).ToList();
 
         // handle Tenant ID mismatches for modified entities
-        var mismatchedModified = modifiedMultiTenantEntities.Where(e =>
-            e.Property("TenantId").CurrentValue != null &&
-            !e.Property("TenantId").CurrentValue!.Equals(tenantInfo.Id)).ToList();
+        var mismatchedModified = modifiedMultiTenantEntities.Where(IsMismatch).ToList();
 
         if (mismatchedModified.Count != 0)
         {
@@ -144,8 +156,7 @@ public static class MultiTenantDbContextExtensions
         }
 
         // handle Tenant ID not set for modified entities
-        var notSetModified = modifiedMultiTenantEntities
-            .Where(e => (string?)e.Property("TenantId").CurrentValue == null).ToList();
+        var notSetModified = modifiedMultiTenantEntities.Where(IsNotSet).ToList();
 
         if (notSetModified.Count != 0)
         {
@@ -168,9 +179,7 @@ public static class MultiTenantDbContextExtensions
         var deletedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Deleted).ToList();
 
         // handle Tenant ID mismatches for deleted entities
-        var mismatchedDeleted = deletedMultiTenantEntities.Where(e =>
-            e.Property("TenantId").CurrentValue != null &&
-            !e.Property("TenantId").CurrentValue!.Equals(tenantInfo.Id)).ToList();
+        var mismatchedDeleted = deletedMultiTenantEntities.Where(IsMismatch).ToList();
 
         if (mismatchedDeleted.Count != 0)
         {
@@ -191,8 +200,7 @@ public static class MultiTenantDbContextExtensions
         }
 
         // handle Tenant Id not set for deleted entities
-        var notSetDeleted = deletedMultiTenantEntities.Where(e => (string?)e.Property("TenantId").CurrentValue == null)
-            .ToList();
+        var notSetDeleted = deletedMultiTenantEntities.Where(IsNotSet).ToList();
 
         if (notSetDeleted.Count != 0)
         {

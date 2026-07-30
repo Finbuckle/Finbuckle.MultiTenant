@@ -167,11 +167,15 @@ public static class MultiTenantBuilderExtensions
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
+    /// <param name="idFromIdentifier">Converts a tenant identifier to a tenant id.</param>
+    /// <param name="identifierFromId">Converts a tenant id to a tenant identifier.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithEchoStore<TTenantInfo, TId>(
-        this MultiTenantBuilder<TTenantInfo, TId> builder)
+        this MultiTenantBuilder<TTenantInfo, TId> builder,
+        Func<string, TId> idFromIdentifier,
+        Func<TId, string> identifierFromId)
         where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
-        => builder.WithStore<EchoStore<TTenantInfo, TId>>(ServiceLifetime.Singleton);
+        => builder.WithStore<EchoStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, idFromIdentifier, identifierFromId);
 
     /// <summary>
     /// Adds and configures a <see cref="StaticStrategy"/> to the application.
