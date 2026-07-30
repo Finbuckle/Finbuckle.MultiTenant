@@ -53,7 +53,11 @@ public static class FinbuckleHttpContextExtensions
         where TTenantInfo : ITenantInfo
     {
         if (resetServiceProviderScope)
-            httpContext.RequestServices = httpContext.RequestServices.CreateScope().ServiceProvider;
+        {
+            var scope = httpContext.RequestServices.CreateScope();
+            httpContext.RequestServices = scope.ServiceProvider;
+            httpContext.Response.RegisterForDispose(scope);
+        }
 
         var multiTenantContext =
             new MultiTenantContext<TTenantInfo>(tenantInfo: tenantInfo, strategyInfo: null, storeInfo: null);
