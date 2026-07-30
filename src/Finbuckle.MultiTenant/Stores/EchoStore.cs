@@ -40,12 +40,16 @@ public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> w
         var identifierProperty = typeof(TTenantInfo).GetProperty("Identifier");
         identifierProperty?.SetValue(tenantInfo, identifier);
 
+        tenantInfo.EnsureValid();
         return Task.FromResult(tenantInfo);
     }
 
     /// <inheritdoc />
     public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
 
         // use reflection since the interfaces only has getters for id and identifier (design choice)
@@ -55,6 +59,7 @@ public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> w
         var identifierProperty = typeof(TTenantInfo).GetProperty("Identifier");
         identifierProperty?.SetValue(tenantInfo, id.ToString() ?? string.Empty);
 
+        tenantInfo.EnsureValid();
         return Task.FromResult(tenantInfo);
     }
 

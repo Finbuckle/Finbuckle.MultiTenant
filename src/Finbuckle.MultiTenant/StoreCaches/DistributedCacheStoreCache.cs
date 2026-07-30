@@ -37,6 +37,9 @@ public class DistributedCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCac
     /// <inheritdoc />
     public async Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         var bytes = await cache.GetStringAsync($"{keyPrefix}id__{id}", cancellationToken).ConfigureAwait(false);
         if (bytes == null)
             return default;
@@ -68,6 +71,7 @@ public class DistributedCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCac
     /// <inheritdoc />
     public async Task SetAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        tenantInfo.EnsureValid();
         var bytes = JsonSerializer.Serialize(tenantInfo);
 
         await cache.SetStringAsync($"{keyPrefix}id__{tenantInfo.Id}", bytes, cacheEntryOptions, cancellationToken)
@@ -79,6 +83,9 @@ public class DistributedCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCac
     /// <inheritdoc />
     public async Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         await cache.RemoveAsync($"{keyPrefix}id__{id}", cancellationToken).ConfigureAwait(false);
     }
 

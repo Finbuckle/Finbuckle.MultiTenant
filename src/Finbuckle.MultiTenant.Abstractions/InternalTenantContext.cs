@@ -19,6 +19,9 @@ internal class InternalTenantContext<TTenantInfo, TId> : ITenantContext<TTenantI
         get;
         set
         {
+            // A resolved tenant must have a non-default id and a non-empty identifier.
+            value?.EnsureValid();
+
             // Ensure that TenantInfo is only set once.
             if (field != null)
                 throw new MultiTenantException("TenantInfo is already set. It cannot be set more than once.");

@@ -33,6 +33,9 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenant
     /// <inheritdoc />
     public virtual async Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         return await dbContext.TenantInfo.AsNoTracking()
             .Where(ti => ti.Id.Equals(id))
             .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
@@ -64,6 +67,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenant
     /// <inheritdoc />
     public virtual async Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        tenantInfo.EnsureValid();
         await dbContext.TenantInfo.AddAsync(tenantInfo, cancellationToken).ConfigureAwait(false);
         var result = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false) > 0;
         dbContext.Entry(tenantInfo).State = EntityState.Detached;
@@ -74,6 +78,9 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenant
     /// <inheritdoc />
     public virtual async Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         var existing = await dbContext.TenantInfo
             .Where(ti => ti.Id.Equals(id))
             .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
@@ -106,6 +113,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenant
     /// <inheritdoc />
     public virtual async Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        tenantInfo.EnsureValid();
         dbContext.TenantInfo.Update(tenantInfo);
         var result = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false) > 0;
         dbContext.Entry(tenantInfo).State = EntityState.Detached;

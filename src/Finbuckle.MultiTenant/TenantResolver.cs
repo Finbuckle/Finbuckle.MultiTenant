@@ -164,6 +164,9 @@ public class TenantResolver<TTenantInfo, TId> : ITenantResolver<TTenantInfo,TId>
             Strategy = finalStrategy
         };
         await _options.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
+
+        // a resolved tenant must have a non-default id and a non-empty identifier
+        resolutionCompletedContext.TenantInfo?.EnsureValid();
         return resolutionCompletedContext.TenantInfo;
     }
 

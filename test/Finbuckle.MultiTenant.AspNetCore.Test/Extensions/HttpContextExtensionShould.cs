@@ -16,7 +16,7 @@ public class HttpContextExtensionShould
     [Fact]
     public void GetExistingTenantContext()
     {
-        var ti = new TenantInfo { Id = "test", Identifier = "" };
+        var ti = new TenantInfo { Id = "test", Identifier = "test" };
 
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo, string>();
@@ -34,7 +34,7 @@ public class HttpContextExtensionShould
     [Fact]
     public void GetExistingNonGenericTenantContext()
     {
-        var ti = new TenantInfo { Id = "test", Identifier = "" };
+        var ti = new TenantInfo { Id = "test", Identifier = "test" };
 
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo, string>();
@@ -69,7 +69,7 @@ public class HttpContextExtensionShould
     [Fact]
     public void ReturnTenantInfo()
     {
-        var ti = new TenantInfo { Id = "test", Identifier = "" };
+        var ti = new TenantInfo { Id = "test", Identifier = "test" };
 
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo, string>();
@@ -116,7 +116,7 @@ public class HttpContextExtensionShould
         var context = httpContextMock.Object;
         sp.BeginTenantScope();
 
-        var ti2 = new TenantInfo { Id = "tenant2", Identifier = "" };
+        var ti2 = new TenantInfo { Id = "tenant2", Identifier = "tenant2" };
         context.SetTenantInfo<TenantInfo, string>(ti2);
         var ti = context.GetTenantInfo<TenantInfo, string>();
 

@@ -34,6 +34,9 @@ public class MemoryCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TT
     /// <inheritdoc />
     public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         cache.TryGetValue($"{keyPrefix}id__{id}", out TTenantInfo? result);
         return Task.FromResult(result);
     }
@@ -48,6 +51,7 @@ public class MemoryCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TT
     /// <inheritdoc />
     public Task SetAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        tenantInfo.EnsureValid();
         cache.Set($"{keyPrefix}id__{tenantInfo.Id}", tenantInfo, cacheEntryOptions);
         cache.Set($"{keyPrefix}identifier__{tenantInfo.Identifier}", tenantInfo, cacheEntryOptions);
 
@@ -57,6 +61,9 @@ public class MemoryCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TT
     /// <inheritdoc />
     public Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         cache.Remove($"{keyPrefix}id__{id}");
 
         return Task.CompletedTask;

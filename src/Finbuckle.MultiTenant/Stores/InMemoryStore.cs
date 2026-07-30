@@ -26,6 +26,9 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     /// <inheritdoc />
     public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         lock (_tenantMapLock)
         {
             return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id)));
@@ -64,7 +67,7 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     /// <inheritdoc />
     public Task<bool> AddAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
-        ValidateTenantInfo(tenantInfo);
+        tenantInfo.EnsureValid();
 
         lock (_tenantMapLock)
         {
@@ -78,6 +81,9 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     /// <inheritdoc />
     public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         lock (_tenantMapLock)
         {
             var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id));
@@ -98,7 +104,7 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     /// <inheritdoc />
     public Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
-        ValidateTenantInfo(tenantInfo);
+        tenantInfo.EnsureValid();
 
         lock (_tenantMapLock)
         {
@@ -119,16 +125,5 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
             _tenantMap.Add(tenantInfo.Identifier, tenantInfo);
             return Task.FromResult(true);
         }
-    }
-
-    private static void ValidateTenantInfo(TTenantInfo tenantInfo)
-    {
-        ArgumentNullException.ThrowIfNull(tenantInfo);
-
-        if (Equals(tenantInfo.Id, null))
-            throw new MultiTenantException("Missing tenant id");
-
-        if (string.IsNullOrWhiteSpace(tenantInfo.Identifier))
-            throw new MultiTenantException("Missing tenant identifier.");
     }
 }

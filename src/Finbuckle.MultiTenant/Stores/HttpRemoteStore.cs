@@ -88,6 +88,7 @@ public class HttpRemoteStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, 
     {
         var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier, cancellationToken)
             .ConfigureAwait(false);
+        result?.EnsureValid();
         return result;
     }
 

@@ -4,7 +4,6 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 
@@ -14,7 +13,15 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 public abstract class MultiTenantDbContext<TId> : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
 {
     /// <inheritdoc />
-    public ITenantInfo<TId>? TenantInfo { get; set; }
+    public ITenantInfo<TId>? TenantInfo
+    {
+        get;
+        set
+        {
+            value?.EnsureValid();
+            field = value;
+        }
+    }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;

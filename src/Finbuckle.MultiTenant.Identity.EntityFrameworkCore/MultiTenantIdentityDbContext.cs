@@ -113,7 +113,15 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TId : IEquatable<TId>
 {
     /// <inheritdoc />
-    public ITenantInfo<TId>? TenantInfo { get; set; }
+    public ITenantInfo<TId>? TenantInfo
+    {
+        get;
+        set
+        {
+            value?.EnsureValid();
+            field = value;
+        }
+    }
 
     /// <inheritdoc />
     public TenantMismatchMode TenantMismatchMode { get; set; } = TenantMismatchMode.Throw;

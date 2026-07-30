@@ -34,7 +34,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -76,7 +76,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -109,7 +109,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -144,7 +144,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -184,7 +184,7 @@ public class MultiTenantBuilderExtensionsShould
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -222,7 +222,7 @@ public class MultiTenantBuilderExtensionsShould
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();

@@ -36,4 +36,15 @@ public class IntTenantIdIdentityDbContextShould : IDisposable
         Assert.Equal(typeof(int), userTenantId.ClrType);
         Assert.Equal(typeof(int), roleTenantId.ClrType);
     }
+
+    [Fact]
+    public void RejectDefaultIdTenant()
+    {
+        _connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
+        using var db = new IntIdentityDbContext(options);
+
+        Assert.Throws<MultiTenantException>(() =>
+            db.TenantInfo = new TenantInfo<int> { Id = 0, Identifier = "x" });
+    }
 }

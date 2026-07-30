@@ -72,6 +72,7 @@ public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInf
             defaults.Bind(newTenant, options => options.BindNonPublicProperties = true);
             tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
 
+            newTenant.EnsureValid();
             newMap.TryAdd(newTenant.Identifier, newTenant);
         }
 
@@ -90,7 +91,8 @@ public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInf
     /// <inheritdoc />
     public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
         return Task.FromResult(tenantMap.Values.SingleOrDefault(v => v.Id.Equals(id)));
     }
 

@@ -67,8 +67,7 @@ public class TenantManager<TTenantInfo, TId>
     /// <returns>True if successfully updated.</returns>
     public async Task<bool> UpdateAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(tenantInfo);
-        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
+        tenantInfo.EnsureValid();
 
         var existing = await GetFromStoreAsync(tenantInfo.Id, cancellationToken).ConfigureAwait(false);
         var result = await UpdateStoreAsync(tenantInfo, existing, cancellationToken).ConfigureAwait(false);
@@ -91,7 +90,8 @@ public class TenantManager<TTenantInfo, TId>
     /// <returns>True if successfully removed.</returns>
     public async Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         var existing = await GetFromStoreAsync(id, cancellationToken).ConfigureAwait(false);
         var result = await RemoveFromStoreAsync(id, cancellationToken).ConfigureAwait(false);
@@ -148,7 +148,8 @@ public class TenantManager<TTenantInfo, TId>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
     public async Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         var missedCaches = new List<IMultiTenantStoreCache<TTenantInfo, TId>>();
         foreach (var cache in _caches)
@@ -281,7 +282,8 @@ public class TenantManager<TTenantInfo, TId>
 
     private async Task<TTenantInfo?> GetFromStoreAsync(TId id, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         var logger = GetLogger(_store);
         TTenantInfo? result = default;
@@ -370,9 +372,7 @@ public class TenantManager<TTenantInfo, TId>
 
     private async Task<bool> AddToStoreAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(tenantInfo);
-        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
-        ArgumentNullException.ThrowIfNull(tenantInfo.Identifier);
+        tenantInfo.EnsureValid();
 
         var logger = GetLogger(_store);
         var result = false;
@@ -429,8 +429,7 @@ public class TenantManager<TTenantInfo, TId>
     private async Task<bool> UpdateStoreAsync(TTenantInfo tenantInfo, TTenantInfo? existing,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(tenantInfo);
-        ArgumentNullException.ThrowIfNull(tenantInfo.Id);
+        tenantInfo.EnsureValid();
 
         var logger = GetLogger(_store);
         var result = false;
@@ -466,7 +465,8 @@ public class TenantManager<TTenantInfo, TId>
 
     private async Task<bool> RemoveFromStoreAsync(TId id, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         var logger = GetLogger(_store);
         var result = false;
@@ -529,7 +529,8 @@ public class TenantManager<TTenantInfo, TId>
     private async Task<TTenantInfo?> GetFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, TId id,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         try
         {
@@ -577,7 +578,8 @@ public class TenantManager<TTenantInfo, TId>
     private async Task RemoveFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, TId id,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
 
         try
         {
