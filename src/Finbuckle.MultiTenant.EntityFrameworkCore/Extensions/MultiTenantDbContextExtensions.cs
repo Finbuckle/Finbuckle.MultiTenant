@@ -258,13 +258,13 @@ public static class MultiTenantDbContextExtensions
     /// <param name="args">Additional dependencies for the <see cref="DbContext"/> constructor.</param>
     /// <typeparam name="TContext">The <see cref="DbContext"/> implementation type.</typeparam>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
-    /// <typeparam name="TIdentifier"></typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The newly created <see cref="DbContext"/> instance.</returns>
-    public static TContext Create<TContext, TTenantInfo, TIdentifier>(TTenantInfo tenantInfo, IServiceProvider serviceProvider,
+    public static TContext Create<TContext, TTenantInfo, TId>(TTenantInfo tenantInfo, IServiceProvider serviceProvider,
         params object[] args)
-        where TContext : DbContext, IMultiTenantDbContext<TIdentifier>
-        where TTenantInfo : ITenantInfo<TIdentifier>
-        where TIdentifier : IEquatable<TIdentifier>, ISpanParsable<TIdentifier>
+        where TContext : DbContext, IMultiTenantDbContext<TId>
+        where TTenantInfo : ITenantInfo<TId>
+        where TId : IEquatable<TId>, ISpanParsable<TId>
     {
         try
         {
