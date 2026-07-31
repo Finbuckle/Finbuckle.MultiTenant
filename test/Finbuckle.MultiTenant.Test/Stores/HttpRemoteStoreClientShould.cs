@@ -111,6 +111,41 @@ public class HttpRemoteStoreClientShould
     }
 
     [Fact]
+    public async Task RoundTripGuidTenantId()
+    {
+        var id = Guid.NewGuid();
+        var handler = new TestHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent($$"""{"id":"{{id}}","identifier":"initech"}""")
+        });
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient(handler));
+        var client = new HttpRemoteStoreClient<TenantInfo<Guid>, Guid>(factory.Object);
+
+        var tenant = await client.GetByIdentifierAsync("https://example.com/{__tenant__}", "initech");
+
+        Assert.Equal(id, tenant?.Id);
+        Assert.Equal("initech", tenant?.Identifier);
+    }
+
+    [Fact]
+    public async Task RoundTripIntTenantId()
+    {
+        var handler = new TestHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("""{"id":42,"identifier":"initech"}""")
+        });
+        var factory = new Mock<IHttpClientFactory>();
+        factory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient(handler));
+        var client = new HttpRemoteStoreClient<TenantInfo<int>, int>(factory.Object);
+
+        var tenant = await client.GetByIdentifierAsync("https://example.com/{__tenant__}", "initech");
+
+        Assert.Equal(42, tenant?.Id);
+        Assert.Equal("initech", tenant?.Identifier);
+    }
+
+    [Fact]
     public async Task GetAllTenantsFromCollectionEndpoint()
     {
         var handler = new TestHandler((_, _) => new HttpResponseMessage(HttpStatusCode.OK)

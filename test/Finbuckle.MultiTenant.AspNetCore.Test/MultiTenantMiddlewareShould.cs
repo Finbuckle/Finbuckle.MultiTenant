@@ -2,6 +2,7 @@
 // Refer to the solution LICENSE file for more information.
 
 using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
 using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,39 @@ public class MultiTenantMiddlewareShould
             sp.GetRequiredService<ITenantContext<string>>(),
             sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
+
+    [Fact]
+    public async Task ResolveGuidTenantAndExposeViaGetTenantInfo()
+    {
+        var tenantId = Guid.NewGuid();
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo<Guid>, Guid>().WithStaticStrategy("initech").WithInMemoryStore();
+        var sp = services.BuildServiceProvider();
+        await sp.GetRequiredService<IMultiTenantStore<TenantInfo<Guid>, Guid>>()
+            .AddAsync(new TenantInfo<Guid> { Id = tenantId, Identifier = "initech" });
+
+        var context = new DefaultHttpContext { RequestServices = sp };
+
+        // The ambient scope established by the middleware flows into the pipeline (the next delegate),
+        // so read the tenant there via the HttpContext extension.
+        TenantInfo<Guid>? observed = null;
+        var mw = new MultiTenantMiddleware<Guid>(ctx =>
+            {
+                observed = ctx.GetTenantInfo<TenantInfo<Guid>, Guid>();
+                return Task.CompletedTask;
+            },
+            MsOptions.Create(new BypassWhenOptions()),
+            MsOptions.Create(new ShortCircuitWhenOptions<Guid>()));
+
+        await mw.Invoke(context,
+            sp.GetRequiredService<ITenantContext<Guid>>(),
+            sp.GetRequiredService<ITenantResolver<Guid>>(),
+            sp.GetRequiredService<ITenantScopeProvider>());
+
+        Assert.NotNull(observed);
+        Assert.Equal(tenantId, observed.Id);
+        Assert.Equal("initech", observed.Identifier);
+    }
 
     [Fact]
     public async Task ResolveTenantContextIfTenantFound()

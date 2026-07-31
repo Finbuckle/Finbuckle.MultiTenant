@@ -107,6 +107,28 @@ public class PerTenantOptionsIntegrationShould
         Assert.Equal("tenant-2:2", notificationValue?.Value);
     }
 
+    [Fact]
+    public void ResolvePerTenantOptionsWithGuidTenantId()
+    {
+        var tenantId = Guid.NewGuid();
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo<Guid>, Guid>();
+        services.Configure<TestOptions>(options => options.Value = "base");
+        services.ConfigurePerTenant<TestOptions, TenantInfo<Guid>, Guid>((options, tenant) =>
+            options.Value += $":{tenant.Id}");
+
+        using var provider = services.BuildServiceProvider();
+        provider.BeginTenantScope(new TenantInfo<Guid> { Id = tenantId, Identifier = "tenant-1" });
+
+        var expected = $"base:{tenantId}";
+        Assert.Equal(expected, provider.GetRequiredService<IOptions<TestOptions>>().Value.Value);
+        using var scope = provider.CreateScope();
+        Assert.Equal(expected,
+            scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value.Value);
+        Assert.Equal(expected,
+            provider.GetRequiredService<IOptionsMonitor<TestOptions>>().CurrentValue.Value);
+    }
+
     private static void SetTenant(IServiceProvider provider, string tenantId)
     {
         provider.BeginTenantScope(new TenantInfo { Id = tenantId, Identifier = tenantId });
