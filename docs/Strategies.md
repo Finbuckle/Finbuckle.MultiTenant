@@ -31,11 +31,11 @@ providing basic logging and exception handling.
 
 ```csharp
 // configure a strategy with a given type
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStrategy<MyStrategy>(myParam1, myParam2)...
 
 // or configure a strategy with a factory method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStrategy(sp => new MyStrategy())...
 ```
 
@@ -59,7 +59,7 @@ Configure by calling `WithStaticStrategy` after `AddMultiTenant<TTenantInfo, TId
 tenant resolution:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStaticStrategy("MyTenant")
 ```
 

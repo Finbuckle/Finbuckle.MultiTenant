@@ -219,6 +219,6 @@ non per-tenant options).
 ## See Also
 
 - [Configuration and Usage](ConfigurationAndUsage) — service registration
-- [Core Concepts](CoreConcepts) — `ITenantContext` and scoped lifetime
+- [Core Concepts](CoreConcepts) — `ITenantContext` and the ambient tenant scope
 - [ASP.NET Core Integration](AspNetCore) — middleware integration
 - [Per-Tenant Authentication](Authentication) — authentication options

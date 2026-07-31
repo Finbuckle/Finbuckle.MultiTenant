@@ -76,11 +76,11 @@ be configured.
 
 ```csharp
 // register a custom store with the templated method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStore<MyStore>(ServiceLifetime.Singleton, myParam1, myParam2)...
 
 // or register a custom store with the non-templated method which accepts a factory method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStore(ServiceLifetime.Singleton, sp => new MyStore())...
 ```
 
@@ -128,7 +128,7 @@ matching is always case-insensitive. Add initial tenants through `TenantManager<
 provider is built and before the application begins handling requests:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithInMemoryStore();
 
 var app = builder.Build();
@@ -164,11 +164,11 @@ configuration object or section name if needed.
 
 ```csharp
 // register to use the default root configuration and section name.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithConfigurationStore()...
     
 // or use a different configuration path key
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithConfigurationStore("customConfigurationPathKey")...
 ```
 
@@ -220,7 +220,7 @@ provide types for the store's database context generic parameter:
 
 ```csharp
 // configure dbcontext `MultiTenantStoreDbContext`, which derives from `EFCoreStoreDbContext`
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
@@ -253,15 +253,15 @@ of `WithHttpRemoteStore` allows for a lambda function to further configure the i
 
 ```csharp
 // append the identifier to the provided url
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/")...
 
 // or template the identifier into a custom location
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo")...
 
 // or modify the underlying `HttpClient` with a custom message handler and settings
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
     {
         httpClientBuilder.AddHttpMessageHandler<MyCustomHeaderHandler>();
@@ -274,7 +274,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
  
 // or add Polly support
 // via https://www.hanselman.com/blog/AddingResilienceAndTransientFaultHandlingToYourNETCoreHttpClientWithPolly.aspx
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
     {
         httpClientBuilder.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(2));
@@ -300,12 +300,12 @@ Configure by calling `WithDistributedCacheStoreCache` after `AddMultiTenant<TTen
 
 ```csharp
 // use the default cache entry configuration.
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
         .WithDistributedCacheStoreCache()
         .WithConfigurationStore()...
 
 // or set a 5 minute sliding expiration.
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
         .WithDistributedCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5))
         .WithConfigurationStore();
 ```
@@ -318,7 +318,7 @@ Uses the standard .NET `IMemoryCache` as a tenant store cache. Configure expirat
 `MemoryCacheEntryOptions`.
 
 ```csharp
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
     .WithMemoryCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5))
     .WithConfigurationStore();
 ```
@@ -336,12 +336,17 @@ information is static and predefined elsewhere.
 This store is read-only and calls to `AddAsync`, `UpdateAsync`, `RemoveAsync`, and `RemoveByIdentifierAsync` will throw
 a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync` will also throw an Exception.
 
-Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo, TId>`.
+Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo, TId>`. Because the store turns a resolved
+string identifier into a tenant `Id` of type `TId`, you must supply a conversion delegate (there is no universal way to
+convert a string to an arbitrary `TId`). For a `string` id this is simply `identifier => identifier`:
 
 ```csharp
-services.AddMultiTenant<TenantInfo>()
-    .WithEchoStore();
+services.AddMultiTenant<TenantInfo, string>()
+    .WithEchoStore(identifier => identifier);
 ```
+
+For a non-`string` id type, pass a parser, for example `.WithEchoStore(Guid.Parse)`. The reverse direction (turning an
+`Id` back into an identifier for `GetAsync`) uses `Id.ToString()` automatically.
 
 ## Important Considerations
 
@@ -352,6 +357,9 @@ services.AddMultiTenant<TenantInfo>()
 - Store caches store each tenant twice (by `Id` and by `Identifier`). `TenantManager<TTenantInfo, TId>` keeps both entries
   in sync automatically when resolving tenants or invalidating caches after writes.
 - `RemoveAsync` removes by tenant id. `RemoveByIdentifierAsync` removes by tenant identifier.
+- Tenant ids must be non-default. `default(TId)` — `0`, `Guid.Empty`, or a null/whitespace `string` — is treated as
+  *no tenant*: adding, updating, or caching such a tenant throws a `MultiTenantException`, and looking one up by a
+  default id throws an `ArgumentException`.
 - `GetAllAsync` is not implemented by all stores. Check individual store documentation before relying on it.
 - Custom stores implementing `IMultiTenantStore<TTenantInfo, TId>` should avoid extensive logging or validation —
   `TenantManager<TTenantInfo, TId>` handles these consistently at runtime.

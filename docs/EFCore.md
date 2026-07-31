@@ -10,7 +10,7 @@ supports each of these models by associating a connection string with each tenan
 
 If each tenant uses a separate database then add a `ConnectionString` property to the app's `TenantInfo`
 implementation and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
-by injecting an `ITenantContext<TTenantInfo>` into the database context class constructor.
+by injecting an `ITenantContext<TTenantInfo, TId>` into the database context class constructor.
 
 ```csharp
 public class AppTenantInfo : ITenantInfo<string>
@@ -25,7 +25,7 @@ public class MyAppDbContext : DbContext
 {
    private AppTenantInfo? TenantInfo { get; set; }
 
-   public MyAppDbContext(ITenantContext<AppTenantInfo> tenantContext)
+   public MyAppDbContext(ITenantContext<AppTenantInfo, string> tenantContext)
    {
        // get the current tenant info at the time of construction
        TenantInfo = tenantContext.TenantInfo;
@@ -581,7 +581,7 @@ or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSet
   binds `TenantInfo` automatically, and wires up `EnforceMultiTenantOnTracking`.
 - `AddPooledMultiTenantDbContext<T>()` reuses context instances across requests. `OnConfiguring` is called only
   on initial creation — do not use it for per-tenant connection strings or providers.
-- For separate databases, inject `ITenantContext<TTenantInfo>` (not an accessor) into the DbContext constructor
+- For separate databases, inject `ITenantContext<TTenantInfo, TId>` (not an accessor) into the DbContext constructor
   to get the current tenant's `ConnectionString`.
 - The global query filter is automatically applied to entities marked with `[MultiTenant]` or configured via the
   fluent API. Use `IgnoreQueryFilters()` to bypass it when needed.

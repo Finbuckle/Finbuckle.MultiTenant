@@ -22,9 +22,9 @@ for each HTTP request:
 1. For every request, the middleware calls `ITenantResolver.ResolveAsync(HttpContext)`.
 2. The resolver iterates through registered strategies (which receive the `HttpContext`) to find a tenant
    identifier, then queries stores to find a matching `TenantInfo`.
-3. If a tenant is found, the middleware sets `TenantInfo` on the scoped `ITenantContext<TTenantInfo, TId>` for
-   that request.
-4. All services resolved within the request's DI scope — including `IOptions<T>`, `IOptionsSnapshot<T>`,
+3. The middleware begins a fresh ambient tenant scope for the request and, if a tenant is found, sets `TenantInfo`
+   on the `ITenantContext<TTenantInfo, TId>` for that scope.
+4. All services resolved during the request — including `IOptions<T>`, `IOptionsSnapshot<T>`,
    `IOptionsMonitor<T>`, and `IMultiTenantDbContext<TId>` — automatically see the resolved tenant.
 
 This means you never need to manually call `ITenantResolver<TId>` or populate `ITenantContext<TId>` in an ASP.NET Core
@@ -103,7 +103,7 @@ access the current tenant in ASP.NET Core because it always reflects the state s
 in post-endpoint processing.
 
 ```csharp
-var tenantInfo = HttpContext.GetTenantContext<TenantInfo, TId>().TenantInfo;
+var tenantInfo = HttpContext.GetTenantContext<TenantInfo, string>().TenantInfo;
 
 if (tenantInfo != null)
 {
@@ -243,7 +243,7 @@ public class DashboardController : Controller
 
 ### Bypass When No Endpoint Is Matched
 
-Call `BypassWhenEndpointNotResolved()` after `AddMultiTenant<TTenantInfo>` to skip tenant resolution
+Call `BypassWhenEndpointNotResolved()` after `AddMultiTenant<TTenantInfo, TId>` to skip tenant resolution
 entirely when the current request has no matched endpoint. This is especially useful when requests arrive
 that do not match any route.
 
@@ -280,7 +280,7 @@ or when some custom condition is met.
 
 ### Short Circuit When Tenant Not Resolved
 
-Call `ShortCircuitWhenTenantNotResolved()` after `AddMultiTenant<TTenantInfo>` to halt further processing
+Call `ShortCircuitWhenTenantNotResolved()` after `AddMultiTenant<TTenantInfo, TId>` to halt further processing
 when no tenant can be found. An overload accepts a URI to redirect to when no tenant is found.
 
 > If you short circuit when tenant not resolved, and you have endpoints that do not require a tenant,
@@ -399,8 +399,9 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 - **`TenantInfo` can only be set once** per request. The middleware sets it early in the pipeline. If you
   need to override it, use `HttpContext.SetTenantInfo<TTenantInfo, TId>()` or `TrySetTenantInfo<TTenantInfo, TId>()` before any tenant-aware
   services are resolved.
-- **`ITenantContext` is scoped.** Each HTTP request gets its own instance. A new scope is created
-  per request by the ASP.NET Core framework, so this happens automatically.
+- **`ITenantContext` is ambient.** The current tenant is held in an `AsyncLocal`, not a scoped DI service. The
+  middleware begins a fresh ambient tenant scope for each request (via `ITenantScopeProvider.BeginScope()`) and sets
+  the resolved tenant on it, so each request sees its own tenant automatically.
 - **`IOptionsMonitor<T>` is scoped** in MultiTenant. Do not capture it in a singleton service.
 - **Not all strategies work for all scenarios.** The [Claim Strategy](Strategies#claim-strategy) needs
   authentication middleware to run first. The [Route Strategy](Strategies#route-strategy) requires
@@ -412,7 +413,7 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 ## See Also
 
 - [Configuration and Usage](ConfigurationAndUsage) — registration and resolver details
-- [Core Concepts](CoreConcepts) — `ITenantContext<TId>`, `TenantContext`, and scoped lifetime
+- [Core Concepts](CoreConcepts) — `ITenantContext<TId>` and the ambient tenant scope
 - [.NET Generic Host Integration](GenericHost) — using MultiTenant in non-web apps
 - [Per-Tenant Authentication](Authentication) — full authentication setup
 - [Per-Tenant Options](Options) — options customization

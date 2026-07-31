@@ -20,13 +20,13 @@ If you also need [per-tenant options](Options), add `Finbuckle.MultiTenant.Optio
 
 ## How It Differs from ASP.NET Core
 
-In ASP.NET Core, the `UseMultiTenant<TId>()` middleware automatically resolves the tenant for each HTTP request and
-populates the scoped `ITenantContext<TId>`. In a Generic Host app there is **no middleware**. You must manually:
+In ASP.NET Core, the `UseMultiTenant<TId>()` middleware automatically begins an ambient tenant scope for each HTTP
+request and sets the resolved tenant on it. In a Generic Host app there is **no middleware**. You must manually:
 1. Create a DI scope for each unit of work (message, job, iteration).
 2. Resolve the tenant within that scope using `ITenantResolver`.
-3. Seed the scoped `ITenantContext<TId>` with the resolved tenant.
+3. Begin an ambient tenant scope seeded with the resolved tenant via `IServiceProvider.BeginTenantScope(tenantInfo)`.
 
-Once the scoped `ITenantContext<TId>` is populated, [per-tenant options](Options),
+Once the ambient scope is established, [per-tenant options](Options),
 [EF Core data isolation](EFCore), and all tenant-aware services work identically to ASP.NET Core.
 
 ## Configuring Services
@@ -100,7 +100,7 @@ services.AddMultiTenant<TenantInfo, string>()
 
 var provider = services.BuildServiceProvider();
 await using var scope = provider.CreateAsyncScope();
-await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo, string>>()
     .AddAsync(new TenantInfo
     {
         Id = Guid.NewGuid().ToString(),
@@ -112,8 +112,9 @@ await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
 
 Resolution is a two-step process:
 
-1. Call `ITenantResolver.ResolveAsync(context)` to determine the tenant.
-2. Set the result's `TenantInfo` on the scoped `ITenantContext<TId>`.
+1. Call `ITenantResolver.ResolveAsync(context)` to determine the tenant. It returns the resolved `TenantInfo` (the
+   `TTenantInfo` instance) or `null` if no tenant was resolved.
+2. If a tenant was resolved, begin an ambient scope seeded with it via `BeginTenantScope(tenantInfo)`.
 
 ### Worker Service Pattern (One Tenant per Message)
 
@@ -142,14 +143,13 @@ public class QueueProcessor : BackgroundService
 
             // 1. Resolve tenant for this message.
             var resolver = services.GetRequiredService<ITenantResolver<TenantInfo, string>>();
-            var result = await resolver.ResolveAsync(message);
+            var tenantInfo = await resolver.ResolveAsync(message);
 
-            // 2. Seed the scoped ITenantContext.
-            var tenantContext = services.GetRequiredService<ITenantContext<TenantInfo, string>>();
-            if (result.TenantInfo is not null)
-                tenantContext.TenantInfo = result.TenantInfo;
+            // 2. Begin an ambient tenant scope seeded with the resolved tenant.
+            if (tenantInfo is not null)
+                services.BeginTenantScope(tenantInfo);
 
-            // 3. Process within the scoped tenant.
+            // 3. Process within the ambient tenant scope.
             var handler = services.GetRequiredService<IMessageHandler>();
             await handler.HandleAsync(message, stoppingToken);
         }
@@ -184,31 +184,28 @@ var scopedProvider = scope.ServiceProvider;
 await scopedProvider.GetRequiredService<TenantManager<TenantInfo, string>>()
     .AddAsync(new TenantInfo { Id = "tenant-a-id", Identifier = "tenant-a" });
 
-// Resolve and set the tenant.
+// Resolve the tenant and begin an ambient scope seeded with it.
 var resolver = scopedProvider.GetRequiredService<ITenantResolver<TenantInfo, string>>();
-var result = await resolver.ResolveAsync("tenant-a");
-
-var tenantContext = scopedProvider.GetRequiredService<ITenantContext<TenantInfo, string>>();
-if (result.TenantInfo is not null)
-    tenantContext.TenantInfo = result.TenantInfo;
+var tenantInfo = await resolver.ResolveAsync("tenant-a");
+if (tenantInfo is not null)
+    scopedProvider.BeginTenantScope(tenantInfo);
 
 // All services resolved from scopedProvider now see the tenant.
 var options = scopedProvider.GetRequiredService<IOptions<MyOptions>>();
-Console.WriteLine($"Tenant: {tenantContext.TenantInfo?.Identifier}");
+Console.WriteLine($"Tenant: {tenantInfo?.Identifier}");
 ```
 
 ### Handling Unresolved Tenants
 
-If no strategy produces an identifier or no store finds a match, `result.TenantInfo` will be `null`.
-Check `result.IsResolved` before setting the scoped context:
+If no strategy produces an identifier or no store finds a match, `ResolveAsync` returns `null`.
+Check for null before beginning the tenant scope:
 
 ```csharp
-var result = await resolver.ResolveAsync(message);
-var tenantContext = services.GetRequiredService<ITenantContext<TenantInfo, string>>();
+var tenantInfo = await resolver.ResolveAsync(message);
 
-if (result.IsResolved)
+if (tenantInfo is not null)
 {
-    tenantContext.TenantInfo = result.TenantInfo;
+    services.BeginTenantScope(tenantInfo);
 }
 else
 {
@@ -298,7 +295,7 @@ builder.Services.AddMultiTenantDbContext<AppDbContext, string>(options =>
 ## See Also
 
 - [Configuration and Usage](ConfigurationAndUsage) — registration and resolver details
-- [Core Concepts](CoreConcepts) — `ITenantContext`, `TenantContext`, and scoped lifetime
+- [Core Concepts](CoreConcepts) — `ITenantContext` and the ambient tenant scope
 - [MultiTenant Strategies](Strategies) — all built-in strategies
 - [Per-Tenant Options](Options) — options customization
 - [EF Core Data Isolation](EFCore) — shared and separate database patterns

@@ -46,13 +46,15 @@ That's all that is needed to get going. Let's break down each line:
 `builder.Services.AddMultiTenant<TenantInfo, string>()`
 
 This line registers the base services and designates `TenantInfo` as the class that will hold tenant information at
-runtime.
+runtime and `string` as the tenant id type.
 
-The type parameter for `AddMultiTenant<TTenantInfo>` must implement `ITenantInfo` and holds
-basic information about the tenant such as its id and an identifier. `TenantInfo` is provided as a basic
-implementation class, but any implementation of `ITenantInfo` can be used if more properties are needed.
+`AddMultiTenant<TTenantInfo, TId>` has two type parameters: `TTenantInfo` must implement `ITenantInfo<TId>` and holds
+basic information about the tenant such as its id and an identifier, while `TId` is the type of the tenant id. `TId`
+must be `IEquatable<TId>` — `string`, `int`, and `Guid` are common choices. `TenantInfo<TId>` is provided as a basic
+implementation class, but any implementation of `ITenantInfo<TId>` can be used if more properties are needed. For
+example, `AddMultiTenant<AppTenantInfo, Guid>()` uses `Guid` tenant ids.
 
-See [Core Concepts](CoreConcepts) for more information on `TenantInfo`.
+See [Core Concepts](CoreConcepts) for more information on `TenantInfo` and tenant id types.
 
 `.WithHostStrategy()`
 
@@ -97,7 +99,7 @@ settings. Be sure to call it before other middleware which will use per-tenant f
 ## Basic Usage
 
 With the services and middleware configured, access information for the current tenant from the `TenantInfo` property on
-the `ITenantContext<TTenantInfo>` object accessed from the `GetTenantContext<TTenantInfo, TId>` extension method:
+the `ITenantContext<TTenantInfo, TId>` object accessed from the `GetTenantContext<TTenantInfo, TId>` extension method:
 
 ```csharp
 var tenantInfo = HttpContext.GetTenantContext<TenantInfo, string>().TenantInfo;
@@ -115,8 +117,8 @@ configuration. If the current tenant could not be determined then `TenantInfo` w
 For non-generic access in ASP.NET Core, use the `HttpContext.TenantContext` extension property. To read only the
 current tenant as `ITenantInfo`, use `HttpContext.CurrentTenant`.
 
-The `TenantInfo` instance and the typed instance are also available using the `ITenantContext<TTenantInfo>` interface
-which is available via dependency injection.
+The `TenantInfo` instance and the typed instance are also available using the `ITenantContext<TTenantInfo, TId>`
+interface which is available via dependency injection.
 
 See [Configuration and Usage](ConfigurationAndUsage) for more information.
 
@@ -140,11 +142,12 @@ the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/sampl
 
 - The type parameter passed to `AddMultiTenant<TTenantInfo, TId>()` determines the `ITenantInfo<Tid>` implementation used
   throughout the app. Choose or define a class that fits your tenant data model.
-- `ITenantContext<TTenantInfo, TId>` is registered as a scoped service. In ASP.NET Core the middleware populates it
-  automatically per request. In other app models you must manage scope creation and tenant resolution manually
-  (see [.NET Generic Host Integration](GenericHost)).
+- `ITenantContext<TTenantInfo, TId>` is an ambient service — the current tenant is held in an `AsyncLocal` and flows
+  with the asynchronous execution context. In ASP.NET Core the middleware begins the scope and populates it
+  automatically per request. In other app models you begin the scope yourself with `BeginTenantScope` after resolving
+  the tenant (see [.NET Generic Host Integration](GenericHost)).
 - `TenantInfo` can only be set once per scope. The middleware handles this in web apps, but be aware of the
-  constraint if you call `SetTenantInfo` manually.
+  constraint if you call `SetTenantInfo` or `BeginTenantScope` manually.
 - Middleware ordering is critical: `UseMultiTenant<TId>()` must come before `UseAuthentication()`, `UseAuthorization()`,
   and any middleware that reads per-tenant options or services.
 - For web apps, prefer the `HttpContext` extension members (`GetTenantContext<T, TId>()`, `GetTenantInfo<T, TId>()`,
