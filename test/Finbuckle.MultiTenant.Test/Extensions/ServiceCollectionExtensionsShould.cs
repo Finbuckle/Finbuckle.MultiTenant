@@ -15,9 +15,9 @@ public class ServiceCollectionExtensionsShould
     public void RegisterITenantResolverInDi()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
 
-        var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver));
+        var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver<string>));
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
@@ -27,9 +27,9 @@ public class ServiceCollectionExtensionsShould
     public void RegisterITenantResolverGenericInDi()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
 
-        var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver<TenantInfo>));
+        var service = services.SingleOrDefault(s => s.ServiceType == typeof(ITenantResolver<TenantInfo, string>));
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Scoped, service.Lifetime);
@@ -39,10 +39,10 @@ public class ServiceCollectionExtensionsShould
     public void RegisterITenantContextInDi()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
 
         var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
-                                                    s.ServiceType == typeof(ITenantContext));
+                                                    s.ServiceType == typeof(ITenantContext<string>));
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
@@ -52,11 +52,11 @@ public class ServiceCollectionExtensionsShould
     public void RegisterITenantContextGenericInDi()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
 
         var service = services.SingleOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
                                                     s.ServiceType ==
-                                                    typeof(ITenantContext<TenantInfo>));
+                                                    typeof(ITenantContext<TenantInfo, string>));
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
@@ -66,21 +66,21 @@ public class ServiceCollectionExtensionsShould
     public void RegisterTenantScopeProviderAndContextAliasesAsSameSingleton()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         using var provider = services.BuildServiceProvider();
 
-        var ambient = provider.GetRequiredService<AmbientTenantContext<TenantInfo>>();
+        var ambient = provider.GetRequiredService<AmbientTenantContext<TenantInfo, string>>();
         Assert.Same(ambient, provider.GetRequiredService<ITenantScopeProvider>());
-        Assert.Same(ambient, provider.GetRequiredService<ITenantContext<TenantInfo>>());
-        Assert.Same(ambient, provider.GetRequiredService<ITenantContext>());
-        Assert.NotNull(provider.GetService<ITenantContext>());
+        Assert.Same(ambient, provider.GetRequiredService<ITenantContext<TenantInfo, string>>());
+        Assert.Same(ambient, provider.GetRequiredService<ITenantContext<string>>());
+        Assert.NotNull(provider.GetService<ITenantContext<string>>());
     }
 
     [Fact]
     public void SingletonConsumerObservesCurrentAmbientTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton<TenantReader>();
         using var provider = services.BuildServiceProvider();
         var reader = provider.GetRequiredService<TenantReader>();
@@ -98,11 +98,11 @@ public class ServiceCollectionExtensionsShould
     public void RegisterMultiTenantOptionsInDi()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
 
         var service = services.FirstOrDefault(s => s.Lifetime == ServiceLifetime.Singleton &&
                                                    s.ServiceType ==
-                                                   typeof(IConfigureOptions<MultiTenantOptions<TenantInfo>>));
+                                                   typeof(IConfigureOptions<MultiTenantOptions<TenantInfo, string>>));
 
         Assert.NotNull(service);
         Assert.Equal(ServiceLifetime.Singleton, service.Lifetime);
@@ -113,7 +113,7 @@ public class ServiceCollectionExtensionsShould
         public string? Prop1 { get; set; }
     }
 
-    private sealed class TenantReader(ITenantContext<TenantInfo> context)
+    private sealed class TenantReader(ITenantContext<TenantInfo, string> context)
     {
         public TenantInfo? TenantInfo => context.TenantInfo;
     }
@@ -122,18 +122,18 @@ public class ServiceCollectionExtensionsShould
     public void RegisterNamedOptionsPerTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.ConfigurePerTenant<TestOptions, TenantInfo>("name1",
+        services.AddMultiTenant<TenantInfo, string>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo,string>("name1",
             (option, tenant) => option.Prop1 = tenant.Id);
         var sp = services.BuildServiceProvider();
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>> options).ToList();
 
         Assert.Single(config);
         Assert.Equal("name1",
-            config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>>)c).Single()
+            config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>>)c).Single()
                 .Name);
     }
 
@@ -141,17 +141,17 @@ public class ServiceCollectionExtensionsShould
     public void RegisterUnnamedOptionsPerTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.ConfigurePerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+        services.AddMultiTenant<TenantInfo, string>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string>((option, tenant) => option.Prop1 = tenant.Id);
         var sp = services.BuildServiceProvider();
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>> options).ToList();
 
         Assert.Single(config);
         Assert.Equal(Microsoft.Extensions.Options.Options.DefaultName,
-            config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>>)c).Single()
+            config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>>)c).Single()
                 .Name);
     }
 
@@ -159,16 +159,16 @@ public class ServiceCollectionExtensionsShould
     public void RegisterAllOptionsPerTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.ConfigureAllPerTenant<TestOptions, TenantInfo>((option, tenant) => option.Prop1 = tenant.Id);
+        services.AddMultiTenant<TenantInfo, string>();
+        services.ConfigureAllPerTenant<TestOptions, TenantInfo, string>((option, tenant) => option.Prop1 = tenant.Id);
         var sp = services.BuildServiceProvider();
 
         var configs = sp.GetRequiredService<IEnumerable<IConfigureOptions<TestOptions>>>();
         var config = configs.Where(config =>
-            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>> options).ToList();
+            config is ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>> options).ToList();
 
         Assert.Single(config);
-        Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo>>)c)
+        Assert.Null(config.Select(c => (ConfigureNamedOptions<TestOptions, ITenantContext<TenantInfo, string>>)c)
             .Single().Name);
     }
 

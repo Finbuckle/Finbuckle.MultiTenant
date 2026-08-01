@@ -16,7 +16,7 @@ public class MultiTenantDbContextShould
     public void WorkWithDependencyInjection()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo,string>();
         services.AddDbContext<TestBlogDbContext>(options => { options.UseSqlite("DataSource=:memory:"); });
         var scope = services.BuildServiceProvider().CreateScope();
 
@@ -43,7 +43,7 @@ public class MultiTenantDbContextShould
     {
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
         var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1,
+            EntityFrameworkCore.Extensions.MultiTenantDbContextExtensions.Create<TestBlogDbContext, TenantInfo, string>(tenant1,
                 new DbContextOptions<TestBlogDbContext>());
 
         Assert.NotNull(c);
@@ -54,7 +54,7 @@ public class MultiTenantDbContextShould
     {
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
         var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object());
+            EntityFrameworkCore.Extensions.MultiTenantDbContextExtensions.Create<TestBlogDbContext, TenantInfo, string>(tenant1, new object());
 
         Assert.NotNull(c);
     }
@@ -69,7 +69,7 @@ public class MultiTenantDbContextShould
 
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
         var c =
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, sp);
+            EntityFrameworkCore.Extensions.MultiTenantDbContextExtensions.Create<TestBlogDbContext, TenantInfo,string>(tenant1, sp);
 
         Assert.NotNull(c);
         Assert.Same(tenant1, c.TenantInfo);
@@ -79,7 +79,7 @@ public class MultiTenantDbContextShould
     public void WorkWithCreateNoOptions()
     {
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
-        var c = EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1);
+        var c = EntityFrameworkCore.Extensions.MultiTenantDbContextExtensions.Create<TestBlogDbContext, TenantInfo, string>(tenant1);
 
         Assert.NotNull(c);
     }
@@ -91,7 +91,7 @@ public class MultiTenantDbContextShould
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
 
         Assert.Throws<ArgumentException>(() =>
-            EntityFrameworkCore.MultiTenantDbContext.Create<TestBlogDbContext, TenantInfo>(tenant1, new object(), new object()));
+            EntityFrameworkCore.Extensions.MultiTenantDbContextExtensions.Create<TestBlogDbContext, TenantInfo, string>(tenant1, new object(), new object()));
     }
 
     [Fact]

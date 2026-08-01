@@ -27,14 +27,14 @@ public static class ServiceProviderExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceProvider"/> instance the extension method applies to.</param>
     /// <param name="tenantInfo">The tenant information for the new scope.</param>
-    public static void BeginTenantScope(this IServiceProvider services, ITenantInfo tenantInfo)
+    public static void BeginTenantScope<TId>(this IServiceProvider services, ITenantInfo<TId> tenantInfo) where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(tenantInfo);
 
         var tenantScopeProvider = services.GetRequiredService<ITenantScopeProvider>();
         tenantScopeProvider.BeginScope();
-        var tenantContext = services.GetRequiredService<ITenantContext>();
+        var tenantContext = services.GetRequiredService<ITenantContext<TId>>();
         tenantContext.TenantInfo = tenantInfo;
     }
 }

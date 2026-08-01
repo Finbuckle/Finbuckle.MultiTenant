@@ -4,12 +4,12 @@
 namespace Finbuckle.MultiTenant.Abstractions;
 
 /// <summary>
-/// Default implementation of <see cref="ITenantInfo"/>.
+/// Default implementation of <see cref="ITenantInfo{TId}"/>.
 /// </summary>
-public class TenantInfo : ITenantInfo
+public class TenantInfo<TId> : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <inheritdoc />
-    public required string Id { get; init; }
+    public required TId Id { get; init; }
 
     /// <inheritdoc />
     public required string Identifier { get; init; }

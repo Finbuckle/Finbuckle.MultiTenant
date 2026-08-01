@@ -31,7 +31,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
             .ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>() // needed for testing only
             .UseSqlite(_connection)
             .Options;
-        return new TestDbContext(config, tenant ?? new TenantInfo { Id = "", Identifier = "" }, options);
+        return new TestDbContext(config, tenant ?? new TenantInfo { Id = "placeholder", Identifier = "placeholder" }, options);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     [Fact]
     public void ThrowOnNonStringExistingTenantIdProperty()
     {
-        using var db = GetDbContext(b => b.Entity<MyThingWithIntTenantId>().IsMultiTenant());
+        using var db = GetDbContext(b => b.Entity<MyThingWithIntTenantId>().IsMultiTenant<string>());
         Assert.Throws<MultiTenantException>(() => db.Model);
     }
 
@@ -77,9 +77,9 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     public void SetNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
 
-        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "123" };
 
         using var db = GetDbContext(null, tenant1);
         db.Database.EnsureCreated();
@@ -95,9 +95,9 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     public void CanIgnoreNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
 
-        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "123" };
 
         using var db = GetDbContext(null, tenant1);
         db.Database.EnsureCreated();
@@ -116,7 +116,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     {
         using var db = GetDbContext(b =>
         { 
-            b.Entity<MyNonMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyNonMultiTenantThing>().IsMultiTenant<string>();
             b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
         });
         var annotation = db.Model.FindEntityType(typeof(MyNonMultiTenantThing))?
@@ -130,7 +130,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     {
         using var db = GetDbContext(b =>
         { 
-            b.Entity<MyNonMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyNonMultiTenantThing>().IsMultiTenant<string>();
             b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
         });
         var prop = db.Model.FindEntityType(typeof(MyNonMultiTenantThing))?.FindProperty("TenantId");
@@ -144,7 +144,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         // First mark it as multi-tenant, then mark it as not multi-tenant
         using var db = GetDbContext(b =>
         {
-            b.Entity<MyNonMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyNonMultiTenantThing>().IsMultiTenant<string>();
             b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
         });
         
@@ -158,12 +158,12 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     [Fact]
     public void NotFilterNonMultiTenantEntity()
     {
-        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
-        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "123" };
 
         using var db = GetDbContext(b =>
         {
-            b.Entity<MyMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyMultiTenantThing>().IsMultiTenant<string>();
             b.Entity<MyNonMultiTenantThing>().IsNotMultiTenant();
         }, tenant1);
         
@@ -195,8 +195,8 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         // Calling IsMultiTenant() twice on the same entity should be a no-op the second time.
         using var db = GetDbContext(b =>
         {
-            b.Entity<MyMultiTenantThing>().IsMultiTenant();
-            b.Entity<MyMultiTenantThing>().IsMultiTenant();
+            b.Entity<MyMultiTenantThing>().IsMultiTenant<string>();
+            b.Entity<MyMultiTenantThing>().IsMultiTenant<string>();
         });
 
         var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));

@@ -8,15 +8,15 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 /// <summary>
 /// Interface for a <see cref="Microsoft.EntityFrameworkCore.DbContext"/> that supports multi-tenancy.
 /// </summary>
-public interface IMultiTenantDbContext
+public interface IMultiTenantDbContext<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets or sets the current tenant information for this context.
     /// </summary>
     /// <remarks>
-    /// Setting the <see cref="ITenantInfo"/> may cause conflicts for entities already being tracked. Use with caution.
+    /// Setting the <see cref="ITenantInfo{TId}"/> may cause conflicts for entities already being tracked. Use with caution.
     /// </remarks>
-    ITenantInfo? TenantInfo { get; set; }
+    ITenantInfo<TId>? TenantInfo { get; set; }
 
     /// <summary>
     /// Gets the mode used to handle entities where TenantId does not match the current tenant.

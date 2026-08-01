@@ -17,11 +17,11 @@ public class PerTenantOptionsIntegrationShould
     public void ResolveConfiguredAndValidatedOptionsThroughAllAccessors()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.Configure<TestOptions>(options => options.Value = "base");
-        services.ConfigurePerTenant<TestOptions, TenantInfo>((options, tenant) =>
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string>((options, tenant) =>
             options.Value += $":{tenant.Id}");
-        services.PostConfigurePerTenant<TestOptions, TenantInfo>((options, tenant) =>
+        services.PostConfigurePerTenant<TestOptions, TenantInfo, string> ((options, tenant) =>
             options.Value += $":post-{tenant.Id}");
         services.AddOptions<TestOptions>().Validate(options =>
             options.Value == "base:tenant-1:post-tenant-1");
@@ -42,12 +42,12 @@ public class PerTenantOptionsIntegrationShould
     public void ConfigureNamedOptionsThroughOptionsBuilderDependencies()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton(new TestDependency("dependency"));
         services.AddOptions<TestOptions>("builder")
-            .ConfigurePerTenant<TestOptions, TestDependency, TenantInfo>((options, dependency, tenant) =>
+            .ConfigurePerTenant<TestOptions, TestDependency, TenantInfo,string>((options, dependency, tenant) =>
                 options.Value = $"{dependency.Value}:{tenant.Id}")
-            .PostConfigurePerTenant<TestOptions, TestDependency, TenantInfo>((options, dependency, _) =>
+            .PostConfigurePerTenant<TestOptions, TestDependency, TenantInfo, string> ((options, dependency, _) =>
                 options.Value += $":post-{dependency.Value}");
 
         using var provider = services.BuildServiceProvider();
@@ -63,11 +63,11 @@ public class PerTenantOptionsIntegrationShould
         var services = new ServiceCollection();
         var state = new ReloadState();
         var source = new ManualChangeTokenSource<TestOptions>("changed");
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton<IOptionsChangeTokenSource<TestOptions>>(source);
-        services.ConfigurePerTenant<TestOptions, TenantInfo>("changed", (options, tenant) =>
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string> ("changed", (options, tenant) =>
             options.Value = $"{tenant.Id}:{state.Version}");
-        services.ConfigurePerTenant<TestOptions, TenantInfo>("unchanged", (options, tenant) =>
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string>  ("unchanged", (options, tenant) =>
             options.Value = $"unchanged:{tenant.Id}");
 
         using var provider = services.BuildServiceProvider();
@@ -105,6 +105,28 @@ public class PerTenantOptionsIntegrationShould
 
         Assert.Equal("changed", notificationName);
         Assert.Equal("tenant-2:2", notificationValue?.Value);
+    }
+
+    [Fact]
+    public void ResolvePerTenantOptionsWithGuidTenantId()
+    {
+        var tenantId = Guid.NewGuid();
+        var services = new ServiceCollection();
+        services.AddMultiTenant<TenantInfo<Guid>, Guid>();
+        services.Configure<TestOptions>(options => options.Value = "base");
+        services.ConfigurePerTenant<TestOptions, TenantInfo<Guid>, Guid>((options, tenant) =>
+            options.Value += $":{tenant.Id}");
+
+        using var provider = services.BuildServiceProvider();
+        provider.BeginTenantScope(new TenantInfo<Guid> { Id = tenantId, Identifier = "tenant-1" });
+
+        var expected = $"base:{tenantId}";
+        Assert.Equal(expected, provider.GetRequiredService<IOptions<TestOptions>>().Value.Value);
+        using var scope = provider.CreateScope();
+        Assert.Equal(expected,
+            scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<TestOptions>>().Value.Value);
+        Assert.Equal(expected,
+            provider.GetRequiredService<IOptionsMonitor<TestOptions>>().CurrentValue.Value);
     }
 
     private static void SetTenant(IServiceProvider provider, string tenantId)

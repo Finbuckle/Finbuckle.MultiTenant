@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using IdentitySampleApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -29,12 +30,12 @@ public abstract class SampleHelper
     /// </summary>
     public static void SeedIdentity(WebApplication app)
     {
-        var tenantManager = app.Services.GetRequiredService<TenantManager<AppTenantInfo>>();
+        var tenantManager = app.Services.GetRequiredService<TenantManager<AppTenantInfo, string>>();
 
         foreach (var tenant in tenantManager.GetAllAsync().Result)
         {
             using var scope = app.Services.CreateScope();
-            using var db = MultiTenantDbContext.Create<AppIdentityDbContext, AppTenantInfo>(tenant, scope.ServiceProvider);
+            using var db = MultiTenantDbContextExtensions.Create<AppIdentityDbContext, AppTenantInfo, string>(tenant, scope.ServiceProvider);
             db.Database.EnsureCreated();
             var userStore = new UserStore<IdentityUser>(db);
             

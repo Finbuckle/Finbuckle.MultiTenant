@@ -20,13 +20,14 @@ public static class ServiceCollectionExtensions
     /// <param name="poolSize">The maximum number of <typeparamref name="T"/> instances retained by the pool. Defaults to 1024.</param>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to resolve from the pool. Must implement
-    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{TId}"/> so tenant context can be applied.
     /// </typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
-    public static IServiceCollection AddPooledMultiTenantDbContext<T>(this IServiceCollection services,
+    public static IServiceCollection AddPooledMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
         int poolSize = 1024)
-        where T : DbContext, IMultiTenantDbContext
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         services.AddPooledDbContextFactory<T>(optionsAction, poolSize);
         services.AddScoped<T>(sp =>
@@ -35,9 +36,9 @@ public static class ServiceCollectionExtensions
             var context = pooledFactory.CreateDbContext();
             context.ChangeTracker.Clear();
 
-            var tenantInfo = sp.GetRequiredService<ITenantContext>().TenantInfo;
+            var tenantInfo = sp.GetRequiredService<ITenantContext<TId>>().TenantInfo;
             context.TenantInfo = tenantInfo;
-            context.EnforceMultiTenantOnTracking();
+            context.EnforceMultiTenantOnTracking<T, TId>();
 
             return context;
         });
@@ -50,13 +51,13 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The service collection to add registrations to.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
-    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services)
-        where T : DbContext, IMultiTenantDbContext
-        => services.AddMultiTenantDbContext<T>((_, _) => { });
+    public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services)
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId> => services.AddMultiTenantDbContext<T, TId>((_, _) => { });
 
     /// <summary>
     /// Registers a MultiTenant db context as a scoped service.
@@ -65,13 +66,13 @@ public static class ServiceCollectionExtensions
     /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/>.</param>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
-    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services,
+    public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction)
-        where T : DbContext, IMultiTenantDbContext
-        => services.AddMultiTenantDbContext<T>((_, b) => optionsAction(b));
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId> => services.AddMultiTenantDbContext<T, TId>((_, b) => optionsAction(b));
 
     /// <summary>
     /// Registers a MultiTenant db context as a scoped service.
@@ -80,21 +81,22 @@ public static class ServiceCollectionExtensions
     /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/> with access to the <see cref="IServiceProvider"/>.</param>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
     /// </typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
-    public static IServiceCollection AddMultiTenantDbContext<T>(this IServiceCollection services,
+    public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder> optionsAction)
-        where T : DbContext, IMultiTenantDbContext
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         services.AddDbContextFactory<T>(optionsAction);
         services.AddScoped<T>(sp =>
         {
             var factory = sp.GetRequiredService<IDbContextFactory<T>>();
             var context = factory.CreateDbContext();
-            var tenantInfo = sp.GetRequiredService<ITenantContext>().TenantInfo;
+            var tenantInfo = sp.GetRequiredService<ITenantContext<TId>>().TenantInfo;
             context.TenantInfo = tenantInfo;
-            context.EnforceMultiTenantOnTracking();
+            context.EnforceMultiTenantOnTracking<T,TId>();
 
             return context;
         });

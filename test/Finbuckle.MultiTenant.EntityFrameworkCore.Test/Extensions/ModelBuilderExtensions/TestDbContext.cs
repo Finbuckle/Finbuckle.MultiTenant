@@ -20,7 +20,7 @@ public class TestDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ConfigureMultiTenant();
+        modelBuilder.ConfigureMultiTenant<string>();
     }
 }
 

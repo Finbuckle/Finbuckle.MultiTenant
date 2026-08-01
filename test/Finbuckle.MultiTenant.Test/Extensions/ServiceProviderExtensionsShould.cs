@@ -14,12 +14,12 @@ public class ServiceProviderExtensionsShould
     public void BeginUnresolvedTenantScope()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         using var provider = services.BuildServiceProvider();
 
         provider.BeginTenantScope();
 
-        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo>>();
+        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo, string>>();
         Assert.False(tenantContext.IsResolved);
         Assert.Null(tenantContext.TenantInfo);
     }
@@ -28,13 +28,13 @@ public class ServiceProviderExtensionsShould
     public void BeginResolvedTenantScope()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         using var provider = services.BuildServiceProvider();
         var tenantInfo = new TenantInfo { Id = "tenant-id", Identifier = "tenant" };
 
         provider.BeginTenantScope(tenantInfo);
 
-        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo>>();
+        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo, string>>();
         Assert.True(tenantContext.IsResolved);
         Assert.Same(tenantInfo, tenantContext.TenantInfo);
     }
@@ -43,14 +43,14 @@ public class ServiceProviderExtensionsShould
     public void ReplaceCurrentTenantScope()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         using var provider = services.BuildServiceProvider();
         var tenantInfo = new TenantInfo { Id = "tenant-id", Identifier = "tenant" };
         provider.BeginTenantScope(tenantInfo);
 
         provider.BeginTenantScope();
 
-        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo>>();
+        var tenantContext = provider.GetRequiredService<ITenantContext<TenantInfo, string>>();
         Assert.False(tenantContext.IsResolved);
         Assert.Null(tenantContext.TenantInfo);
     }
@@ -68,6 +68,6 @@ public class ServiceProviderExtensionsShould
     {
         using var provider = new ServiceCollection().BuildServiceProvider();
 
-        Assert.Throws<ArgumentNullException>(() => provider.BeginTenantScope(null!));
+        Assert.Throws<ArgumentNullException>(() => provider.BeginTenantScope<string>(null!));
     }
 }

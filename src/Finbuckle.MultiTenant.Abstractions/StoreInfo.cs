@@ -6,8 +6,9 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Contains information about the store used for tenant resolution.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class StoreInfo<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class StoreInfo<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets or sets the type of the store used.
@@ -22,10 +23,10 @@ public class StoreInfo<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <summary>
     /// Gets or sets the primary store instance used.
     /// </summary>
-    public IMultiTenantStore<TTenantInfo>? Store => Source as IMultiTenantStore<TTenantInfo>;
+    public IMultiTenantStore<TTenantInfo, TId>? Store => Source as IMultiTenantStore<TTenantInfo, TId>;
 
     /// <summary>
     /// Gets or sets the store cache instance used.
     /// </summary>
-    public IMultiTenantStoreCache<TTenantInfo>? Cache => Source as IMultiTenantStoreCache<TTenantInfo>;
+    public IMultiTenantStoreCache<TTenantInfo, TId>? Cache => Source as IMultiTenantStoreCache<TTenantInfo, TId>;
 }

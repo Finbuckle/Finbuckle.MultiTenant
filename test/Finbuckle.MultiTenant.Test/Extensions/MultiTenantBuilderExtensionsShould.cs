@@ -19,11 +19,11 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         services.AddDistributedMemoryCache();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithDistributedCacheStoreCache();
         var sp = services.BuildServiceProvider();
-        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
-        Assert.IsType<DistributedCacheStoreCache<TenantInfo>>(cache);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo, string>>();
+        Assert.IsType<DistributedCacheStoreCache<TenantInfo, string>>(cache);
     }
 
     [Fact]
@@ -31,60 +31,60 @@ public class MultiTenantBuilderExtensionsShould
     {
         var services = new ServiceCollection();
         services.AddDistributedMemoryCache();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithDistributedCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5));
         var sp = services.BuildServiceProvider();
-        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
-        Assert.IsType<DistributedCacheStoreCache<TenantInfo>>(cache);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo, string>>();
+        Assert.IsType<DistributedCacheStoreCache<TenantInfo, string>>(cache);
     }
 
     [Fact]
     public void AddMemoryCacheStoreCacheDefault()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithMemoryCacheStoreCache();
         var sp = services.BuildServiceProvider();
-        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
-        Assert.IsType<MemoryCacheStoreCache<TenantInfo>>(cache);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo, string>>();
+        Assert.IsType<MemoryCacheStoreCache<TenantInfo, string>>(cache);
     }
 
     [Fact]
     public void AddMemoryCacheStoreCacheWithOptions()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithMemoryCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5));
         var sp = services.BuildServiceProvider();
-        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo>>();
-        Assert.IsType<MemoryCacheStoreCache<TenantInfo>>(cache);
+        var cache = sp.GetRequiredService<IMultiTenantStoreCache<TenantInfo, string>>();
+        Assert.IsType<MemoryCacheStoreCache<TenantInfo, string>>(cache);
     }
 
     [Fact]
     public void AddHttpRemoteStoreAndHttpRemoteStoreClient()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithHttpRemoteStore("https://example.com");
         var sp = services.BuildServiceProvider();
 
-        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<HttpRemoteStore<TenantInfo>>(store);
+        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo, string>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<HttpRemoteStore<TenantInfo, string>>(store);
     }
 
     [Fact]
     public void AddHttpRemoteStoreWithHttpClientBuilders()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         var flag = false;
         builder.WithHttpRemoteStore("https://example.com", _ => flag = true);
         var sp = services.BuildServiceProvider();
 
-        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo>>();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<HttpRemoteStore<TenantInfo>>(store);
+        sp.GetRequiredService<HttpRemoteStoreClient<TenantInfo, string>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<HttpRemoteStore<TenantInfo, string>>(store);
         Assert.True(flag);
     }
 
@@ -96,13 +96,13 @@ public class MultiTenantBuilderExtensionsShould
         var configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithConfigurationStore();
         services.AddSingleton<IConfiguration>(configuration);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<ConfigurationStore<TenantInfo>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<ConfigurationStore<TenantInfo, string>>(store);
 
         var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
@@ -121,15 +121,15 @@ public class MultiTenantBuilderExtensionsShould
         IConfiguration configuration = configBuilder.Build();
 
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
 
         // Non-default section name.
         configuration = configuration.GetSection("Finbuckle");
         builder.WithConfigurationStore(configuration, "MultiTenant:Stores:ConfigurationStore");
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<ConfigurationStore<TenantInfo>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<ConfigurationStore<TenantInfo, string>>(store);
 
         var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech-id", tc!.Id);
@@ -144,12 +144,12 @@ public class MultiTenantBuilderExtensionsShould
     public async Task AddCaseInsensitiveInMemoryStore()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithInMemoryStore();
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<InMemoryStore<TenantInfo>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<InMemoryStore<TenantInfo, string>>(store);
         await store.AddAsync(new TenantInfo { Id = "lol", Identifier = "lol" });
 
         var tc = await store.GetByIdentifierAsync("LOL");
@@ -161,12 +161,12 @@ public class MultiTenantBuilderExtensionsShould
     public async Task AddEchoStore()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithEchoStore();
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithEchoStore(identifier => identifier);
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<EchoStore<TenantInfo>>(store);
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<EchoStore<TenantInfo, string>>(store);
 
         var tc = await store.GetByIdentifierAsync("initech");
         Assert.Equal("initech", tc!.Id);
@@ -181,7 +181,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddDelegateStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithDelegateStrategy(_ => Task.FromResult<string?>("Hi"));
         var sp = services.BuildServiceProvider();
 
@@ -193,8 +193,8 @@ public class MultiTenantBuilderExtensionsShould
     public void AddTypedDelegateStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<int, TenantInfo>(context => Task.FromResult(context.ToString())!);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithDelegateStrategy<int, TenantInfo,string>(context => Task.FromResult(context.ToString())!);
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
@@ -205,8 +205,8 @@ public class MultiTenantBuilderExtensionsShould
     public async Task ReturnNullForWrongTypeSendToTypedDelegateStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<int, TenantInfo>(_ => Task.FromResult("Shouldn't ever get here")!);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithDelegateStrategy<int, TenantInfo,string>(_ => Task.FromResult("Shouldn't ever get here")!);
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
@@ -226,8 +226,8 @@ public class MultiTenantBuilderExtensionsShould
     public async Task InvokeTypedDelegateWhenRuntimeContextIsDerivedType()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<BaseCtx, TenantInfo>(ctx => Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithDelegateStrategy<BaseCtx, TenantInfo,string>(ctx => Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
         var sp = services.BuildServiceProvider();
 
         var strategy = sp.GetRequiredService<IMultiTenantStrategy>();
@@ -240,8 +240,8 @@ public class MultiTenantBuilderExtensionsShould
     public async Task ReturnNullWhenRuntimeContextIsBaseOfExpectedDerivedType()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithDelegateStrategy<DerivedCtx, TenantInfo>(ctx =>
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithDelegateStrategy<DerivedCtx, TenantInfo, string>(ctx =>
             Task.FromResult<string?>($"ok-{ctx.GetType().Name}"));
         var sp = services.BuildServiceProvider();
 
@@ -255,7 +255,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddStaticStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithStaticStrategy("initech");
         var sp = services.BuildServiceProvider();
 
@@ -267,7 +267,7 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfNullParamAddingStaticStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         Assert.Throws<ArgumentNullException>(()
             => builder.WithStaticStrategy(null!));
     }

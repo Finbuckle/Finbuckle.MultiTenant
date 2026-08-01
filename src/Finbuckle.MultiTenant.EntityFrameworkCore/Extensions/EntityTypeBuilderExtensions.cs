@@ -14,10 +14,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 /// </summary>
 public static class EntityTypeBuilderExtensions
 {
-    private class ExpressionVariableScope
+    private class ExpressionVariableScope<TId> where TId : IEquatable<TId>
     {
         // ReSharper disable once UnassignedGetOnlyAutoProperty
-        public IMultiTenantDbContext? Context { get; }
+        public IMultiTenantDbContext<TId>? Context { get; }
     }
 
     /// <summary>
@@ -55,8 +55,8 @@ public static class EntityTypeBuilderExtensions
     /// </summary>
     /// <param name="builder">The typed <see cref="EntityTypeBuilder"/> instance.</param>
     /// <returns>A <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
-    /// <remarks>A string property named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
-    public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
+    /// <remarks>A property of type <typeparamref name="TId"/> named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
+    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>
     {
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);
@@ -65,35 +65,35 @@ public static class EntityTypeBuilderExtensions
 
         try
         {
-            builder.Property<string>("TenantId").IsRequired();
+            builder.Property<TId>("TenantId").IsRequired();
         }
         catch (Exception ex)
         {
             throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
         }
 
-        // build expression tree for e => EF.Property<string>(e, "TenantId") == TenantInfo.Id
+        // build expression tree for e => EF.Property<TId>(e, "TenantId") == TenantInfo.Id
 
         // where e is one of our entity types
         // will need this ParameterExpression for next step and for final step
         var entityParamExp = Expression.Parameter(builder.Metadata.ClrType, "e");
 
-        // build up expression tree for: EF.Property<string>(e, "TenantId")
+        // build up expression tree for: EF.Property<TId>(e, "TenantId")
         var tenantIdExp = Expression.Constant("TenantId", typeof(string));
-        var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(string) }, entityParamExp,
+        var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(TId) }, entityParamExp,
             tenantIdExp);
         var leftExp = efPropertyExp;
 
         // build up express tree for: TenantInfo.Id
         // EF will magically sub the current db context in for scope.Context
-        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
-        var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
+        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope<TId>());
+        var contextMemberInfo = typeof(ExpressionVariableScope<TId>).GetMember(nameof(ExpressionVariableScope<TId>.Context))[0];
         var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
         var contextTenantInfoExp =
-            Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
+            Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext<TId>.TenantInfo));
+        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext<TId>.TenantInfo.Id));
 
-        // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
+        // build expression tree for EF.Property<TId>(e, "TenantId") == TenantInfo.Id'
         var predicate = Expression.Equal(leftExp, rightExp);
 
         // build the final expression tree

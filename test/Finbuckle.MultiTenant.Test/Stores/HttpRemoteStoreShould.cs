@@ -39,7 +39,7 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
     [Fact]
     public void ThrowIfTypedClientParamIsNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore<TenantInfo>(null!, "http://example.com"));
+        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStore<TenantInfo,string>(null!, "http://example.com"));
     }
 
     [Theory]
@@ -50,21 +50,21 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
     public void ThrowIfEndpointTemplateIsNotWellFormed(string uri)
     {
         var clientFactory = new Mock<IHttpClientFactory>();
-        var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
-        Assert.Throws<ArgumentException>(() => new HttpRemoteStore<TenantInfo>(client, uri));
+        var client = new HttpRemoteStoreClient<TenantInfo,string>(clientFactory.Object);
+        Assert.Throws<ArgumentException>(() => new HttpRemoteStore<TenantInfo,string>(client, uri));
     }
 
     [Fact]
     public void AppendTenantToTemplateIfMissing()
     {
         var clientFactory = new Mock<IHttpClientFactory>();
-        var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
-        var store = new HttpRemoteStore<TenantInfo>(client, "http://example.com/");
+        var client = new HttpRemoteStoreClient<TenantInfo,string>(clientFactory.Object);
+        var store = new HttpRemoteStore<TenantInfo,string>(client, "http://example.com/");
 
         var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
         var endpointTemplate = field?.GetValue(store);
 
-        Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}",
+        Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo,string>.DefaultEndpointTemplateIdentifierToken}",
             endpointTemplate);
     }
 
@@ -72,28 +72,28 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
     public void AppendTenantWithSlashToTemplateIfMissing()
     {
         var clientFactory = new Mock<IHttpClientFactory>();
-        var client = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
-        var store = new HttpRemoteStore<TenantInfo>(client, "http://example.com");
+        var client = new HttpRemoteStoreClient<TenantInfo,string>(clientFactory.Object);
+        var store = new HttpRemoteStore<TenantInfo,string>(client, "http://example.com");
 
         var field = store.GetType().GetField("endpointTemplate", BindingFlags.NonPublic | BindingFlags.Instance);
         var endpointTemplate = field?.GetValue(store);
 
-        Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo>.DefaultEndpointTemplateIdentifierToken}",
+        Assert.Equal($"http://example.com/{HttpRemoteStore<TenantInfo,string>.DefaultEndpointTemplateIdentifierToken}",
             endpointTemplate);
     }
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
+    protected override Task<IMultiTenantStore<TenantInfo,string>> CreateTestStore()
     {
         var client = new HttpClient(new TestHandler());
         var clientFactory = new Mock<IHttpClientFactory>();
         clientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(client);
-        var typedClient = new HttpRemoteStoreClient<TenantInfo>(clientFactory.Object);
-        return Task.FromResult<IMultiTenantStore<TenantInfo>>(new HttpRemoteStore<TenantInfo>(typedClient, "http://example.com"));
+        var typedClient = new HttpRemoteStoreClient<TenantInfo,string>(clientFactory.Object);
+        return Task.FromResult<IMultiTenantStore<TenantInfo,string>>(new HttpRemoteStore<TenantInfo,string>(typedClient, "http://example.com"));
     }
 
-    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo,string>> PopulateTestStore(IMultiTenantStore<TenantInfo,string> store)
     {
         throw new NotImplementedException();
     }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.MultiTenantDbContext;
 
-public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext
+public class TestBlogDbContext : EntityFrameworkCore.MultiTenantDbContext<string>
 {
     public DbSet<Blog>? Blogs { get; set; }
     public DbSet<Post>? Posts { get; set; }

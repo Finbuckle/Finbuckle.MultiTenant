@@ -5,14 +5,14 @@ namespace Finbuckle.MultiTenant.AspNetCore.Options;
 /// <summary>
 /// Options for configuring when to short-circuit request processing based on tenant resolution state.
 /// </summary>
-public class ShortCircuitWhenOptions
+public class ShortCircuitWhenOptions<TId> where TId : IEquatable<TId>
 {
-    private Func<ITenantContext, bool>? _predicate;
+    private Func<ITenantContext<TId>, bool>? _predicate;
 
     /// <summary>
     /// The callback that determines if the endpoint should be short circuited.
     /// </summary>
-    public Func<ITenantContext, bool>? Predicate
+    public Func<ITenantContext<TId>, bool>? Predicate
     {
         get { return _predicate; }
         set

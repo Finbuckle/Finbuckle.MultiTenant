@@ -51,7 +51,7 @@ public class AuthenticationPipelineShould
                     services.AddRouting();
                     services.AddAuthentication("capture")
                         .AddScheme<AuthenticationSchemeOptions, CaptureChallengeHandler>("capture", _ => { });
-                    services.AddMultiTenant<TenantInfo>()
+                    services.AddMultiTenant<TenantInfo, string>()
                         .WithStaticStrategy("initech")
                         .WithInMemoryStore()
                         .WithPerTenantAuthenticationCore();
@@ -59,7 +59,7 @@ public class AuthenticationPipelineShould
                 .Configure(app =>
                 {
                     app.UseRouting();
-                    app.UseMultiTenant();
+                    app.UseMultiTenant<string>();
                     app.UseAuthentication();
                     app.UseEndpoints(endpoints =>
                         endpoints.Map("/challenge", context => context.ChallengeAsync("capture")));
@@ -67,7 +67,7 @@ public class AuthenticationPipelineShould
             .StartAsync();
         using (var scope = host.Services.CreateScope())
         {
-            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo, string>>()
                 .AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
         }
 
@@ -107,20 +107,20 @@ public class AuthenticationPipelineShould
                     services.AddSingleton<IAuthenticationSchemeProvider>(schemeProvider.Object);
                     services.AddSingleton<IOptionsMonitor<RemoteAuthenticationCallbackStrategyShould.FakeRemoteOptions>>(
                         optionsMonitor.Object);
-                    services.AddMultiTenant<TenantInfo>()
+                    services.AddMultiTenant<TenantInfo, string>()
                         .WithRemoteAuthenticationCallbackStrategy()
                         .WithInMemoryStore();
                 })
                 .Configure(app =>
                 {
-                    app.UseMultiTenant();
+                    app.UseMultiTenant<string>();
                     app.Run(context => context.Response.WriteAsync(
-                        context.GetTenantInfo<TenantInfo>()?.Identifier ?? "unresolved"));
+                        context.GetTenantInfo<TenantInfo, string>()?.Identifier ?? "unresolved"));
                 }))
             .StartAsync();
         using (var scope = host.Services.CreateScope())
         {
-            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+            await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo, string>>()
                 .AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
         }
 

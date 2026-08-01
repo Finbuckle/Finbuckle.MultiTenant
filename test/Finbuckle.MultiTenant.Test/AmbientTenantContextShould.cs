@@ -8,7 +8,7 @@ public class AmbientTenantContextShould
     [Fact]
     public void ThrowBeforeScopeIsBegun()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
 
         Assert.Throws<MultiTenantException>(() => _ = context.TenantInfo);
         Assert.Throws<MultiTenantException>(() => context.TenantInfo = new TenantInfo { Id = "1", Identifier = "1" });
@@ -17,13 +17,13 @@ public class AmbientTenantContextShould
     [Fact]
     public void BeginScopeStartsUnresolvedForGenericAndNonGenericContexts()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         context.BeginScope();
 
         Assert.Null(context.TenantInfo);
-        Assert.False(((ITenantContext<TenantInfo>)context).IsResolved);
+        Assert.False(((ITenantContext<TenantInfo, string>)context).IsResolved);
 
-        ITenantContext nonGeneric = context;
+        ITenantContext<string> nonGeneric = context;
         Assert.Null(nonGeneric.TenantInfo);
         Assert.False(nonGeneric.IsResolved);
     }
@@ -31,7 +31,7 @@ public class AmbientTenantContextShould
     [Fact]
     public void TenantInfoCanOnlyBeSetOnceAfterScopeBegins()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         context.BeginScope();
         var tenant = new TenantInfo { Id = "1", Identifier = "1" };
 
@@ -45,7 +45,7 @@ public class AmbientTenantContextShould
     [Fact]
     public void NullDoesNotConsumeTheFirstNonNullAssignment()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         context.BeginScope();
 
         context.TenantInfo = null;
@@ -58,14 +58,14 @@ public class AmbientTenantContextShould
     [Fact]
     public void BeginScopeResetsTheCurrentTenant()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         context.BeginScope();
         context.TenantInfo = new TenantInfo { Id = "1", Identifier = "1" };
 
         context.BeginScope();
 
         Assert.Null(context.TenantInfo);
-        Assert.False(((ITenantContext<TenantInfo>)context).IsResolved);
+        Assert.False(((ITenantContext<TenantInfo, string>)context).IsResolved);
         context.TenantInfo = new TenantInfo { Id = "2", Identifier = "2" };
         Assert.Equal("2", context.TenantInfo!.Id);
     }
@@ -73,7 +73,7 @@ public class AmbientTenantContextShould
     [Fact]
     public async Task ChildScopeDoesNotLeakIntoParentExecutionContext()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         var parentTenant = new TenantInfo { Id = "parent", Identifier = "parent" };
         var childTenant = new TenantInfo { Id = "child", Identifier = "child" };
         context.BeginScope();
@@ -94,7 +94,7 @@ public class AmbientTenantContextShould
     [Fact]
     public async Task ParallelChildScopesRemainIndependent()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         var tenant1 = new TenantInfo { Id = "1", Identifier = "1" };
         var tenant2 = new TenantInfo { Id = "2", Identifier = "2" };
 

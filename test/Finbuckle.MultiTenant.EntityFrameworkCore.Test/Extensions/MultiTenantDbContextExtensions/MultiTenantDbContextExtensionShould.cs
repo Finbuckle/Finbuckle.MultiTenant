@@ -38,7 +38,7 @@ public class MultiTenantDbContextExtensionsShould
             {
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
-                db.EnforceMultiTenantOnTracking();
+                db.EnforceMultiTenantOnTracking<TestDbContext, string>();
                 db.TenantNotSetMode = TenantNotSetMode.Throw;
 
                 var blog1 = new Blog { Title = "abc" };
@@ -53,7 +53,7 @@ public class MultiTenantDbContextExtensionsShould
                 db.Database.EnsureCreated();
 
                 db.TenantNotSetMode = TenantNotSetMode.Overwrite;
-                db.EnforceMultiTenantOnTracking();
+                db.EnforceMultiTenantOnTracking<TestDbContext, string>();
                 var blog1 = new Blog { Title = "abc2" };
                 db.Blogs?.Add(blog1);
                 Assert.Equal(tenant1.Id, db.Entry(blog1).Property("TenantId").CurrentValue);
@@ -391,8 +391,8 @@ public class MultiTenantDbContextExtensionsShould
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc" };
         using var db = new TestDbContext(tenant, _options);
 
-        db.EnforceMultiTenantOnTracking();
-        db.EnforceMultiTenantOnTracking();
+        db.EnforceMultiTenantOnTracking<TestDbContext, string>();
+        db.EnforceMultiTenantOnTracking<TestDbContext, string>();
 
         var stateManager = typeof(ChangeTracker)
             .GetField("_stateManager", BindingFlags.NonPublic | BindingFlags.Instance)
@@ -426,7 +426,7 @@ public class MultiTenantDbContextExtensionsShould
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             db.TenantNotSetMode = TenantNotSetMode.Throw;
-            db.EnforceMultiTenantOnTracking();
+            db.EnforceMultiTenantOnTracking<TestDbContext, string>();
 
             var blog = new Blog { Title = "attached" };
             db.Attach(blog);
@@ -451,7 +451,7 @@ public class MultiTenantDbContextExtensionsShould
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             db.TenantNotSetMode = TenantNotSetMode.Throw;
-            db.EnforceMultiTenantOnTracking();
+            db.EnforceMultiTenantOnTracking<TestDbContext, string>();
 
             var blog = new Blog { Title = "state-change" };
             db.Add(blog);
@@ -495,7 +495,7 @@ public class MultiTenantDbContextExtensionsShould
 
             using var db = new TestDbContext(tenant, _options);
             db.Database.EnsureCreated();
-            db.EnforceMultiTenantOnTracking();
+            db.EnforceMultiTenantOnTracking<TestDbContext, string>();
             db.TenantInfo = null;
 
             Assert.Throws<MultiTenantException>(() => db.Add(new Blog { Title = "test" }));

@@ -15,6 +15,5 @@ public static class FinbuckleMultiTenantApplicationBuilderExtensions
     /// </summary>
     /// <param name="builder">The <see cref="IApplicationBuilder"/> instance the extension method applies to.</param>
     /// <returns>The same <see cref="IApplicationBuilder"/> passed into the method.</returns>
-    public static IApplicationBuilder UseMultiTenant(this IApplicationBuilder builder)
-        => builder.UseMiddleware<MultiTenantMiddleware>();
+    public static IApplicationBuilder UseMultiTenant<TId>(this IApplicationBuilder builder) where TId : IEquatable<TId> => builder.UseMiddleware<MultiTenantMiddleware<TId>>();
 }

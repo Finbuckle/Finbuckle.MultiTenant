@@ -10,10 +10,10 @@ supports each of these models by associating a connection string with each tenan
 
 If each tenant uses a separate database then add a `ConnectionString` property to the app's `TenantInfo`
 implementation and use it in the `OnConfiguring` method of the database context class. The tenant info can be obtained
-by injecting an `ITenantContext<TTenantInfo>` into the database context class constructor.
+by injecting an `ITenantContext<TTenantInfo, TId>` into the database context class constructor.
 
 ```csharp
-public class AppTenantInfo : ITenantInfo
+public class AppTenantInfo : ITenantInfo<string>
 {
     public required string Id { get; init; }
     public required string Identifier { get; init; }
@@ -25,7 +25,7 @@ public class MyAppDbContext : DbContext
 {
    private AppTenantInfo? TenantInfo { get; set; }
 
-   public MyAppDbContext(ITenantContext<AppTenantInfo> tenantContext)
+   public MyAppDbContext(ITenantContext<AppTenantInfo, string> tenantContext)
    {
        // get the current tenant info at the time of construction
        TenantInfo = tenantContext.TenantInfo;
@@ -57,10 +57,10 @@ null or mismatched tenants.
 
 MultiTenant provides two different ways to utilize this behavior in a database context class:
 
-1. Implement `IMultiTenantDbContext` and use the provided helper methods as described in
+1. Implement `IMultiTenantDbContext<TId>` and use the provided helper methods as described in
    [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext),
    or
-2. Derive from `MultiTenantDbContext` which handles most of the details for
+2. Derive from `MultiTenantDbContext<TId>` which handles most of the details for
    you as described in [Deriving from MultiTenantDbContext](#deriving-from-multitenantdbcontext).
 
 The first option is more complex, but provides enhanced flexibility and allows existing database context classes (which
@@ -69,13 +69,13 @@ flexibility. These approaches are both explained in detail further below.
 
 ## Hybrid Per-tenant and Shared Databases
 
-When using a shared database context based on `IMultiTenantDbContext` it is simple to extend into a hybrid approach
+When using a shared database context based on `IMultiTenantDbContext<TId>` it is simple to extend into a hybrid approach
 by assigning some tenants to a separate shared database (or its own completely isolated database) via a tenant info
 connection string property as described above in [separate databases](#separate-databases).
 
 ## Configuring and Using a Shared Database
 
-Whether implementing `IMultiTenantDbContext` directly or deriving from `MultiTenantDbContext`, the context will need to
+Whether implementing `IMultiTenantDbContext<TId>` directly or deriving from `MultiTenantDbContext<TId>`, the context will need to
 know which entity types should be treated as multi-tenant (i.e. which entity types are to be isolated per tenant). When
 the database context is initialized, a shadow property named `TenantId` is added to the data model for designated entity
 types. This property is used internally to filter all requests and commands. If there already is a defined string
@@ -109,7 +109,7 @@ public class Roles
     ...
 }
 
-public class BloggingDbContext : MultiTenantDbContext
+public class BloggingDbContext : MultiTenantDbContext<string>
 {
     public BloggingDbContext()
     {
@@ -133,7 +133,7 @@ Otherwise, a database context class can be configured to respect the attribute b
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // not needed if database context derives from MultiTenantDbContext
-    builder.ConfigureMultiTenant();
+    builder.ConfigureMultiTenant<string>();
 }
 ```
 
@@ -146,7 +146,7 @@ multi-tenant functionality for entity types:
 protected override void OnModelCreating(ModelBuilder builder)
 {
     // Configure an entity type to be multi-tenant.
-    builder.Entity<MyEntityType>().IsMultiTenant();
+    builder.Entity<MyEntityType>().IsMultiTenant<string>();
 }
 ```
 
@@ -181,7 +181,7 @@ Entities marked with `IsNotMultiTenant()`:
 - Will not have a `TenantId` property added (shadow or otherwise)
 - Will not be filtered by tenant in queries
 - Will be accessible to all tenants
-- If previously configured with `IsMultiTenant()`, the tenant query filter will be removed
+- If previously configured with `IsMultiTenant<TId>()`, the tenant query filter will be removed
 
 This method is particularly useful when:
 1. You have a mix of tenant-specific and shared entities in the same database context
@@ -201,8 +201,8 @@ in the EF Core documentation for more details.
 
 ## Adding MultiTenant functionality to an existing DbContext
 
-This approach is more flexible than deriving from `MultiTenantDbContext`, but needs more configuration. It requires
-implementing `IMultiTenantDbContext` and following a strict convention of helper method calls.
+This approach is more flexible than deriving from `MultiTenantDbContext<TId>`, but needs more configuration. It requires
+implementing `IMultiTenantDbContext<TId>` and following a strict convention of helper method calls.
 
 Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 
@@ -214,10 +214,10 @@ Next, implement `IMultiTenantDbContext` on the context. These interface properti
 will have the information needed to provide proper data isolation.
 
 ```csharp
-public class MyDbContext : DbContext, IMultiTenantDbContext
+public class MyDbContext : DbContext, IMultiTenantDbContext<string>
 {
     ...
-    public ITenantInfo? TenantInfo { get; }
+    public ITenantInfo<string>? TenantInfo { get; }
     public TenantMismatchMode TenantMismatchMode { get; }
     public TenantNotSetMode TenantNotSetMode { get; }
     ...
@@ -244,10 +244,10 @@ protected override void OnModelCreating(ModelBuilder builder)
     base.OnModelCreating(builder);
 
     // Configure all entity types marked with the [MultiTenant] data attribute
-    builder.ConfigureMultiTenant();
+    builder.ConfigureMultiTenant<string>();
 
     // Configure an entity type to be multi-tenant.
-    builder.Entity<MyEntityType>().IsMultiTenant();
+    builder.Entity<MyEntityType>().IsMultiTenant<string>();
 }
 ```
 
@@ -257,14 +257,14 @@ calling the base class method. This ensures proper data isolation and behavior.
 ```csharp
 public override int SaveChanges(bool acceptAllChangesOnSuccess)
 {
-    this.EnforceMultiTenant();
+    this.EnforceMultiTenant<AppDbContext, string>();
     return base.SaveChanges(acceptAllChangesOnSuccess);
 }
 
 public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
     CancellationToken cancellationToken = default(CancellationToken))
 {
-    this.EnforceMultiTenant();
+    this.EnforceMultiTenant<AppDbContext, string>();
     return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 }
 ```
@@ -273,8 +273,8 @@ Now whenever this database context is used, it will only set and query records f
 
 ## Deriving from `MultiTenantDbContext`
 
-This approach is easier but requires inheriting from `MultiTenantDbContext` which may not always be possible if you
-already have a base class. `MultiTenantDbContext` is a pre-configured implementation of `IMultiTenantDbContext` with the
+This approach is easier but requires inheriting from `MultiTenantDbContext<TId>` which may not always be possible if you
+already have a base class. `MultiTenantDbContext<TId>` is a pre-configured implementation of `IMultiTenantDbContext<TId>` with the
 helper methods as described above in
 [Adding MultiTenant Functionality to an Existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext)
 
@@ -284,13 +284,13 @@ Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
-`MultiTenantDbContext` exposes a parameterless constructor and a constructor that accepts `DbContextOptions`. Derived
+`MultiTenantDbContext<TId>` exposes a parameterless constructor and a constructor that accepts `DbContextOptions`. Derived
 contexts should call the appropriate base constructor. The tenant is not set through the constructor — it is bound
 automatically by `AddMultiTenantDbContext` when using dependency injection, or set explicitly via `TenantInfo` when
 using the `Create` factory method.
 
 ```csharp
-public class BloggingDbContext : MultiTenantDbContext
+public class BloggingDbContext : MultiTenantDbContext<string>
 {
     public BloggingDbContext()
     {
@@ -334,7 +334,7 @@ are stamped with the correct `TenantId`.
 
 ```csharp
 // Program.cs
-builder.Services.AddMultiTenantDbContext<BloggingDbContext>(options =>
+builder.Services.AddMultiTenantDbContext<BloggingDbContext, string>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 ```
 
@@ -342,9 +342,9 @@ If the connection string or provider varies per tenant, use the overload that pr
 `IServiceProvider`:
 
 ```csharp
-builder.Services.AddMultiTenantDbContext<BloggingDbContext>((sp, options) =>
+builder.Services.AddMultiTenantDbContext<BloggingDbContext, string>((sp, options) =>
 {
-    var tenantInfo = sp.GetRequiredService<ITenantContext<AppTenantInfo>>().TenantInfo;
+    var tenantInfo = sp.GetRequiredService<ITenantContext<AppTenantInfo, string>>().TenantInfo;
     options.UseSqlServer(tenantInfo?.ConnectionString);
 });
 ```
@@ -352,7 +352,7 @@ builder.Services.AddMultiTenantDbContext<BloggingDbContext>((sp, options) =>
 A parameterless overload is also available when options are configured via `OnConfiguring` in the context class itself:
 
 ```csharp
-builder.Services.AddMultiTenantDbContext<BloggingDbContext>();
+builder.Services.AddMultiTenantDbContext<BloggingDbContext, string>();
 ```
 
 ### Pooled DbContext
@@ -362,7 +362,7 @@ that rents a context from the pool each request, clears its change tracker, and 
 tenant before returning it:
 
 ```csharp
-builder.Services.AddPooledMultiTenantDbContext<BloggingDbContext>(options =>
+builder.Services.AddPooledMultiTenantDbContext<BloggingDbContext, string>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
     poolSize: 1024); // optional, defaults to 1024
 ```
@@ -382,7 +382,7 @@ database context instance for a specific tenant.
 var tenantInfo = new MyTenantInfo { Id = "id", Identifier = "identifier" };
 
 // create a database context instance for the tenant
-var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo);
+var tenantDbContext = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo, s tring>(tenantInfo);
 
 // create a database context instance for the tenant with an instance of DbOptions<AppMultiTenantDbContext>
 var tenantDbContextWithOptions = MultiTenantDbContext.Create<AppMultiTenantDbContext, AppTenantInfo>(tenantInfo, 
@@ -458,12 +458,12 @@ EF Core Queries will only return results associated to the `TenantInfo`.
 ```csharp
 // Will only return "My Blog".
 var myTenantInfo = new TenantInfo { Id = "1", Identifier = "tenant-1" };
-var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
+var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo, string>(myTenantInfo);
 var tenantBlog = myDbContext.Blogs.First();
 
 // Will only return "Your Blog".
 var yourTenantInfo = new TenantInfo { Id = "2", Identifier = "tenant-2" };
-var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(yourTenantInfo);
+var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo, string>(yourTenantInfo);
 var yourBlogs = yourDbContext.Blogs.First(); 
 ```
 > The global query filter is applied only at the root level of a query. Any entity classes loaded via `Include` or
@@ -480,7 +480,7 @@ in the EF Core documentation for more details.
 ```csharp
 // TenantBlogs will contain all blogs, regardless of tenant.
 var myTenantInfo = ...;
-var db = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
+var db = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo, string>(myTenantInfo);
 var tenantBlogs = db.Blogs.IgnoreQueryFilters(Abstractions.Constants.TenantToken).ToList(); 
 ```
 
@@ -495,13 +495,13 @@ This behavior can be altered by changing the values of [TenantMismatchMode](#ten
 // Add a blog for a tenant.
 Blog myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
 var myTenantInfo = new TenantInfo { Id = "1", Identifier = "tenant-1" };
-var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(myTenantInfo);
+var myDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo, string>(myTenantInfo);
 myDbContext.Blogs.Add(myBlog);
 myDbContext.SaveChanges();
 
 // Modify and attach the same blog to a different tenant.
 var yourTenantInfo = new TenantInfo { Id = "2", Identifier = "tenant-2" };
-var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo>(yourTenantInfo);
+var yourDbContext = MultiTenantDbContext.Create<BloggingDbContext, TenantInfo, string>(yourTenantInfo);
 yourDbContext.Blogs.Attach(myBlog);
 myBlog.Title = "My Changed Blog";
 await yourDbContext.SaveChangesAsync(); // Throws MultiTenantException.
@@ -530,7 +530,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 {
     // Configure an entity type to be multi-tenant, adjust the existing keys and indexes
     var key = builder.Entity<Blog>().Metadata.GetKeys().First();
-    builder.Entity<MyEntityType>().IsMultiTenant().AdjustKey(key, builder).AdjustIndexes();
+    builder.Entity<MyEntityType>().IsMultiTenant<string>().AdjustKey(key, builder).AdjustIndexes();
 }
 ```
 
@@ -581,7 +581,7 @@ or `SaveChangesAsync`. This behavior can be changed by setting the `TenantNotSet
   binds `TenantInfo` automatically, and wires up `EnforceMultiTenantOnTracking`.
 - `AddPooledMultiTenantDbContext<T>()` reuses context instances across requests. `OnConfiguring` is called only
   on initial creation — do not use it for per-tenant connection strings or providers.
-- For separate databases, inject `ITenantContext<TTenantInfo>` (not an accessor) into the DbContext constructor
+- For separate databases, inject `ITenantContext<TTenantInfo, TId>` (not an accessor) into the DbContext constructor
   to get the current tenant's `ConnectionString`.
 - The global query filter is automatically applied to entities marked with `[MultiTenant]` or configured via the
   fluent API. Use `IgnoreQueryFilters()` to bypass it when needed.

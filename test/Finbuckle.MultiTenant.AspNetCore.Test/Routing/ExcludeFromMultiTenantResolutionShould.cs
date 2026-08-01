@@ -26,7 +26,7 @@ public class ExcludeFromMultiTenantResolutionShould
                 .ConfigureServices(services =>
                 {
                     services.AddRouting();
-                    services.AddMultiTenant<TenantInfo>()
+                    services.AddMultiTenant<TenantInfo,string>()
                         .WithStaticStrategy(identifier)
                         .WithInMemoryStore();
                 })
@@ -38,7 +38,7 @@ public class ExcludeFromMultiTenantResolutionShould
                         await next();
                     });
                     app.UseRouting();
-                    app.UseMultiTenant();
+                    app.UseMultiTenant<string>();
 
                     app.UseEndpoints(endpoints =>
                     {
@@ -49,14 +49,14 @@ public class ExcludeFromMultiTenantResolutionShould
 
         var host = await hostBuilder.StartAsync();
         using var scope = host.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo>>()
+        await scope.ServiceProvider.GetRequiredService<TenantManager<TenantInfo,string>>()
             .AddAsync(new TenantInfo { Id = identifier, Identifier = identifier });
         return host;
     }
 
     private static Task WriteResponseAsync(HttpContext context)
     {
-        var tenantContext = context.GetTenantContext<TenantInfo>();
+        var tenantContext = context.GetTenantContext<TenantInfo,string>();
         return context.Response.WriteAsync(
             tenantContext.TenantInfo is null ? NoTenantResponse : tenantContext.TenantInfo.Id);
     }

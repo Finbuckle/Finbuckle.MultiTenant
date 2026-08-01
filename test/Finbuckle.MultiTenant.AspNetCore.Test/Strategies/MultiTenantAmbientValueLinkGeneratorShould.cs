@@ -20,7 +20,7 @@ public class MultiTenantAmbientValueLinkGeneratorShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddRouting();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithRouteStrategy("tenant", useTenantAmbientRouteValue: true);
         var sp = services.BuildServiceProvider();
 

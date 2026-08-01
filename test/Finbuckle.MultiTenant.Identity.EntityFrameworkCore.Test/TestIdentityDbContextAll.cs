@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class TestIdentityDbContextAll : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string,
     IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityRoleClaim<string>,
-    IdentityUserToken<string>, IdentityUserPasskey<string>>
+    IdentityUserToken<string>, IdentityUserPasskey<string>,string>
 {
     public TestIdentityDbContextAll()
     {

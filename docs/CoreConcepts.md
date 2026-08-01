@@ -6,16 +6,21 @@ However, there are a few important specifics to be aware of. The items below mak
 ## `ITenantInfo` and `TenantInfo`
 
 A `TenantInfo` instance contains information about a tenant. Often this will be the "current" tenant in the context of an
-app. The type of these instances must implement `ITenantInfo` which defines properties
-for `Id` and `Identifier`. `TenantInfo` is a basic implementation provided by the library with those two properties.
+app. The type of these instances must implement `ITenantInfo<TId>` which defines properties for `Id` (of type `TId`) and
+`Identifier` (a `string`). `TenantInfo<TId>` is a basic implementation provided by the library with those two properties.
 
-When calling `AddMultiTenant<TTenantInfo>` the type passed into the
-type parameter defines the `ITenantInfo` implementation used throughout the library and app.
+`AddMultiTenant<TTenantInfo, TId>` takes two type parameters: `TTenantInfo` (the `ITenantInfo<TId>` implementation used
+throughout the library and app) and `TId` (the type of the tenant `Id`). `TId` must be `IEquatable<TId>`, so common
+choices are `string`, `int`, and `Guid`. For example, `AddMultiTenant<TenantInfo, string>()` uses string ids while
+`AddMultiTenant<AppTenantInfo, Guid>()` uses `Guid` ids.
 
-* `Id` is a unique id for a tenant in your app and should never change.
+* `Id` is a unique id for a tenant in your app and should never change. It must be non-default: `default(TId)` — `0`,
+  `Guid.Empty`, or a null/whitespace `string` — is treated as *no tenant* and is rejected (a `MultiTenantException` is
+  thrown when adding, updating, resolving, or assigning such a tenant, and an `ArgumentException` when looking one up by
+  a default id).
 * `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for your app (i.e. no
-  crazy symbols in a web app where the identifier will be part of the URL). Unlike `Id`, `Identifier` can be changed if
-  necessary.
+  crazy symbols in a web app where the identifier will be part of the URL). It must be non-empty. Unlike `Id`,
+  `Identifier` can be changed if necessary.
 
 The library provides `TenantInfo` as a base implementation. Your app can and should define a custom class implementing
 `ITenantInfo` (or inheriting from `TenantInfo`) and add custom properties as needed. It is recommended to keep these
@@ -25,29 +30,27 @@ when needed via the tenant `Id`.
 > Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
 > `TenantInfo` derived class.
 
-## `ITenantContext` and `TenantContext<TTenantInfo>`
+## `ITenantContext` and the ambient tenant scope
 
-The `TenantContext<TTenantInfo>` contains information about the current tenant.
+`ITenantContext<TTenantInfo, TId>` (and its non-generic base `ITenantContext<TId>`) holds the current tenant. The
+default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained from dependency injection.
 
-* Implements `ITenantContext` and `ITenantContext<TTenantInfo>` which can be obtained from dependency injection.
-* Registered as a **scoped service** (`AddScoped`), so each DI scope (e.g. each HTTP request in ASP.NET Core)
-  gets its own `TenantContext<TTenantInfo>` instance. All services resolved within the same scope see the
-  same tenant.
-* What constitutes a scope is application-specific: in ASP.NET Core it corresponds to a web request; in a
-  .NET Generic Host worker service it may correspond to a single message dequeued and processed; in a
-  console app it could be a manually created scope. The `TenantContext` lifecycle always matches the DI
-  scope it was resolved from.
-* The DI scope itself is **not** per-tenant — a single scope serves one request for whichever tenant was
-  resolved. The `TenantContext` is simply a scoped service within that scope, not a separate tenant-bound
-  container.
-* The `TenantInfo` property holds the current tenant info. It **can only be set once** — attempting to set it
-  a second time throws a `MultiTenantException`. Setting `TenantInfo` also clears the `Items` dictionary.
-* The `Items` property is a `Dictionary<object, object>` for storing arbitrary data scoped to the current
-  tenant context. Use it for per-request middleware data, tokens, or other transient state. Items are lost
-  when the scope ends or when `TenantInfo` is set.
-* The `IsResolved` property indicates whether a tenant was successfully resolved for the current context.
-* Can be obtained in ASP.NET Core from the current request's `HttpContext` object with
-  `GetTenantContext<TTenantInfo>()` or the non-generic `TenantContext` extension property. See
+* The context is registered as a **singleton** but is **ambient** — the current tenant is stored in an
+  `AsyncLocal`, so it flows with the current asynchronous execution context rather than with the DI scope. Each
+  logical unit of work (an HTTP request, a dequeued message, a console run) gets its own ambient tenant by first
+  calling `BeginScope()` / `BeginTenantScope()`.
+* You establish a scope with `ITenantScopeProvider.BeginScope()` or, more commonly, the
+  `IServiceProvider.BeginTenantScope(tenantInfo)` extension, which begins a scope and sets the tenant in one call.
+  In ASP.NET Core the middleware does this automatically for each request; in other hosts you call it yourself (see
+  [.NET Generic Host Integration](GenericHost)).
+* Accessing `TenantInfo` before a scope has been established throws a `MultiTenantException`
+  (`"No ambient tenant scope has been established."`).
+* The `TenantInfo` property holds the current tenant info. Within a scope it **can only be set once** — attempting to
+  set it a second time throws a `MultiTenantException`. A tenant assigned to the context must be valid: its `Id` must be
+  non-default and its `Identifier` non-empty (see [`ITenantInfo` and `TenantInfo`](#itenantinfo-and-tenantinfo)).
+* The `IsResolved` property indicates whether a tenant has been resolved (`TenantInfo` is not null).
+* Can be obtained in ASP.NET Core from the current request's `HttpContext` with
+  `GetTenantContext<TTenantInfo, TId>()` or the non-generic `TenantContext<TId>()` extension. See
   [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the
   middleware handles this. Use `TrySetTenantInfo` if you need to set only when no tenant has been resolved yet.

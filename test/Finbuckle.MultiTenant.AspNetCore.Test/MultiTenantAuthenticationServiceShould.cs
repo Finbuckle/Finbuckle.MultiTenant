@@ -16,11 +16,11 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test;
 
 public class MultiTenantAuthenticationServiceShould
 {
-    private static (MultiTenantAuthenticationService<TenantInfo> Service, Mock<IAuthenticationService> Inner,
+    private static (MultiTenantAuthenticationService<TenantInfo,string> Service, Mock<IAuthenticationService> Inner,
         DefaultHttpContext Context) CreateService(bool resolved = true, bool skipUnresolvedChallenge = false)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo,string>();
         var serviceProvider = services.BuildServiceProvider();
         if (resolved)
         {
@@ -37,14 +37,14 @@ public class MultiTenantAuthenticationServiceShould
         });
         var inner = new Mock<IAuthenticationService>();
         var context = new DefaultHttpContext { RequestServices = serviceProvider };
-        return (new MultiTenantAuthenticationService<TenantInfo>(inner.Object, options.Object), inner, context);
+        return (new MultiTenantAuthenticationService<TenantInfo,string>(inner.Object, options.Object), inner, context);
     }
 
     [Fact]
     public void ThrowIfInnerServiceIsNull()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new MultiTenantAuthenticationService<TenantInfo>(null!,
+            new MultiTenantAuthenticationService<TenantInfo,string>(null!,
                 Mock.Of<IOptionsMonitor<MultiTenantAuthenticationOptions>>()));
     }
 

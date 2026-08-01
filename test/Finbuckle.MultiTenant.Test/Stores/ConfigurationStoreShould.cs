@@ -20,13 +20,13 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
 
         // ReSharper disable once ObjectCreationAsStatement
         // Will throw if fail
-        new ConfigurationStore<TenantInfo>(configuration);
+        new ConfigurationStore<TenantInfo, string>(configuration);
     }
 
     [Fact]
     public void ThrowIfNullConfiguration()
     {
-        Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo>(null!));
+        Assert.Throws<ArgumentNullException>(() => new ConfigurationStore<TenantInfo, string>(null!));
     }
 
     [Fact]
@@ -36,8 +36,8 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
         IConfiguration configuration = configBuilder.Build();
 
-        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, ""));
-        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo>(configuration, null!));
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo,string>(configuration, ""));
+        Assert.Throws<ArgumentException>(() => new ConfigurationStore<TenantInfo,string>(configuration, null!));
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
         IConfiguration configuration = configBuilder.Build();
 
-        Assert.Throws<MultiTenantException>(() => new ConfigurationStore<TenantInfo>(configuration, "invalid"));
+        Assert.Throws<MultiTenantException>(() => new ConfigurationStore<TenantInfo,string>(configuration, "invalid"));
     }
 
     [Fact]
@@ -71,16 +71,16 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
+    protected override Task<IMultiTenantStore<TenantInfo, string>> CreateTestStore()
     {
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddJsonFile("ConfigurationStoreTestSettings.json");
         var configuration = configBuilder.Build();
 
-        return Task.FromResult<IMultiTenantStore<TenantInfo>>(new ConfigurationStore<TenantInfo>(configuration));
+        return Task.FromResult<IMultiTenantStore<TenantInfo, string>>(new ConfigurationStore<TenantInfo, string >(configuration));
     }
 
-    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo, string>> PopulateTestStore(IMultiTenantStore<TenantInfo, string> store)
     {
         throw new NotImplementedException();
     }

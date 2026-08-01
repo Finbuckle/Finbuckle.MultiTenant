@@ -32,7 +32,7 @@ public class MultiTenantEntityTypeBuilderExtensionsShould
                 .HasIndex(e => e.Url, nameof(Blog.Url))
                 .HasDatabaseName(nameof(Blog.Url) + "DbName")
                 .IsUnique();
-            builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustUniqueIndexes();
         });
         var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
@@ -54,7 +54,7 @@ public class MultiTenantEntityTypeBuilderExtensionsShould
             builder.Entity<Blog>()
                 .HasIndex(e => e.Url, nameof(Blog.Url))
                 .HasDatabaseName(nameof(Blog.Url) + "DbName");
-            builder.Entity<Blog>().IsMultiTenant().AdjustUniqueIndexes();
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustUniqueIndexes();
         });
         var indexes = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().Where(i => i.IsUnique);
 
@@ -76,7 +76,7 @@ public class MultiTenantEntityTypeBuilderExtensionsShould
             builder.Entity<Blog>()
                 .HasIndex(e => e.Url, nameof(Blog.Url))
                 .HasDatabaseName(nameof(Blog.Url) + "DbName"); // non-unique
-            builder.Entity<Blog>().IsMultiTenant().AdjustIndexes();
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndexes();
         });
 
         // AdjustIndexes adjusts ALL indexes (unique and non-unique), not only unique ones

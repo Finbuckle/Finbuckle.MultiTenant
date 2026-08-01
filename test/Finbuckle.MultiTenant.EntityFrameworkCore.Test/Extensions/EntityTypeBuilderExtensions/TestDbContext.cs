@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.EntityTypeBuilderExtensions;
 
-public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
+public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext<string>
 {
     private readonly Action<ModelBuilder>? _config;
 
@@ -32,8 +32,8 @@ public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
         // or use the standard builder configuration
         else
         {
-            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
-            modelBuilder.Entity<MyThingWithTenantId>().IsMultiTenant();
+            modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant<string>();
+            modelBuilder.Entity<MyThingWithTenantId>().IsMultiTenant<string>();
         }
 
         base.OnModelCreating(modelBuilder);

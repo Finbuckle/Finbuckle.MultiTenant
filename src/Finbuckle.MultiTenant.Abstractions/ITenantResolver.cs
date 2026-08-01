@@ -6,14 +6,14 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-public interface ITenantResolver
+public interface ITenantResolver<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Performs tenant resolution within the given context.
     /// </summary>
     /// <param name="context">The context for tenant resolution.</param>
-    /// <returns>The resolved <see cref="ITenantInfo"/>, or <see langword="null"/> if no tenant was resolved.</returns>
-    Task<ITenantInfo?> ResolveAsync(object context);
+    /// <returns>The resolved <see cref="ITenantInfo{TId}"/>, or <see langword="null"/> if no tenant was resolved.</returns>
+    Task<ITenantInfo<TId>?> ResolveAsync(object context);
 
     /// <summary>
     /// Contains a list of <see cref="IMultiTenantStrategy"/> instances used for tenant resolution.
@@ -24,9 +24,10 @@ public interface ITenantResolver
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public interface ITenantResolver<TTenantInfo> : ITenantResolver
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public interface ITenantResolver<TTenantInfo, TId> : ITenantResolver<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Performs tenant resolution within the given context.
@@ -36,12 +37,12 @@ public interface ITenantResolver<TTenantInfo> : ITenantResolver
     new Task<TTenantInfo?> ResolveAsync(object context);
 
     /// <summary>
-    /// The primary <see cref="IMultiTenantStore{TTenantInfo}"/> instance used for tenant resolution.
+    /// The primary <see cref="IMultiTenantStore{TTenantInfo, TId}"/> instance used for tenant resolution.
     /// </summary>
-    public IMultiTenantStore<TTenantInfo> Store { get; }
+    public IMultiTenantStore<TTenantInfo, TId> Store { get; }
 
     /// <summary>
-    /// Contains a list of <see cref="IMultiTenantStoreCache{TTenantInfo}"/> instances used for tenant resolution.
+    /// Contains a list of <see cref="IMultiTenantStoreCache{TTenantInfo, TId}"/> instances used for tenant resolution.
     /// </summary>
-    public IEnumerable<IMultiTenantStoreCache<TTenantInfo>> StoreCaches { get; }
+    public IEnumerable<IMultiTenantStoreCache<TTenantInfo, TId>> StoreCaches { get; }
 }

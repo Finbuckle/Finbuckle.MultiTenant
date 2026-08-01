@@ -14,14 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 // ...add app services
 
 // add MultiTenant services
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()
     .WithConfigurationStore();
 
 var app = builder.Build();
 
 // add the MultiTenant middleware
-app.UseMultiTenant();
+app.UseMultiTenant<strinG>();
 
 // ...add other middleware
 
@@ -30,9 +30,9 @@ app.Run();
 
 ## Adding the MultiTenant Service
 
-Use the `AddMultiTenant<TTenantInfo>` extension method on `IServiceCollection` to register the basic dependencies needed
-by the library. It returns a `MultiTenantBuilder<TTenantInfo>` instance on which the methods below can be called for
-further configuration. Each of these methods returns the same `MultiTenantBuilder<TTenantInfo>` instance allowing for
+Use the `AddMultiTenant<TTenantInfo, TId>` extension method on `IServiceCollection` to register the basic dependencies needed
+by the library. It returns a `MultiTenantBuilder<TTenantInfo, TId>` instance on which the methods below can be called for
+further configuration. Each of these methods returns the same `MultiTenantBuilder<TTenantInfo, TId>` instance allowing for
 chaining method calls.
 
 ## Configuring the Service
@@ -62,7 +62,7 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 - `WithBasePathStrategy`
 - `WithClaimStrategy`
 - `WithDelegateStrategy`
-- `WithDelegateStrategy<TContext, TTenantInfo>`
+- `WithDelegateStrategy<TContext, TTenantInfo, TId>`
 - `WithHeaderStrategy`
 - `WithHostStrategy`
 - `WithHttpContextStrategy`
@@ -101,7 +101,7 @@ tenant manager will query configured store caches in order before the primary st
 strategy will be tried and so on. The `UseMultiTenant` middleware for ASP.NET Core uses `TenantResolver`
 internally.
 
-The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo>` method with the following properties:
+The `TenantResolver` options are configured in the `AddMultiTenant<TTenantInfo, TId>` method with the following properties:
 
 - `IgnoredIdentifiers` - A list of tenant identifiers that should be ignored by the resolver.
 - `Events` - A set of events that can be used to hook into the resolution process:
@@ -131,32 +131,51 @@ There are several ways your app can read the current tenant:
 
 ### Via Dependency Injection
 
-`ITenantContext<TTenantInfo>` (and its non-generic variant `ITenantContext`) are available via dependency injection
-with a **scoped lifetime** (`AddScoped`). Each DI scope (e.g. each HTTP request in ASP.NET Core) gets its own
-`TenantContext<TTenantInfo>` instance. The middleware resolves the tenant and sets `TenantInfo` on this scoped
-instance early in the request pipeline, so all services resolved within the same scope see the same tenant.
+`ITenantContext<TTenantInfo, TId>` (and its non-generic base `ITenantContext<TId>`) are available via dependency
+injection. The default implementation, `AmbientTenantContext<TTenantInfo, TId>`, is **ambient**: the current tenant is
+held in an `AsyncLocal` that flows with the current asynchronous execution context, so a tenant scope must be
+established with `BeginTenantScope` before the tenant can be read or set (see
+[Establishing a tenant scope](#establishing-a-tenant-scope)). In ASP.NET Core the middleware establishes the scope and
+sets `TenantInfo` early in the request pipeline, so all code in that request sees the same tenant.
 
-In ASP.NET Core, prefer the `HttpContext` extension members such as `GetTenantContext<TTenantInfo>` or
-`TenantContext` since they always reflect the state set by the middleware, even in post-endpoint processing.
+In ASP.NET Core, prefer the `HttpContext` extension members such as `GetTenantContext<TTenantInfo, TId>` or
+`TenantContext<TId>` since they always reflect the state set by the middleware, even in post-endpoint processing.
 
 ### Via `HttpContext` (ASP.NET Core)
 
-For ASP.NET Core web apps the `GetTenantContext<TTenantInfo>`, `GetTenantInfo<TTenantInfo>`, `TenantContext`, and
+For ASP.NET Core web apps the `GetTenantContext<TTenantInfo, TId>`, `GetTenantInfo<TTenantInfo, TId>`, `TenantContext`, and
 `CurrentTenant` extension members are available directly on `HttpContext`. See
 [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
 ## Setting the Current Tenant
 
-In most cases the middleware resolves and sets the tenant automatically. When manual override is needed there are two
+In most cases the middleware resolves and sets the tenant automatically. When manual control is needed there are a few
 options:
+
+### Establishing a tenant scope
+
+Because the tenant context is ambient, a scope must exist before a tenant can be read or set. Use the
+`IServiceProvider.BeginTenantScope` extension methods:
+
+```csharp
+// Begin an ambient scope and set the tenant in one call:
+serviceProvider.BeginTenantScope(tenantInfo);
+
+// Or begin an empty scope and set the tenant later via the context:
+serviceProvider.BeginTenantScope();
+```
+
+`BeginTenantScope(tenantInfo)` begins a new ambient scope and assigns `TenantInfo` for it. In ASP.NET Core the
+middleware does this for every request, so you rarely call it directly; in a .NET Generic Host, worker, or console app
+you call it yourself once the tenant is resolved (see [.NET Generic Host Integration](GenericHost)). The tenant passed
+in must be valid — a non-default `Id` and non-empty `Identifier` — or a `MultiTenantException` is thrown.
 
 ### Via Dependency Injection
 
-The injected `ITenantContext<TTenantInfo>` instance's `TenantInfo` property can be set directly to change the
-current tenant. **`TenantInfo` can only be set once** — attempting to set it again throws a
-`MultiTenantException`. This is useful in advanced scenarios and should be used with caution. Prefer the
-`HttpContext` extension method `SetTenantInfo<TTenantInfo>` or `TrySetTenantInfo<TTenantInfo>` when
-`HttpContext` is available.
+Within an established scope, the injected `ITenantContext<TTenantInfo, TId>` instance's `TenantInfo` property can be set
+directly. **`TenantInfo` can only be set once per scope** — attempting to set it again throws a `MultiTenantException`,
+as does reading or setting it when no scope has been established. Prefer the `HttpContext` extension method
+`SetTenantInfo<TTenantInfo, TId>` or `TrySetTenantInfo<TTenantInfo, TId>` when `HttpContext` is available.
 
 ### Via `HttpContext` (ASP.NET Core)
 
@@ -165,10 +184,11 @@ See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-c
 
 ## Important Considerations
 
-- `ITenantContext<TTenantInfo>` is registered as a **scoped** service. Its lifetime is tied to the DI scope,
-  not to a specific tenant. All services within the same scope see the same tenant.
-- `TenantInfo` can only be set once per scope. Attempting to set it a second time throws
-  `MultiTenantException`. Use the `HttpContext.TrySetTenantInfo<T>()` extension or check
+- `ITenantContext<TTenantInfo, TId>` is registered as a **singleton** but is **ambient** — the current tenant is held
+  in an `AsyncLocal` and flows with the asynchronous execution context, not the DI scope. A scope must be established
+  with `BeginTenantScope` (the middleware does this per request in ASP.NET Core) before the tenant can be read or set.
+- `TenantInfo` can only be set once per scope. Attempting to set it a second time — or reading/setting it with no scope
+  established — throws `MultiTenantException`. Use the `HttpContext.TrySetTenantInfo<T, TId>()` extension or check
   `ITenantContext.IsResolved` to avoid this.
 - The `TenantResolver` tries strategies in order, then stores in order for each strategy. Resolution stops
   at the first store returning a match. Plan your ordering accordingly.

@@ -10,9 +10,9 @@ namespace Finbuckle.MultiTenant.Test.Stores;
 
 public abstract class MultiTenantStoreTestBase
 {
-    protected abstract Task<IMultiTenantStore<TenantInfo>> CreateTestStore();
+    protected abstract Task<IMultiTenantStore<TenantInfo, string>> CreateTestStore();
 
-    protected virtual async Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected virtual async Task<IMultiTenantStore<TenantInfo,string>> PopulateTestStore(IMultiTenantStore<TenantInfo,string> store)
     {
         await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
         await store.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol" });

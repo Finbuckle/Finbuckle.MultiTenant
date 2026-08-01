@@ -8,9 +8,10 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Context for when the primary tenant store has attempted to look up a tenant identifier.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class StoreResolveCompletedContext<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class StoreResolveCompletedContext<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// The context used for attempted tenant resolution.
@@ -18,9 +19,9 @@ public class StoreResolveCompletedContext<TTenantInfo>
     public required object Context { get; init; }
 
     /// <summary>
-    /// The <see cref="IMultiTenantStore{TTenantInfo}"/> instance that was run.
+    /// The <see cref="IMultiTenantStore{TTenantInfo, TId}"/> instance that was run.
     /// </summary>
-    public required IMultiTenantStore<TTenantInfo> Store { get; init; }
+    public required IMultiTenantStore<TTenantInfo, TId> Store { get; init; }
 
     /// <summary>
     /// The <see cref="IMultiTenantStrategy"/> instance that was run.

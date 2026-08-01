@@ -4,6 +4,6 @@ using Microsoft.EntityFrameworkCore;
 namespace IdentitySampleApp.Data;
 
 public class AppIdentityDbContext(
-    DbContextOptions<AppIdentityDbContext> options) : MultiTenantIdentityDbContext(options)
+    DbContextOptions<AppIdentityDbContext> options) : MultiTenantIdentityDbContext<string>(options)
 {
 }

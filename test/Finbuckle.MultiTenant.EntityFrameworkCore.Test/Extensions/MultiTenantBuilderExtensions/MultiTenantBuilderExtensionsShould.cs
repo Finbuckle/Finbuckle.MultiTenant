@@ -17,24 +17,24 @@ public class MultiTenantBuilderExtensionsShould
     public void AddEfCoreStore()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
+        builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo,string>();
         var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
-        var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
+        var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>>(resolver);
     }
 
     [Fact]
     public void AddEfCoreStoreWithExistingDbContext()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         services.AddDbContext<TestEfCoreStoreDbContext>(o => o.UseSqlite("DataSource=:memory:"));
-        builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo>();
+        builder.WithStaticStrategy("initech").WithEFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>();
         var sp = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
-        var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
-        Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>>(resolver);
+        var resolver = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
+        Assert.IsType<EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>>(resolver);
     }
 }
