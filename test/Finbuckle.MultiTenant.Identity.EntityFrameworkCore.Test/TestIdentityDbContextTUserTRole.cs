@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
-public class TestIdentityDbContextTUserTRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string>
+public class TestIdentityDbContextTUserTRole : MultiTenantIdentityDbContext<IdentityUser, IdentityRole, string, string>
 {
     public TestIdentityDbContextTUserTRole()
     {

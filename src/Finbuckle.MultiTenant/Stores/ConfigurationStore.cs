@@ -13,8 +13,9 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not
 /// implemented. If the underlying configuration supports reload-on-change, then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> derived type.</typeparam>
-public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> derived type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
     private readonly IConfigurationSection section;
@@ -71,6 +72,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
             defaults.Bind(newTenant, options => options.BindNonPublicProperties = true);
             tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
 
+            newTenant.EnsureValid();
             newMap.TryAdd(newTenant.Identifier, newTenant);
         }
 
@@ -87,10 +89,11 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(id);
-        return Task.FromResult(tenantMap.Values.SingleOrDefault(v => v.Id == id));
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+        return Task.FromResult(tenantMap.Values.SingleOrDefault(v => v.Id.Equals(id)));
     }
 
     /// <inheritdoc />
@@ -116,7 +119,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

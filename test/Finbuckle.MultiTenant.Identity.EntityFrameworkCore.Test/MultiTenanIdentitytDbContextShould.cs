@@ -16,16 +16,16 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
 public class MultiTenantIdentityDbContextShould
 {
-    private TContext CreateDbContextViaDi<TContext>(int schemaVersion) where TContext : DbContext, IMultiTenantDbContext
+    private TContext CreateDbContextViaDi<TContext>(int schemaVersion) where TContext : DbContext, IMultiTenantDbContext<string>
     {
         var services = new ServiceCollection();
         services.AddOptions();
         services.Configure<IdentityOptions>(o => o.Stores.SchemaVersion = new Version(schemaVersion, 0));
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc" };
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithStaticStrategy(tenant.Identifier)
             .WithInMemoryStore();
-        services.AddMultiTenantDbContext<TContext>(o =>
+        services.AddMultiTenantDbContext<TContext, string>(o =>
         {
             o.UseSqlite("DataSource=:memory:");
             o.ReplaceService<IModelCacheKeyFactory, DynamicModelCacheKeyFactory>();
@@ -41,10 +41,10 @@ public class MultiTenantIdentityDbContextShould
     {
         var services = new ServiceCollection();
         var tenant = new TenantInfo { Id = "abc", Identifier = "abc" };
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithStaticStrategy(tenant.Identifier)
             .WithInMemoryStore();
-        services.AddMultiTenantDbContext<TestIdentityDbContext>();
+        services.AddMultiTenantDbContext<TestIdentityDbContext, string>();
         var scope = services.BuildServiceProvider().CreateScope();
         scope.ServiceProvider.BeginTenantScope(tenant);
 
@@ -278,7 +278,7 @@ public class MultiTenantIdentityDbContextShould
     public void CreateMultiTenantIdentityDbContextWithFactory()
     {
         var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
-        var c = MultiTenantDbContext.Create<MultiTenantIdentityDbContext, TenantInfo>(tenant1);
+        var c = MultiTenantDbContextExtensions.Create<MultiTenantIdentityDbContext<string>, TenantInfo, string>(tenant1);
 
         Assert.NotNull(c);
     }
@@ -293,17 +293,17 @@ public class MultiTenantIdentityDbContextShould
         var tenant1 = new TenantInfo { Id = "t1", Identifier = "t1" };
         var tenant2 = new TenantInfo { Id = "t2", Identifier = "t2" };
 
-        using var setup = new MultiTenantIdentityDbContext(options);
+        using var setup = new MultiTenantIdentityDbContext<string>(options);
         setup.TenantInfo = tenant1;
         setup.Database.EnsureCreated();
         setup.Users.Add(new IdentityUser { UserName = "tenant1-user", NormalizedUserName = "TENANT1-USER" });
         setup.SaveChanges();
 
-        using var asT2 = new MultiTenantIdentityDbContext(options);
+        using var asT2 = new MultiTenantIdentityDbContext<string>(options);
         asT2.TenantInfo = tenant2;
         Assert.Equal(0, asT2.Users.Count());
 
-        using var asT1 = new MultiTenantIdentityDbContext(options);
+        using var asT1 = new MultiTenantIdentityDbContext<string>(options);
         asT1.TenantInfo = tenant1;
         Assert.Equal(1, asT1.Users.Count());
     }

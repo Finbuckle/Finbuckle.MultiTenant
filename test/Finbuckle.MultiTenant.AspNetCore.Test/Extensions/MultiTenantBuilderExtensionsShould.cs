@@ -29,12 +29,12 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -70,13 +70,13 @@ public class MultiTenantBuilderExtensionsShould
                 called = true;
             };
         });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -103,13 +103,13 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc", Identifier = "abc" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -139,12 +139,12 @@ public class MultiTenantBuilderExtensionsShould
 #pragma warning disable 1998
         services.AddAuthentication().AddCookie(o => o.Events.OnValidatePrincipal = async _ => called = true);
 #pragma warning restore 1998
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -179,12 +179,12 @@ public class MultiTenantBuilderExtensionsShould
 #pragma warning disable 1998
         services.AddAuthentication().AddCookie(o => o.Events.OnValidatePrincipal = async _ => called = true);
 #pragma warning restore 1998
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithClaimStrategy();
         var sp = services.BuildServiceProvider();
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -216,13 +216,13 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
 
         // Fake a resolved tenant
-        sp.BeginTenantScope(new TenantInfo { Id = "", Identifier = "abc1" });
+        sp.BeginTenantScope(new TenantInfo { Id = "abc1", Identifier = "abc1" });
 
         // Trigger the ValidatePrincipal event
         var httpContextMock = new Mock<HttpContext>();
@@ -249,14 +249,14 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddAuthentication();
         services.AddLogging();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthentication();
 
         var sp = services.BuildServiceProvider();
         sp.BeginTenantScope();
 
         var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
-        Assert.IsType<MultiTenantAuthenticationService<TestTenantInfo>>(authService);
+        Assert.IsType<MultiTenantAuthenticationService<TestTenantInfo,string>>(authService);
 
         var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throws if fails
         Assert.IsType<MultiTenantAuthenticationSchemeProvider>(schemeProvider);
@@ -273,14 +273,14 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddAuthentication();
         services.AddLogging();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthenticationCore();
 
         var sp = services.BuildServiceProvider();
         sp.BeginTenantScope();
 
         var authService = sp.GetRequiredService<IAuthenticationService>(); // Throws if fail
-        Assert.IsType<MultiTenantAuthenticationService<TestTenantInfo>>(authService);
+        Assert.IsType<MultiTenantAuthenticationService<TestTenantInfo, string>>(authService);
 
         var schemeProvider = sp.GetRequiredService<IAuthenticationSchemeProvider>(); // Throws if fails
         Assert.IsType<MultiTenantAuthenticationSchemeProvider>(schemeProvider);
@@ -292,7 +292,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddAuthentication();
         services.AddLogging();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithRemoteAuthenticationCallbackStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -308,7 +308,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
@@ -331,7 +331,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddAuthentication().AddCookie().AddOpenIdConnect("customScheme", null!);
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -358,7 +358,7 @@ public class MultiTenantBuilderExtensionsShould
         services.AddAuthentication(o => o.DefaultChallengeScheme = defaultValue)
             .AddCookie()
             .AddOpenIdConnect("defaultScheme", null!);
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -381,7 +381,7 @@ public class MultiTenantBuilderExtensionsShould
         services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build()); // net7.0+
         services.AddOptions();
         services.AddAuthentication().AddOpenIdConnect();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
@@ -408,7 +408,7 @@ public class MultiTenantBuilderExtensionsShould
         services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build()); // net7.0+
         services.AddOptions();
         services.AddAuthentication().AddOpenIdConnect();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -441,7 +441,7 @@ public class MultiTenantBuilderExtensionsShould
                 options.ClientId = defaultValue;
                 options.ClientSecret = defaultValue;
             });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -463,7 +463,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo, string>()
             .WithPerTenantAuthentication();
         var sp = services.BuildServiceProvider();
 
@@ -489,7 +489,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddOptions();
         services.AddAuthentication().AddCookie();
-        services.AddMultiTenant<TestTenantInfo>()
+        services.AddMultiTenant<TestTenantInfo,string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -520,7 +520,7 @@ public class MultiTenantBuilderExtensionsShould
             options.LogoutPath = defaultValue;
             options.AccessDeniedPath = defaultValue;
         });
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithPerTenantAuthenticationConventions();
         var sp = services.BuildServiceProvider();
 
@@ -540,7 +540,7 @@ public class MultiTenantBuilderExtensionsShould
     public void WithPerTenantAuthentication_ThrowIfCantDecorateIAuthenticationService()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
 
         Assert.Throws<MultiTenantException>(() => builder.WithPerTenantAuthentication());
     }
@@ -549,7 +549,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddBasePathStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithBasePathStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -561,7 +561,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddBasePathStrategyDefaultRebaseDefaultTrue()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithBasePathStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -576,7 +576,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddBasePathStrategyWithOptions()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithBasePathStrategy(options => options.RebaseAspNetCorePathBase = true);
         var sp = services.BuildServiceProvider();
 
@@ -591,7 +591,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddClaimStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithClaimStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -603,7 +603,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddHeaderStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithHeaderStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -615,7 +615,7 @@ public class MultiTenantBuilderExtensionsShould
     public void AddHostStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithHostStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -627,7 +627,7 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfNullParamAddingHostStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         Assert.Throws<ArgumentException>(()
             => builder.WithHostStrategy(null!));
     }
@@ -638,7 +638,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddRouting();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithRouteStrategy();
         var sp = services.BuildServiceProvider();
 
@@ -650,7 +650,7 @@ public class MultiTenantBuilderExtensionsShould
     public void ThrowIfNullParamAddingRouteStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         Assert.Throws<ArgumentException>(()
             => builder.WithRouteStrategy(null!, false));
     }
@@ -661,7 +661,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddRouting();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithRouteStrategy("routeParam", useTenantAmbientRouteValue: true);
         var sp = services.BuildServiceProvider();
 
@@ -678,7 +678,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddRouting();
         services.AddLogging();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithRouteStrategy("routeParam", useTenantAmbientRouteValue: false);
         var sp = services.BuildServiceProvider();
 
@@ -695,7 +695,7 @@ public class MultiTenantBuilderExtensionsShould
         var services = new ServiceCollection();
         services.AddRouting();
         services.AddLogging();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo,string>(services);
         builder.WithRouteStrategy(); // Uses default overload which sets useTenantAmbientRouteValue to true
         var sp = services.BuildServiceProvider();
 

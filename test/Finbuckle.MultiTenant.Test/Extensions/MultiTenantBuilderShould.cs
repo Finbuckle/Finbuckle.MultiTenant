@@ -21,14 +21,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStore<TestStore<TenantInfo>>(lifetime);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithStore<TestStore<TenantInfo, string>>(lifetime);
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
 
         switch (lifetime)
         {
@@ -42,7 +42,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
                 Assert.NotSame(store, store2);
                 break;
         }
@@ -55,14 +55,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithParamsAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStore<TestStore<TenantInfo>>(lifetime, true);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithStore<TestStore<TenantInfo, string>>(lifetime, true);
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
 
         switch (lifetime)
         {
@@ -76,7 +76,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
                 Assert.NotSame(store, store2);
                 break;
 
@@ -92,14 +92,14 @@ public class MultiTenantBuilderShould
     public void AddCustomStoreWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStore(lifetime, _ => new TestStore<TenantInfo>());
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithStore(lifetime, _ => new TestStore<TenantInfo, string>());
 
         var sp = services.BuildServiceProvider();
 
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
         var scope = sp.CreateScope();
-        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store2 = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
 
         switch (lifetime)
         {
@@ -113,7 +113,7 @@ public class MultiTenantBuilderShould
 
             case ServiceLifetime.Transient:
                 Assert.NotSame(store, store2);
-                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+                store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<TenantInfo, string>>();
                 Assert.NotSame(store, store2);
                 break;
         }
@@ -123,39 +123,40 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStore()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         Assert.Throws<ArgumentNullException>(() =>
-            builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton, factory: null!));
+            builder.WithStore<TestStore<TenantInfo, string>>(ServiceLifetime.Singleton, factory: null!));
     }
 
     [Fact]
     public void ThrowIfAddingMultiplePrimaryStores()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithStore<TestStore<TenantInfo, string>>(ServiceLifetime.Singleton);
 
         Assert.Throws<InvalidOperationException>(() =>
-            builder.WithStore<TestStore<TenantInfo>>(ServiceLifetime.Singleton));
+            builder.WithStore<TestStore<TenantInfo, string>>(ServiceLifetime.Singleton));
     }
 
     [Fact]
     public void AddMultipleStoreCachesInOrder()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
-        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "first");
-        builder.WithStoreCache<TestStoreCache<TenantInfo>>(ServiceLifetime.Singleton, "second");
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
+        builder.WithStoreCache<TestStoreCache<TenantInfo, string>>(ServiceLifetime.Singleton, "first");
+        builder.WithStoreCache<TestStoreCache<TenantInfo, string>>(ServiceLifetime.Singleton, "second");
 
         var sp = services.BuildServiceProvider();
-        var caches = sp.GetRequiredService<IEnumerable<IMultiTenantStoreCache<TenantInfo>>>()
-            .Cast<TestStoreCache<TenantInfo>>()
+        var caches = sp.GetRequiredService<IEnumerable<IMultiTenantStoreCache<TenantInfo, string>>>()
+            .Cast<TestStoreCache<TenantInfo, string>>()
             .ToArray();
 
         Assert.Equal(2, caches.Length);
         Assert.Equal("first", caches[0].Name);
         Assert.Equal("second", caches[1].Name);
     }
+ 
 
     [Theory]
     [InlineData(ServiceLifetime.Singleton)]
@@ -164,7 +165,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithDefaultCtorAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithStrategy<StaticStrategy>(lifetime, "initech");
 
         var sp = services.BuildServiceProvider();
@@ -200,7 +201,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithParamsAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithStrategy<StaticStrategy>(lifetime, "id");
 
         var sp = services.BuildServiceProvider();
@@ -234,7 +235,7 @@ public class MultiTenantBuilderShould
     public void AddCustomStrategyWithFactoryAndLifetime(ServiceLifetime lifetime)
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         builder.WithStrategy(lifetime, _ => new StaticStrategy("id"));
 
         var sp = services.BuildServiceProvider();
@@ -265,13 +266,13 @@ public class MultiTenantBuilderShould
     public void ThrowIfNullFactoryAddingCustomStrategy()
     {
         var services = new ServiceCollection();
-        var builder = new MultiTenantBuilder<TenantInfo>(services);
+        var builder = new MultiTenantBuilder<TenantInfo, string>(services);
         Assert.Throws<ArgumentNullException>(() =>
             builder.WithStrategy<StaticStrategy>(ServiceLifetime.Singleton, factory: null!));
     }
 
-    private class TestStore<TTenant> : IMultiTenantStore<TTenant>
-        where TTenant : TenantInfo
+    private class TestStore<TTenant, TId> : IMultiTenantStore<TTenant,TId>
+        where TTenant : TenantInfo, ITenantInfo<TId> where TId : IEquatable<TId>
     {
         // ReSharper disable once NotAccessedField.Local
         private readonly bool _testParam;
@@ -292,7 +293,7 @@ public class MultiTenantBuilderShould
             throw new NotImplementedException();
         }
 
-        public Task<TTenant?> GetAsync(string id, CancellationToken cancellationToken = default)
+        public Task<TTenant?> GetAsync(TId id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -312,7 +313,7 @@ public class MultiTenantBuilderShould
             throw new NotImplementedException();
         }
 
-        public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+        public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -328,8 +329,8 @@ public class MultiTenantBuilderShould
         }
     }
 
-    private class TestStoreCache<TTenant> : IMultiTenantStoreCache<TTenant>
-        where TTenant : TenantInfo
+    private class TestStoreCache<TTenant, TId> : IMultiTenantStoreCache<TTenant, TId>
+        where TTenant : TenantInfo, ITenantInfo<TId> where TId : IEquatable<TId>
     {
         public TestStoreCache(string name)
         {
@@ -338,7 +339,7 @@ public class MultiTenantBuilderShould
 
         public string Name { get; }
 
-        public Task<TTenant?> GetAsync(string id, CancellationToken cancellationToken = default)
+        public Task<TTenant?> GetAsync(TId id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
@@ -353,7 +354,7 @@ public class MultiTenantBuilderShould
             throw new NotImplementedException();
         }
 
-        public Task RemoveAsync(string id, CancellationToken cancellationToken = default)
+        public Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -4,12 +4,12 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
-@inject Finbuckle.MultiTenant.TenantManager<AppTenantInfo> TenantManager;
+@inject Finbuckle.MultiTenant.TenantManager<AppTenantInfo, string> TenantManager;
 
 <ul class="navbar-nav">
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-light text-bg-secondary" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            @(Context.GetTenantInfo<AppTenantInfo>()?.Name ?? "Select Tenant")
+            @(Context.GetTenantInfo<AppTenantInfo, string>()?.Name ?? "Select Tenant")
         </a>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" asp-controller="Home" asp-action="Index" asp-route-__tenant__="">No Tenant</a></li>

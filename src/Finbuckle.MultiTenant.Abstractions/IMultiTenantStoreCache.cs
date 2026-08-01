@@ -6,8 +6,9 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Interface definition for tenant store caches.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public interface IMultiTenantStoreCache<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public interface IMultiTenantStoreCache<TTenantInfo, in TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Retrieve the TTenantInfo for a given tenant Id.
@@ -15,7 +16,7 @@ public interface IMultiTenantStoreCache<TTenantInfo> where TTenantInfo : ITenant
     /// <param name="id">TenantId for the tenant to retrieve.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default);
+    Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given identifier.
@@ -39,7 +40,7 @@ public interface IMultiTenantStoreCache<TTenantInfo> where TTenantInfo : ITenant
     /// <param name="id">TenantId for the tenant to remove.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task RemoveAsync(string id, CancellationToken cancellationToken = default);
+    Task RemoveAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Remove a tenant from the cache by identifier.

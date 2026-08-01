@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantEntityTypeBuilderExtensions;
 
-public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext
+public class TestDbContext : EntityFrameworkCore.MultiTenantDbContext<string>
 {
     private readonly Action<ModelBuilder> _config;
 

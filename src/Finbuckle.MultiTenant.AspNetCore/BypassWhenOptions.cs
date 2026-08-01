@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 namespace Finbuckle.MultiTenant.AspNetCore.Options;
 
 /// <summary>
-/// Options for configuring when <see cref="MultiTenantMiddleware"/> should bypass tenant resolution
+/// Options for configuring when <see cref="MultiTenantMiddleware{TId}"/> should bypass tenant resolution
 /// and pass the request directly to the next middleware.
 /// </summary>
 public class BypassWhenOptions

@@ -12,13 +12,14 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class TenantResolver<TTenantInfo, TId> : ITenantResolver<TTenantInfo,TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
-    private readonly MultiTenantOptions<TTenantInfo> _options;
+    private readonly MultiTenantOptions<TTenantInfo, TId> _options;
     private readonly ILoggerFactory? _loggerFactory;
-    private readonly TenantManager<TTenantInfo> _tenantManager;
+    private readonly TenantManager<TTenantInfo, TId> _tenantManager;
 
     /// <summary>
     /// Initializes a new instance of TenantResolver.
@@ -27,7 +28,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     /// <param name="tenantManager">The tenant manager.</param>
     /// <param name="options">The multi-tenant options.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        TenantManager<TTenantInfo> tenantManager, IOptions<MultiTenantOptions<TTenantInfo>> options) :
+        TenantManager<TTenantInfo, TId> tenantManager, IOptions<MultiTenantOptions<TTenantInfo, TId>> options) :
         this(strategies, tenantManager, options, null)
     {
     }
@@ -40,7 +41,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     /// <param name="options">The multi-tenant options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        TenantManager<TTenantInfo> tenantManager, IOptions<MultiTenantOptions<TTenantInfo>> options,
+        TenantManager<TTenantInfo, TId> tenantManager, IOptions<MultiTenantOptions<TTenantInfo, TId>> options,
          ILoggerFactory? loggerFactory)
     {
         _tenantManager = tenantManager ?? throw new ArgumentNullException(nameof(tenantManager));
@@ -54,18 +55,18 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
     public IEnumerable<IMultiTenantStrategy> Strategies { get; set; }
 
     /// <inheritdoc />
-    public IMultiTenantStore<TTenantInfo> Store => _tenantManager.Store;
+    public IMultiTenantStore<TTenantInfo, TId> Store => _tenantManager.Store;
 
     /// <inheritdoc />
-    public IEnumerable<IMultiTenantStoreCache<TTenantInfo>> StoreCaches => _tenantManager.Caches;
+    public IEnumerable<IMultiTenantStoreCache<TTenantInfo, TId>> StoreCaches => _tenantManager.Caches;
 
     /// <inheritdoc />
     public async Task<TTenantInfo?> ResolveAsync(object context)
     {
         var tenantResolverLogger = _loggerFactory?.CreateLogger(GetType()) ?? NullLogger.Instance;
         IMultiTenantStrategy? finalStrategy = null;
-        IMultiTenantStore<TTenantInfo>? finalStore = null;
-        IMultiTenantStoreCache<TTenantInfo>? finalCache = null;
+        IMultiTenantStore<TTenantInfo, TId>? finalStore = null;
+        IMultiTenantStoreCache<TTenantInfo, TId>? finalCache = null;
         TTenantInfo? resolvedTenantInfo = default;
 
         foreach (var strategy in Strategies)
@@ -101,7 +102,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             {
                 if (lookupInfo.Cache is not null)
                 {
-                    var cacheResolveCompletedContext = new StoreCacheResolveCompletedContext<TTenantInfo>
+                    var cacheResolveCompletedContext = new StoreCacheResolveCompletedContext<TTenantInfo, TId>
                     {
                         Context = context,
                         Cache = lookupInfo.Cache,
@@ -124,7 +125,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                     return cacheResolveCompletedContext.TenantInfo;
                 }
 
-                var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo>
+                var storeResolveCompletedContext = new StoreResolveCompletedContext<TTenantInfo, TId>
                 {
                     Context = context,
                     Store = lookupInfo.Store!,
@@ -154,7 +155,7 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
                 break;
         }
 
-        var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo>
+        var resolutionCompletedContext = new TenantResolveCompletedContext<TTenantInfo, TId>
         {
             TenantInfo = resolvedTenantInfo,
             Context = context,
@@ -163,11 +164,14 @@ public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
             Strategy = finalStrategy
         };
         await _options.Events.OnTenantResolveCompleted(resolutionCompletedContext).ConfigureAwait(false);
+
+        // a resolved tenant must have a non-default id and a non-empty identifier
+        resolutionCompletedContext.TenantInfo?.EnsureValid();
         return resolutionCompletedContext.TenantInfo;
     }
 
     /// <inheritdoc />
-    async Task<ITenantInfo?> ITenantResolver.ResolveAsync(object context)
+    async Task<ITenantInfo<TId>?> ITenantResolver<TId>.ResolveAsync(object context)
     {
         return await ResolveAsync(context).ConfigureAwait(false);
     }

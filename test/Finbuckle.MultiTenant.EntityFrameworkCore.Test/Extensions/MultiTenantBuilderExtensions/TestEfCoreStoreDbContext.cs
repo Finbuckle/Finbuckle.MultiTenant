@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Extensions.MultiTenantBuilderExtensions;
 
-public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo,string>
 {
     public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
     {

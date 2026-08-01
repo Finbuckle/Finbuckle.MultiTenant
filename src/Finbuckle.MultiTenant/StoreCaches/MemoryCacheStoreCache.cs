@@ -9,9 +9,10 @@ namespace Finbuckle.MultiTenant.StoreCaches;
 /// <summary>
 /// Tenant store cache that uses an <see cref="IMemoryCache"/> instance as its backing.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class MemoryCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IMemoryCache cache;
     private readonly string keyPrefix;
@@ -31,8 +32,11 @@ public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenant
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         cache.TryGetValue($"{keyPrefix}id__{id}", out TTenantInfo? result);
         return Task.FromResult(result);
     }
@@ -47,6 +51,7 @@ public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenant
     /// <inheritdoc />
     public Task SetAsync(TTenantInfo tenantInfo, CancellationToken cancellationToken = default)
     {
+        tenantInfo.EnsureValid();
         cache.Set($"{keyPrefix}id__{tenantInfo.Id}", tenantInfo, cacheEntryOptions);
         cache.Set($"{keyPrefix}identifier__{tenantInfo.Identifier}", tenantInfo, cacheEntryOptions);
 
@@ -54,8 +59,11 @@ public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenant
     }
 
     /// <inheritdoc />
-    public Task RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
+        if (EqualityComparer<TId>.Default.Equals(id, default!))
+            throw new ArgumentException("Tenant id cannot be the default value.", nameof(id));
+
         cache.Remove($"{keyPrefix}id__{id}");
 
         return Task.CompletedTask;

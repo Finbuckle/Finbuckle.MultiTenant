@@ -21,7 +21,7 @@ public class TestDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant();
+        modelBuilder.Entity<MyMultiTenantThing>().IsMultiTenant<string>();
     }
 }
 

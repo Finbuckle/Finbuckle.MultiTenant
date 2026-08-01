@@ -2,9 +2,9 @@ using Finbuckle.MultiTenant.Abstractions;
 
 namespace WebApiSample;
 
-public class AppTenantInfo : ITenantInfo
+public class AppTenantInfo : ITenantInfo<Guid>
 {
-	public string Id { get; set; } = string.Empty;
+	public Guid Id { get; set; } = Guid.Empty;
 	public string Identifier { get; set; } = string.Empty;
 	public string? Name { get; set; } = string.Empty;
 	public string PreferredLanguage { get; set; } = "en";

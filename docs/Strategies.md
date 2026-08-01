@@ -23,7 +23,7 @@ If an identifier can't be determined, `GetIdentifierAsync` should return null wh
 null `ITenantInfo`.
 
 Configure a custom implementation of `IMultiTenantStrategy` by calling `WithStrategy<TStrategy>`
-after `AddMultiTenant<TTenantInfo>` in your app configuration. There are several
+after `AddMultiTenant<TTenantInfo, TId>` in your app configuration. There are several
 available overrides for configuring the strategy. The first override uses dependency injection along with any passed
 parameters to construct the implementation instance. The second override accepts a `Func<IServiceProvider, TStrategy>`
 factory method for even more customization. The library internally decorates any `IMultiTenantStrategy` with a wrapper
@@ -31,21 +31,21 @@ providing basic logging and exception handling.
 
 ```csharp
 // configure a strategy with a given type
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStrategy<MyStrategy>(myParam1, myParam2)...
 
 // or configure a strategy with a factory method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStrategy(sp => new MyStrategy())...
 ```
 
 ## Using Multiple Strategies
 
-Multiple strategies can be registered after `AddMultiTenant<TTenantInfo>`. They are tried in registration order. When a
+Multiple strategies can be registered after `AddMultiTenant<TTenantInfo, TId>`. They are tried in registration order. When a
 strategy returns an identifier, the configured stores are queried; if none resolves a tenant, the next strategy is tried.
 
 Most out-of-the-box strategies are registered as singleton services so configuring them multiple times
-after `AddMultiTenant<TTenantInfo>` is not recommended. The main use for configuring multiple strategies of the same
+after `AddMultiTenant<TTenantInfo, TId>` is not recommended. The main use for configuring multiple strategies of the same
 type is for several instances of `DelegateStrategy` utilizing distinct logic or other advanced scenarios.
 
 ## Static Strategy
@@ -55,11 +55,11 @@ type is for several instances of `DelegateStrategy` utilizing distinct logic or 
 Always uses the same identifier to resolve the tenant. Often useful in testing or to resolve to a fallback or default
 tenant. This strategy will run last no matter where it is configured.
 
-Configure by calling `WithStaticStrategy` after `AddMultiTenant<TTenantInfo>` and passing in the identifier to use for
+Configure by calling `WithStaticStrategy` after `AddMultiTenant<TTenantInfo, TId>` and passing in the identifier to use for
 tenant resolution:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStaticStrategy("MyTenant")
 ```
 
@@ -72,7 +72,7 @@ Uses a provided `Func<object, Task<string?>>` to determine the tenant. For examp
 This strategy is good to use for testing or simple logic. This strategy can be used multiple times and will run
 in the order configured.
 
-Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo>`. A `Func<object, Task<string?>>` is passed
+Configure by calling `WithDelegateStrategy` after `AddMultiTenant<TTenantInfo, TId>`. A `Func<object, Task<string?>>` is passed
 in which will be used with each request to resolve the tenant. A lambda or async lambda can be used as the parameter.
 Alternatively, `WithDelegateStrategy<TContext, TTenantInfo>` accepts a typed context parameter. When using the typed
 variant, the delegate will run when the runtime context instance is assignable to `TContext` — that is, when it's of
@@ -81,12 +81,12 @@ resolution falls through to the next strategy.
 
 ```csharp
 // use custom logic to get the tenant identifier
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithDelegateStrategy(context => Task.FromResult<string?>("initech"))...
 
 // or register with a typed lambda, HttpContext in this case; derived runtime types are also supported
-builder.Services.AddMultiTenant<TenantInfo>()
-    .WithDelegateStrategy<HttpContext, TenantInfo>(httpContext =>
+builder.Services.AddMultiTenant<TenantInfo, string>()
+    .WithDelegateStrategy<HttpContext, TenantInfo, string>(httpContext =>
     {
         var tenantIdentifier = httpContext.Request.Query["tenant"].FirstOrDefault();
         return Task.FromResult(tenantIdentifier);
@@ -105,10 +105,10 @@ Uses a delegate that takes an `HttpContext` parameter to determine the tenant id
 Core middleware each request's `HttpContext` is passed to the strategy. This strategy can be used multiple times and will
 run in the order configured. Tenant resolution will ignore this strategy if the context is not of the correct type.
 
-Configure by calling `WithHttpContextStrategy` after `AddMultiTenant<TTenantInfo>`:
+Configure by calling `WithHttpContextStrategy` after `AddMultiTenant<TTenantInfo, TId>`:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpContextStrategy(async httpContext =>
     {
          var identifier = httpContext.Request.Query["tenant"];
@@ -134,14 +134,14 @@ This allows subsequent app logic to operate as if the tenant segment was never t
 a `Path` of `/mytenant/mypath`. This behavior will adjust these values to `/mytenant` and `/mypath`
 respectively when a tenant is successfully resolved. If you do not want this behavior, use the overload that accepts options and set `RebaseAspNetCorePathBase` to false.
 
-Configure by calling `WithBasePathStrategy` after `AddMultiTenant<TTenantInfo>`:
+Configure by calling `WithBasePathStrategy` after `AddMultiTenant<TTenantInfo, TId>`:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithBasePathStrategy()...
     
 // or configure not to rebase PathBase and Path
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithBasePathStrategy(options =>
     {
           options.RebaseAspNetCorePathBase = false;
@@ -176,16 +176,16 @@ used as normal, and in most use cases should come after `UseMultiTenant`.
 Note that this strategy does not work well with per-tenant cookie names since it must know the cookie name before the
 tenant is resolved.
 
-Configure by calling `WithClaimStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom claim type
+Configure by calling `WithClaimStrategy` after `AddMultiTenant<TTenantInfo, TId>`. An overload to accept a custom claim type
 is also available:
 
 ```csharp
 // check for a claim type __tenant__
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithClaimStrategy()...
 
 // check for a custom claim type
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithClaimStrategy("MyClaimType")...
 ```
 
@@ -195,16 +195,16 @@ builder.Services.AddMultiTenant<TenantInfo>()
 
 Uses the ASP.NET Core session to retrieve the tenant identifier. This strategy is configured as a singleton.
 
-Configure by calling `WithSessionStrategy` after `AddMultiTenant<TTenantInfo>`. Uses a default session key
+Configure by calling `WithSessionStrategy` after `AddMultiTenant<TTenantInfo, TId>`. Uses a default session key
 named `__tenant__`. An overload of `WithSessionStrategy` can be used to specify a different key name:
 
 ```csharp
 // check for default "__tenant__" as the session key
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithSessionStrategy()...
 
 // or check for a custom session key
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithSessionStrategy("my-tenant-session-key")...
 ```
 
@@ -228,16 +228,16 @@ By default the route parameter name is `__tenant__`, but a custom name can also 
 default the strategy adds the tenant route value as an ambient value when generating links. This behavior can
 be disabled via an overload as well.
 
-Configure by calling `WithRouteStrategy` after `AddMultiTenant<TTenantInfo>`. A custom route parameter can also be
+Configure by calling `WithRouteStrategy` after `AddMultiTenant<TTenantInfo, TId>`. A custom route parameter can also be
 configured:
 
 ```csharp
 // use the default route parameter name "__tenant__"
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
   .WithRouteStrategy()...
     
 // or set a different route parameter name of "MyTenantRouteParam" and do not add the tenant as an ambient route value
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
   .WithRouteStrategy("MyTenantRouteParam", false)...
 
 // UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy used
@@ -257,7 +257,7 @@ Use `useTenantAmbientRouteValue: true` when you want generated URLs to consisten
 to `false` if you prefer the default ASP.NET Core behavior and are managing tenant route values yourself.
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithRouteStrategy("tenant", useTenantAmbientRouteValue: true)
     .WithConfigurationStore();
 ```
@@ -285,16 +285,16 @@ It can also use `?` and `*` characters to represent one or "zero or more" segmen
 - As a special case, a pattern string of just `__tenant__` will use the entire host as the tenant identifier, as opposed
   to a single segment.
 
-Configure by calling `WithHostStrategy` after `AddMultiTenant<TTenantInfo>`. A template pattern can be specified with
+Configure by calling `WithHostStrategy` after `AddMultiTenant<TTenantInfo, TId>`. A template pattern can be specified with
 the overloaded version:
 
 ```csharp
 // check the first domain segment (e.g. subdomain)
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy()...
 
 // check the second level domain segment (see 2nd example above)
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHostStrategy("*.__tenant__.?")...
 ```
 
@@ -305,16 +305,16 @@ builder.Services.AddMultiTenant<TenantInfo>()
 Uses an HTTP request header to determine the tenant identifier. By default, the header with key `__tenant__` is used,
 but a custom key can also be used.
 
-Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo>`. An overload to accept a custom header key
+Configure by calling `WithHeaderStrategy` after `AddMultiTenant<TTenantInfo, TId>`. An overload to accept a custom header key
 is also available:
 
 ```csharp
 // check for header "__tenant__" value
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHeaderStrategy()...
 
 // or check for custom header value
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHeaderStrategy("MyHeaderKey")...
 ```
 

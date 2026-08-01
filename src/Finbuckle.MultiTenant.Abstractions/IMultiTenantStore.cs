@@ -6,8 +6,9 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Interface definition for tenant stores.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public interface IMultiTenantStore<TTenantInfo, in TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Try to add the TTenantInfo to the store.
@@ -31,7 +32,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <param name="id">TenantId for the tenant to remove.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if successfully removed.</returns>
-    Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default);
+    Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Try to remove the TTenantInfo from the store by identifier.
@@ -55,8 +56,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <param name="id">TenantId for the tenant to retrieve.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default);
-
+    Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieve all the TTenantInfo's from the store.

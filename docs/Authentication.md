@@ -23,8 +23,8 @@ The sections below assume MultiTenant is installed and configured. See
 
 ## Using WithPerTenantAuthentication()
 
-The `WithPerTenantAuthentication()` method can be called after
-`AddMultiTenant<TTenantInfo>()` and uses conventions to configure common authentication
+The `WithPerTenantAuthentication<TTenantInfo, TId>()` method can be called after
+`AddMultiTenant<TTenantInfo, TId>()` and uses conventions to configure common authentication
 options based on public properties of the `TenantInfo` type parameter.
 
 The following happens when `WithPerTenantAuthentication()` is called:
@@ -86,7 +86,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
-public class AppTenantInfo : TenantInfo
+public class AppTenantInfo : TenantInfo<string>
 {
     public string? ChallengeScheme { get; set; }
     public string? CookieLoginPath { get; set; }
@@ -108,7 +108,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        .AddOpenIdConnect();
 
 // add MultiTenant services
-builder.Services.AddMultiTenant<AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo, string>()
        .WithRouteStrategy()
        .WithConfigurationStore()
        .WithPerTenantAuthentication();
@@ -116,13 +116,13 @@ builder.Services.AddMultiTenant<AppTenantInfo>()
 var app = builder.Build();
 
 // add the MultiTenant middleware
-app.UseMultiTenant();
+app.UseMultiTenant<string>();
 
 // ...add other middleware
 
 app.Run();
 
-public class AppTenantInfo : TenantInfo
+public class AppTenantInfo : TenantInfo<string>
 {
     public string? Name { get; init; }
     public string? ChallengeScheme { get; init; }
@@ -179,9 +179,9 @@ work.
 
 ## Other Authentication Options
 
-Internally `WithPerTenantAuthentication()` makes use of
+Internally `WithPerTenantAuthenticationTTenantInfo, TId()` makes use of
 [per-tenant options](Options). For authentication options not covered by
-`WithPerTenantAuthentication()`, per-tenant options can provide similar behavior.
+`WithPerTenantAuthenticationTTenantInfo, TId()`, per-tenant options can provide similar behavior.
 
 For example, if you want to configure JWT tokens so that each tenant has a
 different recognized authority for token validation we can add a field to the
@@ -189,7 +189,7 @@ different recognized authority for token validation we can add a field to the
 configurations:
 
 ```csharp 
-builder.Services.AddMultiTenant<AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo, string>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -217,7 +217,7 @@ existing tenant sign-ins when switching between requests on the same browser or
 agent because new sign-ins are not replacing the existing cookie:
 
 ```csharp
-builder.Services.AddMultiTenant<AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo, string>()
         .WithConfigurationStore()
         .WithRouteStrategy()
         .WithPerTenantAuthentication();
@@ -234,14 +234,14 @@ builder.Services.ConfigurePerTenant<CookieAuthenticationOptions, AppTenantInfo>(
 
 ## Important Considerations
 
-- `WithPerTenantAuthentication()` requires `Finbuckle.MultiTenant.AspNetCore` and only works in ASP.NET Core apps.
+- `WithPerTenantAuthenticationTTenantInfo, TId()` requires `Finbuckle.MultiTenant.AspNetCore` and only works in ASP.NET Core apps.
 - A tenant claim is added to the user during sign-in and validated on subsequent requests. If the current
   request's tenant changes, existing sign-in sessions are rejected for the new tenant.
 - By default only one tenant can be signed in per browser. Use [per-tenant cookie names](#other-authentication-options)
   if you need concurrent tenant sessions.
 - The [Claim Strategy](Strategies#claim-strategy) does not work well with per-tenant cookie names since the
   cookie name must be known before the tenant is resolved.
-- Place `UseMultiTenant()` before `UseAuthentication()` so the middleware resolves the tenant before
+- Place `UseMultiTenant<TId>()` before `UseAuthentication()` so the middleware resolves the tenant before
   authentication runs.
 
 ## See Also

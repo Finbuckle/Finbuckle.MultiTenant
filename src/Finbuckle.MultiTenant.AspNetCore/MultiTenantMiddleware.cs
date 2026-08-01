@@ -10,13 +10,13 @@ using Microsoft.Extensions.Options;
 namespace Finbuckle.MultiTenant.AspNetCore;
 
 /// <summary>
-/// Middleware for resolving the <see cref="ITenantContext"/> for the request.
+/// Middleware for resolving the <see cref="ITenantContext{TId}"/> for the request.
 /// </summary>
-public class MultiTenantMiddleware
+public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>
 {
     private readonly RequestDelegate next;
     private readonly BypassWhenOptions bypassOptions;
-    private readonly ShortCircuitWhenOptions shortCircuitWhenOptions;
+    private readonly ShortCircuitWhenOptions<TId> shortCircuitWhenOptions;
 
     /// <summary>
     /// Initializes a new instance of MultiTenantMiddleware.
@@ -26,7 +26,7 @@ public class MultiTenantMiddleware
     /// <param name="shortCircuitWhenOptions">Options for short-circuiting the middleware pipeline after resolution.</param>
     public MultiTenantMiddleware(RequestDelegate next,
         IOptions<BypassWhenOptions> bypassOptions,
-        IOptions<ShortCircuitWhenOptions> shortCircuitWhenOptions)
+        IOptions<ShortCircuitWhenOptions<TId>> shortCircuitWhenOptions)
     {
         this.next = next;
         this.bypassOptions = bypassOptions.Value;
@@ -40,7 +40,7 @@ public class MultiTenantMiddleware
     /// <param name="tenantContext">The tenant context.</param>
     /// <param name="tenantResolver">The tenant resolver.</param>
     /// <param name="tenantScopeProvider">The provider used to begin the ambient tenant scope.</param>
-    public async Task Invoke(HttpContext context, ITenantContext tenantContext, ITenantResolver tenantResolver, ITenantScopeProvider tenantScopeProvider)
+    public async Task Invoke(HttpContext context, ITenantContext<TId> tenantContext, ITenantResolver<TId> tenantResolver, ITenantScopeProvider tenantScopeProvider)
     {
         if (bypassOptions.Predicate?.Invoke(context) == true)
         {
