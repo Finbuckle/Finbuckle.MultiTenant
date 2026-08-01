@@ -18,7 +18,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 /// delegated to the decorated <c>inner</c> provider, which already owns that state at whatever lifetime it
 /// was registered with. This class only adds per-tenant aware "default scheme" resolution on top, which is
 /// why it reads <see cref="AuthenticationOptions"/> on every call. The options implementation remains
-/// singleton-registered, with the ambient singleton <see cref="ITenantContext"/> selecting the current tenant.
+/// singleton-registered, with the ambient singleton <see cref="ITenantContext{TId}"/> selecting the current tenant.
 /// </summary>
 public class MultiTenantAuthenticationSchemeProvider : IAuthenticationSchemeProvider
 {

@@ -8,11 +8,12 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Options for multi-tenant resolution.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class MultiTenantOptions<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class MultiTenantOptions<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
-    /// Gets or sets the type of <see cref="TenantInfo"/> derived.
+    /// Gets or sets the type of <see cref="TenantInfo{TId}"/> derived.
     /// </summary>
     public required Type TenantInfoType { get; set; }
 
@@ -24,5 +25,5 @@ public class MultiTenantOptions<TTenantInfo> where TTenantInfo : ITenantInfo
     /// <summary>
     /// Gets or sets the event handlers for tenant resolution.
     /// </summary>
-    public MultiTenantEvents<TTenantInfo> Events { get; set; } = new();
+    public MultiTenantEvents<TTenantInfo, TId> Events { get; set; } = new();
 }

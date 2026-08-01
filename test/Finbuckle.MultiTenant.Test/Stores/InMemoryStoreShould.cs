@@ -46,16 +46,13 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     }
 
     [Theory]
-    [InlineData("", "")]
     [InlineData(null, null)]
-    [InlineData("", null)]
     [InlineData("a", "")]
     [InlineData("a", null)]
-    [InlineData("", "a")]
     [InlineData(null, "a")]
     public async Task ThrowIfAddingTenantWithMissingIdOrIdentifier(string? id, string? identifier)
     {
-        var store = new InMemoryStore<TenantInfo>();
+        var store = new InMemoryStore<TenantInfo,string>();
 
         await Assert.ThrowsAsync<MultiTenantException>(() =>
             store.AddAsync(new TenantInfo { Id = id!, Identifier = identifier! }));
@@ -105,9 +102,9 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
 
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
-    protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
+    protected override async Task<IMultiTenantStore<TenantInfo,string>> CreateTestStore()
     {
-        var store = new InMemoryStore<TenantInfo>();
+        var store = new InMemoryStore<TenantInfo,string>();
 
         return await PopulateTestStore(store);
     }

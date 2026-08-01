@@ -16,13 +16,13 @@ public class PerTenantOptionsRegistrationShould
     public void ReplaceExactClosedOptionsRegistrationsAndKeepOpenGenericDefaults()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddOptions();
         services.AddSingleton<IOptionsMonitorCache<TestOptions>, OptionsCache<TestOptions>>();
         services.AddSingleton<IOptions<TestOptions>>(Microsoft.Extensions.Options.Options.Create(new TestOptions()));
         services.AddScoped<IOptionsSnapshot<TestOptions>, CustomOptionsSnapshot>();
 
-        services.ConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string>((_, _) => { });
 
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOptions<>));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<>));
@@ -31,7 +31,7 @@ public class PerTenantOptionsRegistrationShould
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<TestOptions>));
         var cacheDescriptor = Assert.Single(services,
             descriptor => descriptor.ServiceType == typeof(IOptionsMonitorCache<TestOptions>));
-        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions>), cacheDescriptor.ImplementationType);
+        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions, string>), cacheDescriptor.ImplementationType);
 
         using var provider = services.BuildServiceProvider();
         Assert.IsType<MultiTenantOptionsManager<TestOptions>>(
@@ -45,17 +45,17 @@ public class PerTenantOptionsRegistrationShould
     public void LeaveOneClosedRegistrationAfterRepeatedConfiguration()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.ConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+        services.AddMultiTenant<TenantInfo, string>();
+        services.ConfigurePerTenant<TestOptions, TenantInfo, string>((_, _) => { });
         services.AddSingleton<IOptionsMonitorCache<TestOptions>, OptionsCache<TestOptions>>();
 
-        services.PostConfigurePerTenant<TestOptions, TenantInfo>((_, _) => { });
+        services.PostConfigurePerTenant<TestOptions, TenantInfo, string>((_, _) => { });
 
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptions<TestOptions>));
         Assert.Single(services, descriptor => descriptor.ServiceType == typeof(IOptionsSnapshot<TestOptions>));
         var cacheDescriptor = Assert.Single(services,
             descriptor => descriptor.ServiceType == typeof(IOptionsMonitorCache<TestOptions>));
-        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions>), cacheDescriptor.ImplementationType);
+        Assert.Equal(typeof(MultiTenantOptionsCache<TestOptions,string>), cacheDescriptor.ImplementationType);
     }
 
     [Fact]
@@ -66,19 +66,19 @@ public class PerTenantOptionsRegistrationShould
         OptionsBuilder<TestOptions>? builder = null;
 
         Assert.Throws<ArgumentNullException>(() =>
-            ServiceCollectionExtensions.ConfigurePerTenant<TestOptions, TenantInfo>(null!, configure));
+            ServiceCollectionExtensions.ConfigurePerTenant<TestOptions, TenantInfo, string>(null!, configure));
         Assert.Throws<ArgumentNullException>(() =>
-            services.ConfigurePerTenant<TestOptions, TenantInfo>(null!));
+            services.ConfigurePerTenant<TestOptions, TenantInfo, string>(null!));
         Assert.Throws<ArgumentNullException>(() =>
-            ServiceCollectionExtensions.PostConfigurePerTenant<TestOptions, TenantInfo>(null!, configure));
+            ServiceCollectionExtensions.PostConfigurePerTenant<TestOptions, TenantInfo, string>(null!, configure));
         Assert.Throws<ArgumentNullException>(() =>
-            services.PostConfigurePerTenant<TestOptions, TenantInfo>(null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            Finbuckle.MultiTenant.Extensions.OptionsBuilderExtensions
-                .ConfigurePerTenant<TestOptions, TenantInfo>(builder!, configure));
+            services.PostConfigurePerTenant<TestOptions, TenantInfo, string>(null!));
         Assert.Throws<ArgumentNullException>(() =>
             Finbuckle.MultiTenant.Extensions.OptionsBuilderExtensions
-                .PostConfigurePerTenant<TestOptions, TenantInfo>(builder!, configure));
+                .ConfigurePerTenant<TestOptions, TenantInfo, string>(builder!, configure));
+        Assert.Throws<ArgumentNullException>(() =>
+            Finbuckle.MultiTenant.Extensions.OptionsBuilderExtensions
+                .PostConfigurePerTenant<TestOptions, TenantInfo, string>(builder!, configure));
     }
 
     public class TestOptions

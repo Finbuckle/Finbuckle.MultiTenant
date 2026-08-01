@@ -23,10 +23,10 @@ public class MultiTenantAuthenticationSchemeProviderShould
             .AddCookie("tenant1Scheme")
             .AddCookie("tenant2Scheme");
 
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithPerTenantAuthentication();
 
-        services.ConfigureAllPerTenant<AuthenticationOptions, TenantInfo>((ao, ti) =>
+        services.ConfigureAllPerTenant<AuthenticationOptions, TenantInfo,string>((ao, ti) =>
         {
             ao.DefaultChallengeScheme = ti.Identifier + "Scheme";
         });
@@ -70,7 +70,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
         services.AddAuthentication()
             .AddCookie("tenant1Scheme");
 
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithPerTenantAuthentication();
 
         var sp = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
@@ -93,7 +93,7 @@ public class MultiTenantAuthenticationSchemeProviderShould
         services.AddAuthentication()
             .AddCookie("tenant1Scheme");
 
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo, string>()
             .WithPerTenantAuthentication();
 
         var sp = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });

@@ -13,9 +13,10 @@ namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 /// <summary>
 /// Multi-tenant aware authentication service that decorates the default authentication service.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationService
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class MultiTenantAuthenticationService<TTenantInfo, TId> : IAuthenticationService
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IAuthenticationService _inner;
     private readonly IOptionsMonitor<MultiTenantAuthenticationOptions> _multiTenantAuthenticationOptions;
@@ -36,7 +37,7 @@ public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationServ
     private static void AddTenantIdentifierToProperties(HttpContext context, ref AuthenticationProperties? properties)
     {
         // Add tenant identifier to the properties so on the callback we can use it to set the multi-tenant context.
-        var multiTenantContext = context.GetTenantContext<TTenantInfo>();
+        var multiTenantContext = context.GetTenantContext<TTenantInfo, TId>();
         if (multiTenantContext.TenantInfo != null)
         {
             properties ??= new AuthenticationProperties();
@@ -55,7 +56,7 @@ public class MultiTenantAuthenticationService<TTenantInfo> : IAuthenticationServ
     {
         if (_multiTenantAuthenticationOptions.CurrentValue.SkipChallengeIfTenantNotResolved)
         {
-            if (context.GetTenantContext<TTenantInfo>().TenantInfo == null)
+            if (context.GetTenantContext<TTenantInfo, TId>().TenantInfo == null)
                 return;
         }
 

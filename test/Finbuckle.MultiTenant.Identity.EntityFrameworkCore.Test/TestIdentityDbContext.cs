@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test;
 
-public class TestIdentityDbContext : MultiTenantIdentityDbContext
+public class TestIdentityDbContext : MultiTenantIdentityDbContext<string>
 {
     public TestIdentityDbContext()
     {

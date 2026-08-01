@@ -32,7 +32,7 @@ public class MultiTenantEntityTypeBuilderShould
             builder.Entity<Blog>().HasIndex(e => e.BlogId);
 
             var origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
-            builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndex(origIndex);
         });
 
         var index = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().First();
@@ -50,7 +50,7 @@ public class MultiTenantEntityTypeBuilderShould
                 .HasDatabaseName("CustomIndexDbName");
 
             var origIndex = builder.Entity<Blog>().Metadata.GetIndexes().First();
-            builder.Entity<Blog>().IsMultiTenant().AdjustIndex(origIndex);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndex(origIndex);
         });
 
         var index = db.Model.FindEntityType(typeof(Blog))?.GetIndexes().First();
@@ -68,7 +68,7 @@ public class MultiTenantEntityTypeBuilderShould
             builder.Entity<Blog>().HasIndex(e => e.Url);
 
             foreach (var index in builder.Entity<Blog>().Metadata.GetIndexes().ToList())
-                builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
+                builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndex(index);
         });
 
         var index = db.Model.FindEntityType(typeof(Blog))?
@@ -87,7 +87,7 @@ public class MultiTenantEntityTypeBuilderShould
         using var db = GetDbContext(builder =>
         {
             var index = builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique().HasFilter("some filter").Metadata;
-            builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndex(index);
         });
 
         var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?
@@ -102,7 +102,7 @@ public class MultiTenantEntityTypeBuilderShould
         using var db = GetDbContext(builder =>
         {
             var key = builder.Entity<Post>().Metadata.GetKeys().First();
-            builder.Entity<Post>().IsMultiTenant().AdjustKey(key, builder);
+            builder.Entity<Post>().IsMultiTenant<string>().AdjustKey(key, builder);
         });
 
         var key = db.Model.FindEntityType(typeof(Post))?.GetKeys().ToList();
@@ -120,7 +120,7 @@ public class MultiTenantEntityTypeBuilderShould
         {
             var key = builder.Entity<Blog>().Metadata.GetKeys().First();
 
-            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustKey(key, builder);
         });
 
         var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
@@ -137,7 +137,7 @@ public class MultiTenantEntityTypeBuilderShould
         using var db = GetDbContext(builder =>
         {
             var key = builder.Entity<Blog>().HasAlternateKey(b => b.Url).Metadata;
-            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustKey(key, builder);
         });
 
         var key = db.Model.FindEntityType(typeof(Blog))?.GetKeys().Where(k => !k.IsPrimaryKey()).ToList();
@@ -159,7 +159,7 @@ public class MultiTenantEntityTypeBuilderShould
                 .WithMany(b => b.Posts!)
                 .HasForeignKey(p => p.Title) // Since Title is a string lets use it as key to Blog.Url
                 .HasPrincipalKey(b => b.Url);
-            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustKey(key, builder);
         });
 
         var key = db.Model.FindEntityType(typeof(Post))?.GetForeignKeys().ToList();
@@ -177,7 +177,7 @@ public class MultiTenantEntityTypeBuilderShould
         {
             var index = builder.Entity<Blog>().HasIndex(e => e.BlogId).IsUnique()
                 .HasAnnotation("some annotation", "some value").Metadata;
-            builder.Entity<Blog>().IsMultiTenant().AdjustIndex(index);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustIndex(index);
         });
 
         var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?
@@ -194,7 +194,7 @@ public class MultiTenantEntityTypeBuilderShould
         {
             var key = builder.Entity<Blog>().Metadata.GetKeys().First();
             key.AddAnnotation("some annotation", "some value");
-            builder.Entity<Blog>().IsMultiTenant().AdjustKey(key, builder);
+            builder.Entity<Blog>().IsMultiTenant<string>().AdjustKey(key, builder);
         });
 
         var index = db.GetService<IDesignTimeModel>().Model.FindEntityType(typeof(Blog))?

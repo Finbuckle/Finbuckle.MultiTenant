@@ -15,12 +15,12 @@ public class ServiceCollectionExtensionsShould
     private static IServiceProvider BuildPooledServiceProvider(string dbName, TenantInfoHolder tenantHolder)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton(tenantHolder);
-        services.AddSingleton<ITenantContext<TenantInfo>>(sp =>
+        services.AddSingleton<ITenantContext<TenantInfo, string>>(sp =>
             new TestTenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>()));
-        services.AddSingleton<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
-        services.AddPooledMultiTenantDbContext<PooledTestDbContext>(
+        services.AddSingleton<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo, string>>());
+        services.AddPooledMultiTenantDbContext<PooledTestDbContext,string>(
             options => options.UseSqlite($"DataSource={dbName};Mode=Memory;Cache=Shared"),
             poolSize: 1);
         return services.BuildServiceProvider();
@@ -29,12 +29,12 @@ public class ServiceCollectionExtensionsShould
     private static IServiceProvider BuildNonPooledServiceProvider(string dbName, TenantInfoHolder tenantHolder)
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton(tenantHolder);
-        services.AddSingleton<ITenantContext<TenantInfo>>(sp =>
+        services.AddSingleton<ITenantContext<TenantInfo, string>>(sp =>
             new TestTenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>()));
-        services.AddSingleton<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
-        services.AddMultiTenantDbContext<NonPooledTestDbContext>(
+        services.AddSingleton<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo, string>>());
+        services.AddMultiTenantDbContext<NonPooledTestDbContext,string>(
             options => options.UseSqlite($"DataSource={dbName};Mode=Memory;Cache=Shared"));
         return services.BuildServiceProvider();
     }
@@ -94,8 +94,8 @@ public class ServiceCollectionExtensionsShould
     public void AddMultiTenantDbContext_RegistersDbContextAsScoped()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.AddMultiTenantDbContext<NonPooledTestDbContext>(
+        services.AddMultiTenant<TenantInfo, string>();
+        services.AddMultiTenantDbContext<NonPooledTestDbContext, string>(
             options => options.UseSqlite("DataSource=:memory:"));
 
         var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(NonPooledTestDbContext));
@@ -159,13 +159,13 @@ public class ServiceCollectionExtensionsShould
         string? capturedValue = null;
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton(tenantHolder);
-        services.AddSingleton<ITenantContext<TenantInfo>>(sp =>
+        services.AddSingleton<ITenantContext<TenantInfo, string>>(sp =>
             new TestTenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>()));
-        services.AddSingleton<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
+        services.AddSingleton<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo, string>>());
         services.AddSingleton("test-connection-string");
-        services.AddMultiTenantDbContext<NonPooledTestDbContext>((sp, options) =>
+        services.AddMultiTenantDbContext<NonPooledTestDbContext,string>((sp, options) =>
         {
             capturedValue = sp.GetRequiredService<string>();
             options.UseSqlite("DataSource=:memory:");
@@ -184,8 +184,8 @@ public class ServiceCollectionExtensionsShould
     public void AddMultiTenantDbContext_ParameterlessOverloadRegistersDbContextAsScoped()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>();
-        services.AddMultiTenantDbContext<NonPooledTestDbContext>();
+        services.AddMultiTenant<TenantInfo, string>();
+        services.AddMultiTenantDbContext<NonPooledTestDbContext,string>();
 
         var descriptor = services.FirstOrDefault(d => d.ServiceType == typeof(NonPooledTestDbContext));
         Assert.NotNull(descriptor);
@@ -204,12 +204,12 @@ public class ServiceCollectionExtensionsShould
     {
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
-        services.AddMultiTenant<TenantInfo>();
+        services.AddMultiTenant<TenantInfo, string>();
         services.AddSingleton(tenantHolder);
-        services.AddSingleton<ITenantContext<TenantInfo>>(sp =>
+        services.AddSingleton<ITenantContext<TenantInfo, string>>(sp =>
             new TestTenantContext<TenantInfo>(sp.GetRequiredService<TenantInfoHolder>()));
-        services.AddSingleton<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
-        services.AddMultiTenantDbContext<CustomIMultiTenantDbContext>(
+        services.AddSingleton<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo, string>>());
+        services.AddMultiTenantDbContext<CustomIMultiTenantDbContext, string>(
             options => options.UseSqlite("DataSource=:memory:"));
 
         var sp = services.BuildServiceProvider();
@@ -227,15 +227,15 @@ public class ServiceCollectionExtensionsShould
         public TenantInfo? Current { get; set; }
     }
 
-    private sealed class TestTenantContext<TTenantInfo>(TenantInfoHolder holder) : ITenantContext<TTenantInfo>
-        where TTenantInfo : ITenantInfo
+    private sealed class TestTenantContext<TTenantInfo>(TenantInfoHolder holder) : ITenantContext<TTenantInfo,string>
+        where TTenantInfo : ITenantInfo<string>
     {
         public TTenantInfo? TenantInfo
         {
             get => (TTenantInfo?)(object?)holder.Current;
             set => holder.Current = (TenantInfo?)(object?)value;
         }
-        ITenantInfo? ITenantContext.TenantInfo
+        ITenantInfo<string>? ITenantContext<string>.TenantInfo
         {
             get => TenantInfo;
             set => TenantInfo = (TTenantInfo?)value;
@@ -247,7 +247,7 @@ public class ServiceCollectionExtensionsShould
 }
 
 public class NonPooledTestDbContext(DbContextOptions<NonPooledTestDbContext> options)
-    : EntityFrameworkCore.MultiTenantDbContext(options)
+    : EntityFrameworkCore.MultiTenantDbContext<string>(options)
 {
     public DbSet<NonPooledBlog>? Blogs { get; set; }
 }
@@ -260,7 +260,7 @@ public class NonPooledBlog
 }
 
 public class PooledTestDbContext(DbContextOptions<PooledTestDbContext> options)
-    : EntityFrameworkCore.MultiTenantDbContext(options)
+    : EntityFrameworkCore.MultiTenantDbContext<string>(options)
 {
     public DbSet<PooledBlog>? Blogs { get; set; }
 }
@@ -278,16 +278,16 @@ public class PooledBlog
 /// TenantInfo must be wired up externally by the service registration.
 /// </summary>
 public class CustomIMultiTenantDbContext(DbContextOptions<CustomIMultiTenantDbContext> options)
-    : DbContext(options), IMultiTenantDbContext
+    : DbContext(options), IMultiTenantDbContext<string>
 {
-    public ITenantInfo? TenantInfo { get; set; }
+    public ITenantInfo<string>? TenantInfo { get; set; }
     public TenantMismatchMode TenantMismatchMode { get; } = TenantMismatchMode.Throw;
     public TenantNotSetMode TenantNotSetMode { get; } = TenantNotSetMode.Throw;
 
     public DbSet<CustomBlog>? Blogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => modelBuilder.ConfigureMultiTenant();
+        => modelBuilder.ConfigureMultiTenant<string>();
 }
 
 [MultiTenant]

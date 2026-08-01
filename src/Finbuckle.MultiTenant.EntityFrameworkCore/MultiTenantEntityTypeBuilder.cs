@@ -78,7 +78,8 @@ public class MultiTenantEntityTypeBuilder
         foreach (var fk in foreignKeys)
         {
             var fkEntityBuilder = modelBuilder.Entity(fk.DeclaringEntityType.ClrType);
-            var newFkProp = fkEntityBuilder.Property<string>("TenantId").Metadata;
+            // match the CLR type of the principal's TenantId property rather than assuming string
+            var newFkProp = fkEntityBuilder.Property(prop.ClrType, "TenantId").Metadata;
             var fkProps = fk.Properties.Append(newFkProp).ToImmutableList();
             fk.SetProperties(fkProps, newKey!);
         }

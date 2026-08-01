@@ -30,9 +30,9 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
-        services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
-        services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TenantInfo>((options, tenantInfo) => options.Prop1 = tenantInfo.Id);
+        services.AddScoped<ITenantContext<TenantInfo,string>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
+        services.AddScoped<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo,string>>());
+        services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TenantInfo,string>((options, tenantInfo) => options.Prop1 = tenantInfo.Id);
         var provider = services.BuildServiceProvider();
 
         tenantHolder.Current = new TenantInfo { Id = "tenant-1", Identifier = "identifier-1" };
@@ -55,10 +55,10 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
-        services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
+        services.AddScoped<ITenantContext<TenantInfo,string>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
+        services.AddScoped<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo,string>>());
         services.AddSingleton(new TestDependency("prefix-"));
-        services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TestDependency, TenantInfo>((options, dep, tenantInfo) =>
+        services.AddOptions<TestOptions>().ConfigurePerTenant<TestOptions, TestDependency, TenantInfo,string>((options, dep, tenantInfo) =>
             options.Prop1 = dep.Value + tenantInfo.Id);
         var provider = services.BuildServiceProvider();
 
@@ -82,11 +82,11 @@ public class OptionsBuilderExtensionsShould
         var services = new ServiceCollection();
         var tenantHolder = new TenantInfoHolder();
         services.AddSingleton(tenantHolder);
-        services.AddScoped<ITenantContext<TenantInfo>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
-        services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<ITenantContext<TenantInfo>>());
+        services.AddScoped<ITenantContext<TenantInfo,string>>(sp => new TestTenantContext { TenantInfo = sp.GetRequiredService<TenantInfoHolder>().Current });
+        services.AddScoped<ITenantContext<string>>(sp => sp.GetRequiredService<ITenantContext<TenantInfo,string>>());
         services.AddOptions<TestOptions>()
             .Configure(options => options.Prop1 = "base")
-            .PostConfigurePerTenant<TestOptions, TenantInfo>((options, tenantInfo) => options.Prop2 = tenantInfo.Identifier);
+            .PostConfigurePerTenant<TestOptions, TenantInfo,string>((options, tenantInfo) => options.Prop2 = tenantInfo.Identifier);
         var provider = services.BuildServiceProvider();
 
         tenantHolder.Current = new TenantInfo { Id = "tenant-3", Identifier = "identifier-3" };
@@ -105,11 +105,11 @@ public class OptionsBuilderExtensionsShould
         Assert.Equal(tenantHolder.Current!.Identifier, options2.Prop2);
     }
 
-    private sealed class TestTenantContext : ITenantContext<TenantInfo>
+    private sealed class TestTenantContext : ITenantContext<TenantInfo,string>
     {
         public TenantInfo? TenantInfo { get; set; }
 
-        ITenantInfo? ITenantContext.TenantInfo
+        ITenantInfo<string>? ITenantContext<string>.TenantInfo
         {
             get => TenantInfo;
             set => TenantInfo = (TenantInfo?)value;

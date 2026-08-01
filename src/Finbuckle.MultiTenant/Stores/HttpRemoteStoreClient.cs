@@ -10,8 +10,9 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// HTTP client for retrieving tenant information from a remote endpoint.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class HttpRemoteStoreClient<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IHttpClientFactory clientFactory;
     private readonly JsonSerializerOptions _defaultSerializerOptions;
@@ -48,8 +49,8 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
     public async Task<TTenantInfo?> GetByIdentifierAsync(string endpointTemplate, string identifier,
         CancellationToken cancellationToken)
     {
-        var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
-        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
+        var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo, TId>).FullName!);
+        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo, TId>.DefaultEndpointTemplateIdentifierToken,
             identifier);
         var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 
@@ -81,8 +82,8 @@ public class HttpRemoteStoreClient<TTenantInfo> where TTenantInfo : ITenantInfo
     public async Task<IEnumerable<TTenantInfo>> GetAllAsync(string endpointTemplate,
         CancellationToken cancellationToken)
     {
-        var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo>).FullName!);
-        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo>.DefaultEndpointTemplateIdentifierToken,
+        var client = clientFactory.CreateClient(typeof(HttpRemoteStoreClient<TTenantInfo, TId>).FullName!);
+        var uri = endpointTemplate.Replace(HttpRemoteStore<TTenantInfo, TId>.DefaultEndpointTemplateIdentifierToken,
             string.Empty);
         var response = await client.GetAsync(uri, cancellationToken).ConfigureAwait(false);
 

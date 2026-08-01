@@ -6,23 +6,23 @@ current tenant information for the app.
 
 Tenant storage has three parts:
 
-- A single primary store registered as `IMultiTenantStore<TTenantInfo>`.
-- Zero or more store caches registered as `IMultiTenantStoreCache<TTenantInfo>`.
-- `TenantManager<TTenantInfo>`, which is the runtime API that coordinates reads, writes, cache read-through, and cache
+- A single primary store registered as `IMultiTenantStore<TTenantInfo, TId>`.
+- Zero or more store caches registered as `IMultiTenantStoreCache<TTenantInfo, TId>`.
+- `TenantManager<TTenantInfo, TId>`, which is the runtime API that coordinates reads, writes, cache read-through, and cache
   invalidation.
 
-During tenant resolution, each strategy can produce an identifier. For that identifier, `TenantManager<TTenantInfo>`
+During tenant resolution, each strategy can produce an identifier. For that identifier, `TenantManager<TTenantInfo, TId>`
 checks store caches in registration order before querying the primary store. If a later cache or the primary store
 returns a tenant, earlier caches that missed are populated. This means faster caches can sit in front of durable stores
 without each app needing to implement its own cache coordination.
 
 Writes are deliberately simpler: they go only to the primary store. After a successful add, update, or remove,
-`TenantManager<TTenantInfo>` invalidates the affected entries in every configured cache and does not immediately refill
+`TenantManager<TTenantInfo, TId>` invalidates the affected entries in every configured cache and does not immediately refill
 them. The next read repopulates caches through the normal read-through path. `GetAllAsync` is also primary-store only,
 so listing tenants does not populate or depend on caches.
 
 MultiTenant includes several built-in stores and store caches. Custom primary stores implement
-`IMultiTenantStore<TTenantInfo>`, while custom store caches implement `IMultiTenantStoreCache<TTenantInfo>`.
+`IMultiTenantStore<TTenantInfo, TId>`, while custom store caches implement `IMultiTenantStoreCache<TTenantInfo, TId>`.
 
 > MultiTenant stores support custom `ITenantInfo` implementations, but complex implementations may require special
 > handling. For best results ensure the type works well with the underlying store approach—for example, that it can be
@@ -31,10 +31,10 @@ MultiTenant includes several built-in stores and store caches. Custom primary st
 
 ## TenantManager
 
-`TenantManager<TTenantInfo>` is the main API for reading and writing tenant information at runtime. App code should
-inject `TenantManager<TTenantInfo>` rather than injecting `IMultiTenantStore<TTenantInfo>` directly. Direct store access
+`TenantManager<TTenantInfo, TId>` is the main API for reading and writing tenant information at runtime. App code should
+inject `TenantManager<TTenantInfo, TId>` rather than injecting `IMultiTenantStore<TTenantInfo, TId>` directly. Direct store access
 bypasses cache read-through, cache invalidation, and the basic validation, logging, and error handling that
-`TenantManager<TTenantInfo>` provides.
+`TenantManager<TTenantInfo, TId>` provides.
 
 ```csharp
 // Checks store caches first, then the primary store.
@@ -58,36 +58,36 @@ var tenants = await tenantManager.GetAllAsync();
 ## Store and Cache Interfaces
 
 If the provided MultiTenant stores are not suitable then a custom primary store can be created by
-implementing `IMultiTenantStore<TTenantInfo>`. The library will set the type parameter `TTenantInfo` to match the type
-parameter passed to `AddMultiTenant<TTenantInfo>` at compile time. The interface defines `AddAsync`, `UpdateAsync`,
+implementing `IMultiTenantStore<TTenantInfo, TId>`. The library will set the type parameter `TTenantInfo` to match the type
+parameter passed to `AddMultiTenant<TTenantInfo, TId>` at compile time. The interface defines `AddAsync`, `UpdateAsync`,
 `RemoveAsync`, `RemoveByIdentifierAsync`, `GetByIdentifierAsync`, `GetAsync`, and `GetAllAsync` methods.
 `RemoveAsync` and `GetAsync` use the tenant id. `RemoveByIdentifierAsync` and `GetByIdentifierAsync` use the tenant
 identifier. `GetByIdentifierAsync` and `GetAsync` should return null if there is no suitable tenant match.
 
-A custom implementation of `IMultiTenantStore<TTenantInfo>` can be registered by calling `WithStore<TStore>`
-after `AddMultiTenant<TTenantInfo>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
+A custom implementation of `IMultiTenantStore<TTenantInfo, TId>` can be registered by calling `WithStore<TStore>`
+after `AddMultiTenant<TTenantInfo, TId>` in the `ConfigureServices` method of the `Startup` class. `WithStore<TStore>` uses
 dependency injection along with any passed parameters to construct the implementation instance. Alternative overloads
 accept a service lifetime, a factory method, and/or other parameters for more customization. Only one primary store can
 be configured.
 
 > Custom store and cache implementations can keep basic validation, logging, and exception handling minimal.
-> `TenantManager<TTenantInfo>` handles those concerns consistently at runtime, along with cache read-through and
+> `TenantManager<TTenantInfo, TId>` handles those concerns consistently at runtime, along with cache read-through and
 > invalidation.
 
 ```csharp
 // register a custom store with the templated method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStore<MyStore>(ServiceLifetime.Singleton, myParam1, myParam2)...
 
 // or register a custom store with the non-templated method which accepts a factory method
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStore(ServiceLifetime.Singleton, sp => new MyStore())...
 ```
 
-Custom store caches implement `IMultiTenantStoreCache<TTenantInfo>` and are registered with `WithStoreCache<TCache>`.
+Custom store caches implement `IMultiTenantStoreCache<TTenantInfo, TId>` and are registered with `WithStoreCache<TCache>`.
 Caches are checked in registration order before the primary store. Caches are maintained by `TenantManager` through
 read-through population and invalidation after successful primary-store writes. Cache implementations should be treated
-as read-only by app code; `TenantManager<TTenantInfo>` is responsible for calling `SetAsync`, `RemoveAsync`, and
+as read-only by app code; `TenantManager<TTenantInfo, TId>` is responsible for calling `SetAsync`, `RemoveAsync`, and
 `RemoveByIdentifierAsync`.
 
 ## Using Store Caches
@@ -101,13 +101,13 @@ Each cache uses its own configured cache entry options when storing the tenant. 
 store and does not populate caches.
 
 Writes are performed against the primary store only. After a successful `AddAsync`, `UpdateAsync`, `RemoveAsync`, or
-`RemoveByIdentifierAsync`, `TenantManager<TTenantInfo>` invalidates affected entries from every configured cache and
+`RemoveByIdentifierAsync`, `TenantManager<TTenantInfo, TId>` invalidates affected entries from every configured cache and
 does not immediately refill them. `UpdateAsync` invalidates both the previous tenant keys and the new tenant keys, so an
 identifier change does not leave stale cache entries behind.
 
 ## Getting All Tenants from Store
 
-If implemented, `GetAllAsync` will return an `IEnumerable<TTenantInfo>` listing of all tenants in the store.
+If implemented, `GetAllAsync` will return an `IEnumerable<TTenantInfo, TId>` listing of all tenants in the store.
 Currently `InMemoryStore`, `ConfigurationStore`, and `EFCoreStore` implement `GetAllAsync`.
 
 ### Pagination of GetAllAsync
@@ -123,12 +123,12 @@ Uses a lock-protected `Dictionary<string, TenantInfo>` as the underlying store. 
 [web api sample project](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/samples) for an example of 
 using the in-memory store.
 
-Configure an empty store by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo>`. Tenant identifier
-matching is always case-insensitive. Add initial tenants through `TenantManager<TTenantInfo>` after the service
+Configure an empty store by calling `WithInMemoryStore` after `AddMultiTenant<TTenantInfo, TId>`. Tenant identifier
+matching is always case-insensitive. Add initial tenants through `TenantManager<TTenantInfo, TId>` after the service
 provider is built and before the application begins handling requests:
 
 ```csharp
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithInMemoryStore();
 
 var app = builder.Build();
@@ -157,18 +157,18 @@ This store is read-only and calls to `AddAsync`, `UpdateAsync`, `RemoveAsync`, a
 a `NotImplementedException`. However, if the app is configured to reload its configuration if the source changes,
 e.g. `appsettings.json` is updated, then the MultiTenant store will reflect the change.
 
-Configure by calling `WithConfigurationStore` after `AddMultiTenant<TTenantInfo>`. By default, it will use the root
+Configure by calling `WithConfigurationStore` after `AddMultiTenant<TTenantInfo, TId>`. By default, it will use the root
 configuration object and search for a section named "Finbuckle:MultiTenant:Stores:ConfigurationStore". An overload
 of `WithConfigurationStore` allows for a different base
 configuration object or section name if needed.
 
 ```csharp
 // register to use the default root configuration and section name.
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithConfigurationStore()...
     
 // or use a different configuration path key
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithConfigurationStore("customConfigurationPathKey")...
 ```
 
@@ -215,12 +215,12 @@ using no-tracking queries and detaching entities after store operations. If your
 This database context is not itself multi-tenant, but rather contains the details of all tenants.
 It will often be a standalone database separate from any tenant database(s) and will have its own connection string.
 
-Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext,TenantInfo>` after `AddMultiTenant<TTenantInfo>` and
+Configure by calling `WithEFCoreStore<TEFCoreStoreDbContext,TenantInfo>` after `AddMultiTenant<TTenantInfo, TId>` and
 provide types for the store's database context generic parameter:
 
 ```csharp
 // configure dbcontext `MultiTenantStoreDbContext`, which derives from `EFCoreStoreDbContext`
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithEFCoreStore<MultiTenantStoreDbContext,TenantInfo>()...
 ```
 
@@ -239,29 +239,29 @@ This store will attempt to deserialize the tenant using
 the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
 
 For a successful request, the store expects a 200 response code and a json body with properties `Id` and `Identifier`.
-Any additional properties supported by the type passed to `AddMultiTenant<TTenantInfo>` will also be mapped.
+Any additional properties supported by the type passed to `AddMultiTenant<TTenantInfo, TId>` will also be mapped.
 
 Any non-200 response code results in a null `TenantInfo`.
 
 This store is read-only and calls to `AddAsync`, `UpdateAsync`, `RemoveAsync`, and `RemoveByIdentifierAsync` will throw
 a `NotImplementedException`.
 
-Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo>` uri template string must be passed to the
+Configure by calling `WithHttpRemoteStore` after `AddMultiTenant<TTenantInfo, TId>` uri template string must be passed to the
 method. At runtime the tenant identifier will replace the substring `{__tenant__}` in the uri template. If the template
 provided does not contain `{__tenant__}`, the identifier is appended to the template. An overload
 of `WithHttpRemoteStore` allows for a lambda function to further configure the internal `HttpClient`:
 
 ```csharp
 // append the identifier to the provided url
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/")...
 
 // or template the identifier into a custom location
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/{__tenant__}/getinfo")...
 
 // or modify the underlying `HttpClient` with a custom message handler and settings
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
     {
         httpClientBuilder.AddHttpMessageHandler<MyCustomHeaderHandler>();
@@ -274,7 +274,7 @@ builder.Services.AddMultiTenant<TenantInfo>()
  
 // or add Polly support
 // via https://www.hanselman.com/blog/AddingResilienceAndTransientFaultHandlingToYourNETCoreHttpClientWithPolly.aspx
-builder.Services.AddMultiTenant<TenantInfo>()
+builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithHttpRemoteStore("https://remoteserver.com/", httpClientBuilder =>
     {
         httpClientBuilder.AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.RetryAsync(2));
@@ -296,16 +296,16 @@ Each tenant info instance is actually cached twice, once using the Tenant ID as 
 Identifier as the key. `TenantManager` keeps these dual cache entries synced through read-through population and
 invalidation.
 
-Configure by calling `WithDistributedCacheStoreCache` after `AddMultiTenant<TTenantInfo>`.
+Configure by calling `WithDistributedCacheStoreCache` after `AddMultiTenant<TTenantInfo, TId>`.
 
 ```csharp
 // use the default cache entry configuration.
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
         .WithDistributedCacheStoreCache()
         .WithConfigurationStore()...
 
 // or set a 5 minute sliding expiration.
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
         .WithDistributedCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5))
         .WithConfigurationStore();
 ```
@@ -318,7 +318,7 @@ Uses the standard .NET `IMemoryCache` as a tenant store cache. Configure expirat
 `MemoryCacheEntryOptions`.
 
 ```csharp
-services.AddMultiTenant<TenantInfo>()
+services.AddMultiTenant<TenantInfo, string>()
     .WithMemoryCacheStoreCache(options => options.SlidingExpiration = TimeSpan.FromMinutes(5))
     .WithConfigurationStore();
 ```
@@ -336,12 +336,17 @@ information is static and predefined elsewhere.
 This store is read-only and calls to `AddAsync`, `UpdateAsync`, `RemoveAsync`, and `RemoveByIdentifierAsync` will throw
 a `NotImplementedException`. Because no stores are saved, a call to `GetAllAsync` will also throw an Exception.
 
-Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
+Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo, TId>`. Because the store turns a resolved
+string identifier into a tenant `Id` of type `TId`, you must supply a conversion delegate (there is no universal way to
+convert a string to an arbitrary `TId`). For a `string` id this is simply `identifier => identifier`:
 
 ```csharp
-services.AddMultiTenant<TenantInfo>()
-    .WithEchoStore();
+services.AddMultiTenant<TenantInfo, string>()
+    .WithEchoStore(identifier => identifier);
 ```
+
+For a non-`string` id type, pass a parser, for example `.WithEchoStore(Guid.Parse)`. The reverse direction (turning an
+`Id` back into an identifier for `GetAsync`) uses `Id.ToString()` automatically.
 
 ## Important Considerations
 
@@ -349,12 +354,15 @@ services.AddMultiTenant<TenantInfo>()
   a match wins.
 - `ConfigurationStore`, `HttpRemoteStore`, and `EchoStore` are read-only. `AddAsync`, `UpdateAsync`, `RemoveAsync`,
   and `RemoveByIdentifierAsync` throw `NotImplementedException`.
-- Store caches store each tenant twice (by `Id` and by `Identifier`). `TenantManager<TTenantInfo>` keeps both entries
+- Store caches store each tenant twice (by `Id` and by `Identifier`). `TenantManager<TTenantInfo, TId>` keeps both entries
   in sync automatically when resolving tenants or invalidating caches after writes.
 - `RemoveAsync` removes by tenant id. `RemoveByIdentifierAsync` removes by tenant identifier.
+- Tenant ids must be non-default. `default(TId)` — `0`, `Guid.Empty`, or a null/whitespace `string` — is treated as
+  *no tenant*: adding, updating, or caching such a tenant throws a `MultiTenantException`, and looking one up by a
+  default id throws an `ArgumentException`.
 - `GetAllAsync` is not implemented by all stores. Check individual store documentation before relying on it.
-- Custom stores implementing `IMultiTenantStore<TTenantInfo>` should avoid extensive logging or validation —
-  `TenantManager<TTenantInfo>` handles these consistently at runtime.
+- Custom stores implementing `IMultiTenantStore<TTenantInfo, TId>` should avoid extensive logging or validation —
+  `TenantManager<TTenantInfo, TId>` handles these consistently at runtime.
 
 ## See Also
 

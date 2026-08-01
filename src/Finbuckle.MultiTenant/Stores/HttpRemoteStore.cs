@@ -9,13 +9,14 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Basic store that can only retrieve tenant via HTTP calls. Note that add, update, and remove functionality is not
 /// implemented. Any changes to the tenant store must occur on the server.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId">The ID implementation type.</typeparam>
+public class HttpRemoteStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     // internal for testing, static for use in the client
     internal static readonly string DefaultEndpointTemplateIdentifierToken = $"{{{Constants.TenantToken}}}";
-    private readonly HttpRemoteStoreClient<TTenantInfo> _client;
+    private readonly HttpRemoteStoreClient<TTenantInfo, TId> _client;
     private readonly string endpointTemplate;
 
     /// <summary>
@@ -25,7 +26,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// <param name="endpointTemplate">Template string for the remote endpoint.</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public HttpRemoteStore(HttpRemoteStoreClient<TTenantInfo> client, string endpointTemplate)
+    public HttpRemoteStore(HttpRemoteStoreClient<TTenantInfo, TId> client, string endpointTemplate)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
         if (!endpointTemplate.Contains(DefaultEndpointTemplateIdentifierToken))
@@ -61,7 +62,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -87,6 +88,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         var result = await _client.GetByIdentifierAsync(endpointTemplate, identifier, cancellationToken)
             .ConfigureAwait(false);
+        result?.EnsureValid();
         return result;
     }
 
@@ -94,7 +96,7 @@ public class HttpRemoteStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

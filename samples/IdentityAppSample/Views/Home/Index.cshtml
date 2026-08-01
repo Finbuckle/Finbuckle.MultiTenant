@@ -6,7 +6,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-@if (Context.GetTenantInfo<AppTenantInfo>() is AppTenantInfo tenant)
+@if (Context.GetTenantInfo<AppTenantInfo, string>() is AppTenantInfo tenant)
 {
     <div class="row">
         <dl class="col-3">

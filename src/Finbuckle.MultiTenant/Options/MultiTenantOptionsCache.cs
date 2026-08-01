@@ -12,11 +12,11 @@ namespace Finbuckle.MultiTenant.Options;
 /// Adds, retrieves, and removes instances of TOptions after adjusting them for the current TenantContext.
 /// </summary>
 public class MultiTenantOptionsCache<
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions, TId>
     : IOptionsMonitorCache<TOptions>
-    where TOptions : class
+    where TOptions : class where TId : IEquatable<TId>
 {
-    private readonly ITenantContext tenantContext;
+    private readonly ITenantContext<TId> tenantContext;
 
     private readonly ConcurrentDictionary<string, OptionsCache<TOptions>> map = new();
 
@@ -25,7 +25,7 @@ public class MultiTenantOptionsCache<
     /// </summary>
     /// <param name="tenantContext">The tenant context.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="tenantContext"/> is null.</exception>
-    public MultiTenantOptionsCache(ITenantContext tenantContext)
+    public MultiTenantOptionsCache(ITenantContext<TId> tenantContext)
     {
         this.tenantContext = tenantContext ?? throw new ArgumentNullException(nameof(tenantContext));
     }
@@ -35,7 +35,9 @@ public class MultiTenantOptionsCache<
     /// </summary>
     public void Clear()
     {
-        var tenantId = tenantContext.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo == null
+            ? string.Empty
+            : tenantContext.TenantInfo.Id.ToString() ?? string.Empty;
         map.TryRemove(tenantId, out _);
     }
 
@@ -45,7 +47,7 @@ public class MultiTenantOptionsCache<
     /// <param name="tenantId">The Id of the tenant which will have its options cleared.</param>
     public void Clear(string? tenantId)
     {
-        map.TryRemove(tenantId ?? "", out _);
+        map.TryRemove(tenantId ?? string.Empty, out _);
     }
 
     /// <summary>
@@ -64,7 +66,9 @@ public class MultiTenantOptionsCache<
         ArgumentNullException.ThrowIfNull(createOptions);
 
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
-        var tenantId = tenantContext.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo == null
+            ? string.Empty
+            : tenantContext.TenantInfo.Id.ToString() ?? string.Empty;
         var cache = map.GetOrAdd(tenantId, static _ => new OptionsCache<TOptions>());
 
         return cache.GetOrAdd(name, createOptions);
@@ -80,7 +84,9 @@ public class MultiTenantOptionsCache<
     {
         ArgumentNullException.ThrowIfNull(options);
         name ??= Microsoft.Extensions.Options.Options.DefaultName;
-        var tenantId = tenantContext.TenantInfo?.Id ?? "";
+        var tenantId = tenantContext.TenantInfo == null
+            ? string.Empty
+            : tenantContext.TenantInfo.Id.ToString() ?? string.Empty;
         var cache = map.GetOrAdd(tenantId, static _ => new OptionsCache<TOptions>());
 
         return cache.TryAdd(name, options);

@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using WebApiSample;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +12,7 @@ builder.Services.AddOpenApi();
 
 // Configure MultiTenant to use our AppTenantInfo class with the route strategy and in-memory store.
 var tenantList = SampleHelper.BuildTenantList();
-builder.Services.AddMultiTenant<AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo,Guid>()
     .WithBasePathStrategy()
     .WithInMemoryStore();
 
@@ -19,7 +20,7 @@ var app = builder.Build();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
-    var tenantManager = scope.ServiceProvider.GetRequiredService<TenantManager<AppTenantInfo>>();
+    var tenantManager = scope.ServiceProvider.GetRequiredService<TenantManager<AppTenantInfo,Guid>>();
     foreach (var tenant in tenantList)
         await tenantManager.AddAsync(tenant);
 }
@@ -33,7 +34,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Add the MultiTenant middleware.
-app.UseMultiTenant();
+app.UseMultiTenant<Guid>();
 
 // Define summaries in English, French, and German.
 var summaries = new Dictionary<string, string[]>
@@ -49,7 +50,7 @@ app.MapGet("/{__tenant__}/weatherforecast", (string __tenant__, HttpContext http
     // Note: __tenant__ parameter isn't used but required for OpenAPI to work properly.
     
     // Get the MultiTenantContext instance.
-    var tenant = http.GetTenantInfo<AppTenantInfo>();
+    var tenant = http.GetTenantInfo<AppTenantInfo, Guid>();
     
     // Set language to the tenant's preferred or default to english.
     var language = tenant?.PreferredLanguage ?? "en";

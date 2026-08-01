@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Test.Stores;
 public class EfCoreStoreShould
     : MultiTenantStoreTestBase, IDisposable
 {
-    public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo>
+    public class TestEfCoreStoreDbContext : EFCoreStoreDbContext<TenantInfo,string>
     {
         public TestEfCoreStoreDbContext(DbContextOptions options) : base(options)
         {
@@ -39,18 +39,18 @@ public class EfCoreStoreShould
         return prop;
     }
 
-    protected override async Task<IMultiTenantStore<TenantInfo>> CreateTestStore()
+    protected override async Task<IMultiTenantStore<TenantInfo,string>> CreateTestStore()
     {
         _connection.Open();
         var options = new DbContextOptionsBuilder().UseSqlite(_connection).Options;
         var dbContext = new TestEfCoreStoreDbContext(options);
         await dbContext.Database.EnsureCreatedAsync();
 
-        var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>(dbContext);
+        var store = new EFCoreStore<TestEfCoreStoreDbContext, TenantInfo,string>(dbContext);
         return await PopulateTestStore(store);
     }
 
-    protected override Task<IMultiTenantStore<TenantInfo>> PopulateTestStore(IMultiTenantStore<TenantInfo> store)
+    protected override Task<IMultiTenantStore<TenantInfo, string>> PopulateTestStore(IMultiTenantStore<TenantInfo, string> store)
     {
         return base.PopulateTestStore(store);
     }
@@ -72,7 +72,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnGet()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = await store.GetAsync("initech-id");
 
         var entity = store.dbContext.Entry(tenant!);
@@ -82,7 +82,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnGetByIdentifier()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
 
         var entity = store.dbContext.Entry(tenant!);
@@ -92,7 +92,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnGetAll()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = (await store.GetAllAsync()).First();
 
         var entity = store.dbContext.Entry(tenant);
@@ -102,7 +102,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnAdd()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = new TenantInfo { Id = "test-id", Identifier = "test-identifier" };
         await store.AddAsync(tenant);
 
@@ -113,7 +113,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnUpdate()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
         tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier };
         await store.UpdateAsync(tenant);
@@ -125,7 +125,7 @@ public class EfCoreStoreShould
     [Fact]
     public async Task NotTrackContextOnRemove()
     {
-        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo>)await CreateTestStore();
+        var store = (EFCoreStore<TestEfCoreStoreDbContext, TenantInfo, string>)await CreateTestStore();
         var tenant = await store.GetByIdentifierAsync("initech");
         tenant = new TenantInfo { Id = tenant!.Id, Identifier = tenant.Identifier };
         await store.RemoveAsync(tenant.Id);

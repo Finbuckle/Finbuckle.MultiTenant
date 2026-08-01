@@ -19,7 +19,7 @@ public class MultiTenantOptionsManagerShould
         var factory = new Mock<IOptionsFactory<object>>();
         factory.Setup(f => f.Create(optionName)).Returns(new object());
         var context = BuildTenantContext("tenant-1");
-        var cache = new MultiTenantOptionsCache<object>(context);
+        var cache = new MultiTenantOptionsCache<object,string>(context);
         var manager = new MultiTenantOptionsManager<object>(factory.Object, cache);
 
         manager.Get(optionName);
@@ -35,7 +35,7 @@ public class MultiTenantOptionsManagerShould
         factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(new object());
         var context = BuildTenantContext("tenant-1");
         var manager = new MultiTenantOptionsManager<object>(factory.Object,
-            new MultiTenantOptionsCache<object>(context));
+            new MultiTenantOptionsCache<object,string>(context));
 
         manager.Get(null!);
 
@@ -49,7 +49,7 @@ public class MultiTenantOptionsManagerShould
         factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(new object());
         var context = BuildTenantContext("tenant-1");
         var manager = new MultiTenantOptionsManager<object>(factory.Object,
-            new MultiTenantOptionsCache<object>(context));
+            new MultiTenantOptionsCache<object,string>(context));
 
         _ = manager.Value;
 
@@ -63,7 +63,7 @@ public class MultiTenantOptionsManagerShould
         factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(() => new object());
         var context = BuildTenantContext("tenant-1");
         var manager = new MultiTenantOptionsManager<object>(factory.Object,
-            new MultiTenantOptionsCache<object>(context));
+            new MultiTenantOptionsCache<object,string>(context));
 
         var first = manager.Value;
         manager.Reset();
@@ -78,9 +78,9 @@ public class MultiTenantOptionsManagerShould
     {
         var factory = new Mock<IOptionsFactory<object>>();
         factory.Setup(f => f.Create(Microsoft.Extensions.Options.Options.DefaultName)).Returns(() => new object());
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         var manager = new MultiTenantOptionsManager<object>(factory.Object,
-            new MultiTenantOptionsCache<object>(context));
+            new MultiTenantOptionsCache<object,string>(context));
 
         context.BeginScope();
         context.TenantInfo = new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" };
@@ -98,9 +98,9 @@ public class MultiTenantOptionsManagerShould
         factory.Verify(f => f.Create(It.IsAny<string>()), Times.Exactly(2));
     }
 
-    private static AmbientTenantContext<TenantInfo> BuildTenantContext(string tenantId)
+    private static AmbientTenantContext<TenantInfo, string> BuildTenantContext(string tenantId)
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo, string>();
         context.BeginScope();
         context.TenantInfo = new TenantInfo { Id = tenantId, Identifier = tenantId };
         return context;

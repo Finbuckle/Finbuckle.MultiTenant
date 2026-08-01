@@ -31,7 +31,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-builder.Services.AddMultiTenant<AppTenantInfo>()
+builder.Services.AddMultiTenant<AppTenantInfo, string>()
     .WithRouteStrategy()
     .WithConfigurationStore()
     .WithPerTenantAuthentication();
@@ -52,7 +52,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseMultiTenant();
+app.UseMultiTenant<string>();
 app.UseAuthentication();
 app.UseAuthorization();
 
