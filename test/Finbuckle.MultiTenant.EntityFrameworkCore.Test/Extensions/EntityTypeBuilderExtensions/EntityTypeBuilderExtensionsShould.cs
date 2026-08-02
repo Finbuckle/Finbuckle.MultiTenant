@@ -92,6 +92,57 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     }
 
     [Fact]
+    public void SetNamedFilterQueryWithTypedBuilder()
+    {
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "123" };
+
+        using var db = GetDbContext(
+            b => b.Entity<MyMultiTenantThing>().IsMultiTenant<MyMultiTenantThing, string>(),
+            tenant1);
+        db.Database.EnsureCreated();
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
+        db.SaveChanges();
+
+        Assert.Equal(1, db.MyMultiTenantThings!.Count());
+        db.TenantInfo = tenant2;
+        Assert.Equal(0, db.MyMultiTenantThings!.Count());
+    }
+
+    [Fact]
+    public void SetNamedFilterQueryWithNonGenericBuilder()
+    {
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "abc" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "123" };
+
+        using var db = GetDbContext(
+            b => b.Entity(typeof(MyMultiTenantThing)).IsMultiTenant<string>(),
+            tenant1);
+        db.Database.EnsureCreated();
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
+        db.SaveChanges();
+
+        Assert.Equal(1, db.MyMultiTenantThings!.Count());
+        db.TenantInfo = tenant2;
+        Assert.Equal(0, db.MyMultiTenantThings!.Count());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ReturnNoRecordsWhenQueryingWithNullTenantInfo(bool useTypedBuilder)
+    {
+        Action<ModelBuilder> config = useTypedBuilder
+            ? b => b.Entity<MyMultiTenantThing>().IsMultiTenant<MyMultiTenantThing, string>()
+            : b => b.Entity(typeof(MyMultiTenantThing)).IsMultiTenant<string>();
+        using var db = GetDbContext(config);
+        db.Database.EnsureCreated();
+        db.TenantInfo = null;
+
+        Assert.Empty(db.MyMultiTenantThings!);
+    }
+
+    [Fact]
     public void CanIgnoreNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
