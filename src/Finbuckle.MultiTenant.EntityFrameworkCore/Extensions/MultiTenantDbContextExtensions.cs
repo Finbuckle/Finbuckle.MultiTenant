@@ -34,9 +34,9 @@ public static class MultiTenantDbContextExtensions
                 return;
 
             // Configure event to handle newly tracked entities.
-            context.ChangeTracker.Tracking += (sender, args) =>
+            context.ChangeTracker.Tracking += (_, args) =>
             {
-                if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
+                if (!args.Entry.Metadata.IsMultiTenant || args.FromQuery ||
                     args.Entry.Context is not IMultiTenantDbContext<TId> multiTenantDbContext) return;
 
                 if (multiTenantDbContext.TenantInfo is null)
@@ -69,7 +69,7 @@ public static class MultiTenantDbContextExtensions
 
         var changedMultiTenantEntities = changeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
-            .Where(e => e.Metadata.IsMultiTenant()).ToList();
+            .Where(e => e.Metadata.IsMultiTenant).ToList();
 
         // ensure tenant context is valid
         if (changedMultiTenantEntities.Count == 0)
@@ -246,7 +246,6 @@ public static class MultiTenantDbContextExtensions
     {
         try
         {
-            args ??= [];
             var context = (TContext)Activator.CreateInstance(typeof(TContext), args)!;
             context.TenantInfo = tenantInfo;
             return context;
@@ -276,7 +275,6 @@ public static class MultiTenantDbContextExtensions
     {
         try
         {
-            args ??= [];
             var context = ActivatorUtilities.CreateInstance<TContext>(serviceProvider, args);
             context.TenantInfo = tenantInfo;
             return context;

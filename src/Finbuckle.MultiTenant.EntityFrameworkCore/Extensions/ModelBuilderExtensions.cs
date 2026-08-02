@@ -18,7 +18,7 @@ public static class FinbuckleModelBuilderExtensions
     /// <returns>The <see cref="ModelBuilder"/> instance.</returns>
     public static ModelBuilder ConfigureMultiTenant<TId>(this ModelBuilder modelBuilder) where TId : IEquatable<TId>
     {
-        // Call IsMultiTenant() to configure the types marked with the MultiTenant Data Attribute
+        // Call IsMultiTenant<TId>() to configure the types marked with the MultiTenant Data Attribute
         foreach (var clrType in modelBuilder.Model.GetEntityTypes()
                      .Where(et => et.ClrType.HasMultiTenantAttribute())
                      .Select(et => et.ClrType))

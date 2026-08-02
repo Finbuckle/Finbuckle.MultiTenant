@@ -6,45 +6,35 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 
 /// <summary>
-/// Extension methods for <see cref="IEntityType"/>.
+/// Extension methods for <see cref="IReadOnlyEntityType"/>.
 /// </summary>
 public static class EntityTypeExtensions
 {
-    /// <summary>
-    /// Whether or not the <see cref="IMutableEntityType"/> is configured as multi-tenant.
-    /// </summary>
-    /// <param name="entityType">The entity type to test for multi-tenant configuration.</param>
-    /// <returns>Returns true if the entity type has multi-tenant configuration, false if not.</returns>
-    public static bool IsMultiTenant(this IMutableEntityType? entityType)
+    extension<T>(T entityType)
+        where T : class, IReadOnlyEntityType
     {
-        while (entityType != null)
+
+        /// <summary>
+        /// Whether or not the entity type is configured as multi-tenant.
+        /// </summary>
+        public bool IsMultiTenant
         {
-            var hasMultiTenantAnnotation =
-                (bool?)entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
-            if (hasMultiTenantAnnotation)
-                return true;
-            entityType = entityType.BaseType;
+            get
+            {
+                IReadOnlyEntityType? current = entityType;
+                while (current != null)
+                {
+                    var hasMultiTenantAnnotation =
+                        (bool?)current.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
+
+                    if (hasMultiTenantAnnotation)
+                        return true;
+
+                    current = current.BaseType;
+                }
+
+                return false;
+            }
         }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Whether or not the <see cref="IEntityType"/> is configured as multi-tenant.
-    /// </summary>
-    /// <param name="entityType">The entity type to test for multi-tenant configuration.</param>
-    /// <returns>Returns true if the entity type has multi-tenant configuration, false if not.</returns>
-    public static bool IsMultiTenant(this IEntityType? entityType)
-    {
-        while (entityType != null)
-        {
-            var hasMultiTenantAnnotation =
-                (bool?)entityType.FindAnnotation(Constants.MultiTenantAnnotationName)?.Value ?? false;
-            if (hasMultiTenantAnnotation)
-                return true;
-            entityType = entityType.BaseType;
-        }
-
-        return false;
     }
 }

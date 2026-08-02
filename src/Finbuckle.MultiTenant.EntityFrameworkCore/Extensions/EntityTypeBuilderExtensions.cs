@@ -58,7 +58,7 @@ public static class EntityTypeBuilderExtensions
     /// <remarks>A property of type <typeparamref name="TId"/> named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
     public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>
     {
-        if (builder.Metadata.IsMultiTenant())
+        if (builder.Metadata.IsMultiTenant)
             return new MultiTenantEntityTypeBuilder(builder);
 
         builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);

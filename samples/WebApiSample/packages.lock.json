@@ -11,6 +11,12 @@
           "Microsoft.OpenApi": "2.0.0"
         }
       },
+      "Microsoft.OpenApi": {
+        "type": "Direct",
+        "requested": "[2.11.0, )",
+        "resolved": "2.11.0",
+        "contentHash": "/ignjfdeKT2SGLIR7QEv19KnI0rvoxRG/TYDOZdK9EsWLjKK9IK8i1Mo5NRm9PRV3i64DzlTqnIflWvoyfljLg=="
+      },
       "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
         "type": "Transitive",
         "resolved": "10.0.10",
@@ -70,11 +76,6 @@
           "Microsoft.Bcl.Cryptography": "10.0.2",
           "Microsoft.IdentityModel.Logging": "8.19.2"
         }
-      },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "Transitive",

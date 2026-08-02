@@ -17,6 +17,6 @@ public static class ModelExtensions
     /// <returns>Multi-tenant entity types.</returns>
     public static IEnumerable<IEntityType> GetMultiTenantEntityTypes(this IModel model)
     {
-        return model.GetEntityTypes().Where(et => et.IsMultiTenant());
+        return model.GetEntityTypes().Where(et => et.IsMultiTenant);
     }
 }

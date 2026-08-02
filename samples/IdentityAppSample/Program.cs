@@ -52,19 +52,24 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
 app.UseMultiTenant<string>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets().ShortCircuit();
+
 app.MapControllerRoute(
         name: "default",
         pattern: "{__tenant__}/{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.MapControllerRoute(
         name: "default_notenant",
         pattern: "/{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.MapRazorPages()
     .WithStaticAssets();
 
