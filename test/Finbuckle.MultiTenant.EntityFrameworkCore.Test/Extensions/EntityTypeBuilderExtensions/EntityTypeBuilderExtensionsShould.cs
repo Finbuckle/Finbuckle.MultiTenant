@@ -135,11 +135,16 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         Action<ModelBuilder> config = useTypedBuilder
             ? b => b.Entity<MyMultiTenantThing>().IsMultiTenant<MyMultiTenantThing, string>()
             : b => b.Entity(typeof(MyMultiTenantThing)).IsMultiTenant<string>();
-        using var db = GetDbContext(config);
+        using var db = GetDbContext(config, new TenantInfo { Id = "abc", Identifier = "abc" });
         db.Database.EnsureCreated();
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
+        db.SaveChanges();
+        Assert.Equal(1, db.MyMultiTenantThings!.Count()); // sanity check data exists
+
         db.TenantInfo = null;
 
-        Assert.Empty(db.MyMultiTenantThings!);
+        var result = db.MyMultiTenantThings!.ToList();
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -251,10 +256,11 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         });
 
         var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));
-        Assert.True(entityType.IsMultiTenant);
+        Assert.NotNull(entityType);
+        Assert.True(entityType!.IsMultiTenant);
 
         // TenantId shadow property should exist exactly once
-        var tenantIdProps = entityType?.GetProperties().Where(p => p.Name == "TenantId").ToList();
-        Assert.Single(tenantIdProps!);
+        var tenantIdProps = entityType.GetProperties().Where(p => p.Name == "TenantId").ToList();
+        Assert.Single(tenantIdProps);
     }
 }

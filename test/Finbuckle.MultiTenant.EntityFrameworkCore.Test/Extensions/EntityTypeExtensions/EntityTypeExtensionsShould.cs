@@ -12,20 +12,26 @@ public class EntityTypeExtensionShould
     public void ReturnTrueOnIsMultiTenantOnIfMultiTenant()
     {
         using var db = new TestDbContext();
-        Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant);
+        var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));
+        Assert.NotNull(entityType);
+        Assert.True(entityType!.IsMultiTenant);
     }
 
     [Fact]
     public void ReturnTrueOnIsMultiTenantOnIfAncestorIsMultiTenant()
     {
         using var db = new TestDbContext();
-        Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantChildThing)).IsMultiTenant);
+        var entityType = db.Model.FindEntityType(typeof(MyMultiTenantChildThing));
+        Assert.NotNull(entityType);
+        Assert.True(entityType!.IsMultiTenant);
     }
 
     [Fact]
     public void ReturnFalseOnIsMultiTenantOnIfNotMultiTenant()
     {
         using var db = new TestDbContext();
-        Assert.False(db.Model.FindEntityType(typeof(MyThing)).IsMultiTenant);
+        var entityType = db.Model.FindEntityType(typeof(MyThing));
+        Assert.NotNull(entityType);
+        Assert.False(entityType!.IsMultiTenant);
     }
 }

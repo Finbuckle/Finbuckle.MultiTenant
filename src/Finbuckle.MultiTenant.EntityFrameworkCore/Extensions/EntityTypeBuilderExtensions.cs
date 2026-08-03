@@ -71,9 +71,12 @@ public static class EntityTypeBuilderExtensions
         }
 
         IMultiTenantDbContext<TId>? dummyContext = null;
+
+        // Really wanted e => dummyContext.TenantInfo != null && EF.Property<TId>(e, "TenantId").Equals(dummyContext.TenantInfo.Id)
+        // but EFCore is really finicky with how the SQL generation works and doesn't short circuit.
         builder.HasQueryFilter(Abstractions.Constants.TenantToken,
-            e => dummyContext!.TenantInfo != null &&
-                 EF.Property<TId>(e, "TenantId").Equals(dummyContext.TenantInfo.Id));
+            e => dummyContext!.TenantInfo != null && EF.Property<TId>(e, "TenantId")
+                .Equals(dummyContext.TenantInfo != null ? dummyContext.TenantInfo.Id : default(TId)));
 
         return new MultiTenantEntityTypeBuilder(builder);
     }
@@ -81,10 +84,11 @@ public static class EntityTypeBuilderExtensions
     /// <summary>
     /// Adds multi-tenant support for an entity via a named query filter.
     /// </summary>
-    /// <param name="builder">The typed <see cref="EntityTypeBuilder"/> instance.</param>
+    /// <param name="builder">The <see cref="EntityTypeBuilder"/> instance.</param>
     /// <returns>A <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
     /// <remarks>A property of type <typeparamref name="TId"/> named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
-    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>
+    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder)
+        where TId : IEquatable<TId>
     {
         if (builder.Metadata.IsMultiTenant)
             return new MultiTenantEntityTypeBuilder(builder);
@@ -99,7 +103,9 @@ public static class EntityTypeBuilderExtensions
             throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
         }
 
-        // build expression tree for e => EF.Property<TId>(e, "TenantId") == TenantInfo.Id
+        // build expression tree for:
+        // e => TenantInfo != null && EF.Property<TId>(e, "TenantId") ==
+        //      (TenantInfo != null ? TenantInfo.Id : default(TId))
 
         // where e is one of our entity types
         // will need this ParameterExpression for next step and for final step
@@ -109,22 +115,24 @@ public static class EntityTypeBuilderExtensions
         var tenantIdExp = Expression.Constant("TenantId", typeof(string));
         var efPropertyExp = Expression.Call(typeof(EF), nameof(EF.Property), new[] { typeof(TId) }, entityParamExp,
             tenantIdExp);
-        var leftExp = efPropertyExp;
 
-        // Build a null-safe expression for the current tenant ID. EF substitutes the active context for the typed
-        // null context constant. When TenantInfo is null the expression evaluates to false.
+        // Build expression for TenantInfo != null
         var dummyConstantExp = Expression.Constant(null, typeof(IMultiTenantDbContext<TId>));
         var dummyTenantInfoExp =
             Expression.Property(dummyConstantExp, nameof(IMultiTenantDbContext<TId>.TenantInfo));
         var tenantInfoNotNullExp = Expression.NotEqual(
             dummyTenantInfoExp,
-            Expression.Constant(null, typeof(ITenantInfo<TId>)));
-        var currentTenantIdExp = Expression.Property(dummyTenantInfoExp, nameof(ITenantInfo<TId>.Id));
-        var tenantMatchesExp = Expression.Equal(leftExp, currentTenantIdExp);
-        var predicate = Expression.Condition(
+            Expression.Constant(null));
+        
+        // Build expression for TenantInfo != null ? TenantInfo.Id : default(TId)
+        var currentTenantIdExp =
+            Expression.Condition(
+                tenantInfoNotNullExp,
+                Expression.Property(dummyTenantInfoExp, nameof(IMultiTenantDbContext<TId>.TenantInfo.Id)),
+                Expression.Default(typeof(TId)));
+        var predicate = Expression.AndAlso(
             tenantInfoNotNullExp,
-            tenantMatchesExp,
-            Expression.Constant(false));
+            Expression.Equal(efPropertyExp, currentTenantIdExp));
 
         // build the final expression tree
         var delegateType = Expression.GetDelegateType(builder.Metadata.ClrType, typeof(bool));

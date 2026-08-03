@@ -12,13 +12,17 @@ public class ModelBuilderExtensionShould
     public void OnConfigureMultiTenantSetMultiTenantOnTypeWithMultiTenantAttribute()
     {
         using var db = new TestDbContext();
-        Assert.True(db.Model.FindEntityType(typeof(MyMultiTenantThing)).IsMultiTenant);
+        var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));
+        Assert.NotNull(entityType);
+        Assert.True(entityType!.IsMultiTenant);
     }
 
     [Fact]
     public void OnConfigureMultiTenantDoNotSetMultiTenantOnTypeWithoutMultiTenantAttribute()
     {
         using var db = new TestDbContext();
-        Assert.False(db.Model.FindEntityType(typeof(MyThing)).IsMultiTenant);
+        var entityType = db.Model.FindEntityType(typeof(MyThing));
+        Assert.NotNull(entityType);
+        Assert.False(entityType!.IsMultiTenant);
     }
 }
