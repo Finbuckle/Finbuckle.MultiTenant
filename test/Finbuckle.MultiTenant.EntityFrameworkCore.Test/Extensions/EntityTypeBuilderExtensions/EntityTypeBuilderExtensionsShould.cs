@@ -92,6 +92,37 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
     }
 
     [Fact]
+    public void SetNamedFilterQueryWithTypedBuilder()
+    {
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+
+        using var db = GetDbContext(
+            b => b.Entity<MyMultiTenantThing>().IsMultiTenant(),
+            tenant1);
+        db.Database.EnsureCreated();
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
+        db.SaveChanges();
+
+        Assert.Equal(1, db.MyMultiTenantThings!.Count());
+        db.TenantInfo = tenant2;
+        Assert.Equal(0, db.MyMultiTenantThings!.Count());
+    }
+
+    [Fact]
+    public void ThrowWhenQueryingWithNullTenantInfo()
+    {
+        using var db = GetDbContext(null, new TenantInfo { Id = "abc", Identifier = "" });
+        db.Database.EnsureCreated();
+        db.MyMultiTenantThings?.Add(new MyMultiTenantThing { Id = 1 });
+        db.SaveChanges();
+
+        db.TenantInfo = null;
+
+        Assert.Throws<NullReferenceException>(() => db.MyMultiTenantThings!.ToList());
+    }
+
+    [Fact]
     public void CanIgnoreNamedFilterQuery()
     {
         // Doesn't appear to be a way to test this except to try it out...
