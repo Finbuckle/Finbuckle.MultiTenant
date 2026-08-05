@@ -14,12 +14,6 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 /// </summary>
 public static class EntityTypeBuilderExtensions
 {
-    private class ExpressionVariableScope
-    {
-        // ReSharper disable once UnassignedGetOnlyAutoProperty
-        public IMultiTenantDbContext? Context { get; }
-    }
-
     /// <summary>
     /// Marks an entity as non-multi-tenant, removing any tenant-based query filters.
     /// </summary>
@@ -41,15 +35,46 @@ public static class EntityTypeBuilderExtensions
                 builder.Metadata.RemoveProperty(property);
 
 
-                // remove the named query filter if it exists
-                var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
+            // remove the named query filter if it exists
+            var existingFilter = builder.Metadata.FindDeclaredQueryFilter(Abstractions.Constants.TenantToken);
             if (existingFilter is not null)
                 builder.Metadata.SetQueryFilter(Abstractions.Constants.TenantToken, null);
         }
 
         return builder;
     }
-    
+
+    /// <summary>
+    /// Adds multi-tenant support for an entity via a named query filter.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <param name="builder">The typed <see cref="EntityTypeBuilder{TEntity}"/> instance.</param>
+    /// <returns>A <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
+    /// <remarks>A string property named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
+    public static MultiTenantEntityTypeBuilder IsMultiTenant<TEntity>(
+        this EntityTypeBuilder<TEntity> builder)
+        where TEntity : class
+    {
+        if (builder.Metadata.IsMultiTenant())
+            return new MultiTenantEntityTypeBuilder(builder);
+        
+        try
+        {
+            builder.Property<string>("TenantId").IsRequired();
+            builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
+        }
+        catch (Exception ex)
+        {
+            throw new MultiTenantException($"{builder.Metadata.ClrType} unable to add TenantId property", ex);
+        }
+
+        IMultiTenantDbContext? dummyContext = null;
+        builder.HasQueryFilter(Abstractions.Constants.TenantToken,
+            e => EF.Property<string>(e, "TenantId") == dummyContext!.TenantInfo!.Id);
+
+        return new MultiTenantEntityTypeBuilder(builder);
+    }
+
     /// <summary>
     /// Adds multi-tenant support for an entity via a named query filter.
     /// </summary>
@@ -60,7 +85,7 @@ public static class EntityTypeBuilderExtensions
     {
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);
-
+        
         builder.HasAnnotation(Constants.MultiTenantAnnotationName, true);
 
         try
@@ -84,13 +109,12 @@ public static class EntityTypeBuilderExtensions
             tenantIdExp);
         var leftExp = efPropertyExp;
 
-        // build up express tree for: TenantInfo.Id
-        // EF will magically sub the current db context in for scope.Context
-        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
-        var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
-        var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
-        var contextTenantInfoExp =
-            Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
+        // build up expression tree for: TenantInfo.Id
+        // EF will magically substitute the current db context for the null constant.
+        var contextConstantExp = Expression.Constant(null, typeof(IMultiTenantDbContext));
+        var contextTenantInfoExp = Expression.Property(
+            contextConstantExp,
+            nameof(IMultiTenantDbContext.TenantInfo));
         var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
 
         // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
