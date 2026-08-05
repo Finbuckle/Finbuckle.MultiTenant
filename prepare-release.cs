@@ -29,6 +29,7 @@
 
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 // ============================================================================
@@ -156,6 +157,67 @@ static string Git(string args)
     return stdout.Trim();
 }
 
+// Run a GitHub CLI command with the supplied token and return trimmed stdout.
+static string Gh(string args, string token)
+{
+    using var proc = new Process();
+    proc.StartInfo = new ProcessStartInfo
+    {
+        FileName               = "gh",
+        Arguments              = args,
+        RedirectStandardOutput = true,
+        RedirectStandardError  = true,
+        UseShellExecute        = false,
+        CreateNoWindow         = true
+    };
+    proc.StartInfo.Environment["GH_TOKEN"] = token;
+    proc.Start();
+    string stdout = proc.StandardOutput.ReadToEnd();
+    string stderr = proc.StandardError.ReadToEnd();
+    proc.WaitForExit();
+
+    if (proc.ExitCode != 0)
+        throw new InvalidOperationException(
+            $"`gh {args}` failed (exit {proc.ExitCode}):\n{stderr.Trim()}");
+
+    return stdout.Trim();
+}
+
+// Resolve a pull request author's GitHub username.
+static string? GetPullRequestAuthor(string repoUrl, int pullRequestNumber)
+{
+    string? token = Environment.GetEnvironmentVariable("GH_TOKEN")
+        ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+    if (string.IsNullOrWhiteSpace(token))
+        return null;
+
+    string repoPath = new Uri(repoUrl).AbsolutePath.Trim('/');
+    string response = Gh($"api repos/{repoPath}/pulls/{pullRequestNumber}", token);
+    using var document = JsonDocument.Parse(response);
+    return document.RootElement.GetProperty("user").GetProperty("login").GetString();
+}
+
+// Resolve the first pull request associated with a commit.
+static PullRequestInfo? GetPullRequestForCommit(string repoUrl, string commitSha)
+{
+    string? token = Environment.GetEnvironmentVariable("GH_TOKEN")
+        ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+    if (string.IsNullOrWhiteSpace(token))
+        return null;
+
+    string repoPath = new Uri(repoUrl).AbsolutePath.Trim('/');
+    string response = Gh($"api repos/{repoPath}/commits/{commitSha}/pulls", token);
+    using var document = JsonDocument.Parse(response);
+    if (document.RootElement.ValueKind != JsonValueKind.Array ||
+        document.RootElement.GetArrayLength() == 0)
+        return null;
+
+    var pullRequest = document.RootElement[0];
+    int number = pullRequest.GetProperty("number").GetInt32();
+    string? author = pullRequest.GetProperty("user").GetProperty("login").GetString();
+    return new PullRequestInfo(number, author);
+}
+
 // Resolve the GitHub HTTPS base URL from the git remote named "origin".
 // Handles both SSH (git@github.com:Owner/Repo.git) and HTTPS remote formats.
 // Falls back to the Finbuckle repo URL if the remote cannot be read.
@@ -178,38 +240,17 @@ static string GetRepoUrl()
 
 // Validate that the major component of newVersion is consistent with the current
 // git branch. Rules:
-//   main   - any version is allowed (new major versions are cut from main)
 //   N.x    - the new version's major must equal N
-//   other  - error; releases must be made from main or an N.x branch.
+//   other  - error; releases must be made from an N.x branch.
 static void ValidateBranchMajorVersion(SemanticVersion newVersion)
 {
     string branch = Git("rev-parse --abbrev-ref HEAD");
-
-    if (branch == "main")
-    {
-        // On main, check that no N.x branch already exists for the new major version.
-        // If one does, the release should be made from that branch instead.
-        string expectedReleaseBranch = $"{newVersion.Major}.x";
-        var allBranches = Git("branch --list --all")
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(b => b.Trim().TrimStart('*').Trim()
-                          .Replace("remotes/origin/", ""))
-            .Distinct();
-
-        if (allBranches.Any(b => b == expectedReleaseBranch))
-            throw new InvalidOperationException(
-                $"Branch \"{expectedReleaseBranch}\" already exists. " +
-                $"Release {newVersion.ToTag()} should be made from that branch, not from main.");
-
-        Console.WriteLine($"Branch check passed: on main and \"{expectedReleaseBranch}\" does not yet exist.");
-        return;
-    }
 
     var m = Regex.Match(branch, @"^(\d+)\.x$");
     if (!m.Success)
         throw new InvalidOperationException(
             $"Current branch \"{branch}\" is not a valid release branch. " +
-            $"Releases must be made from \"main\" or an \"N.x\" branch (e.g. \"8.x\").");
+            $"Releases must be made from a matching \"N.x\" branch (e.g. \"10.x\").");
 
     int branchMajor = int.Parse(m.Groups[1].Value);
     if (branchMajor != newVersion.Major)
@@ -437,19 +478,52 @@ static string BuildReleaseNotes(
     sb.AppendLine($"## [{newVersion}]({compareUrl}) ({today})");
     sb.AppendLine();
 
+    var prAuthors = new Dictionary<int, string?>();
+    var commitPullRequests = new Dictionary<string, PullRequestInfo?>();
+
+    string PrReference(ConventionalCommit c)
+    {
+        var match = Regex.Match(c.Description, @"\s*\(#(\d+)\)\s*$");
+        PullRequestInfo? pullRequest;
+
+        if (match.Success)
+        {
+            int number = int.Parse(match.Groups[1].Value);
+            if (!prAuthors.TryGetValue(number, out string? author))
+            {
+                author = GetPullRequestAuthor(repoUrl, number);
+                prAuthors[number] = author;
+            }
+
+            pullRequest = new PullRequestInfo(number, author);
+        }
+        else
+        {
+            if (!commitPullRequests.TryGetValue(c.FullHash, out pullRequest))
+            {
+                pullRequest = GetPullRequestForCommit(repoUrl, c.FullHash);
+                commitPullRequests[c.FullHash] = pullRequest;
+            }
+        }
+
+        if (pullRequest is null) return "";
+
+        string authorLink = string.IsNullOrEmpty(pullRequest.Author)
+            ? ""
+            : $" by [@{pullRequest.Author}](https://github.com/{pullRequest.Author})";
+        return $" ([#{pullRequest.Number}]({repoUrl}/issues/{pullRequest.Number}){authorLink})";
+    }
+
     // Formats a single commit as a changelog bullet.
-    // Extracts a trailing "(#1234)" PR reference from the description if present and
-    // renders it as a proper GitHub issue link before the commit hash link.
+    // Resolves a trailing "(#1234)" PR reference or the PR associated with the commit.
     string FormatBullet(ConventionalCommit c)
     {
         // Strip a trailing "(#NNNN)" PR number from the description text
         var prMatch = Regex.Match(c.Description, @"\s*\(#(\d+)\)\s*$");
         string desc       = prMatch.Success ? c.Description[..prMatch.Index].TrimEnd() : c.Description;
-        string prLink     = prMatch.Success
-            ? $" ([#{prMatch.Groups[1].Value}]({repoUrl}/issues/{prMatch.Groups[1].Value}))"
-            : "";
+        string prLink     = PrReference(c);
         string commitLink = $"([{c.ShortHash}]({repoUrl}/commit/{c.FullHash}))";
-        return $"* {desc}{prLink} ({commitLink})";
+        return $"* {desc}{prLink} {commitLink}";
     }
 
     // Appends a section; does nothing when the list is empty.
@@ -471,7 +545,7 @@ static string BuildReleaseNotes(
                 if (c.BreakingNotes.Count > 0)
                 {
                     foreach (var note in c.BreakingNotes)
-                        sb.AppendLine($"* {note}");
+                        sb.AppendLine($"* {note}{PrReference(c)}");
                 }
                 else
                     sb.AppendLine(FormatBullet(c));
@@ -495,7 +569,7 @@ static string BuildReleaseNotes(
                     if (c.BreakingNotes.Count > 0)
                     {
                         foreach (var note in c.BreakingNotes)
-                            sb.AppendLine($"* {note}");
+                            sb.AppendLine($"* {note}{PrReference(c)}");
                     }
                     else
                         sb.AppendLine(FormatBullet(c));
@@ -514,7 +588,7 @@ static string BuildReleaseNotes(
                     if (c.BreakingNotes.Count > 0)
                     {
                         foreach (var note in c.BreakingNotes)
-                            sb.AppendLine($"* {note}");
+                            sb.AppendLine($"* {note}{PrReference(c)}");
                     }
                     else
                         sb.AppendLine(FormatBullet(c));
@@ -526,12 +600,13 @@ static string BuildReleaseNotes(
         sb.AppendLine();
     }
 
-    // Only include commit types that drive a version change.
-    // docs, style, refactor, test, chore, ci, build, revert are intentionally omitted.
+    // Include refactor commits in release notes, but they do not drive a version change.
+    // docs, style, test, chore, ci, build, revert are intentionally omitted.
     Section("⚠ BREAKING CHANGES", commits.Where(c => c.IsBreaking).ToList());
     Section("Features",            commits.Where(c => c.Type == "feat" && !c.IsBreaking).ToList());
     Section("Bug Fixes",           commits.Where(c => c.Type == "fix"  && !c.IsBreaking).ToList());
     Section("Performance",         commits.Where(c => c.Type == "perf" && !c.IsBreaking).ToList());
+    Section("Refactoring",        commits.Where(c => c.Type == "refactor" && !c.IsBreaking).ToList());
 
     return sb.ToString();
 }
@@ -706,6 +781,8 @@ static string RemoveExistingVersionSection(string content, SemanticVersion versi
 
 /// <summary>The category of semver bump required by a set of commits.</summary>
 enum BumpLevel { None, Patch, Minor, Major }
+
+record PullRequestInfo(int Number, string? Author);
 
 /// <summary>An immutable semantic version triplet.</summary>
 record SemanticVersion(int Major, int Minor, int Patch)
