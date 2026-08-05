@@ -144,6 +144,7 @@ public class HttpContextExtensionShould
         var httpContextMock = new Mock<HttpContext>();
 
         httpContextMock.SetupProperty(c => c.RequestServices);
+        httpContextMock.Setup(c => c.Response).Returns(new Mock<HttpResponse>().Object);
 
         var services = new ServiceCollection();
         services.AddScoped<object>(_ => DateTime.Now);
