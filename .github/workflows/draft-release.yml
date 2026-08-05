@@ -24,6 +24,8 @@ jobs:
           dotnet test -c Release --no-build
       - name: prepare release
         id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: dotnet prepare-release.cs
       - name: commit, tag and push
         if: steps.prepare.outputs.bump_level != ''
