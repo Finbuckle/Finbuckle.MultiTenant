@@ -1,23 +1,19 @@
-name: Release
+name: Draft Release
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-test-prep-release:
-    if: github.event_name == 'workflow_dispatch' || github.event.release.tag_name == 'autodraft'
+  draft-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
         with:
           token: ${{ github.token }}
           fetch-depth: 0
-          ref: ${{ github.event_name == 'release' && github.event.release.target_commitish || github.ref }}
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10
@@ -39,23 +35,12 @@ jobs:
           git tag ${{ steps.prepare.outputs.new_version }}
           git push origin HEAD
           git push origin ${{ steps.prepare.outputs.new_version }}
-      - name: create release and clean up draft
-        if: steps.prepare.outputs.bump_level != '' && github.event_name == 'release'
+      - name: create draft release
+        if: steps.prepare.outputs.bump_level != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ steps.prepare.outputs.new_version }} \
             --title "${{ steps.prepare.outputs.new_version }}" \
             --notes-file "${{ steps.prepare.outputs.release_notes_file }}" \
-            --latest
-          gh release delete autodraft --yes
-          git push origin :autodraft
-      - name: create release
-        if: steps.prepare.outputs.bump_level != '' && github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create ${{ steps.prepare.outputs.new_version }} \
-            --title "${{ steps.prepare.outputs.new_version }}" \
-            --notes-file "${{ steps.prepare.outputs.release_notes_file }}" \
-            --latest
+            --draft
