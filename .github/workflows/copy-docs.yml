@@ -1,8 +1,6 @@
 name: Copy Docs to Website
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       branch:
@@ -20,25 +18,14 @@ jobs:
       - name: Checkout Finbuckle.MultiTenant
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
         with:
-          ref: ${{ github.event.release.tag_name || inputs.branch }}
+          ref: ${{ inputs.branch }}
           fetch-depth: 0
-      - name: Resolve docs release tag
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Resolve latest version on branch
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            VERSION="${{ github.event.release.tag_name }}"
-          else
-            VERSION=$(gh release list \
-              --exclude-drafts \
-              --exclude-pre-releases \
-              --limit 1 \
-              --json tagName \
-              --jq '.[0].tagName')
-          fi
+          VERSION=$(git tag --merged HEAD --list 'v*' --sort=-version:refname | head -n 1)
 
           if [ -z "$VERSION" ]; then
-            echo "No published release tag was found." >&2
+            echo "No version tag was found on branch '${{ inputs.branch }}'." >&2
             exit 1
           fi
 
@@ -50,7 +37,10 @@ jobs:
           token: ${{ secrets.workflow_pat }}
           path: website
       - name: Copy Docs
-        run: mkdir -p website/content/docs/${{ env.version }} && cp docs/* website/content/docs/${{ env.version }}
+        run: |
+          rm -rf "website/content/docs/${{ env.version }}"
+          mkdir -p "website/content/docs/${{ env.version }}"
+          cp docs/* "website/content/docs/${{ env.version }}"
       - name: Checkin Website
         working-directory: website
         run: |
