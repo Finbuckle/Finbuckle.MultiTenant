@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.3</span>
 
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.1.2</span>](#whats-new)
+1. [What's New in v<span class="_version">10.1.3</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,42 +31,50 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.1.2</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.1.3</span>
 
-> This section only lists release update details specific to v<span class="_version">10.1.2</span>. See
+> This section only lists release update details specific to v<span class="_version">10.1.3</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 ### Bug Fixes
 
-#### aspnetcore
-
-* handle missing remote callback state consistently ([#1177](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1177) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([2775977](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/2775977626cfb911278d41680071a4ac7347d0ae))
-
 #### deps
 
-* update source dependencies ([#1180](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1180) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([c741331](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c74133184dfe0916bd78d8dab51ba82b5d6d1ce9))
-
-#### finbuckle
-
-* keep in-memory identifier lookup consistent on update ([#1177](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1177) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([15474ff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/15474ff658632ec4b358030dd23d4068aa29f589))
-* improve service decoration for keyed registrations and validation ([#1176](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1176) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([b308761](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3087614247957377f5fe5b97b91b4508779783e))
+* update source dependencies ([#1194](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1194) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([c63ba4d](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c63ba4def6197b30da5b8cc3163b23246c52c7d3))
 
 #### general
 
-* replace closed per-tenant options registrations ([#1173](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1173) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([4b5ac9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4b5ac9f0b012b33d07753473cdfb39cbd4aad998))
-* invalidate named options across tenants ([#1173](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1173) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([16dcf33](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/16dcf335437494a359f8b9ab6320e71afc6221e7))
+* ensure created service scope get disposed ([#1190](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1190) by [@Waleed-KH](https://github.com/Waleed-KH)) ([abf9e51](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/abf9e51c24e2cae596232a8795699c3774d0b633))
+
+
+### Refactoring
+
+#### efcore
+
+* add typed `IsMultiTenant` for per-tenant EFCore functionality and other small imrpovements ([#1191](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1191) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([d3b36c4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d3b36c47f45bb82e19791449b58d171298d7e2df))
 
 
 
 <!--_release-notes-->
 
-## Open Source Support
+## Open Source Maintenance Fee
 
-Your support helps keep the project going and is greatly appreciated!
+**Effective November 10th, 20026**
 
-Finbuckle.MultiTenant is primarily supported by its [GitHub sponsors](https://github.com/sponsors/Finbuckle) and [contributors](https://github.com/Finbuckle/Finbuckle.MultiTenant/graphs/contributors).  
+This project participates in the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org).
 
-Additional support is provided by the following organizations:
+The source code is freely available under the terms of the LICENSE. To
+support sustainable maintenance, use of the project’s official releases
+in revenue-generating activities requires adherence to the
+[Open Source Maintenance Fee](./OSMFEULA.txt).
+
+In short: if you use this project as part of generating revenue, the
+Maintenance Fee applies. The fee directly supports the people maintaining
+the project and helps ensure its long-term health.
+
+To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbuckle).
+
+**Additional support is provided by the following organizations:**
 
 <p><a href="https://www.digitalocean.com/">
   <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" alt="Digital Ocean logo" height="40">
