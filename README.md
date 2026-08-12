@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.16</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">8.1.17</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -13,7 +13,7 @@ Current publish feed release:
 
 Table of Contents
 
-1. [What's New in v<span class="_version">8.1.16</span>](#whats-new)
+1. [What's New in v<span class="_version">8.1.17</span>](#whats-new)
 2. [Quick Start](#quick-start)
 3. [Documentation](#documentation)
 4. [Sample Projects](#sample-projects)
@@ -25,9 +25,9 @@ Table of Contents
 10. [Building from Source](#building-from-source)
 11. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">8.1.16</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">8.1.17</span>
 
-> This section only lists release update details specific to v<span class="_version">8.1.16</span>. See
+> This section only lists release update details specific to v<span class="_version">8.1.17</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 
 <!--_release-notes-->
@@ -35,8 +35,7 @@ Table of Contents
 
 ### Bug Fixes
 
-* backport post-release fixes to v8 ([fb7f65b](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fb7f65b37ce3b3e163ddb21d13bffb38827e331a))
-* update dependencies ([f639184](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f6391843266ba815a64e92e20afd52aff18e92fa))
+* update dependencies ([da6c278](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/da6c278f19bc6ed415485e8f5eb70962a33d83b7))
 <!--_release-notes-->
 
 ## Quick Start
