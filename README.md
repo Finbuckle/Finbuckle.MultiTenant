@@ -60,13 +60,24 @@ Table of Contents
 
 <!--_release-notes-->
 
-## Open Source Support
+## Open Source Maintenance Fee
 
-Your support helps keep the project going and is greatly appreciated!
+**Effective November 10th, 20026**
 
-Finbuckle.MultiTenant is primarily supported by its [GitHub sponsors](https://github.com/sponsors/Finbuckle) and [contributors](https://github.com/Finbuckle/Finbuckle.MultiTenant/graphs/contributors).  
+This project participates in the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org).
 
-Additional support is provided by the following organizations:
+The source code is freely available under the terms of the LICENSE. To
+support sustainable maintenance, use of the project’s official releases
+in revenue-generating activities requires adherence to the
+[Open Source Maintenance Fee](./OSMFEULA.txt).
+
+In short: if you use this project as part of generating revenue, the
+Maintenance Fee applies. The fee directly supports the people maintaining
+the project and helps ensure its long-term health.
+
+To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbuckle).
+
+**Additional support is provided by the following organizations:**
 
 <p><a href="https://www.digitalocean.com/">
   <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" alt="Digital Ocean logo" height="40">
