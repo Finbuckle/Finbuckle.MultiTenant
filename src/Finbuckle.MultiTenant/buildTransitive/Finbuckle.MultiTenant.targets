@@ -1,0 +1,5 @@
+<Project>
+    <Target Name="DisplayVersion8DeprecationMessage" BeforeTargets="Build">
+        <Message Importance="high" Text="Versions 8.x of Finbuckle.MultiTenant will be deprecated with the .NET 9 end of life on Novermber 10, 2026. Please upgrade to a newer Finbuckle MultiTenant version for continued support." />
+    </Target>
+</Project>
