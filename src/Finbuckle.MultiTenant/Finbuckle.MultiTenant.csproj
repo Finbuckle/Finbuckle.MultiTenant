@@ -19,5 +19,11 @@
             <PackageReference Include="Microsoft.Extensions.Http" Version="$(TfmMajVer).0.*"/>
             <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="$(TfmMajVer).0.*"/>
         </ItemGroup>
-    </Target>    
+    </Target>
+
+    <ItemGroup>
+        <None Update="buildTransitive/Finbuckle.MultiTenant.targets" Pack="true" PackagePath="buildTransitive/" />
+    </ItemGroup>
+
+    <Import Project="buildTransitive/Finbuckle.MultiTenant.targets" />
 </Project>
