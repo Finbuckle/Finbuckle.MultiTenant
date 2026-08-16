@@ -75,7 +75,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[10.1.2, )"
+          "Finbuckle.MultiTenant.Abstractions": "[10.1.3, )"
         }
       },
       "finbuckle.multitenant.abstractions": {
