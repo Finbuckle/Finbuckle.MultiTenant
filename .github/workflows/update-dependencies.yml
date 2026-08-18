@@ -76,11 +76,21 @@ jobs:
               PR_TITLE="chore(deps): update sample and test dependencies"
             fi
           fi
+          PR_TITLE="$PR_TITLE for ${{ matrix.branch }}"
+          if gh pr list \
+            --base "${{ matrix.branch }}" \
+            --state open \
+            --limit 1000 \
+            --json title \
+            --jq '.[].title' | grep -Fxq "$PR_TITLE"; then
+            echo "An open pull request with title '$PR_TITLE' already exists; skipping."
+            exit 0
+          fi
           git push origin "$BRANCH"
           BODY_FILE=$(mktemp)
           printf 'Automated dependency updates from `update-dependencies` workflow.\n\n<details>\n<summary>dotnet-outdated report</summary>\n\n```\n%s\n```\n\n</details>' "$UPDATE_REPORT" > "$BODY_FILE"
           gh pr create \
             --base "${{ matrix.branch }}" \
             --head "$BRANCH" \
-            --title "$PR_TITLE for ${{ matrix.branch }}" \
+            --title "$PR_TITLE" \
             --body-file "$BODY_FILE"
