@@ -45,7 +45,8 @@ tenant = await tenantManager.GetAsync("initech-id");
 
 // Writes go to the primary store and invalidate affected cache entries.
 await tenantManager.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol" });
-await tenantManager.UpdateAsync(tenant with { Identifier = "initech-new" });
+// Tenants are updated by passing a new instance; the library never mutates a tenant instance.
+await tenantManager.UpdateAsync(new TenantInfo { Id = tenant.Id, Identifier = "initech-new" });
 
 // RemoveAsync uses the tenant id. Use RemoveByIdentifierAsync for identifiers.
 await tenantManager.RemoveAsync("lol-id");
@@ -175,6 +176,19 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
 automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
 of `TenantInfo` properties are mapped from the JSON automatically.
+
+Each tenant is created with the standard configuration binder from the tenant's own keys overlaid on the `Defaults`
+section, so the tenant info type may have settable properties (`set` or `init`, public or non-public) **or** a single
+public constructor whose parameter names match the configuration keys (constructor-only immutable types work without
+any extra code). If the binder cannot construct the type (for example it has several parameterized constructors), a
+`MultiTenantException` is thrown at startup explaining the problem. In that case pass a factory that receives the merged
+configuration for a single tenant:
+
+```csharp
+builder.Services.AddMultiTenant<AppTenantInfo, string>()
+    .WithConfigurationStore(builder.Configuration, "Finbuckle:MultiTenant:Stores:ConfigurationStore",
+        config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
+```
 
 ```json
 {
@@ -348,6 +362,15 @@ services.AddMultiTenant<TenantInfo, string>()
 For a non-`string` id type, pass a parser, for example `.WithEchoStore(Guid.Parse)`. The reverse direction (turning an
 `Id` back into an identifier for `GetAsync`) uses `Id.ToString()` automatically.
 
+The store has to construct tenant instances itself. By default it does so by reflection, which requires `Id` and
+`Identifier` to have a setter (`set` or `init`, public or non-public). For a constructor-only immutable tenant info type
+the store throws a `MultiTenantException` explaining the problem; pass a factory instead:
+
+```csharp
+services.AddMultiTenant<AppTenantInfo, string>()
+    .WithEchoStore(identifier => identifier, (id, identifier) => new AppTenantInfo(id, identifier));
+```
+
 ## Important Considerations
 
 - Store caches are queried in registration order for each strategy before the primary store. The first source to return
@@ -363,6 +386,10 @@ For a non-`string` id type, pass a parser, for example `.WithEchoStore(Guid.Pars
 - `GetAllAsync` is not implemented by all stores. Check individual store documentation before relying on it.
 - Custom stores implementing `IMultiTenantStore<TTenantInfo, TId>` should avoid extensive logging or validation —
   `TenantManager<TTenantInfo, TId>` handles these consistently at runtime.
+- Stores never mutate a tenant info instance, and the built-in stores key their lookups by the `Id`/`Identifier` values
+  captured on add/update rather than by re-reading stored instances. `Id` and `Identifier` must not change for the
+  lifetime of an instance once it has been handed to a store; update a tenant by passing a new instance. See the
+  [tenant info contract](CoreConcepts#tenant-info-contract).
 
 ## See Also
 
