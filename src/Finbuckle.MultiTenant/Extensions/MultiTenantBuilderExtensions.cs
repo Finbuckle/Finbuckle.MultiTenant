@@ -150,6 +150,27 @@ public static class MultiTenantBuilderExtensions
         => builder.WithStore<ConfigurationStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, configuration, sectionName);
 
     /// <summary>
+    /// Adds a <see cref="ConfigurationStore{TTenantInfo, TId}"/> with a custom tenant info factory to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
+    /// <param name="configuration">The <see cref="IConfiguration"/> to load the section from.</param>
+    /// <param name="sectionName">The configuration section to load.</param>
+    /// <param name="tenantInfoFactory">
+    /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys overlaid on the
+    /// <c>Defaults</c> section). Use when the standard configuration binder cannot construct <typeparamref name="TTenantInfo"/>.
+    /// </param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo, TId> WithConfigurationStore<TTenantInfo, TId>(
+        this MultiTenantBuilder<TTenantInfo, TId> builder,
+        IConfiguration configuration,
+        string sectionName,
+        Func<IConfiguration, TTenantInfo> tenantInfoFactory)
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
+        => builder.WithStore<ConfigurationStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, configuration, sectionName, tenantInfoFactory);
+
+    /// <summary>
     /// Adds an empty <see cref="InMemoryStore{TTenantInfo, TId}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
@@ -174,6 +195,25 @@ public static class MultiTenantBuilderExtensions
         Func<string, TId> idFromIdentifier)
         where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
         => builder.WithStore<EchoStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, idFromIdentifier);
+
+    /// <summary>
+    /// Adds an <see cref="EchoStore{TTenantInfo, TId}"/> with a custom tenant info factory to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
+    /// <param name="idFromIdentifier">Converts a tenant identifier to a tenant id. For a string id this is <c>identifier => identifier</c>.</param>
+    /// <param name="tenantInfoFactory">
+    /// Creates the <typeparamref name="TTenantInfo"/> instance from a tenant id and identifier. Use when
+    /// <typeparamref name="TTenantInfo"/> has no settable <c>Id</c>/<c>Identifier</c> properties.
+    /// </param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo, TId> WithEchoStore<TTenantInfo, TId>(
+        this MultiTenantBuilder<TTenantInfo, TId> builder,
+        Func<string, TId> idFromIdentifier,
+        Func<TId, string, TTenantInfo> tenantInfoFactory)
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
+        => builder.WithStore<EchoStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, idFromIdentifier, tenantInfoFactory);
 
     /// <summary>
     /// Adds and configures a <see cref="StaticStrategy"/> to the application.
