@@ -48,6 +48,9 @@ public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> w
     /// Creates the <typeparamref name="TTenantInfo"/> instance from a tenant id and identifier. Use this when
     /// <typeparamref name="TTenantInfo"/> has no settable <c>Id</c>/<c>Identifier</c> properties, e.g. a
     /// constructor-only immutable implementation.
+    /// The store retains this delegate and invokes it for each lookup. The factory must support concurrent calls.
+    /// Avoid capturing scoped services, such as a <c>DbContext</c>, or unsynchronized mutable state. Return a fully
+    /// constructed tenant whose <c>Id</c> and <c>Identifier</c> match the supplied values and remain stable.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when either argument is null.</exception>
     public EchoStore(Func<string, TId> idFromIdentifier, Func<TId, string, TTenantInfo> tenantInfoFactory)
