@@ -8,14 +8,20 @@ using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores;
 
-public abstract class MultiTenantStoreTestBase
+/// <summary>
+/// Store test base parameterized on the tenant info type so the same behavior can be proven for the library's
+/// mutable <see cref="TenantInfo"/> and for a constructor-only immutable implementation.
+/// </summary>
+public abstract class MultiTenantStoreTestBase<TTenantInfo> where TTenantInfo : ITenantInfo<string>
 {
-    protected abstract Task<IMultiTenantStore<TenantInfo, string>> CreateTestStore();
+    protected abstract TTenantInfo NewTenant(string id, string identifier);
 
-    protected virtual async Task<IMultiTenantStore<TenantInfo,string>> PopulateTestStore(IMultiTenantStore<TenantInfo,string> store)
+    protected abstract Task<IMultiTenantStore<TTenantInfo, string>> CreateTestStore();
+
+    protected virtual async Task<IMultiTenantStore<TTenantInfo, string>> PopulateTestStore(IMultiTenantStore<TTenantInfo, string> store)
     {
-        await store.AddAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });
-        await store.AddAsync(new TenantInfo { Id = "lol-id", Identifier = "lol" });
+        await store.AddAsync(NewTenant("initech-id", "initech"));
+        await store.AddAsync(NewTenant("lol-id", "lol"));
 
         return store;
     }
@@ -57,7 +63,7 @@ public abstract class MultiTenantStoreTestBase
         var store = await CreateTestStore();
 
         Assert.Null(await store.GetByIdentifierAsync("identifier"));
-        Assert.True(await store.AddAsync(new TenantInfo { Id = "id", Identifier = "identifier" }));
+        Assert.True(await store.AddAsync(NewTenant("id", "identifier")));
         Assert.NotNull(await store.GetByIdentifierAsync("identifier"));
     }
 
@@ -66,7 +72,7 @@ public abstract class MultiTenantStoreTestBase
     {
         var store = await CreateTestStore();
 
-        var result = await store.UpdateAsync(new TenantInfo { Id = "initech-id", Identifier = "initech2" });
+        var result = await store.UpdateAsync(NewTenant("initech-id", "initech2"));
         Assert.True(result);
         Assert.Null(await store.GetByIdentifierAsync("initech"));
         Assert.Equal("initech2", (await store.GetByIdentifierAsync("initech2"))?.Identifier);
@@ -109,4 +115,20 @@ public abstract class MultiTenantStoreTestBase
         Assert.NotNull(tenant);
         Assert.Equal("lol", tenant.Identifier);
     }
+}
+
+/// <summary>
+/// Store test base using the library's <see cref="TenantInfo"/> implementation.
+/// </summary>
+public abstract class MultiTenantStoreTestBase : MultiTenantStoreTestBase<TenantInfo>
+{
+    protected override TenantInfo NewTenant(string id, string identifier) => new() { Id = id, Identifier = identifier };
+}
+
+/// <summary>
+/// Store test base using the constructor-only <see cref="ImmutableTenantInfo"/> implementation.
+/// </summary>
+public abstract class ImmutableTenantStoreTestBase : MultiTenantStoreTestBase<ImmutableTenantInfo>
+{
+    protected override ImmutableTenantInfo NewTenant(string id, string identifier) => new(id, identifier);
 }
