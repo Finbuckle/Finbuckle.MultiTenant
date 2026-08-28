@@ -104,6 +104,26 @@ public static class MultiTenantBuilderExtensions
         => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton, configuration, sectionName);
 
     /// <summary>
+    /// Adds a <see cref="ConfigurationStore{TTenantInfo}"/> with a custom tenant info factory to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="configuration">The <see cref="IConfiguration"/> to load the section from.</param>
+    /// <param name="sectionName">The configuration section to load.</param>
+    /// <param name="tenantInfoFactory">
+    /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys overlaid on the
+    /// <c>Defaults</c> section). Use when <typeparamref name="TTenantInfo"/> has no settable properties.
+    /// </param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder,
+        IConfiguration configuration,
+        string sectionName,
+        Func<IConfiguration, TTenantInfo> tenantInfoFactory)
+        where TTenantInfo : ITenantInfo
+        => builder.WithStore<ConfigurationStore<TTenantInfo>>(ServiceLifetime.Singleton, configuration, sectionName, tenantInfoFactory);
+
+    /// <summary>
     /// Adds an empty <see cref="InMemoryStore{TTenantInfo}"/> to the application.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
@@ -143,6 +163,22 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo> builder)
         where TTenantInfo : ITenantInfo
         => builder.WithStore<EchoStore<TTenantInfo>>(ServiceLifetime.Singleton);
+
+    /// <summary>
+    /// Adds an <see cref="EchoStore{TTenantInfo}"/> with a custom tenant info factory to the application.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="tenantInfoFactory">
+    /// Creates the <typeparamref name="TTenantInfo"/> instance from the identifier (used as both id and identifier).
+    /// Use when <typeparamref name="TTenantInfo"/> has no settable <c>Id</c>/<c>Identifier</c> properties.
+    /// </param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> WithEchoStore<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder,
+        Func<string, TTenantInfo> tenantInfoFactory)
+        where TTenantInfo : ITenantInfo
+        => builder.WithStore<EchoStore<TTenantInfo>>(ServiceLifetime.Singleton, tenantInfoFactory);
 
     /// <summary>
     /// Adds and configures a <see cref="StaticStrategy"/> to the application.
