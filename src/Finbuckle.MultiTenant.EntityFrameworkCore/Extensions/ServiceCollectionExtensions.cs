@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{TId}"/> so tenant context can be applied.
     /// </typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="services">The service collection to add registrations to.</param>
@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
     /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/>.</param>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{TId}"/> so tenant context can be applied.
     /// </typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
     /// <param name="optionsAction">An action to configure the <see cref="DbContextOptionsBuilder"/> with access to the <see cref="IServiceProvider"/>.</param>
     /// <typeparam name="T">
     /// The <see cref="DbContext"/> type to register. Must implement
-    /// <see cref="IMultiTenantDbContext{Tid}"/> so tenant context can be applied.
+    /// <see cref="IMultiTenantDbContext{TId}"/> so tenant context can be applied.
     /// </typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>

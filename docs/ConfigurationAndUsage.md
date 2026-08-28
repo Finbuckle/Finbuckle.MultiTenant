@@ -131,7 +131,7 @@ There are several ways your app can read the current tenant:
 
 ### Via Dependency Injection
 
-`ITenantContext<TTenantInfo, TId>` (and its non-generic base `ITenantContext<TId>`) are available via dependency
+`ITenantContext<TTenantInfo, TId>` (and its base `ITenantContext<TId>`) are available via dependency
 injection. The default implementation, `AmbientTenantContext<TTenantInfo, TId>`, is **ambient**: the current tenant is
 held in an `AsyncLocal` that flows with the current asynchronous execution context, so a tenant scope must be
 established with `BeginTenantScope` before the tenant can be read or set (see
@@ -143,8 +143,8 @@ In ASP.NET Core, prefer the `HttpContext` extension members such as `GetTenantCo
 
 ### Via `HttpContext` (ASP.NET Core)
 
-For ASP.NET Core web apps the `GetTenantContext<TTenantInfo, TId>`, `GetTenantInfo<TTenantInfo, TId>`, `TenantContext`, and
-`CurrentTenant` extension members are available directly on `HttpContext`. See
+For ASP.NET Core web apps the `GetTenantContext<TTenantInfo, TId>`, `GetTenantInfo<TTenantInfo, TId>`, `TenantContext<TId>()`, and
+`TenantInfo<TId>()` extension members are available directly on `HttpContext`. See
 [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
 ## Setting the Current Tenant
@@ -179,7 +179,7 @@ as does reading or setting it when no scope has been established. Prefer the `Ht
 
 ### Via `HttpContext` (ASP.NET Core)
 
-For ASP.NET Core web apps the `SetTenantInfo<TTenantInfo>` extension method is available directly on `HttpContext`.
+For ASP.NET Core web apps the `SetTenantInfo<TTenantInfo, TId>` extension method is available directly on `HttpContext`.
 See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details and examples.
 
 ## Important Considerations
@@ -189,7 +189,7 @@ See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-c
   with `BeginTenantScope` (the middleware does this per request in ASP.NET Core) before the tenant can be read or set.
 - `TenantInfo` can only be set once per scope. Attempting to set it a second time — or reading/setting it with no scope
   established — throws `MultiTenantException`. Use the `HttpContext.TrySetTenantInfo<T, TId>()` extension or check
-  `ITenantContext.IsResolved` to avoid this.
+  `ITenantContext<TId>.IsResolved` to avoid this.
 - The `TenantResolver` tries strategies in order, then stores in order for each strategy. Resolution stops
   at the first store returning a match. Plan your ordering accordingly.
 - Strategies from `Finbuckle.MultiTenant.AspNetCore` (Host, Route, Base Path, etc.) require `HttpContext`

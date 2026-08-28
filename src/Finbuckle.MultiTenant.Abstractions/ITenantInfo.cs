@@ -15,11 +15,13 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <see cref="TenantInfo{TId}"/> or be a <c>record</c>.
 /// </para>
 /// <para>
-/// In return, implementations must honor one rule: <see cref="Id"/> and <see cref="Identifier"/> must not change
-/// for the lifetime of an instance once it has been handed to the library (stored, cached, resolved, or assigned to a
-/// tenant context). Tenant identity is <see cref="Id"/> equality via <see cref="EqualityComparer{T}.Default"/>;
-/// built-in stores look up <see cref="Identifier"/> case-insensitively. To change a tenant, create a new instance and
-/// pass it to the store's update method.
+/// In return, implementations must honor two rules. <see cref="Id"/> never changes: it is the tenant's identity, and
+/// tenant equality is <see cref="Id"/> equality via <see cref="EqualityComparer{T}.Default"/>. <see cref="Identifier"/>
+/// may change, but only through the store: create a new instance carrying the new identifier and pass it to the
+/// store's update method, which re-keys its lookups. Never change <see cref="Identifier"/> in place on an instance the
+/// library already holds (stored, cached, resolved, or assigned to a tenant context), because those are keyed by the
+/// value captured when the tenant was added or updated. Built-in stores look up <see cref="Identifier"/>
+/// case-insensitively.
 /// </para>
 /// <para>
 /// The active tenant of an ambient tenant scope can only be assigned once; the library exposes no API to replace it.
@@ -31,8 +33,8 @@ public interface ITenantInfo<out TId> where TId : IEquatable<TId>
     /// Gets a unique identifier for the tenant. Typically used as the primary key.
     /// </summary>
     /// <remarks>
-    /// Must be non-default (<c>default(TId)</c> is treated as "no tenant") and must never change for the lifetime of
-    /// an instance.
+    /// Must be non-default (<c>default(TId)</c> is treated as "no tenant") and never changes: it is the tenant's
+    /// identity.
     /// </remarks>
     public TId Id { get; }
 
@@ -40,8 +42,9 @@ public interface ITenantInfo<out TId> where TId : IEquatable<TId>
     /// Gets an externally facing identifier used for tenant resolution.
     /// </summary>
     /// <remarks>
-    /// Must be non-empty. Built-in stores match it case-insensitively. Must not change for the lifetime of an
-    /// instance; use the store's update method with a new instance to change a tenant's identifier.
+    /// Must be non-empty. Built-in stores match it case-insensitively. May change over a tenant's lifetime, but only
+    /// by passing a new instance to the store's update method, never by changing it in place on an instance the
+    /// library already holds.
     /// </remarks>
     public string Identifier { get; }
 }
