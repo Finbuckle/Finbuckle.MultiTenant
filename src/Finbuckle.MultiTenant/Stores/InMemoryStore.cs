@@ -10,10 +10,19 @@ namespace Finbuckle.MultiTenant.Stores;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId">The ID implementation type.</typeparam>
+/// <remarks>
+/// Lookups are keyed by the <c>Id</c> and <c>Identifier</c> values captured when a tenant is added or updated, not by
+/// live reads of the stored instance, so later mutation of an instance handed out by the store cannot corrupt the
+/// store's indexes.
+/// </remarks>
 public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
     where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
+    // Identifier (case-insensitive) -> tenant. The key is a snapshot taken on add/update.
     private readonly Dictionary<string, TTenantInfo> _tenantMap = new(StringComparer.OrdinalIgnoreCase);
+
+    // Id -> identifier snapshot, used for id based lookups without reading the stored instance.
+    private readonly Dictionary<TId, string> _identifierById = new();
     private readonly Lock _tenantMapLock = new();
 
     /// <summary>
@@ -31,7 +40,11 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
 
         lock (_tenantMapLock)
         {
-            return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id)));
+            TTenantInfo? result = default;
+            if (_identifierById.TryGetValue(id, out var identifier))
+                _tenantMap.TryGetValue(identifier, out result);
+
+            return Task.FromResult(result);
         }
     }
 
@@ -69,12 +82,18 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     {
         tenantInfo.EnsureValid();
 
+        // snapshot the keys once so the stored instance is never read again
+        var id = tenantInfo.Id;
+        var identifier = tenantInfo.Identifier;
+
         lock (_tenantMapLock)
         {
-            if (_tenantMap.Values.Any(existing => existing.Id.Equals(tenantInfo.Id)))
+            if (_identifierById.ContainsKey(id) || _tenantMap.ContainsKey(identifier))
                 return Task.FromResult(false);
 
-            return Task.FromResult(_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo));
+            _tenantMap.Add(identifier, tenantInfo);
+            _identifierById.Add(id, identifier);
+            return Task.FromResult(true);
         }
     }
 
@@ -86,9 +105,11 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
 
         lock (_tenantMapLock)
         {
-            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id));
-            return Task.FromResult(existingTenantInfo?.Identifier is not null &&
-                                   _tenantMap.Remove(existingTenantInfo.Identifier));
+            if (!_identifierById.Remove(id, out var identifier))
+                return Task.FromResult(false);
+
+            _tenantMap.Remove(identifier);
+            return Task.FromResult(true);
         }
     }
 
@@ -97,7 +118,12 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     {
         lock (_tenantMapLock)
         {
-            return Task.FromResult(_tenantMap.Remove(identifier));
+            if (!_tenantMap.Remove(identifier))
+                return Task.FromResult(false);
+
+            var id = _identifierById.Single(kv => _tenantMap.Comparer.Equals(kv.Value, identifier)).Key;
+            _identifierById.Remove(id);
+            return Task.FromResult(true);
         }
     }
 
@@ -106,23 +132,22 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     {
         tenantInfo.EnsureValid();
 
+        var id = tenantInfo.Id;
+        var newIdentifier = tenantInfo.Identifier;
+
         lock (_tenantMapLock)
         {
-            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(tenantInfo.Id));
-            if (existingTenantInfo?.Identifier is null)
+            if (!_identifierById.TryGetValue(id, out var existingIdentifier))
                 return Task.FromResult(false);
 
-            if (_tenantMap.Comparer.Equals(existingTenantInfo.Identifier, tenantInfo.Identifier))
-            {
-                _tenantMap[existingTenantInfo.Identifier] = tenantInfo;
-                return Task.FromResult(true);
-            }
-
-            if (_tenantMap.ContainsKey(tenantInfo.Identifier))
+            // a different tenant already owns the new identifier
+            if (!_tenantMap.Comparer.Equals(existingIdentifier, newIdentifier) && _tenantMap.ContainsKey(newIdentifier))
                 return Task.FromResult(false);
 
-            _tenantMap.Remove(existingTenantInfo.Identifier);
-            _tenantMap.Add(tenantInfo.Identifier, tenantInfo);
+            // re-add so a case-only identifier change is reflected in the key
+            _tenantMap.Remove(existingIdentifier);
+            _tenantMap.Add(newIdentifier, tenantInfo);
+            _identifierById[id] = newIdentifier;
             return Task.FromResult(true);
         }
     }
