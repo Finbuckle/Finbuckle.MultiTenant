@@ -20,15 +20,60 @@ choices are `string`, `int`, and `Guid`. For example, `AddMultiTenant<TenantInfo
   a default id).
 * `Identifier` is the value used to actually resolve a tenant and should have a syntax compatible for your app (i.e. no
   crazy symbols in a web app where the identifier will be part of the URL). It must be non-empty. Unlike `Id`,
-  `Identifier` can be changed if necessary.
+  `Identifier` can be changed if necessary by updating the tenant with a new instance (see the
+  [tenant info contract](#tenant-info-contract) below).
 
-The library provides `TenantInfo` as a base implementation. Your app can and should define a custom class implementing
-`ITenantInfo` (or inheriting from `TenantInfo`) and add custom properties as needed. It is recommended to keep these
-classes lightweight since they are often queried. Keep heavier associated data in an external area that can be pulled in
-when needed via the tenant `Id`.
+The library provides `TenantInfo<TId>` as a base implementation. Your app can define a custom class implementing
+`ITenantInfo<TId>` (or inheriting from `TenantInfo<TId>`) and add custom properties as needed. It is recommended to
+keep these classes lightweight since they are often queried. Keep heavier associated data in an external area that can
+be pulled in when needed via the tenant `Id`.
 
 > Previous versions of `TenantInfo` included a connection string property. If needed simply add it to your custom
 > `TenantInfo` derived class.
+
+### Tenant info contract
+
+`ITenantInfo<TId>` is the only contract the library depends on. It is **read-only from the library's point of view**:
+the library never writes to a tenant info instance after it has been constructed and never forces a particular shape
+onto your type. All of the following are supported and covered by the test suite:
+
+```csharp
+// plain mutable properties
+public class AppTenantInfo : ITenantInfo<string>
+{
+    public string Id { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Name { get; set; }
+}
+
+// init-only properties (the shape of the built-in TenantInfo<TId>)
+public class AppTenantInfo : TenantInfo<string>
+{
+    public string? Name { get; init; }
+}
+
+// constructor-only, fully immutable, not derived from TenantInfo and not a record
+public sealed class AppTenantInfo(string id, string identifier, string? name = null) : ITenantInfo<string>
+{
+    public string Id { get; } = id;
+    public string Identifier { get; } = identifier;
+    public string? Name { get; } = name;
+}
+```
+
+In return the library asks for one rule: **`Id` and `Identifier` must not change for the lifetime of an instance once
+it has been handed to the library** (stored, cached, resolved, or assigned to a tenant context). Tenant identity is `Id`
+equality; built-in stores match `Identifier` case-insensitively. To change a tenant, create a new instance and pass it to
+`TenantManager<TTenantInfo, TId>.UpdateAsync`. Mutating other properties of your own type is your business, but keep in
+mind the same instance may be shared by caches and by the current request.
+
+The library enforces its side of the contract:
+
+* The active tenant of an ambient tenant scope can only be set once (see below); there is no API to replace it.
+* Built-in stores key their lookups by the `Id`/`Identifier` values captured when a tenant is added or updated, never
+  by re-reading the stored instance, so the store cannot be corrupted by mutation of an instance it handed out.
+* Stores that must construct tenant instances themselves (`ConfigurationStore` and `EchoStore`) support
+  constructor-only types out of the box or through a factory overload. See [MultiTenant Stores](Stores) for details.
 
 ## `ITenantContext` and the ambient tenant scope
 
