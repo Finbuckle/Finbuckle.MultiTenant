@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
+      "coverlet.msbuild": {
+        "type": "Direct",
+        "requested": "[10.0.1, )",
+        "resolved": "10.0.1",
+        "contentHash": "kb5kBe1HioGuH+ZDKysv/oAO9cCUW2yxtrGrRBZp/dIij5f011OfC4XiNMayZ8bGfOv2+n2ocPkaJIGppAZDEg=="
+      },
       "Microsoft.Extensions.Caching.Memory": {
         "type": "Direct",
         "requested": "[10.0.10, )",
