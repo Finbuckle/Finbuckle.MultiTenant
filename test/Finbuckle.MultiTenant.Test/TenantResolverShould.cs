@@ -231,6 +231,28 @@ public class TenantResolverShould
     }
 
     [Fact]
+    public async Task RejectInvalidTenantInfoSetByCompletionEvent()
+    {
+        // Events may replace the tenant before it is committed, but the committed tenant is always validated.
+        var services = new ServiceCollection();
+        services.Configure<MultiTenantOptions<TenantInfo,string>>(options =>
+            options.Events.OnTenantResolveCompleted = context =>
+            {
+                context.TenantInfo = new TenantInfo { Id = "", Identifier = "invalid" };
+                return Task.CompletedTask;
+            });
+        services.AddMultiTenant<TenantInfo,string>()
+            .WithStaticStrategy("initech")
+            .WithInMemoryStore();
+        var provider = services.BuildServiceProvider();
+        await provider.GetRequiredService<TenantManager<TenantInfo,string>>()
+            .AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
+
+        await Assert.ThrowsAsync<MultiTenantException>(() =>
+            provider.GetRequiredService<ITenantResolver<TenantInfo,string>>().ResolveAsync(new object()));
+    }
+
+    [Fact]
     public async Task CompletionEventCanClearTenantInfoAndReturnNull()
     {
         var services = new ServiceCollection();
