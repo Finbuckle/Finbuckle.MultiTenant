@@ -13,6 +13,12 @@ MultiTenant stores support custom `ITenantInfo` implementations, but complex typ
 handling. For best results, ensure the type works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
+Stores never mutate a tenant info instance, and `Id`/`Identifier` must not change for the lifetime of an instance once
+it has been handed to a store; update a tenant by passing a new instance to `UpdateAsync`. Constructor-only immutable
+implementations are supported by every store; `ConfigurationStore` and `EchoStore`, which have to construct instances
+themselves, take a factory for such types (see below). See the
+[tenant info contract](CoreConcepts#tenant-info-contract) for details.
+
 The examples in this documentation use the `TenantInfo` basic implementation.
 
 ## IMultiTenantStore and Custom Stores
@@ -134,6 +140,16 @@ builder.Services.AddMultiTenant<TenantInfo>()
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
 automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
 of `TenantInfo`, its properties are mapped from the JSON automatically.
+
+Properties are bound with the standard configuration binder, so they need a setter (`set` or `init`, public or
+non-public). For a constructor-only immutable tenant info type the store throws a `MultiTenantException` explaining the
+problem; pass a factory instead, which receives the tenant's own keys overlaid on the `Defaults` section:
+
+```csharp
+builder.Services.AddMultiTenant<AppTenantInfo>()
+    .WithConfigurationStore(builder.Configuration, "Finbuckle:MultiTenant:Stores:ConfigurationStore",
+        config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
+```
 
 ```json
 {
@@ -290,4 +306,13 @@ Configure by calling `WithEchoStore` after `AddMultiTenant<TTenantInfo>`.
 ```csharp
 services.AddMultiTenant<TenantInfo>()
     .WithEchoStore();
+```
+
+The store has to construct tenant instances itself. By default it does so by reflection, which requires `Id` and
+`Identifier` to have a setter (`set` or `init`, public or non-public). For a constructor-only immutable tenant info type
+the store throws a `MultiTenantException` explaining the problem; pass a factory instead:
+
+```csharp
+services.AddMultiTenant<AppTenantInfo>()
+    .WithEchoStore(identifier => new AppTenantInfo(identifier, identifier));
 ```
