@@ -1,13 +1,13 @@
-# What's New in v<span class="_version">8.1.17</span>
+# What's New in v<span class="_version">8.1.18</span>
 
-> This page only lists release update details specific to v<span class="_version">8.1.17</span>. [Release update details for all releases are shown in the history page.](History)
+> This page only lists release update details specific to v<span class="_version">8.1.18</span>. [Release update details for all releases are shown in the history page.](History)
 
 <!--_release-notes-->
-## [8.1.17](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.16...v8.1.17) (2026-08-12)
+## [8.1.18](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v8.1.17...v8.1.18) (2026-09-10)
 
 
 ### Bug Fixes
 
-* update dependencies ([da6c278](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/da6c278f19bc6ed415485e8f5eb70962a33d83b7))
+* update dependencies ([#1208](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1208)) ([f7e7217](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/f7e7217352b219f3299618d6903057960b7e5253))
 
 <!--_release-notes-->
