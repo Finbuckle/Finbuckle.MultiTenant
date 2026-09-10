@@ -27,6 +27,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: dotnet prepare-release.cs
+      - name: update lock files
+        if: steps.prepare.outputs.bump_level != ''
+        run: dotnet restore
       - name: commit, tag and push
         if: steps.prepare.outputs.bump_level != ''
         run: |
