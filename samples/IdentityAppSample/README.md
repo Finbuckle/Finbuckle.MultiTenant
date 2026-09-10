@@ -11,7 +11,7 @@ The sample extends the default ASP.NET Core MVC template with Identity to suppor
 - **Route Strategy**: Tenants are identified by the `__tenant__` route parameter (e.g., `/acme/Home/Index`)
 - **Configuration Store**: Tenant configuration is loaded from `appsettings.json`
 - **Per-Tenant Authentication**: Each tenant maintains isolated user authentication with separate database contexts
-- **Custom Tenant Info**: Extends `TenantInfo` with an `Tier` property
+- **Custom Tenant Info**: Extends `TenantInfo` with a `Tier` property
 - **Multi-Tenant Identity DbContext**: Uses Entity Framework Core with per-tenant database isolation
 - **Razor Pages Multi-Tenancy**: Identity UI pages automatically include tenant routing via `MultiTenantPageRouteModelConvention`
 - **Database Seeding**: Sample users are automatically created for each tenant on startup

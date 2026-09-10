@@ -36,19 +36,19 @@ public sealed class HostStrategy : IMultiTenantStrategy
             }
 
             // Wildcard "*" must be only occur once in template.
-            if (Regex.Match(template, @"\*(?=.*\*)").Success)
+            if (Regex.IsMatch(template, @"\*(?=.*\*)"))
             {
                 throw new MultiTenantException("Wildcard \"*\" must be only occur once in template.");
             }
 
             // Wildcard "*" must be only token in template segment.
-            if (Regex.Match(template, @"\*[^\.]|[^\.]\*").Success)
+            if (Regex.IsMatch(template, @"\*[^\.]|[^\.]\*"))
             {
                 throw new MultiTenantException("\"*\" wildcard must be only token in template segment.");
             }
 
             // Wildcard "?" must be only token in template segment.
-            if (Regex.Match(template, @"\?[^\.]|[^\.]\?").Success)
+            if (Regex.IsMatch(template, @"\?[^\.]|[^\.]\?"))
             {
                 throw new MultiTenantException("\"?\" wildcard must be only token in template segment.");
             }

@@ -16,26 +16,22 @@ namespace Finbuckle.MultiTenant.AspNetCore;
 public class MultiTenantMiddleware
 {
     private readonly RequestDelegate next;
+    private readonly BypassWhenOptions bypassOptions;
     private readonly ShortCircuitWhenOptions? options;
 
     /// <summary>
     /// Initializes a new instance of MultiTenantMiddleware.
     /// </summary>
     /// <param name="next">The next middleware in the pipeline.</param>
-    public MultiTenantMiddleware(RequestDelegate next)
+    /// <param name="bypassOptions">Options for bypassing tenant resolution before it runs.</param>
+    /// <param name="shortCircuitOptions">Options for short-circuiting the middleware pipeline after resolution.</param>
+    public MultiTenantMiddleware(RequestDelegate next,
+        IOptions<BypassWhenOptions> bypassOptions,
+        IOptions<ShortCircuitWhenOptions> shortCircuitOptions)
     {
         this.next = next;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of MultiTenantMiddleware with short-circuit options.
-    /// </summary>
-    /// <param name="next">The next middleware in the pipeline.</param>
-    /// <param name="options">Options for short-circuiting the middleware pipeline.</param>
-    public MultiTenantMiddleware(RequestDelegate next, IOptions<ShortCircuitWhenOptions> options)
-    {
-        this.next = next;
-        this.options = options.Value;
+        this.bypassOptions = bypassOptions.Value;
+        this.options = shortCircuitOptions.Value;
     }
 
     /// <summary>
@@ -44,6 +40,12 @@ public class MultiTenantMiddleware
     /// <param name="context">The HTTP context.</param>
     public async Task Invoke(HttpContext context)
     {
+        if (bypassOptions.Predicate?.Invoke(context) == true)
+        {
+            await next(context);
+            return;
+        }
+
         if (context.GetEndpoint()?.Metadata.GetMetadata<IExcludeFromMultiTenantResolutionMetadata>() is
             { ExcludeFromResolution: true })
         {

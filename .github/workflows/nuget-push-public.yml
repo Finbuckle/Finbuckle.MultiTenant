@@ -1,15 +1,23 @@
 name: NuGet Push Public
 
-on: [workflow_dispatch]
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (for example, v10.1.1)
+        required: true
+        type: string
 
 jobs:
   build-test-prep-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: '10.x'
 
@@ -17,8 +25,9 @@ jobs:
         run: dotnet restore
         
       - name: Create the package
-        run: dotnet test -c Release && dotnet pack --no-build -c Release --output nupkgs
-        
+        run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
+
+      # Le fork est publié sur le flux GitHub Packages de SirFull, pas sur nuget.org.
       - name: Publish the package to github
         env:
           NUGET_KEY: ${{secrets.NUGET_KEY}}

@@ -1,6 +1,81 @@
 # Version History
 
-<!--_history-->
+## [10.1.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.1.1...v10.1.2) (2026-07-14)
+
+### Bug Fixes
+
+#### aspnetcore
+
+* handle missing remote callback state consistently ([#1177](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1177) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([2775977](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/2775977626cfb911278d41680071a4ac7347d0ae))
+
+#### deps
+
+* update source dependencies ([#1180](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1180) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([c741331](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c74133184dfe0916bd78d8dab51ba82b5d6d1ce9))
+
+#### finbuckle
+
+* keep in-memory identifier lookup consistent on update ([#1177](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1177) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([15474ff](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/15474ff658632ec4b358030dd23d4068aa29f589))
+* improve service decoration for keyed registrations and validation ([#1176](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1176) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([b308761](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3087614247957377f5fe5b97b91b4508779783e))
+
+#### general
+
+* replace closed per-tenant options registrations ([#1173](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1173) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([4b5ac9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4b5ac9f0b012b33d07753473cdfb39cbd4aad998))
+* invalidate named options across tenants ([#1173](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1173) by [@AndrewTriesToCode](https://github.com/AndrewTriesToCode)) ([16dcf33](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/16dcf335437494a359f8b9ab6320e71afc6221e7))
+
+
+## [10.1.1](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.1.0...v10.1.1) (2026-06-10)
+
+### Bug Fixes
+
+* Bump the microsoft-packages group with 16 updates ([#1144](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1144)) (([635d350](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/635d3507c27f177a8b22d8f91fb09fa792e248c3)))
+
+## [10.1.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.8...v10.1.0) (2026-05-25)
+
+### Features
+
+* add functionality to conditionally bypass middleware in ASP.NET Core ([#1134](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1134)) (([fd2e0f6](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fd2e0f62c63fe1c69722448eb0b3e7493f02c84b)))
+
+### Bug Fixes
+
+* prevent multiple event handlers being registered for EnforceMultiTenantOnTracking ([#1133](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1133)) (([b179b6e](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b179b6ec5738aba4e6f81e6c99762a9f1ad2f861)))
+
+## [10.0.8](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.7...v10.0.8) (2026-05-12)
+
+### Bug Fixes
+
+* Bump the microsoft-packages group with 15 updates ([#1123](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1123)) ([9bc0f99](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/9bc0f9906ebe58dc4d13ab78a01f381c5cedc468))
+
+## [10.0.7](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.6...v10.0.7) (2026-04-29)
+
+### Bug Fixes
+
+* update to 10.0.7 for version alignment with .NET ([#1120](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1120)) ([3a470ed](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/3a470ed624844a1ca2dc6607efc456de81bb9026))
+
+## [10.0.6](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.5...v10.0.6) (2026-04-21)
+
+### Bug Fixes
+
+* Bump the microsoft-packages group with 15 updates ([#1115](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1115)) ([02a2415](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/02a2415728b702ffd1bff3bd81942605a92f7b04))
+
+## [10.0.5](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.4...v10.0.5) (2026-04-15)
+
+### Bug Fixes
+
+* Bump the microsoft-packages group with 15 updates ([#1112](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1112)) ([603ffc0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/603ffc01538a098221ae4c360d25ef3c49df8150))
+
+## [10.0.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.3...v10.0.4) (2026-03-12)
+
+### Bug Fixes
+
+* Bump Microsoft.AspNetCore.Authentication.OpenIdConnect and 15 others ([#1104](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1104)) ([bcaf705](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/bcaf7050df1ee8d8ac170a9802e8a0b8f21dd1be))
+
+## [10.0.3](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.2...v10.0.3) (2026-02-11)
+
+### Bug Fixes
+
+* add logging level checks to improve perf ([#1095](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1095)) ([78c1cad](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/78c1cad7e1e1659baa704e44bf9289e975cbfebe))
+* Bump the microsoft-packages group with 15 updates ([#1098](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1098)) ([1b96122](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1b96122b89597715ec75d195d304319f443a6109))
+
 ## [10.0.2](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.0.1...v10.0.2) (2026-01-14)
 
 ### Bug Fixes
@@ -50,7 +125,7 @@
 * Identity entity types are all multi-tenant by default on `MultiTenantIdentityDbContext` variants. ([4e1bd9f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/4e1bd9faf111344499fcf4feb0eee1636737eef7))
 * immutable IMultiTenantContext ([#1018](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1018)) ([03ddeb0](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/03ddeb067654c23e3747f7d2c90b33f7ca0ceeb9))
 * improve folder structure ([#1040](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1040)) ([d46ce8c](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d46ce8c9fb6e6b1cc30c09f6fd4fbb05e076a0bc))
-* improved depedency structure with `Finbuckle.MultiTenant.Abstractions` and `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` ([#1006](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1006)) ([e191d83](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e191d83dfe2b161aeafcf08bcca5978d23bcd783))
+* improved dependency structure with `Finbuckle.MultiTenant.Abstractions` and `Finbuckle.MultiTenant.Identity.EntityFrameworkCore` ([#1006](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1006)) ([e191d83](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/e191d83dfe2b161aeafcf08bcca5978d23bcd783))
 * improved store interface ([#1020](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1020)) ([c6a16c4](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c6a16c44880ac1edcf5b7c09da9986091efe3a52))
 * improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([fdd59b9](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fdd59b980d9209296d7e4af6a3bb73211e9aa91c))
 * improved xml comments ([#1038](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1038)) ([8ee6597](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/8ee65977088989cfb16936fbd70999789cca9d90))
@@ -411,7 +486,7 @@
 
 ### Bug Fixes
 
-* change delegate strategy func return type as nullabe and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
+* change delegate strategy func return type as nullable and adds unit test ([#525](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/525)) ([80c7104](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/80c71041ad164da9ae8fb93a3ea0c68998b4e247))
 * remove tenant id value generator ([#524](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/524)) ([0d3dcd8](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/0d3dcd891d23124c1589b736a0b2274d4fda060f))
 
 ## [6.6.0](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v6.5.1...v6.6.0) (2022-02-13)
@@ -700,4 +775,3 @@
 ### Changes
 
 - Initial release
-<!--_history-->

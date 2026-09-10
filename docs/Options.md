@@ -1,9 +1,9 @@
 # Per-Tenant Options
 
-> Add the `Finbuckle.MultiTenant.Options` package to your project to use this functionality.
+> This functionality is included in the `Finbuckle.MultiTenant` package.
 
 MultiTenant is designed to emphasize using per-tenant options in your app to drive per-tenant behavior. This
-approach allows your app logic to be written without having to add tenant-dependent or tenant-specific logic directly to the code.
+approach lets you write app logic without adding tenant-specific branching directly to the code.
 
 By using per-tenant options, the options values used within app logic will automatically
 reflect the per-tenant values as configured for the current tenant. Any code already using the Options pattern will gain
@@ -39,7 +39,7 @@ correct values for the current tenant are used.
 
 ## Options Basics
 
-Consider a typical scenario in ASP.Net Core, starting with a simple class:
+Consider a typical scenario in ASP.NET Core, starting with a simple class:
 
 ```csharp
 public class MyOptions
@@ -65,7 +65,7 @@ access to the options values. A service provider instance can also provide acces
 
 ```csharp
 // access options via dependency injection in a class constructor
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
     
@@ -77,78 +77,87 @@ public MyController : Controller
 }
 
 // or with a service provider
-httpContext.RequestServices.GetServices<IOptionsSnapshot<MyOptions>();
+var options = httpContext.RequestServices.GetRequiredService<IOptionsSnapshot<MyOptions>>().Value;
 ```
 
-With standard options each tenant would get see the same exact options.
+With standard options each tenant would see the same exact options.
 
 ## Customizing Options Per Tenant
 
-This section assumes a standard web application builder is configured and MultiTenant is configured with
-a `TTenantInfo` type of `TenantInfo`.
-See [Getting Started](GettingStarted) for details.
-
-Make sure to add the `Finbuckle.MultiTenant.Options` package to your project.
-
-To configure options per tenant, the standard `Configure` method variants on the service collection now all
-have `PerTenant` equivalents which accept a `Action<TOptions, TTenantInfo>` delegate. When the options are created at
-runtime the delegate will be called with the current tenant details.
+This section assumes a standard web application builder is configured and MultiTenant is configured with a custom
+`TTenantInfo` type that derives from `TenantInfo`:
 
 ```csharp
-using Finbuckle.MultiTenant.Options.OptionsBuilderExtensions;
-using Finbuckle.MultiTenant.Options.ServiceCollectionExtensions;
+using Finbuckle.MultiTenant.Abstractions;
+
+public class AppTenantInfo : TenantInfo
+{
+    public int Option1Value { get; set; }
+    public int Option2Value { get; set; }
+}
+```
+See [Getting Started](GettingStarted) for details.
+
+Make sure your project references the `Finbuckle.MultiTenant` package.
+
+To configure options per tenant, the standard `Configure` method variants on the service collection have `PerTenant`
+equivalents that accept an `Action<TOptions, TTenantInfo>` delegate. When options are created at runtime, the delegate
+is called with the current tenant details.
+
+```csharp
+using Finbuckle.MultiTenant.Extensions;
 
 // configure options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // or configure named options per tenant
-builder.Services.ConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.ConfigurePerTenant<MyOptions, AppTenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // ConfigureAll options variant
-builder.Services.ConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.ConfigureAllPerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
 // can also configure post options, named post options, and all post options variants
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigurePerTenant<MyOptions, TenantInfo>("scheme2", (options, tenantInfo) =>
+builder.Services.PostConfigurePerTenant<MyOptions, AppTenantInfo>("scheme2", (options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 
-builder.Services.PostConfigureAllPerTenant<MyOptions, TenantInfo>((options, tenantInfo) =>
+builder.Services.PostConfigureAllPerTenant<MyOptions, AppTenantInfo>((options, tenantInfo) =>
     {
-        options.MyOption1 = tenantInfo.Option1Value;
-        options.MyOption2 = tenantInfo.Option2Value;
+        options.Option1 = tenantInfo.Option1Value;
+        options.Option2 = tenantInfo.Option2Value;
     });
 ```
 
 Now with the same controller example from above, the option values will be specific to the current tenant:
 
 ```csharp
-public MyController : Controller
+public class MyController : Controller
 {
     private readonly MyOptions _myOptions;
 
     public MyController(IOptionsMonitor<MyOptions> optionsAccessor)
     {
-        // _myOptions.MyOptions1 and .MyOptions2 will be specific to the current tenant.
+        // _myOptions.Option1 and .Option2 will be specific to the current tenant.
         _myOptions = optionsAccessor.Value;
     }
 }
@@ -166,9 +175,9 @@ normally supports up to five dependencies, MultiTenant support only supports fou
 ```csharp
 // use OptionsBuilder API to configure per-tenant options with dependencies
 builder.Services.AddOptions<MyOptions>("optionalName")
-    .ConfigurePerTenant<ExampleService, TenantInfo>(
+    .ConfigurePerTenant<ExampleService, AppTenantInfo>(
         (options, es, tenantInfo) =>
-            options.Property = DoSomethingWith(es, tenantInfo));
+            options.Option1 = DoSomethingWith(es, tenantInfo));
 ```
 
 ## Options and Caching
@@ -177,8 +186,8 @@ Internally .NET caches options, and MultiTenant extends this to cache options pe
 occurs when a `TOptions` instance is retrieved via `Value` or `Get` on the injected `IOptions<TOptions>` (or derived)
 instance for the first time for a tenant.
 
-`IOptions<TOptions>` instances are always regenerated when injected so any caching only lasts as long as the specific
-instance.
+`IOptions<TOptions>` is registered as a singleton. Its per-tenant cache can therefore persist for the lifetime of the
+application service provider.
 
 `IOptionsSnapshot<TOptions>` instances are generated once per HTTP request and caching will last throughout the entire
 request.
@@ -189,12 +198,24 @@ In some situations cached options may need to be cleared so that the options can
 
 When using per-tenant options via `IOptions<TOptions>` and `IOptionsSnapshot<TOptions>` the injected instance is of
 type `MultiTenantOptionsManager<TOptions>`. Casting to this type exposes the `Reset()` method which clears any internal
-caching for the current tenant and cause the options to be regenerated when next accessed via `Value`
+caching for the current tenant and causes the options to be regenerated when next accessed via `Value`
 or `Get(string name)`.
 
 When using per-tenant options with `IOptionsMonitor<TOptions>` each injected instance uses a shared persistent cache.
-This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>` which has
-a `Clear()` method that will clear the cache for the current tenant. Casting the `IOptionsMonitorCache<TOptions>`
-instance to `MultiTenantOptionsCache<TOptions>` exposes the `Clear(string tenantId)` and `ClearAll()`
-methods. `Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
+This cache can be retrieved by injecting or resolving an instance of `IOptionsMonitorCache<TOptions>`. The standard
+interface does not expose a method to clear the cache for the current tenant; casting it to
+`MultiTenantOptionsCache<TOptions>` exposes the `Clear()`, `Clear(string tenantId)`, and `ClearAll()` methods.
+`Clear(string tenantId)` clears cached options for a specific tenant (or the regular non per-tenant options if
 the parameter is empty or null). `ClearAll()` clears all cached options (including regular non per-tenant options).
+
+When an `IOptionsMonitor<TOptions>` change token fires, the named option associated with that token is removed from
+the cache for every tenant and for the regular non per-tenant context. Other named options remain cached. The changed
+option is recreated for each tenant when it is next accessed. An `OnChange` callback is a notification that the named
+option was invalidated globally; the options value supplied to the callback is created using the ambient tenant context
+of the change-token callback (often no tenant) and does not represent the value for every tenant.
+
+Enabling per-tenant options for a `TOptions` type replaces any exact closed registrations for
+`IOptionsMonitorCache<TOptions>`, `IOptions<TOptions>`, and `IOptionsSnapshot<TOptions>` with the Finbuckle
+implementations required for tenant isolation. The standard open generic registrations remain available for other
+options types. Registering a custom exact closed implementation after configuring per-tenant options is unsupported and
+may disable tenant isolation.

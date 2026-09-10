@@ -1,9 +1,11 @@
 name: Tidy Issues and PRs
 on:
+  workflow_dispatch:
   schedule:
     - cron: 30 1 * * *
 
 permissions:
+  actions: write
   issues: write
   pull-requests: write
 
@@ -11,14 +13,15 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@997185467fa4f803885201cee163a9f38240193d # v10.0.0
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v10.0.0
         with:
           days-before-stale: 180
-          days-before-close: -1
+          days-before-close: 180
           stale-issue-label: inactive
           stale-pr-label: inactive
           exempt-issue-labels: pinned
           exempt-pr-labels: pinned
-          stale-issue-message: This issue has been labeled inactive because it has been open 180 days with no activity. Please consider closing this issue if no further action is needed.
-          stale-pr-message: This PR has been labeled inactive because it has been open 180 days with no activity. Please consider closing this PR if no further action is needed.
-          
+          stale-issue-message: This issue has been labeled inactive because it has been open 180 days with no activity. Please consider closing this issue if no further action is needed. In order to maintain a tidy project, this issue will be closed in 180 days if no further activity takes place.
+          stale-pr-message: This PR has been labeled inactive because it has been open 180 days with no activity. Please consider closing this PR if no further action is needed. In order to maintain a tidy project, this PR will be closed in 180 days if no further activity takes place.
+          close-issue-message: This issue has been inactive for at least 360 days. If you feel this issue is not resolved please do not hesitate to reopen it. In order to maintain a tidy project, this issue has been closed.
+          close-pr-message: This PR has been inactive for at least 360 days. If you feel this PR is not resolved please do not hesitate to reopen it. In order to maintain a tidy project, this PR has been closed.

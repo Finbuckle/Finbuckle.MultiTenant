@@ -89,8 +89,15 @@ public class RemoteAuthenticationCallbackStrategy : IMultiTenantStrategy
                         var formOptions = new FormOptions { BufferBody = true, MemoryBufferThreshold = 1048576 };
 
                         var form = await httpContext.Request.ReadFormAsync(formOptions).ConfigureAwait(false);
-                        state = form.Single(i => string.Equals(i.Key, "state", StringComparison.OrdinalIgnoreCase))
-                            .Value;
+                        if (form.TryGetValue("state", out var formState))
+                            state = formState;
+                    }
+
+                    if (string.IsNullOrEmpty(state))
+                    {
+                        logger?.LogWarning(
+                            "A tenant could not be determined because no state parameter passed with the remote authentication callback.");
+                        return null;
                     }
 
                     var properties = ((dynamic)options).StateDataFormat.Unprotect(state) as AuthenticationProperties;

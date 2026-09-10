@@ -7,27 +7,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.2" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.10" />
 
-        <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj"/>
+        <ProjectReference Include="../../src/Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
 
         <None Include="*TestSettings*.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
 
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
 
-        <PackageReference Update="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit" Version="2.9.3" />
 
-        <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5">
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Update="Moq" Version="4.20.72" />
+        <PackageReference Include="Moq" Version="4.20.72" />
 
     </ItemGroup>
 </Project>

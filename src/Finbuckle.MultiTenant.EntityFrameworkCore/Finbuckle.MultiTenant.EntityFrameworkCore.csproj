@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <Title>Finbuckle.MultiTenant.EntityFrameworkCore.Sirfull</Title>
+        <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
         <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
-        <PackageId>$(AssemblyName).Sirfull</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
 
         <ProjectReference Include="../Finbuckle.MultiTenant/Finbuckle.MultiTenant.csproj" />
     </ItemGroup>

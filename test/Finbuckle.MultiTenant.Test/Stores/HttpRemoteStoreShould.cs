@@ -3,10 +3,10 @@
 
 using System.Net;
 using System.Reflection;
+using System.Text.Json;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.Stores;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Finbuckle.MultiTenant.Test.Stores;
@@ -25,7 +25,7 @@ public class HttpRemoteStoreShould : MultiTenantStoreTestBase
                     StringComparison.OrdinalIgnoreCase))
             {
                 var tenantInfo = new TenantInfo{Id= "initech-id", Identifier= "initech"};
-                var json = JsonConvert.SerializeObject(tenantInfo);
+                var json = JsonSerializer.Serialize(tenantInfo);
                 result.StatusCode = HttpStatusCode.OK;
                 result.Content = new StringContent(json);
             }

@@ -23,7 +23,34 @@ namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 public static class MultiTenantBuilderExtensions
 {
     /// <summary>
-    /// Configures a callback that determines when endpoints should be short circuited
+    /// Configures <see cref="BypassWhenOptions"/> to control when tenant resolution is bypassed.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <param name="configureOption">A delegate to configure <see cref="BypassWhenOptions"/>.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> BypassWhen<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder, Action<BypassWhenOptions> configureOption)
+        where TTenantInfo : ITenantInfo
+    {
+        builder.Services.Configure(configureOption);
+        return builder;
+    }
+
+    /// <summary>
+    /// Configures the middleware to bypass tenant resolution and pass the request directly to the
+    /// next middleware when no endpoint has been matched for the current request.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
+    public static MultiTenantBuilder<TTenantInfo> BypassWhenEndpointNotResolved<TTenantInfo>(
+        this MultiTenantBuilder<TTenantInfo> builder)
+        where TTenantInfo : ITenantInfo
+        => builder.BypassWhen(config => config.Predicate = ctx => ctx.GetEndpoint() is null);
+
+    /// <summary>
+    /// Configures a callback that determines when endpoints should be short-circuited
     /// during multi-tenant resolution.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
@@ -39,7 +66,7 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Configures endpoints to be short circuited during multi-tenant resolution when
+    /// Configures endpoints to be short-circuited during multi-tenant resolution when
     /// no tenant was resolved.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
@@ -53,7 +80,7 @@ public static class MultiTenantBuilderExtensions
     }
 
     /// <summary>
-    /// Configures endpoints to be short circuited during multi-tenant resolution when
+    /// Configures endpoints to be short-circuited during multi-tenant resolution when
     /// no tenant was resolved.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>

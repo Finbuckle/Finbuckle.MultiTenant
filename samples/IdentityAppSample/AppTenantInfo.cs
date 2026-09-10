@@ -1,6 +1,9 @@
 using Finbuckle.MultiTenant.Abstractions;
 
-public record AppTenantInfo(string Id, string Identifier, string Name) : TenantInfo(Id, Identifier, Name)
+public class AppTenantInfo : ITenantInfo
 {
+    public string Id { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Name { get; set; } = string.Empty;
     public string Tier { get; set; } = "Default";
 }

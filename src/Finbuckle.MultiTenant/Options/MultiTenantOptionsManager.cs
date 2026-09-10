@@ -4,6 +4,7 @@
 //    Portions of this file are derived from the .NET Foundation source file located at:
 //    https://github.com/aspnet/Options/blob/dev/src/Microsoft.Extensions.Options/OptionsManager.cs
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 
 namespace Finbuckle.MultiTenant.Options;
@@ -12,7 +13,9 @@ namespace Finbuckle.MultiTenant.Options;
 /// Implementation of <see cref="IOptions{TOptions}"/> and <see cref="IOptionsSnapshot{TOptions}"/> that uses dependency injection for its private cache.
 /// </summary>
 /// <typeparam name="TOptions">The type of options being configured.</typeparam>
-public class MultiTenantOptionsManager<TOptions> : IOptionsSnapshot<TOptions> where TOptions : class
+public class MultiTenantOptionsManager<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>
+    : IOptionsSnapshot<TOptions> where TOptions : class
 {
     private readonly IOptionsFactory<TOptions> _factory;
     private readonly IOptionsMonitorCache<TOptions> _cache; // Note: this is a private cache

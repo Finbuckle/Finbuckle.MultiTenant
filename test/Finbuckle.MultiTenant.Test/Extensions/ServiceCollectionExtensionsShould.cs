@@ -201,6 +201,205 @@ public class ServiceCollectionExtensionsShould
         Assert.Contains(instance2, inners);
     }
 
+    [Fact]
+    public void DecorateService_PassesParametersAndResolvesDecoratorDependencies()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<DecoratorDependency>();
+        services.AddSingleton<ITestService, TestService>();
+        var parameters = new object[] { "original" };
+
+        services.DecorateService<ITestService, ParameterizedDecoratedTestService>(parameters);
+        parameters[0] = "mutated";
+
+        using var provider = services.BuildServiceProvider();
+        var service = Assert.IsType<ParameterizedDecoratedTestService>(
+            provider.GetRequiredService<ITestService>());
+
+        Assert.Equal("original", service.Label);
+        Assert.IsType<TestService>(service.Inner);
+        Assert.NotNull(service.Dependency);
+    }
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void DecorateService_PreservesLifetimeAndRuntimeSemantics(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        ((IServiceCollection)services).Add(new ServiceDescriptor(typeof(ITestService), typeof(TestService), lifetime));
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        Assert.Equal(lifetime, services.Single(s => s.ServiceType == typeof(ITestService)).Lifetime);
+
+        using var provider = services.BuildServiceProvider();
+        using var firstScope = provider.CreateScope();
+        using var secondScope = provider.CreateScope();
+        var first = firstScope.ServiceProvider.GetRequiredService<ITestService>();
+        var firstAgain = firstScope.ServiceProvider.GetRequiredService<ITestService>();
+        var second = secondScope.ServiceProvider.GetRequiredService<ITestService>();
+
+        if (lifetime == ServiceLifetime.Singleton)
+        {
+            Assert.Same(first, firstAgain);
+            Assert.Same(first, second);
+        }
+        else if (lifetime == ServiceLifetime.Scoped)
+        {
+            Assert.Same(first, firstAgain);
+            Assert.NotSame(first, second);
+        }
+        else
+        {
+            Assert.NotSame(first, firstAgain);
+            Assert.NotSame(first, second);
+        }
+    }
+
+    [Fact]
+    public void DecorateService_PassesTheActiveProviderToTheOriginalFactory()
+    {
+        var services = new ServiceCollection();
+        services.AddScoped<FactoryDependency>();
+        services.AddScoped<ITestService>(sp =>
+            new FactoryTestService(sp.GetRequiredService<FactoryDependency>()));
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var service = Assert.IsType<DecoratedTestService>(
+            scope.ServiceProvider.GetRequiredService<ITestService>());
+
+        var inner = Assert.IsType<FactoryTestService>(service.Inner);
+        Assert.NotNull(inner.Dependency);
+    }
+
+    [Fact]
+    public void DecorateService_PreservesRegistrationOrderAndDefaultResolution()
+    {
+        var services = new ServiceCollection();
+        var first = new TestService();
+        var second = new TestService();
+        services.AddSingleton<IOtherService, FirstOtherService>();
+        services.AddSingleton<ITestService>(first);
+        services.AddSingleton<IOtherService, SecondOtherService>();
+        services.AddSingleton<ITestService>(second);
+        var serviceTypesBefore = services.Select(s => s.ServiceType).ToArray();
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        Assert.Equal(serviceTypesBefore, services.Select(s => s.ServiceType).ToArray());
+        using var provider = services.BuildServiceProvider();
+        var service = Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>());
+        Assert.Same(second, service.Inner);
+        Assert.Equal(2, provider.GetServices<IOtherService>().Count());
+    }
+
+    [Fact]
+    public void DecorateService_StacksDecoratorsWhenCalledRepeatedly()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+        services.DecorateService<ITestService, SecondDecoratedTestService>();
+
+        using var provider = services.BuildServiceProvider();
+        var outer = Assert.IsType<SecondDecoratedTestService>(provider.GetRequiredService<ITestService>());
+        var inner = Assert.IsType<DecoratedTestService>(outer.Inner);
+        Assert.IsType<TestService>(inner.Inner);
+    }
+
+    [Fact]
+    public void DecorateService_LeavesKeyedRegistrationsUntouched()
+    {
+        var services = new ServiceCollection();
+        var unkeyed = new TestService();
+        services.AddKeyedSingleton<ITestService, TestService>("key");
+        services.AddSingleton<ITestService>(unkeyed);
+
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        using var provider = services.BuildServiceProvider();
+        var decorated = Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>());
+        Assert.Same(unkeyed, decorated.Inner);
+        Assert.IsType<TestService>(provider.GetKeyedService<ITestService>("key"));
+    }
+
+    [Fact]
+    public void DecorateService_ThrowsWhenOnlyKeyedRegistrationExists()
+    {
+        var services = new ServiceCollection();
+        services.AddKeyedSingleton<ITestService, TestService>("key");
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            services.DecorateService<ITestService, DecoratedTestService>());
+
+        Assert.Contains(nameof(ITestService), exception.Message);
+    }
+
+    [Fact]
+    public void DecorateService_ThrowsForNullServiceCollection()
+    {
+        IServiceCollection? services = null;
+
+        Assert.Throws<ArgumentNullException>(() =>
+            ServiceCollectionExtensions.DecorateService<ITestService, DecoratedTestService>(services!));
+    }
+
+    [Fact]
+    public void DecorateService_ThrowsForNullParameters()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            ServiceCollectionExtensions.DecorateService<ITestService, DecoratedTestService>(
+                services, (object[])null!));
+    }
+
+    [Fact]
+    public void DecorateService_ThrowsForIncompatibleDecoratorTypeBeforeMutation()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+        var serviceCount = services.Count;
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            services.DecorateService<ITestService, IncompatibleDecorator>());
+
+        Assert.Contains(nameof(IncompatibleDecorator), exception.Message);
+        Assert.Equal(serviceCount, services.Count);
+        Assert.Equal(typeof(TestService), services.Single().ImplementationType);
+    }
+
+    [Fact]
+    public void DecorateService_ThrowsWhenFactoryReturnsNull()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService>(_ => null!);
+        services.DecorateService<ITestService, DecoratedTestService>();
+        using var provider = services.BuildServiceProvider();
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            provider.GetRequiredService<ITestService>());
+
+        Assert.Contains("Unable to instantiate decorated service", exception.Message);
+    }
+
+    [Fact]
+    public void DecorateService_PropagatesDecoratorActivationFailure()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, TestService>();
+        services.DecorateService<ITestService, UnconstructableDecoratedTestService>();
+        using var provider = services.BuildServiceProvider();
+
+        Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<ITestService>());
+    }
+
     public interface ITestService
     {
     }
@@ -213,5 +412,69 @@ public class ServiceCollectionExtensionsShould
     {
         public ITestService Inner { get; }
         public DecoratedTestService(ITestService inner) => Inner = inner;
+    }
+
+    public sealed class ParameterizedDecoratedTestService : ITestService
+    {
+        public ITestService Inner { get; }
+        public string Label { get; }
+        public DecoratorDependency Dependency { get; }
+
+        public ParameterizedDecoratedTestService(ITestService inner, string label, DecoratorDependency dependency)
+        {
+            Inner = inner;
+            Label = label;
+            Dependency = dependency;
+        }
+    }
+
+    public sealed class SecondDecoratedTestService : ITestService
+    {
+        public ITestService Inner { get; }
+        public SecondDecoratedTestService(ITestService inner) => Inner = inner;
+    }
+
+    public sealed class FactoryTestService : ITestService
+    {
+        public FactoryDependency Dependency { get; }
+        public FactoryTestService(FactoryDependency dependency) => Dependency = dependency;
+    }
+
+    public sealed class DecoratorDependency
+    {
+    }
+
+    public sealed class FactoryDependency
+    {
+    }
+
+    public interface IOtherService
+    {
+    }
+
+    public sealed class FirstOtherService : IOtherService
+    {
+    }
+
+    public sealed class SecondOtherService : IOtherService
+    {
+    }
+
+    public sealed class IncompatibleDecorator
+    {
+        public IncompatibleDecorator(ITestService inner)
+        {
+        }
+    }
+
+    public sealed class UnconstructableDecoratedTestService : ITestService
+    {
+        public UnconstructableDecoratedTestService(ITestService inner, MissingDecoratorDependency dependency)
+        {
+        }
+    }
+
+    public sealed class MissingDecoratorDependency
+    {
     }
 }

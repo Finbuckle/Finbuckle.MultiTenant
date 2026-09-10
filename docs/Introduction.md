@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.0.2</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.2</span>
 
 ## About MultiTenant
 
@@ -38,7 +38,7 @@ Additional support is provided by the following organizations:
 
 ## License
 
-This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for
+This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](../LICENSE) file for
 license information.
 
 ## .NET Foundation
@@ -49,7 +49,7 @@ This project is supported by the [.NET Foundation](https://dotnetfoundation.org)
 
 This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our
 community. For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct)
-or the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+or the [CONTRIBUTING.md](../CONTRIBUTING.md) file.
 
 ## Community
 
@@ -62,7 +62,6 @@ From the command line clone the git repository, `cd` into the new directory, and
 
 ```bash
 git clone https://github.com/Finbuckle/Finbuckle.MultiTenant.git
-cd Finbuckle.MultiTenant
 cd Finbuckle.MultiTenant
 dotnet build
 ```
