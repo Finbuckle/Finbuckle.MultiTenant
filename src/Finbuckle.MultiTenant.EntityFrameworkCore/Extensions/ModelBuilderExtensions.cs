@@ -24,7 +24,7 @@ public static class FinbuckleModelBuilderExtensions
                      .Select(et => et.ClrType))
         {
             modelBuilder.Entity(clrType)
-                .IsMultiTenant();
+                .IsMultiTenant(shareable: clrType.HasMultiTenantShareableAttribute());
         }
 
         return modelBuilder;

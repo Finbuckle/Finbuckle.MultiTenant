@@ -16,6 +16,7 @@ public class TestDbContext(Action<ModelBuilder>? config, TenantInfo tenantInfo, 
     public DbSet<MyThingWithIntTenantId>? MyThingsWithIntTenantId { get; set; }
     public DbSet<MyMultiTenantThingWithAttribute>? MyMultiTenantThingsWithAttribute { get; set; }
     public DbSet<MyNonMultiTenantThing>? MyNonMultiTenantThings { get; set; }
+    public DbSet<MyShareableThing>? MyShareableThings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,4 +73,13 @@ public class MyThingWithIntTenantId
 {
     public int Id { get; set; }
     public int TenantId { get; set; }
+}
+
+[MultiTenant]
+[MultiTenantShareable]
+public class MyShareableThing
+{
+    public int Id { get; set; }
+    public string? TenantId { get; set; }
+    public bool IsShared { get; set; }
 }

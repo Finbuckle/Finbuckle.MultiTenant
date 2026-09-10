@@ -190,4 +190,55 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         // Non-multi-tenant entities should not be filtered (both should be visible)
         Assert.Equal(2, db.MyNonMultiTenantThings!.Count());
     }
+
+    [Fact]
+    public void ShowOnlySharedEntitiesToOtherTenants()
+    {
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+
+        using var db = GetDbContext(null, tenant1);
+        db.Database.EnsureCreated();
+
+        db.MyShareableThings?.Add(new MyShareableThing { Id = 1, IsShared = false });
+        db.MyShareableThings?.Add(new MyShareableThing { Id = 2, IsShared = true });
+        db.SaveChanges();
+
+        // The owner sees both of its entities.
+        Assert.Equal(2, db.MyShareableThings!.Count());
+
+        db.TenantInfo = tenant2;
+
+        // Another tenant sees the shared one only.
+        Assert.Equal(1, db.MyShareableThings!.Count());
+        Assert.Equal(2, db.MyShareableThings!.Single().Id);
+    }
+
+    [Fact]
+    public void RejectWritesToSharedEntitiesFromAnotherTenant()
+    {
+        var tenant1 = new TenantInfo { Id = "abc", Identifier = "" };
+        var tenant2 = new TenantInfo { Id = "123", Identifier = "" };
+
+        using var db = GetDbContext(null, tenant1);
+        db.Database.EnsureCreated();
+
+        db.MyShareableThings?.Add(new MyShareableThing { Id = 1, IsShared = true });
+        db.SaveChanges();
+
+        db.TenantInfo = tenant2;
+
+        // Sharing grants visibility, never ownership: the entity still belongs to tenant1.
+        var shared = db.MyShareableThings!.Single();
+        shared.IsShared = false;
+
+        Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+    }
+
+    [Fact]
+    public void ThrowOnShareableEntityWithoutIsSharedProperty()
+    {
+        using var db = GetDbContext(b => b.Entity<MyMultiTenantThing>().IsMultiTenant(shareable: true));
+        Assert.Throws<MultiTenantException>(() => db.Model);
+    }
 }

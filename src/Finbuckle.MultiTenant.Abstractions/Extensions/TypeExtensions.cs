@@ -52,4 +52,14 @@ public static class TypeExtensions
     {
         return type.GetCustomAttribute<MultiTenantAttribute>() != null;
     }
+
+    /// <summary>
+    /// Determines whether the specified type has the MultiTenantShareable attribute.
+    /// </summary>
+    /// <param name="type">The type to check.</param>
+    /// <returns>True if the type has the MultiTenantShareable attribute; otherwise, false.</returns>
+    public static bool HasMultiTenantShareableAttribute(this Type type)
+    {
+        return type.GetCustomAttribute<MultiTenantShareableAttribute>() != null;
+    }
 }
