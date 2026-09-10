@@ -95,7 +95,7 @@ public static class EntityTypeBuilderExtensions
         // this code will generate this expression : EF.Property<string>(e, "TenantId") == TenantInfo.Id
         // var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
 
-        // On récupère toujours les entités avec TenantId = "*" car elles sont considérées comme des entités globales (non multi-tenant)
+        // On rÃ©cupÃ¨re toujours les entitÃ©s avec TenantId = "*" car elles sont considÃ©rÃ©es comme des entitÃ©s globales (non multi-tenant)
 
         // Generate expression: IsMultiTenantEnabled == False 
         var multiTenantDisabled = Expression.Equal(Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)), Expression.Constant(false));
