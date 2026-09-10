@@ -60,15 +60,9 @@ public static class MultiTenantDbContextExtensions
         var tenantMismatchMode = context.TenantMismatchMode;
         var tenantNotSetMode = context.TenantNotSetMode;
 
-        #region Fork Sirfull
-        // Les entités portant TenantId = '*' sont globales : elles n'appartiennent à aucun tenant
-        // et restent modifiables depuis n'importe quel contexte, donc hors des contrôles ci-dessous.
         var changedMultiTenantEntities = changeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
-            .Where(e => e.Metadata.IsMultiTenant())
-            .Where(e => (string?)e.Property("TenantId").CurrentValue != "*")
-            .ToList();
-        #endregion
+            .Where(e => e.Metadata.IsMultiTenant()).ToList();
 
         // ensure tenant context is valid
         if (changedMultiTenantEntities.Count == 0)
@@ -76,6 +70,7 @@ public static class MultiTenantDbContextExtensions
 
         if (tenantInfo is null)
             throw new MultiTenantException("MultiTenant Entity cannot be changed if TenantInfo is null.");
+
 
         // get list of all added entities with MultiTenant annotation
         var addedMultiTenantEntities = changedMultiTenantEntities.Where(e => e.State == EntityState.Added).ToList();

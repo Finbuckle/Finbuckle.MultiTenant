@@ -105,42 +105,31 @@ public static class EntityTypeBuilderExtensions
         var contextTenantInfoExp = Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
 
         #region Fork Sirfull
-        // Original code
-        // this code will generate this expression : EF.Property<string>(e, "TenantId") == TenantInfo.Id
-        // var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
-
-        // On récupère toujours les entités avec TenantId = "*" car elles sont considérées comme des entités globales (non multi-tenant)
-
-        // Generate expression: IsMultiTenantEnabled == False 
+        // Generate expression: IsMultiTenantEnabled == False
         var multiTenantDisabled = Expression.Equal(Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.IsMultiTenantEnabled)), Expression.Constant(false));
-
-        // Generate expression:  EF.Property<string>(e, "TenantId") == "*"
-        var tenantIdIsWildcard = Expression.Equal(leftExp, Expression.Constant("*", typeof(string)));
 
         // Generate expression: TenantInfo == null
         var tenantInfoIsNull = Expression.Equal(contextTenantInfoExp, Expression.Constant(null));
 
-        // Generate expression: EF.Property<string>(e, "TenantId") == TenantInfo == null ? "*" : TenantInfo.Id
+        // Generate expression: EF.Property<string>(e, "TenantId") == (TenantInfo == null ? null : TenantInfo.Id)
+        // The conditional keeps TenantInfo.Id from being dereferenced when there is no tenant;
+        // that case is already covered by the TenantInfo == null clause of the predicate.
         var rightExp = Expression.Condition(
-            Expression.Equal(contextTenantInfoExp, Expression.Constant(null)),
-            Expression.Constant("*", typeof(string)),
+            tenantInfoIsNull,
+            Expression.Constant(null, typeof(string)),
             Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id))
         );
         var tenantIdEqualsInfo = Expression.Equal(leftExp, rightExp);
 
         // Build the complete predicate with OR conditions
-        //  IsMultiTenantEnabled == False 
-        //   || EF.Property<string>(e, "TenantId") == "*"
+        //  IsMultiTenantEnabled == False
         //   || TenantInfo == null
-        //   || EF.Property<string>(e, "TenantId") == TenantInfo == null ? "*" : TenantInfo.Id
+        //   || EF.Property<string>(e, "TenantId") == TenantInfo.Id
         var predicate = Expression.OrElse(
             multiTenantDisabled,
             Expression.OrElse(
-                tenantIdIsWildcard,
-                Expression.OrElse(
-                    tenantInfoIsNull,
-                    tenantIdEqualsInfo
-                )
+                tenantInfoIsNull,
+                tenantIdEqualsInfo
             )
         );
 
