@@ -214,10 +214,20 @@
         "resolved": "10.0.10",
         "contentHash": "5wu/GrYVd8mG2DVUw3vFJzF+O336TyTGg/Kmcgw9bfwYhCoFiV5lR5QeEmKecJyrW4W54nMfD3p3589E8a7czQ=="
       },
-      "finbuckle.multitenant": {
+      "Finbuckle.MultiTenant.Abstractions.Sirfull": {
+        "type": "Project"
+      },
+      "Finbuckle.MultiTenant.EntityFrameworkCore.Sirfull": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.1.2, )",
+          "Finbuckle.MultiTenant.Sirfull": "[10.1.2-sfs.1, )",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
+        }
+      },
+      "Finbuckle.MultiTenant.Sirfull": {
+        "type": "Project",
+        "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.1.2-sfs.1, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.0.10, )",
           "Microsoft.Extensions.Configuration": "[10.0.10, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.10, )",
@@ -225,16 +235,6 @@
           "Microsoft.Extensions.Logging": "[10.0.10, )",
           "Microsoft.Extensions.Options": "[10.0.10, )",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "[10.0.10, )"
-        }
-      },
-      "Finbuckle.MultiTenant.Abstractions.Sirfull": {
-        "type": "Project"
-      },
-      "finbuckle.multitenant.entityframeworkcore": {
-        "type": "Project",
-        "dependencies": {
-          "Finbuckle.MultiTenant": "[10.1.2, )",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.10, )"
         }
       }
     }

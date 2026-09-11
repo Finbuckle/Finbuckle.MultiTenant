@@ -21,6 +21,17 @@
         <ImplicitUsings>true</ImplicitUsings>
     </PropertyGroup>
 
+    <PropertyGroup Label="Fork Sirfull">
+        <!-- Le suffixe de nom distingue les paquets du fork de ceux publiés par Finbuckle. Il est
+             déclaré ici et non dans chaque csproj, que les merges upstream réécrivent.
+             AssemblyName n'est défini qu'ensuite, par Sdk.props : le nom du projet en tient lieu. -->
+        <PackageId>$(MSBuildProjectName).Sirfull</PackageId>
+        <!-- La version reprend celle d'upstream, que le merge remonte, et y ajoute le rang du fork :
+             deux livraisons du fork sur un même upstream se distinguent par ce seul nombre. -->
+        <SirfullRevision>1</SirfullRevision>
+        <Version>$(Version)-sfs.$(SirfullRevision)</Version>
+    </PropertyGroup>
+
     <PropertyGroup Label="Analysis rules">
         <AnalysisLevel>latest-Recommended</AnalysisLevel>
         <NoWarn>$(NoWarn);CA1848</NoWarn> <!-- For improved performance, use the LoggerMessage delegates -->

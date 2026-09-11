@@ -72,14 +72,14 @@
           "Microsoft.IdentityModel.Tokens": "8.19.2"
         }
       },
-      "finbuckle.multitenant": {
-        "type": "Project",
-        "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.1.2, )"
-        }
-      },
       "Finbuckle.MultiTenant.Abstractions.Sirfull": {
         "type": "Project"
+      },
+      "Finbuckle.MultiTenant.Sirfull": {
+        "type": "Project",
+        "dependencies": {
+          "Finbuckle.MultiTenant.Abstractions.Sirfull": "[10.1.2-sfs.1, )"
+        }
       }
     }
   }
