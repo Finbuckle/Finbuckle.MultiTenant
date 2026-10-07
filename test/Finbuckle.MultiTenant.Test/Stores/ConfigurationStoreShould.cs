@@ -69,6 +69,36 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.GetByIdentifierAsync(null!));
     }
 
+    [Fact]
+    public async Task OverlayTenantCollectionEntriesOnDefaultsByIndex()
+    {
+        // The tenant section is layered over Defaults into one configuration before binding, so collection entries
+        // present in both are overlaid by index (standard configuration layering) rather than appended.
+        const string prefix = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [$"{prefix}:Defaults:Tags:0"] = "default-0",
+                [$"{prefix}:Defaults:Tags:1"] = "default-1",
+                [$"{prefix}:Tenants:0:Id"] = "initech-id",
+                [$"{prefix}:Tenants:0:Identifier"] = "initech",
+                [$"{prefix}:Tenants:0:Tags:0"] = "initech-0",
+                [$"{prefix}:Tenants:1:Id"] = "lol-id",
+                [$"{prefix}:Tenants:1:Identifier"] = "lol"
+            })
+            .Build();
+
+        var store = new ConfigurationStore<TaggedTenantInfo, string>(configuration);
+
+        var initech = await store.GetByIdentifierAsync("initech");
+        var lol = await store.GetByIdentifierAsync("lol");
+
+        Assert.NotNull(initech);
+        Assert.Equal(new[] { "initech-0", "default-1" }, initech.Tags);
+        Assert.NotNull(lol);
+        Assert.Equal(new[] { "default-0", "default-1" }, lol.Tags);
+    }
+
     // Basic store functionality tested in MultiTenantStoresShould.cs
 
     protected override Task<IMultiTenantStore<TenantInfo, string>> CreateTestStore()
@@ -137,5 +167,10 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     public override async Task GetAllTenantsFromStoreAsyncSkip1Take1()
     {
         await base.GetAllTenantsFromStoreAsyncSkip1Take1();
+    }
+
+    public class TaggedTenantInfo : TenantInfo<string>
+    {
+        public List<string> Tags { get; set; } = new();
     }
 }
