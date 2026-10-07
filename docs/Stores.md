@@ -151,8 +151,10 @@ builder.Services.AddMultiTenant<AppTenantInfo>()
         config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
 ```
 
-The configuration supplied to a tenant factory is disposed after the factory returns. Read its values during the
-factory call and return a self-contained tenant; do not retain the configuration for ongoing use.
+The singleton store retains the factory and invokes it for each tenant during initialization and configuration
+reloads. The factory must support concurrent calls. Avoid capturing scoped services or unsynchronized mutable state.
+Read the supplied configuration during the call and return a fully constructed tenant with stable identity values;
+the configuration is disposed after the factory returns and must not be retained for ongoing use.
 
 ```json
 {
@@ -319,3 +321,7 @@ the store throws a `MultiTenantException` explaining the problem; pass a factory
 services.AddMultiTenant<AppTenantInfo>()
     .WithEchoStore(identifier => new AppTenantInfo(identifier, identifier));
 ```
+
+The singleton store retains the factory and invokes it for each lookup. The factory must support concurrent calls.
+Avoid capturing scoped services, such as a `DbContext`, or unsynchronized mutable state. Return a fully constructed
+tenant whose `Id` and `Identifier` match the supplied identifier and remain stable.
