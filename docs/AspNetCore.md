@@ -112,13 +112,13 @@ if (tenantInfo != null)
 }
 ```
 
-#### `TenantContext`
+#### `TenantContext<TId>()`
 
-Returns the non-generic `ITenantContext` instance for the current request. This is useful when code does not need
-the concrete tenant info type, or when working with shared infrastructure that only depends on `ITenantInfo`.
+Returns the `ITenantContext<TId>` instance for the current request. This is useful when code does not need
+the concrete tenant info type, or when working with shared infrastructure that only depends on `ITenantInfo<TId>`.
 
 ```csharp
-var tenantContext = HttpContext.TenantContext;
+var tenantContext = HttpContext.TenantContext<string>();
 
 if (tenantContext.IsResolved)
 {
@@ -140,13 +140,13 @@ if (tenantInfo != null)
 }
 ```
 
-#### `CurrentTenant`
+#### `TenantInfo<TId>()`
 
-A convenience shorthand for `TenantContext.TenantInfo`. Returns the current `ITenantInfo` instance, or null if
+A convenience shorthand for `TenantContext<TId>().TenantInfo`. Returns the current `ITenantInfo<TId>` instance, or null if
 no tenant was resolved.
 
 ```csharp
-var tenantInfo = HttpContext.CurrentTenant;
+var tenantInfo = HttpContext.TenantInfo<string>();
 
 if (tenantInfo != null)
 {

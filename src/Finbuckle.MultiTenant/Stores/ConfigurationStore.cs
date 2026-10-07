@@ -60,8 +60,10 @@ public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInf
     /// Creates a <typeparamref name="TTenantInfo"/> from the configuration of a single tenant. The configuration
     /// passed in contains the tenant's own keys overlaid on the <c>Defaults</c> section. Use this when the standard
     /// configuration binder cannot construct <typeparamref name="TTenantInfo"/>.
-    /// Read the configuration during this call and return a self-contained tenant. The supplied configuration is
-    /// disposed after the factory returns and must not be retained for ongoing use.
+    /// The store retains this delegate and invokes it for each tenant during initialization and configuration reloads.
+    /// The factory must support concurrent calls and should not capture scoped services or unsynchronized mutable state.
+    /// Read values during the call and return a fully constructed tenant with stable identity values. The supplied
+    /// configuration is disposed after the factory returns and must not be retained for ongoing use.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration"/> or <paramref name="tenantInfoFactory"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="sectionName"/> is null or empty.</exception>

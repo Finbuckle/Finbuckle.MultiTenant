@@ -160,8 +160,10 @@ public static class MultiTenantBuilderExtensions
     /// <param name="tenantInfoFactory">
     /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys overlaid on the
     /// <c>Defaults</c> section). Use when the standard configuration binder cannot construct <typeparamref name="TTenantInfo"/>.
-    /// Read values during the factory call and return a self-contained tenant. The supplied configuration is
-    /// disposed after the factory returns and must not be retained for ongoing use.
+    /// The singleton store retains this delegate and invokes it for each tenant during initialization and configuration
+    /// reloads. The factory must support concurrent calls and should not capture scoped services or unsynchronized
+    /// mutable state. Read values during the call and return a fully constructed tenant with stable identity values.
+    /// The supplied configuration is disposed after the factory returns and must not be retained for ongoing use.
     /// </param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithConfigurationStore<TTenantInfo, TId>(
@@ -208,6 +210,9 @@ public static class MultiTenantBuilderExtensions
     /// <param name="tenantInfoFactory">
     /// Creates the <typeparamref name="TTenantInfo"/> instance from a tenant id and identifier. Use when
     /// <typeparamref name="TTenantInfo"/> has no settable <c>Id</c>/<c>Identifier</c> properties.
+    /// The singleton store retains this delegate and invokes it for each lookup. The factory must support concurrent
+    /// calls. Avoid capturing scoped services, such as a <c>DbContext</c>, or unsynchronized mutable state. Return a fully
+    /// constructed tenant whose <c>Id</c> and <c>Identifier</c> match the supplied values and remain stable.
     /// </param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithEchoStore<TTenantInfo, TId>(

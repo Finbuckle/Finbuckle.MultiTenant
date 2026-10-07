@@ -77,7 +77,7 @@ The library enforces its side of the contract:
 
 ## `ITenantContext` and the ambient tenant scope
 
-`ITenantContext<TTenantInfo, TId>` (and its non-generic base `ITenantContext<TId>`) holds the current tenant. The
+`ITenantContext<TTenantInfo, TId>` (and its base `ITenantContext<TId>`) holds the current tenant. The
 default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained from dependency injection.
 
 * The context is registered as a **singleton** but is **ambient** — the current tenant is stored in an
@@ -95,7 +95,7 @@ default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained fro
   non-default and its `Identifier` non-empty (see [`ITenantInfo` and `TenantInfo`](#itenantinfo-and-tenantinfo)).
 * The `IsResolved` property indicates whether a tenant has been resolved (`TenantInfo` is not null).
 * Can be obtained in ASP.NET Core from the current request's `HttpContext` with
-  `GetTenantContext<TTenantInfo, TId>()` or the non-generic `TenantContext<TId>()` extension. See
+  `GetTenantContext<TTenantInfo, TId>()` or the `TenantContext<TId>()` extension. See
   [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-core) for details.
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the
   middleware handles this. Use `TrySetTenantInfo` if you need to set only when no tenant has been resolved yet.
