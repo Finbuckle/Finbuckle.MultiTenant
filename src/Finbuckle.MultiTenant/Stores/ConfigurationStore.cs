@@ -59,6 +59,8 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// Creates a <typeparamref name="TTenantInfo"/> from the configuration of a single tenant. The configuration
     /// passed in contains the tenant's own keys overlaid on the <c>Defaults</c> section. Use this when
     /// <typeparamref name="TTenantInfo"/> has no settable properties, e.g. a constructor-only immutable implementation.
+    /// Read the configuration during this call and return a self-contained tenant. The supplied configuration is
+    /// disposed after the factory returns and must not be retained for ongoing use.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="configuration"/> or <paramref name="tenantInfoFactory"/> is null.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="sectionName"/> is null or empty.</exception>
@@ -108,6 +110,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
                 .AddConfiguration(tenantSection)
                 .Build();
 
+            using var mergedLifetime = merged as IDisposable;
             var newTenant = tenantInfoFactory(merged) ??
                             throw new MultiTenantException(
                                 $"The tenant info factory returned null for configuration section '{tenantSection.Path}'.");

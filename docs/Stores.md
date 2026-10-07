@@ -151,6 +151,9 @@ builder.Services.AddMultiTenant<AppTenantInfo>()
         config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
 ```
 
+The configuration supplied to a tenant factory is disposed after the factory returns. Read its values during the
+factory call and return a self-contained tenant; do not retain the configuration for ongoing use.
+
 ```json
 {
   "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
