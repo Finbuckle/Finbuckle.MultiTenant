@@ -61,11 +61,17 @@ public sealed class AppTenantInfo(string id, string identifier, string? name = n
 }
 ```
 
-In return the library asks for one rule: **`Id` and `Identifier` must not change for the lifetime of an instance once
-it has been handed to the library** (stored, cached, resolved, or assigned to a tenant context). Tenant identity is `Id`
-equality; built-in stores match `Identifier` case-insensitively. To change a tenant, create a new instance and pass it to
-`TenantManager<TTenantInfo, TId>.UpdateAsync`. Mutating other properties of your own type is your business, but keep in
-mind the same instance may be shared by caches and by the current request.
+In return the library asks for two things:
+
+* **`Id` never changes.** It is the tenant's identity; tenant equality is `Id` equality.
+* **`Identifier` may change, but only through the store.** Create a new instance carrying the new `Identifier` and pass
+  it to `TenantManager<TTenantInfo, TId>.UpdateAsync`; the store re-keys its lookups and hands out the new instance from
+  then on. Never change `Identifier` in place on an instance the library already holds (a store's map, a cache entry, or
+  the current tenant context), because those are keyed by the value captured when the tenant was added or updated and
+  cannot notice the change. Built-in stores match `Identifier` case-insensitively.
+
+Mutating other properties of your own type is your business, but keep in mind the same instance may be shared by caches
+and by the current request.
 
 The library enforces its side of the contract:
 

@@ -396,8 +396,8 @@ tenant whose `Id` and `Identifier` match the supplied values and remain stable.
 - Custom stores implementing `IMultiTenantStore<TTenantInfo, TId>` should avoid extensive logging or validation —
   `TenantManager<TTenantInfo, TId>` handles these consistently at runtime.
 - Stores never mutate a tenant info instance, and the built-in stores key their lookups by the `Id`/`Identifier` values
-  captured on add/update rather than by re-reading stored instances. `Id` and `Identifier` must not change for the
-  lifetime of an instance once it has been handed to a store; update a tenant by passing a new instance. See the
+  captured on add/update rather than by re-reading stored instances. `Id` never changes; `Identifier` may change only by
+  passing a new instance to `UpdateAsync`, never in place on an instance a store already holds. See the
   [tenant info contract](CoreConcepts#tenant-info-contract).
 
 ## See Also
