@@ -13,11 +13,10 @@ MultiTenant stores support custom `ITenantInfo` implementations, but complex typ
 handling. For best results, ensure the type works well with the underlying store approach—for example, that it can be
 serialized from JSON for the configuration store if using JSON file configuration sources.
 
-Stores never mutate a tenant info instance, and `Id`/`Identifier` must not change for the lifetime of an instance once
-it has been handed to a store; update a tenant by passing a new instance to `UpdateAsync`. Constructor-only immutable
-implementations are supported by every store; `ConfigurationStore` and `EchoStore`, which have to construct instances
-themselves, take a factory for such types (see below). See the
-[tenant info contract](CoreConcepts#tenant-info-contract) for details.
+Stores never mutate a tenant info instance. `Id` never changes; `Identifier` may change only by passing a new instance
+to `UpdateAsync`, never in place on an instance a store already holds. Constructor-only immutable implementations are
+supported by every store; `ConfigurationStore` and `EchoStore`, which have to construct instances themselves, take a
+factory for such types (see below). See the [tenant info contract](CoreConcepts#tenant-info-contract) for details.
 
 The examples in this documentation use the `TenantInfo` basic implementation.
 
