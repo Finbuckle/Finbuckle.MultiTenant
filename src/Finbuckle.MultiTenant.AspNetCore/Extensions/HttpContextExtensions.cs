@@ -28,7 +28,7 @@ public static class HttpContextExtensions
             httpContext.TenantContext<TId>().TenantInfo;
 
         /// <summary>
-        /// Returns the current <see cref="ITenantContext{TTenantInfo}"/>.
+        /// Returns the current <see cref="ITenantContext{TTenantInfo, TId}"/>.
         /// </summary>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
         /// <typeparam name="TId">The ID implementation type.</typeparam>
@@ -53,7 +53,7 @@ public static class HttpContextExtensions
         /// <param name="tenantInfo">The tenant info instance to set as current.</param>
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
         /// <typeparam name="TId">The ID implementation type.</typeparam>
-        /// <remarks>This method will throw a <see cref="MultiTenantException"/> if the <see cref="ITenantContext{TTenantInfo}.TenantInfo"/> has already been set.</remarks>
+        /// <remarks>This method will throw a <see cref="MultiTenantException"/> if the <see cref="ITenantContext{TTenantInfo, TId}.TenantInfo"/> has already been set.</remarks>
         public void SetTenantInfo<TTenantInfo, TId>(TTenantInfo tenantInfo)
             where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {

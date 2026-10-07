@@ -210,7 +210,7 @@ Start by adding the `MultiTenant.EntityFrameworkCore` package to the project:
 dotnet add package Finbuckle.MultiTenant.EntityFrameworkCore
 ```
 
-Next, implement `IMultiTenantDbContext` on the context. These interface properties ensure that the extension methods
+Next, implement `IMultiTenantDbContext<TId>` on the context. These interface properties ensure that the extension methods
 will have the information needed to provide proper data isolation.
 
 ```csharp
@@ -251,7 +251,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 }
 ```
 
-In `SaveChanges` and `SaveChangesAsync` call the `IMultiTenantDbContext` extension method `EnforceMultiTenant` before
+In `SaveChanges` and `SaveChangesAsync` call the `IMultiTenantDbContext<TId>` extension method `EnforceMultiTenant` before
 calling the base class method. This ensures proper data isolation and behavior.
 
 ```csharp
@@ -309,7 +309,7 @@ Now whenever this database context is used it will only set and query records fo
 ## Binding the Tenant to the DbContext
 
 It is recommended that the tenant associated with an instance of your DbContext is set at the time of creation and is
-immutable. When implementing `IMultiTenantDbContext` directly, note that the interface requires a setter for
+immutable. When implementing `IMultiTenantDbContext<TId>` directly, note that the interface requires a setter for
 `TenantInfo`. If you want `TenantInfo` to remain effectively immutable to consumers of your concrete DbContext, you can
 implement the interface setter explicitly and expose only a public getter on the concrete type. `MultiTenantDbContext`
 and `MultiTenantIdentityDbContext` expose a public setter for `TenantInfo` to support advanced scenarios such as
@@ -411,7 +411,7 @@ foreach (var tenant in tenants)
 ```
 
 Make sure to dispose of the database context instance when it is no longer needed, or better yet use a `using` block or
-variable. The `Create` method requires that `TContext` implements both `DbContext` and `IMultiTenantDbContext`.
+variable. The `Create` method requires that `TContext` implements both `DbContext` and `IMultiTenantDbContext<TId>`.
 
 ## Design Time Instantiation
 
@@ -428,12 +428,12 @@ as described above.
 Added entities are automatically associated with the current `TenantInfo`. If an entity is associated with a different
 `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`. This behavior can be
 altered by changing the values of [TenantMismatchMode](#tenant-mismatch-mode) and
-[TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext`.
+[TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext<TId>`.
 
 > EF Core will require a non-null value when adding an entity that has `TenantId` as a part of the primary key.
 > If the `TenantId` property is not settable (e.g. it is a shadow property), EF Core will require a non-null value.
 > MultiTenant will ensure a `TenantId` is assigned if you call the `EnforceMultiTenantOnTracking` extension
-> method of `IMultiTenantDbContext` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
+> method of `IMultiTenantDbContext<TId>` on your db context. See [EF Core Tracking](#ef-core-tracking) for more details.
 
 ```csharp
 Blog myBlog = new Blog{ TenantId = "1", Title = "My Blog" };
@@ -489,7 +489,7 @@ var tenantBlogs = db.Blogs.IgnoreQueryFilters(Abstractions.Constants.TenantToken
 Updated or deleted entities are checked to make sure they are associated with the `TenantInfo`. If an entity is
 associated with a different `TenantInfo` then a `MultiTenantException` is thrown in `SaveChanges` or `SaveChangesAsync`.
 This behavior can be altered by changing the values of [TenantMismatchMode](#tenant-mismatch-mode) and
-[TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext`.
+[TenantNotSetMode](#tenant-not-set-mode) on the `IMultiTenantDbContext<TId>`.
 
 ```csharp
 // Add a blog for a tenant.
@@ -542,7 +542,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 
 When attaching an entity to tracking in EF Core using either `Add` or `Attach`, all primary keys are required
 to be non-null. MultiTenant will ensure a `TenantId` is assigned if you call the
-`EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext` on your db context. If no `TenantId` is
+`EnforceMultiTenantOnTracking` extension method of `IMultiTenantDbContext<TId>` on your db context. If no `TenantId` is
 initially set then the current `TenantId` of the db context will be used. This applies to both explicit `TenantId`
 properties and implicit `TenantId` shadow properties. It is recommended to call `EnforceMultiTenantOnTracking`
 in your db context constructor.
