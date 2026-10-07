@@ -14,8 +14,8 @@ the library and app.
 
 * `Id` is a unique id for a tenant in your app and should never change.
 * `Identifier` is the value used to resolve a tenant and should use a syntax appropriate for your app (for example, URL-safe
-  characters when it is part of a web address). Unlike `Id`, `Identifier` can be changed if
-  necessary.
+  characters when it is part of a web address). Unlike `Id`, `Identifier` can be changed if necessary by updating the
+  tenant with a new instance (see the [tenant info contract](#tenant-info-contract) below).
 
 The library provides `TenantInfo` as a base implementation. Your app can define a custom class that implements
 `ITenantInfo` or inherits from `TenantInfo`, adding properties as needed. Keep these
@@ -73,11 +73,17 @@ public sealed class AppTenantInfo(string id, string identifier, string? name = n
 }
 ```
 
-In return the library asks for one rule: **`Id` and `Identifier` must not change for the lifetime of an instance once
-it has been handed to the library** (stored, cached, resolved, or assigned to a multi-tenant context). Tenant identity
-is `Id` equality; built-in stores match `Identifier` case-insensitively by default. To change a tenant, create a new
-instance and pass it to the store's `UpdateAsync`. Mutating other properties of your own type is your business, but keep
-in mind the same instance may be shared by caches and by the current request.
+In return the library asks for two things:
+
+* **`Id` never changes.** It is the tenant's identity; tenant equality is `Id` equality.
+* **`Identifier` may change, but only through the store.** Create a new instance carrying the new `Identifier` and pass
+  it to the store's `UpdateAsync`; the store re-keys its lookups and hands out the new instance from then on. Never
+  change `Identifier` in place on an instance the library already holds (a store's map, a cache entry, or the current
+  multi-tenant context), because those are keyed by the value captured when the tenant was added or updated and cannot
+  notice the change. Built-in stores match `Identifier` case-insensitively by default.
+
+Mutating other properties of your own type is your business, but keep in mind the same instance may be shared by caches
+and by the current request.
 
 The library enforces its side of the contract:
 
