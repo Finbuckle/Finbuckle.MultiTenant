@@ -113,6 +113,8 @@ public static class MultiTenantBuilderExtensions
     /// <param name="tenantInfoFactory">
     /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys overlaid on the
     /// <c>Defaults</c> section). Use when <typeparamref name="TTenantInfo"/> has no settable properties.
+    /// Read values during the factory call and return a self-contained tenant. The supplied configuration is
+    /// disposed after the factory returns and must not be retained for ongoing use.
     /// </param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo> WithConfigurationStore<TTenantInfo>(
