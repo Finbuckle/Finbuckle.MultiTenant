@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.13</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) Finbuckle.MultiTenant <span class="_version">9.4.14</span>
 
 ## About Finbuckle.MultiTenant
 
@@ -12,7 +12,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 Table of Contents
 
-1. [What's New in v<span class="_version">9.4.13</span>](#whats-new)
+1. [What's New in v<span class="_version">9.4.14</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -25,15 +25,15 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">9.4.13</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">9.4.14</span>
 
-> This section only lists release update details specific to v<span class="_version">9.4.13</span>. See
+> This section only lists release update details specific to v<span class="_version">9.4.14</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
 
 ### Bug Fixes
 
-* update dependencies ([#1207](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1207)) ([d4c5477](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/d4c547704547ac8f5b3827e2d9a43f151c3fc633))
+* update dependencies ([fdad143](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/fdad14382b747fa1717fc10a8b1af954f1b1def9))
 <!--_release-notes-->
 
 ## Open Source Support
