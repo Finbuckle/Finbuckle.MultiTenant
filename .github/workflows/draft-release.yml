@@ -29,7 +29,7 @@ jobs:
         run: dotnet prepare-release.cs
       - name: update lock files
         if: steps.prepare.outputs.bump_level != ''
-        run: dotnet restore
+        run: dotnet restore --force-evaluate
       - name: commit, tag and push
         if: steps.prepare.outputs.bump_level != ''
         run: |
