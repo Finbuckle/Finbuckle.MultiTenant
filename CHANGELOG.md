@@ -1,3 +1,9 @@
+## [10.1.5](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.1.4...v10.1.5) (2026-10-19)
+
+### Bug Fixes
+
+* update dependencies ([b3bea33](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/b3bea331364a421b48197040893e928f54ff44a8))
+
 ## [10.1.4](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.1.3...v10.1.4) (2026-09-10)
 
 ### Bug Fixes
