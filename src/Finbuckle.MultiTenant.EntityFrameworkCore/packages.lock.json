@@ -173,7 +173,7 @@
       "finbuckle.multitenant": {
         "type": "Project",
         "dependencies": {
-          "Finbuckle.MultiTenant.Abstractions": "[10.1.5, )",
+          "Finbuckle.MultiTenant.Abstractions": "[10.1.6, )",
           "Microsoft.Extensions.Caching.Abstractions": "[10.0.14, )",
           "Microsoft.Extensions.Configuration": "[10.0.14, )",
           "Microsoft.Extensions.DependencyInjection": "[10.0.14, )",
