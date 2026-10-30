@@ -14,8 +14,8 @@ the library and app.
 
 * `Id` is a unique id for a tenant in your app and should never change.
 * `Identifier` is the value used to resolve a tenant and should use a syntax appropriate for your app (for example, URL-safe
-  characters when it is part of a web address). Unlike `Id`, `Identifier` can be changed if
-  necessary.
+  characters when it is part of a web address). Unlike `Id`, `Identifier` can be changed if necessary by updating the
+  tenant with a new instance (see the [tenant info contract](#tenant-info-contract) below).
 
 The library provides `TenantInfo` as a base implementation. Your app can define a custom class that implements
 `ITenantInfo` or inherits from `TenantInfo`, adding properties as needed. Keep these
@@ -39,8 +39,60 @@ The `MultiTenantContext<TTenantInfo>` contains information about the current ten
 * The `HttpContext` extension method `SetTenantInfo` can be used to manually set the current tenant, but normally the middleware handles this.
 * A custom implementation can be defined for advanced use cases.
 
-> In the original v10 release the `TenantInfo` property was immutable, but this change was reverted. It is 
-> recommended that you only mutate the `TenantInfo` property with extreme care.
+> In the original v10 release `TenantInfo` was a record and `ITenantInfo` was removed to enforce immutability. This
+> was reverted in 10.0.2 in favor of the interface contract described below, which the library enforces on its side
+> and proves by test for both mutable and immutable implementations.
+
+### Tenant info contract
+
+`ITenantInfo` is the only contract the library depends on. It is **read-only from the library's point of view**: the
+library never writes to a tenant info instance after it has been constructed and never forces a particular shape onto
+your type. All of the following are supported and covered by the test suite:
+
+```csharp
+// plain mutable properties
+public class AppTenantInfo : ITenantInfo
+{
+    public string Id { get; set; } = string.Empty;
+    public string Identifier { get; set; } = string.Empty;
+    public string? Name { get; set; }
+}
+
+// init-only properties (the shape of the built-in TenantInfo)
+public class AppTenantInfo : TenantInfo
+{
+    public string? ConnectionString { get; init; }
+}
+
+// constructor-only, fully immutable, not derived from TenantInfo and not a record
+public sealed class AppTenantInfo(string id, string identifier, string? name = null) : ITenantInfo
+{
+    public string Id { get; } = id;
+    public string Identifier { get; } = identifier;
+    public string? Name { get; } = name;
+}
+```
+
+In return the library asks for two things:
+
+* **`Id` never changes.** It is the tenant's identity; tenant equality is `Id` equality.
+* **`Identifier` may change, but only through the store.** Create a new instance carrying the new `Identifier` and pass
+  it to the store's `UpdateAsync`; the store re-keys its lookups and hands out the new instance from then on. Never
+  change `Identifier` in place on an instance the library already holds (a store's map, a cache entry, or the current
+  multi-tenant context), because those are keyed by the value captured when the tenant was added or updated and cannot
+  notice the change. Built-in stores match `Identifier` case-insensitively by default.
+
+Mutating other properties of your own type is your business, but keep in mind the same instance may be shared by caches
+and by the current request.
+
+The library enforces its side of the contract:
+
+* `IMultiTenantContext` and `MultiTenantContext<TTenantInfo>` are init-only; the current tenant of a request is changed
+  only by assigning a new context (for example through `HttpContext.SetTenantInfo`), never by mutating the current
+  instance.
+* Stores that must construct tenant instances themselves (`ConfigurationStore` and `EchoStore`) accept a factory for
+  constructor-only types and throw a clear `MultiTenantException` when a type cannot be constructed. See
+  [MultiTenant Stores](Stores) for details.
 
 ## MultiTenant Strategies
 
