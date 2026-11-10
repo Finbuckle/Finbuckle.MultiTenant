@@ -8,6 +8,8 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 **This release supports .NET 9 and .NET 8.**
 
+**This is the final release for Finbuckle.MultiTenant v9.x**
+
 ## Open Source Support
 
 Table of Contents
