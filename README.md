@@ -8,8 +8,7 @@ See [https://www.finbuckle.com/multitenant](https://www.finbuckle.com/multitenan
 
 **This release supports .NET 6, .NET 7, and .NET 8.**
 
-Current publish feed release:  
-![Finbuckle.MultiTenant NuGet.org badge](https://buildstats.info/nuget/finbuckle.multitenant)
+**Note: This is the final release of Finbuckle.MultiTenant v8.x**
 
 Table of Contents
 
