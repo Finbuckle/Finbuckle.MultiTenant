@@ -111,8 +111,9 @@ public static class MultiTenantBuilderExtensions
     /// <param name="configuration">The <see cref="IConfiguration"/> to load the section from.</param>
     /// <param name="sectionName">The configuration section to load.</param>
     /// <param name="tenantInfoFactory">
-    /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys overlaid on the
-    /// <c>Defaults</c> section). Use when <typeparamref name="TTenantInfo"/> has no settable properties.
+    /// Creates a <typeparamref name="TTenantInfo"/> from a single tenant's configuration (its own keys layered over the
+    /// <c>Defaults</c> section, so collection entries present in both are overlaid by index rather than appended).
+    /// Use when <typeparamref name="TTenantInfo"/> has no settable properties.
     /// Read values during the factory call and return a self-contained tenant. The supplied configuration is
     /// disposed after the factory returns and must not be retained for ongoing use.
     /// </param>

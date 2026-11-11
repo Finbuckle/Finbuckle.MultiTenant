@@ -15,16 +15,25 @@ namespace Finbuckle.MultiTenant.Stores;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> derived type.</typeparam>
 /// <remarks>
+/// <para>
 /// By default each tenant is created by binding the <c>Defaults</c> section and then the tenant section onto a new
-/// instance, which requires settable properties (<c>set</c> or <c>init</c>, public or non-public). For
-/// constructor-only implementations pass a <c>tenantInfoFactory</c> to the constructor (or to the
-/// <c>WithConfigurationStore</c> overload that accepts one).
+/// instance, which requires settable properties (<c>set</c> or <c>init</c>, public or non-public). Because the two
+/// sections are bound one after the other, collection properties present in both are appended: the tenant's entries
+/// follow the defaults' entries. Scalar values and dictionary keys in the tenant section replace those from
+/// <c>Defaults</c>.
+/// </para>
+/// <para>
+/// For constructor-only implementations pass a <c>tenantInfoFactory</c> to the constructor (or to the
+/// <c>WithConfigurationStore</c> overload that accepts one). The factory receives a single configuration with the
+/// tenant section layered over <c>Defaults</c>, so collection entries present in both are overlaid by index rather
+/// than appended.
+/// </para>
 /// </remarks>
 public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
     private readonly IConfigurationSection section;
-    private readonly Func<IConfiguration, TTenantInfo> tenantInfoFactory;
+    private readonly Func<IConfiguration, TTenantInfo>? tenantInfoFactory;
     private ConcurrentDictionary<string, TTenantInfo> tenantMap = new();
 
     // ReSharper disable once IntroduceOptionalParameters.Global
@@ -46,7 +55,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <exception cref="ArgumentException">Thrown when <paramref name="sectionName"/> is null or empty.</exception>
     /// <exception cref="MultiTenantException">Thrown when the section name is invalid or a tenant cannot be bound.</exception>
     public ConfigurationStore(IConfiguration configuration, string sectionName)
-        : this(configuration, sectionName, BindTenantInfo, validateFactory: false)
+        : this(configuration, sectionName, tenantInfoFactory: null, validateFactory: false)
     {
     }
 
@@ -57,7 +66,8 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     /// <param name="sectionName">Name of the section within the configuration containing tenant information.</param>
     /// <param name="tenantInfoFactory">
     /// Creates a <typeparamref name="TTenantInfo"/> from the configuration of a single tenant. The configuration
-    /// passed in contains the tenant's own keys overlaid on the <c>Defaults</c> section. Use this when
+    /// passed in contains the tenant's own keys layered over the <c>Defaults</c> section, so collection entries present
+    /// in both are overlaid by index rather than appended (unlike default binding). Use this when
     /// <typeparamref name="TTenantInfo"/> has no settable properties, e.g. a constructor-only immutable implementation.
     /// Read the configuration during this call and return a self-contained tenant. The supplied configuration is
     /// disposed after the factory returns and must not be retained for ongoing use.
@@ -72,7 +82,7 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
     }
 
     private ConfigurationStore(IConfiguration configuration, string sectionName,
-        Func<IConfiguration, TTenantInfo> tenantInfoFactory, bool validateFactory)
+        Func<IConfiguration, TTenantInfo>? tenantInfoFactory, bool validateFactory)
     {
         ArgumentNullException.ThrowIfNull(configuration);
         if (validateFactory)
@@ -104,16 +114,9 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
 
         foreach (var tenantSection in tenants)
         {
-            // The tenant's own keys take precedence over the Defaults section.
-            var merged = new ConfigurationBuilder()
-                .AddConfiguration(defaults)
-                .AddConfiguration(tenantSection)
-                .Build();
-
-            using var mergedLifetime = merged as IDisposable;
-            var newTenant = tenantInfoFactory(merged) ??
-                            throw new MultiTenantException(
-                                $"The tenant info factory returned null for configuration section '{tenantSection.Path}'.");
+            var newTenant = tenantInfoFactory is null
+                ? BindTenantInfo(defaults, tenantSection)
+                : CreateTenantInfo(tenantInfoFactory, defaults, tenantSection);
 
             if (string.IsNullOrWhiteSpace(newTenant.Id) || string.IsNullOrWhiteSpace(newTenant.Identifier))
             {
@@ -130,11 +133,30 @@ public class ConfigurationStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> wh
         tenantMap = newMap;
     }
 
-    private static TTenantInfo BindTenantInfo(IConfiguration tenantConfiguration)
+    // Binds Defaults and then the tenant section onto the same instance. Binding twice (rather than binding a merged
+    // configuration) preserves the established behavior that collection entries from both sections are appended.
+    private static TTenantInfo BindTenantInfo(IConfigurationSection defaults, IConfigurationSection tenantSection)
     {
         var newTenant = (TTenantInfo)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
-        tenantConfiguration.Bind(newTenant, options => options.BindNonPublicProperties = true);
+        defaults.Bind(newTenant, options => options.BindNonPublicProperties = true);
+        tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
         return newTenant;
+    }
+
+    // Layers the tenant section over Defaults into one configuration (the tenant's keys take precedence) and passes it
+    // to the factory. The temporary configuration is disposed afterward to release its reload token registrations.
+    private static TTenantInfo CreateTenantInfo(Func<IConfiguration, TTenantInfo> factory,
+        IConfigurationSection defaults, IConfigurationSection tenantSection)
+    {
+        var merged = new ConfigurationBuilder()
+            .AddConfiguration(defaults)
+            .AddConfiguration(tenantSection)
+            .Build();
+
+        using var mergedLifetime = merged as IDisposable;
+        return factory(merged) ??
+               throw new MultiTenantException(
+                   $"The tenant info factory returned null for configuration section '{tenantSection.Path}'.");
     }
 
     /// <summary>
