@@ -69,26 +69,131 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await store.GetByIdentifierAsync(null!));
     }
 
-    [Fact]
-    public async Task OverlayTenantCollectionEntriesOnDefaultsByIndex()
+    private const string CollectionPrefix = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
+
+    private static IConfiguration BuildCollectionConfiguration(Dictionary<string, string?> values)
     {
-        // The tenant section is layered over Defaults into one configuration before binding, so collection entries
-        // present in both are overlaid by index (standard configuration layering) rather than appended.
-        const string prefix = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                [$"{prefix}:Defaults:Tags:0"] = "default-0",
-                [$"{prefix}:Defaults:Tags:1"] = "default-1",
-                [$"{prefix}:Tenants:0:Id"] = "initech-id",
-                [$"{prefix}:Tenants:0:Identifier"] = "initech",
-                [$"{prefix}:Tenants:0:Tags:0"] = "initech-0",
-                [$"{prefix}:Tenants:1:Id"] = "lol-id",
-                [$"{prefix}:Tenants:1:Identifier"] = "lol"
-            })
-            .Build();
+        var data = new Dictionary<string, string?>
+        {
+            [$"{CollectionPrefix}:Tenants:0:Id"] = "initech-id",
+            [$"{CollectionPrefix}:Tenants:0:Identifier"] = "initech",
+            [$"{CollectionPrefix}:Tenants:1:Id"] = "lol-id",
+            [$"{CollectionPrefix}:Tenants:1:Identifier"] = "lol"
+        };
+
+        foreach (var (key, value) in values)
+            data[$"{CollectionPrefix}:{key}"] = value;
+
+        return new ConfigurationBuilder().AddInMemoryCollection(data).Build();
+    }
+
+    [Fact]
+    public async Task AppendTenantListEntriesToDefaults()
+    {
+        // Defaults and the tenant section are bound one after the other, so list entries present in both are
+        // appended (the behavior since before 10.2.0).
+        var configuration = BuildCollectionConfiguration(new Dictionary<string, string?>
+        {
+            ["Defaults:Tags:0"] = "default-0",
+            ["Defaults:Tags:1"] = "default-1",
+            ["Tenants:0:Tags:0"] = "initech-0"
+        });
 
         var store = new ConfigurationStore<TaggedTenantInfo>(configuration);
+
+        var initech = await store.GetByIdentifierAsync("initech");
+        var lol = await store.GetByIdentifierAsync("lol");
+
+        Assert.NotNull(initech);
+        Assert.Equal(new[] { "default-0", "default-1", "initech-0" }, initech.Tags);
+        Assert.NotNull(lol);
+        Assert.Equal(new[] { "default-0", "default-1" }, lol.Tags);
+    }
+
+    [Fact]
+    public async Task AppendTenantListEntriesWhenTenantHasMoreEntriesThanDefaults()
+    {
+        var configuration = BuildCollectionConfiguration(new Dictionary<string, string?>
+        {
+            ["Defaults:Tags:0"] = "default-0",
+            ["Tenants:0:Tags:0"] = "initech-0",
+            ["Tenants:0:Tags:1"] = "initech-1",
+            ["Tenants:0:Tags:2"] = "initech-2"
+        });
+
+        var store = new ConfigurationStore<TaggedTenantInfo>(configuration);
+
+        var initech = await store.GetByIdentifierAsync("initech");
+
+        Assert.NotNull(initech);
+        Assert.Equal(new[] { "default-0", "initech-0", "initech-1", "initech-2" }, initech.Tags);
+    }
+
+    [Fact]
+    public async Task AppendTenantArrayEntriesToDefaults()
+    {
+        var configuration = BuildCollectionConfiguration(new Dictionary<string, string?>
+        {
+            ["Defaults:Codes:0"] = "default-0",
+            ["Defaults:Codes:1"] = "default-1",
+            ["Tenants:0:Codes:0"] = "initech-0"
+        });
+
+        var store = new ConfigurationStore<TaggedTenantInfo>(configuration);
+
+        var initech = await store.GetByIdentifierAsync("initech");
+        var lol = await store.GetByIdentifierAsync("lol");
+
+        Assert.NotNull(initech);
+        Assert.Equal(new[] { "default-0", "default-1", "initech-0" }, initech.Codes);
+        Assert.NotNull(lol);
+        Assert.Equal(new[] { "default-0", "default-1" }, lol.Codes);
+    }
+
+    [Fact]
+    public async Task MergeDictionaryKeysFromDefaultsAndTenant()
+    {
+        // Dictionaries merge by key: tenant keys replace matching default keys and other default keys are kept.
+        var configuration = BuildCollectionConfiguration(new Dictionary<string, string?>
+        {
+            ["Defaults:Settings:Theme"] = "light",
+            ["Defaults:Settings:Region"] = "us",
+            ["Tenants:0:Settings:Theme"] = "dark",
+            ["Tenants:0:Settings:Plan"] = "gold"
+        });
+
+        var store = new ConfigurationStore<TaggedTenantInfo>(configuration);
+
+        var initech = await store.GetByIdentifierAsync("initech");
+        var lol = await store.GetByIdentifierAsync("lol");
+
+        Assert.NotNull(initech);
+        Assert.Equal(
+            new Dictionary<string, string> { ["Theme"] = "dark", ["Region"] = "us", ["Plan"] = "gold" },
+            initech.Settings);
+        Assert.NotNull(lol);
+        Assert.Equal(new Dictionary<string, string> { ["Theme"] = "light", ["Region"] = "us" }, lol.Settings);
+    }
+
+    [Fact]
+    public async Task OverlayTenantCollectionEntriesOnDefaultsByIndexForFactory()
+    {
+        // The factory receives one configuration with the tenant section layered over Defaults, so collection
+        // entries present in both are overlaid by index (standard configuration layering) rather than appended.
+        var configuration = BuildCollectionConfiguration(new Dictionary<string, string?>
+        {
+            ["Defaults:Tags:0"] = "default-0",
+            ["Defaults:Tags:1"] = "default-1",
+            ["Tenants:0:Tags:0"] = "initech-0"
+        });
+
+        var store = new ConfigurationStore<TaggedTenantInfo>(configuration, CollectionPrefix, config =>
+            new TaggedTenantInfo
+            {
+                Id = config["Id"]!,
+                Identifier = config["Identifier"]!,
+                Tags = config.GetSection("Tags").Get<List<string>>() ?? new()
+            });
 
         var initech = await store.GetByIdentifierAsync("initech");
         var lol = await store.GetByIdentifierAsync("lol");
@@ -172,5 +277,7 @@ public class ConfigurationStoreShould : MultiTenantStoreTestBase
     public class TaggedTenantInfo : TenantInfo
     {
         public List<string> Tags { get; set; } = new();
+        public string[] Codes { get; set; } = [];
+        public Dictionary<string, string> Settings { get; set; } = new();
     }
 }

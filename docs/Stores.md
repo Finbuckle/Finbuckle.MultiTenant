@@ -137,23 +137,9 @@ builder.Services.AddMultiTenant<TenantInfo>()
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
-automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
+automatically copied into each tenant unless the tenant specifies its own value (collections are the exception; see
+below). For a custom implementation
 of `TenantInfo`, its properties are mapped from the JSON automatically.
-
-Properties are bound with the standard configuration binder, so they need a setter (`set` or `init`, public or
-non-public). For a constructor-only immutable tenant info type the store throws a `MultiTenantException` explaining the
-problem; pass a factory instead, which receives the tenant's own keys overlaid on the `Defaults` section:
-
-```csharp
-builder.Services.AddMultiTenant<AppTenantInfo>()
-    .WithConfigurationStore(builder.Configuration, "Finbuckle:MultiTenant:Stores:ConfigurationStore",
-        config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
-```
-
-The singleton store retains the factory and invokes it for each tenant during initialization and configuration
-reloads. The factory must support concurrent calls. Avoid capturing scoped services or unsynchronized mutable state.
-Read the supplied configuration during the call and return a fully constructed tenant with stable identity values;
-the configuration is disposed after the factory returns and must not be retained for ongoing use.
 
 ```json
 {
@@ -178,6 +164,37 @@ the configuration is disposed after the factory returns and must not be retained
   }
 }
 ```
+
+Each tenant is created by binding the `Defaults` section and then the tenant's own section onto a new instance, so:
+
+* scalar values in the tenant section replace the value from `Defaults`,
+* dictionary entries are merged by key, with tenant keys replacing matching default keys,
+* collection (list or array) entries are **appended**: the tenant's entries follow the entries from `Defaults`. For
+  example, `"Tags": ["a", "b"]` in `Defaults` and `"Tags": ["c"]` in a tenant gives that tenant `["a", "b", "c"]`.
+  To give a tenant a different collection rather than an extended one, leave the property out of `Defaults`.
+
+Properties are bound with the standard configuration binder, so they need a setter (`set` or `init`, public or
+non-public). For a constructor-only immutable tenant info type the store throws a `MultiTenantException` explaining the
+problem; pass a factory instead:
+
+```csharp
+builder.Services.AddMultiTenant<AppTenantInfo>()
+    .WithConfigurationStore(builder.Configuration, "Finbuckle:MultiTenant:Stores:ConfigurationStore",
+        config => new AppTenantInfo(config["Id"]!, config["Identifier"]!, config["ConnectionString"]));
+```
+
+The factory receives a single configuration with the tenant's own keys layered over the `Defaults` section. Scalar
+values and dictionary keys behave as above, but collection entries present in both are **overlaid by index** rather
+than appended, as with any layered .NET configuration: `["a", "b"]` in `Defaults` and `["c"]` in a tenant reads as
+`["c", "b"]`. Read collections with care, or keep them out of `Defaults`, if this matters to your app.
+
+The singleton store retains the factory and invokes it for each tenant during initialization and configuration
+reloads. The factory must support concurrent calls. Avoid capturing scoped services or unsynchronized mutable state.
+Read the supplied configuration during the call and return a fully constructed tenant with stable identity values;
+the configuration is disposed after the factory returns and must not be retained for ongoing use.
+
+Every tenant must end up with a non-empty `Id` and `Identifier`, whether bound or created by a factory; otherwise the
+store throws a `MultiTenantException` naming the offending configuration section.
 
 ## EFCore Store
 
