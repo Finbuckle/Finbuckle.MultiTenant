@@ -1,4 +1,4 @@
-# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.2.0</span>
+# ![Finbuckle Logo](https://www.finbuckle.com/images/finbuckle-32x32-gh.png) MultiTenant <span class="_version">10.1.6</span>
 
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
@@ -18,7 +18,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 
 Table of Contents
 
-1. [What's New in v<span class="_version">10.2.0</span>](#whats-new)
+1. [What's New in v<span class="_version">10.1.6</span>](#whats-new)
 2. [Open Source Support](#open-source-support)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
@@ -31,27 +31,16 @@ Table of Contents
 11. [Building from Source](#building-from-source)
 12. [Running Unit Tests](#running-unit-tests)
 
-## <a name="whats-new"></a> What's New in v<span class="_version">10.2.0</span>
+## <a name="whats-new"></a> What's New in v<span class="_version">10.1.6</span>
 
-> This section only lists release update details specific to v<span class="_version">10.2.0</span>. See
+> This section only lists release update details specific to v<span class="_version">10.1.6</span>. See
 > the [changelog file](CHANGELOG.md) for all release update details.
 <!--_release-notes-->
-### Features
-
-#### finbuckle
-
-* support constructor-only tenant info in EchoStore and ConfigurationStore ([#1205](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1205) by [@fdcastel](https://github.com/fdcastel)) ([1217d16](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/1217d168198a4261c54f2962eecc1b59c9cef9b8))
-
-
 ### Bug Fixes
 
 #### deps
 
-* update source dependencies ([#1225](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1225) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([c25b301](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c25b301a84bf0351159be40b4c78fa05ba4ce042))
-
-#### finbuckle
-
-* dispose temporary tenant configurations ([#1205](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1205) by [@fdcastel](https://github.com/fdcastel)) ([ce7851f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ce7851f29f8d515d45931aac4914649e4adef8f7))
+* update source dependencies ([#1222](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1222) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([bbeaeca](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/bbeaecaa16f95ef86d79910d5027463dc0c46535))
 
 
 
