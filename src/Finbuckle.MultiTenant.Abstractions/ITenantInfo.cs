@@ -20,8 +20,9 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// may change, but only through the store: create a new instance carrying the new identifier and pass it to the
 /// store's update method, which re-keys its lookups. Never change <see cref="Identifier"/> in place on an instance the
 /// library already holds (stored, cached, resolved, or assigned to a tenant context), because those are keyed by the
-/// value captured when the tenant was added or updated. Built-in stores look up <see cref="Identifier"/>
-/// case-insensitively.
+/// value captured when the tenant was added or updated. Whether <see cref="Identifier"/> lookups are case-sensitive
+/// depends on the store: the in-memory and configuration stores are case-insensitive, while the others follow their
+/// backing database, cache, or remote server.
 /// </para>
 /// <para>
 /// The active tenant of an ambient tenant scope can only be assigned once; the library exposes no API to replace it.
@@ -42,8 +43,8 @@ public interface ITenantInfo<out TId> where TId : IEquatable<TId>
     /// Gets an externally facing identifier used for tenant resolution.
     /// </summary>
     /// <remarks>
-    /// Must be non-empty. Built-in stores match it case-insensitively. May change over a tenant's lifetime, but only
-    /// by passing a new instance to the store's update method, never by changing it in place on an instance the
+    /// Must be non-empty. Case sensitivity of lookups depends on the store. May change over a tenant's lifetime, but
+    /// only by passing a new instance to the store's update method, never by changing it in place on an instance the
     /// library already holds.
     /// </remarks>
     public string Identifier { get; }

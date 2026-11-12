@@ -29,6 +29,12 @@ MultiTenant includes several built-in stores and store caches. Custom primary st
 > serialized from JSON for the configuration store if using JSON file configuration sources. The examples in this
 > documentation use the `TenantInfo` basic implementation.
 
+The `HttpRemoteStore` and `DistributedCacheStoreCache` create tenant instances with `System.Text.Json`. A
+constructor-only tenant info type works with them when it has exactly one public constructor whose parameter names
+match its property names (for example a primary constructor, as in the
+[tenant info contract](CoreConcepts#tenant-info-contract) example). If the type has more than one public constructor,
+mark the one to use with `[JsonConstructor]`; otherwise deserialization throws a `NotSupportedException`.
+
 ## TenantManager
 
 `TenantManager<TTenantInfo, TId>` is the main API for reading and writing tenant information at runtime. App code should
@@ -168,13 +174,14 @@ configuration object or section name if needed.
 builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithConfigurationStore()...
     
-// or use a different configuration path key
+// or use a different configuration object and section name
 builder.Services.AddMultiTenant<TenantInfo, string>()
-    .WithConfigurationStore("customConfigurationPathKey")...
+    .WithConfigurationStore(builder.Configuration, "MyApp:Tenants")...
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
-automatically copied into each tenant unless the tenant specifies its own value. For a custom implementation
+automatically copied into each tenant unless the tenant specifies its own value (collections are the exception; see
+[how defaults and tenant values combine](#how-defaults-and-tenant-values-combine)). For a custom implementation
 of `TenantInfo` properties are mapped from the JSON automatically.
 
 Each tenant is created with the standard configuration binder from the tenant's own keys overlaid on the `Defaults`
@@ -219,6 +226,27 @@ the configuration is disposed after the factory returns and must not be retained
 }
 ```
 
+### How defaults and tenant values combine
+
+Each tenant's own section is layered over the `Defaults` section, the same way later .NET configuration sources
+override earlier ones, and the tenant info instance is then created from the result. This applies both to the standard
+binder and to a factory:
+
+* Scalar values in the tenant section replace the value from `Defaults`.
+* Dictionary entries are merged by key, with tenant keys replacing matching default keys.
+* Collection (list or array) entries are **overlaid by index**, not appended. `"Tags": ["a", "b"]` in `Defaults` and
+  `"Tags": ["c"]` in a tenant gives that tenant `["c", "b"]`; a tenant with three tags replaces both defaults and adds
+  one. To give a tenant its own collection rather than one combined with the defaults, leave the property out of
+  `Defaults`.
+
+Because the standard binder creates the instance through its constructor, property initializers run first:
+
+* A scalar property initializer acts as a fallback: `public string Plan { get; set; } = "free";` stays `"free"` unless
+  `Defaults` or the tenant sets it.
+* A list property initializer is **added to**, not replaced: with `public List<string> Tags { get; set; } = ["seed"];`
+  the configured tags are appended after `"seed"`. Put fallback collection values in `Defaults` instead of an
+  initializer.
+
 ## EFCore Store
 
 > NuGet package: Finbuckle.MultiTenant.EntityFrameworkCore
@@ -226,6 +254,10 @@ the configuration is disposed after the factory returns and must not be retained
 Uses an Entity Framework Core database context as the backing store.
 
 Case sensitivity is determined by the underlying EF Core database provider.
+
+EF Core does not map getter-only properties by convention. `Id` and `Identifier` are mapped by `EFCoreStoreDbContext`,
+but any additional properties of a constructor-only tenant info type must be mapped explicitly, for example with
+`modelBuilder.Entity<AppTenantInfo>().Property(t => t.Name)` in `OnModelCreating`.
 
 The database context must derive from `EFCoreStoreDbContext`. The `EFCoreStore` carefully avoids tracking issues by 
 using no-tracking queries and detaching entities after store operations. If your app uses the
@@ -308,8 +340,11 @@ Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/perfor
 mechanism. The distributed cache can use Redis, SQL Server, NCache, or an in-memory (for testing purposes)
 implementation. Configure expiration with `DistributedCacheEntryOptions`.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This store will attempt to deserialize the tenant using
-the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
+This cache serializes and deserializes the tenant with the default `System.Text.Json` options.
+
+The tenant identifier is part of the cache key, so case sensitivity is determined by how the cache implementation
+compares keys. The in-memory and Redis caches compare keys exactly: a lookup whose casing differs from the stored
+`Identifier` misses the cache and is answered by the next cache or the primary store.
 
 Each tenant info instance is actually cached twice, once using the Tenant ID as the key and another using the Tenant
 Identifier as the key. `TenantManager` keeps these dual cache entries synced through read-through population and
@@ -335,6 +370,9 @@ services.AddMultiTenant<TenantInfo, string>()
 
 Uses the standard .NET `IMemoryCache` as a tenant store cache. Configure expiration with
 `MemoryCacheEntryOptions`.
+
+Cache keys include the tenant identifier and are compared exactly, so lookups are case-sensitive: a lookup whose casing
+differs from the stored `Identifier` misses the cache and is answered by the next cache or the primary store.
 
 ```csharp
 services.AddMultiTenant<TenantInfo, string>()
