@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <!-- Run on the targeted .NET runtime when it is installed, otherwise roll forward to the next newer major
+             version (for example, .NET 11 on a machine without the .NET 10 runtime). -->
+        <RollForward>Major</RollForward>
+    </PropertyGroup>
+</Project>

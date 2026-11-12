@@ -40,13 +40,15 @@ public class InMemoryStoreImmutableTenantShould : ImmutableTenantStoreTestBase
     }
 
     [Fact]
-    public void AcceptImmutableTenantsFromOptions()
+    public async Task AcceptImmutableTenantsFromOptions()
     {
         var options = new InMemoryStoreOptions<ImmutableTenantInfo>();
         options.Tenants.Add(new ImmutableTenantInfo("initech-id", "initech"));
         var store = new InMemoryStore<ImmutableTenantInfo>(MsOptions.Create(options));
 
-        Assert.Equal("initech-id", store.GetByIdentifierAsync("initech").Result?.Id);
+        var tenant = await store.GetByIdentifierAsync("initech");
+
+        Assert.Equal("initech-id", tenant?.Id);
     }
 
     [Fact]
