@@ -15,10 +15,6 @@
 
 * update source dependencies ([#1225](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1225) by [@github-actions[bot]](https://github.com/github-actions[bot])) ([c25b301](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/c25b301a84bf0351159be40b4c78fa05ba4ce042))
 
-#### finbuckle
-
-* dispose temporary tenant configurations ([#1205](https://github.com/Finbuckle/Finbuckle.MultiTenant/issues/1205) by [@fdcastel](https://github.com/fdcastel)) ([ce7851f](https://github.com/Finbuckle/Finbuckle.MultiTenant/commit/ce7851f29f8d515d45931aac4914649e4adef8f7))
-
 
 ## [10.1.6](https://github.com/Finbuckle/Finbuckle.MultiTenant/compare/v10.1.5...v10.1.6) (2026-10-30)
 
