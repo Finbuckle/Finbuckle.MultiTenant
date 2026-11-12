@@ -18,6 +18,12 @@ to `UpdateAsync`, never in place on an instance a store already holds. Construct
 supported by every store; `ConfigurationStore` and `EchoStore`, which have to construct instances themselves, take a
 factory for such types (see below). See the [tenant info contract](CoreConcepts#tenant-info-contract) for details.
 
+The `HttpRemoteStore` and `DistributedCacheStore` create tenant instances with `System.Text.Json`. A constructor-only
+type works with these stores when it has exactly one public constructor whose parameter names match its property names
+(for example a primary constructor, as in the [tenant info contract](CoreConcepts#tenant-info-contract) example). If the
+type has more than one public constructor, mark the one to use with `[JsonConstructor]`; otherwise deserialization
+throws a `NotSupportedException`.
+
 The examples in this documentation use the `TenantInfo` basic implementation.
 
 ## IMultiTenantStore and Custom Stores
@@ -131,9 +137,9 @@ configuration object or section name if needed.
 builder.Services.AddMultiTenant<TenantInfo>()
     .WithConfigurationStore()...
     
-// or use a different configuration path key
+// or use a different configuration object and section name
 builder.Services.AddMultiTenant<TenantInfo>()
-    .WithConfigurationStore("customConfigurationPathKey")...
+    .WithConfigurationStore(builder.Configuration, "MyApp:Tenants")...
 ```
 
 The configuration section should use this JSON format shown below. Any fields in the `Defaults` section will be
@@ -286,8 +292,11 @@ Uses the [distributed cache](https://docs.microsoft.com/en-us/aspnet/core/perfor
 mechanism. The distributed cache can use Redis, SQL Server, NCache, or an in-memory (for testing purposes)
 implementation. A sliding expiration is also supported. The store does not interact with any other stores by default.
 Make sure the tenant info type will support basic JSON serialization and deserialization via `System.Text.Json`.
-This store attempts to deserialize the tenant using
-the [System.Text.Json web defaults](https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-configure-options?pivots=dotnet-6-0#web-defaults-for-jsonserializeroptions).
+This store serializes and deserializes the tenant with the default `System.Text.Json` options.
+
+The tenant identifier is part of the cache key, so case sensitivity when retrieving tenant information by tenant
+identifier is determined by how the cache implementation compares keys. The in-memory and Redis caches compare keys
+exactly, so lookups are case-sensitive.
 
 Each tenant info instance is actually stored twice in the cache, once using the Tenant ID as the key and another using
 the Tenant Identifier as the key. Calls to `AddAsync`, `UpdateAsync`, and `RemoveAsync` will keep these dual

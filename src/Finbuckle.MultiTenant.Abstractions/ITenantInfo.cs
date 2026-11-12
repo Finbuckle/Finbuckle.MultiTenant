@@ -16,9 +16,10 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// create a new instance carrying the new identifier and pass it to the store's update method, which re-keys its
 /// lookups. Never change <see cref="Identifier"/> in place on an instance the library already holds (stored, cached,
 /// resolved, or assigned to a multi-tenant context), because those are keyed by the value captured when the tenant was
-/// added or updated. Built-in stores look up <see cref="Identifier"/> case-insensitively by default. The current
-/// tenant of a request is changed only by assigning a new <see cref="IMultiTenantContext"/>, never by mutating the
-/// current instance.
+/// added or updated. Whether <see cref="Identifier"/> lookups are case-sensitive depends on the store: the in-memory
+/// and configuration stores are case-insensitive by default, while others follow their backing database, cache, or
+/// remote server. The current tenant of a request is changed only by assigning a new
+/// <see cref="IMultiTenantContext"/>, never by mutating the current instance.
 /// </para>
 /// </remarks>
 public interface ITenantInfo
