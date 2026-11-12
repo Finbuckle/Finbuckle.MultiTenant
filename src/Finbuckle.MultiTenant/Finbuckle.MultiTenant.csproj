@@ -22,7 +22,7 @@
     </Target>
 
     <ItemGroup>
-        <None Update="buildTransitive/Finbuckle.MultiTenant.targets" Pack="true" PackagePath="buildTransitive/" />
+        <None Include="buildTransitive/Finbuckle.MultiTenant.targets" Pack="true" PackagePath="buildTransitive/Finbuckle.MultiTenant.targets" />
     </ItemGroup>
 
     <Import Project="buildTransitive/Finbuckle.MultiTenant.targets" />
