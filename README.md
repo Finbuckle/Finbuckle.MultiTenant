@@ -17,7 +17,7 @@ In general, you should target the version of MultiTenant that matches your .NET 
 Table of Contents
 
 1. [What's New in v<span class="_version">10.1.6</span>](#whats-new)
-2. [Open Source Maintenance Fee](#open-source-maintenance-fee)
+2. [Sponsorship](#sponsorship)
 3. [Quick Start](#quick-start)
 4. [Documentation](#documentation)
 5. [Sample Projects](#sample-projects)
@@ -44,18 +44,14 @@ Table of Contents
 
 <!--_release-notes-->
 
-## Open Source Maintenance Fee
+## Sponsorship
 
-This project participates in the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org).
+If MultiTenant is useful to you, please consider [becoming a Sponsor](https://github.com/sponsors/finbuckle).
+Sponsorship directly supports the people maintaining the project and helps ensure its long-term health.
 
-As of November 10, 2026, with the release of .NET 11, MultiTenant v11 and later require the Maintenance Fee for use of
-the project's official releases in revenue-generating activities. The source code remains freely available under the
-terms of the LICENSE.
-
-**MultiTenant v10 does not require the Maintenance Fee.** Users of v10 are encouraged to participate voluntarily. The fee
-directly supports the people maintaining the project and helps ensure its long-term health.
-
-To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbuckle).
+As of November 10, 2026, with the release of .NET 11, MultiTenant v11 and later require the
+[Open Source Maintenance Fee](https://opensourcemaintenancefee.org) for use in revenue-generating activities.
+MultiTenant v10 does not.
 
 **Additional support is provided by the following organizations:**
 
