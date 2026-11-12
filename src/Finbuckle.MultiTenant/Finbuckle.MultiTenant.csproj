@@ -16,4 +16,11 @@
 
         <ProjectReference Include="../Finbuckle.MultiTenant.Abstractions/Finbuckle.MultiTenant.Abstractions.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <None Update="buildTransitive/Finbuckle.MultiTenant.targets" Pack="true"
+              PackagePath="buildTransitive/Finbuckle.MultiTenant.targets" />
+    </ItemGroup>
+
+    <Import Project="buildTransitive/Finbuckle.MultiTenant.targets" />
 </Project>
