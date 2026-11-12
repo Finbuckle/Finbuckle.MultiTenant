@@ -22,6 +22,12 @@ Your support helps keep the project going and is greatly appreciated!
 
 MultiTenant is primarily supported by its [GitHub sponsors](https://github.com/sponsors/Finbuckle) and [contributors](https://github.com/Finbuckle/Finbuckle.MultiTenant/graphs/contributors).
 
+As of November 10, 2026, with the release of .NET 11, MultiTenant v11 and later require the
+[Open Source Maintenance Fee](https://opensourcemaintenancefee.org) for use in revenue-generating activities.
+MultiTenant v10 does not, but if you use v10 and find it useful, please consider
+[becoming a sponsor](https://github.com/sponsors/Finbuckle). Sponsorship directly supports the people maintaining the
+project and helps ensure its long-term health.
+
 Additional support is provided by the following organizations:
 
 <p><a href="https://www.digitalocean.com/">
