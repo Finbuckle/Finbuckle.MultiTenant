@@ -68,7 +68,9 @@ In return the library asks for two things:
   it to `TenantManager<TTenantInfo, TId>.UpdateAsync`; the store re-keys its lookups and hands out the new instance from
   then on. Never change `Identifier` in place on an instance the library already holds (a store's map, a cache entry, or
   the current tenant context), because those are keyed by the value captured when the tenant was added or updated and
-  cannot notice the change. Built-in stores match `Identifier` case-insensitively.
+  cannot notice the change. Whether `Identifier` matching is case-sensitive depends on the store: `InMemoryStore` and
+  `ConfigurationStore` are case-insensitive, while the EF Core and HTTP remote stores and the store caches follow their
+  database, remote server, or cache. See [MultiTenant Stores](Stores) for each store.
 
 Mutating other properties of your own type is your business, but keep in mind the same instance may be shared by caches
 and by the current request.
