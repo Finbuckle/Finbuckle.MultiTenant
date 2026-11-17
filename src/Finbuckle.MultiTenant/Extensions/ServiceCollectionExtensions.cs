@@ -66,7 +66,9 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentException">Thrown when no service of type <typeparamref name="TService"/> is found.</exception>
     /// <remarks>
     /// Keyed registrations are not changed. Calling this method repeatedly stacks decorators around the existing
-    /// registration. A decorator that wraps a disposable inner service should forward disposal as appropriate.
+    /// registration. Each original registration is moved to a hidden keyed registration with the same lifetime and the
+    /// decorator resolves it from the container, so the container still owns the original service: services it creates
+    /// from a type or factory registration are disposed as before, and instances supplied to it are not.
     /// </remarks>
     public static bool DecorateService<TService, TImpl>(this IServiceCollection services, params object[] parameters)
     {
@@ -86,44 +88,54 @@ public static class ServiceCollectionExtensions
             throw new ArgumentException($"No service of type {typeof(TService).Name} found.");
 
         var replacements = existingServices.Select(item =>
-            (item.index, descriptor: CreateDecoratedDescriptor<TService, TImpl>(item.descriptor, parametersCopy)))
+            {
+                var innerKey = new DecoratedServiceKey();
+                return (item.index,
+                    inner: CreateKeyedInnerDescriptor(item.descriptor, innerKey),
+                    decorator: CreateDecoratorDescriptor<TService, TImpl>(item.descriptor, innerKey, parametersCopy));
+            })
             .ToList();
 
         foreach (var replacement in replacements)
-            services[replacement.index] = replacement.descriptor;
+        {
+            services[replacement.index] = replacement.decorator;
+            services.Add(replacement.inner);
+        }
 
         return true;
     }
 
-    private static ServiceDescriptor CreateDecoratedDescriptor<TService, TImpl>(
-        ServiceDescriptor existingService, object[] parameters)
+    /// <summary>
+    /// A unique key for the hidden keyed registration that holds a decorated service's original registration.
+    /// </summary>
+    private sealed class DecoratedServiceKey;
+
+    private static ServiceDescriptor CreateKeyedInnerDescriptor(ServiceDescriptor existingService, object innerKey)
     {
-        Func<IServiceProvider, object?> createInner;
-
         if (existingService.ImplementationType is not null)
+            return new ServiceDescriptor(existingService.ServiceType, innerKey, existingService.ImplementationType,
+                existingService.Lifetime);
+
+        if (existingService.ImplementationInstance is not null)
+            return new ServiceDescriptor(existingService.ServiceType, innerKey, existingService.ImplementationInstance);
+
+        if (existingService.ImplementationFactory is not null)
         {
-            var implementationType = existingService.ImplementationType;
-            createInner = sp => ActivatorUtilities.CreateInstance(sp, implementationType);
-        }
-        else if (existingService.ImplementationInstance is not null)
-        {
-            var implementationInstance = existingService.ImplementationInstance;
-            createInner = _ => implementationInstance;
-        }
-        else if (existingService.ImplementationFactory is not null)
-        {
-            createInner = existingService.ImplementationFactory;
-        }
-        else
-        {
-            throw new ArgumentException("Unable to instantiate decorated type.");
+            var factory = existingService.ImplementationFactory;
+            return new ServiceDescriptor(existingService.ServiceType, innerKey, (sp, _) => factory(sp),
+                existingService.Lifetime);
         }
 
+        throw new ArgumentException("Unable to instantiate decorated type.");
+    }
+
+    private static ServiceDescriptor CreateDecoratorDescriptor<TService, TImpl>(
+        ServiceDescriptor existingService, object innerKey, object[] parameters)
+    {
         return new ServiceDescriptor(existingService.ServiceType,
             sp =>
             {
-                var innerObject = createInner(sp);
-                if (innerObject is not TService inner)
+                if (sp.GetKeyedService<TService>(innerKey) is not { } inner)
                     throw new ArgumentException(
                         $"Unable to instantiate decorated service of type {typeof(TService).Name}.");
 

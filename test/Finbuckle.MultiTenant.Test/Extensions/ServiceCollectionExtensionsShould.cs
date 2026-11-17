@@ -269,7 +269,8 @@ public class ServiceCollectionExtensionsShould
 
         services.DecorateService<ITestService, DecoratedTestService>();
 
-        Assert.Equal(lifetime, services.Single(s => s.ServiceType == typeof(ITestService)).Lifetime);
+        Assert.Equal(lifetime,
+            services.Single(s => s.ServiceType == typeof(ITestService) && !s.IsKeyedService).Lifetime);
 
         using var provider = services.BuildServiceProvider();
         using var firstScope = provider.CreateScope();
@@ -327,7 +328,9 @@ public class ServiceCollectionExtensionsShould
 
         services.DecorateService<ITestService, DecoratedTestService>();
 
-        Assert.Equal(serviceTypesBefore, services.Select(s => s.ServiceType).ToArray());
+        // The originals move to hidden keyed registrations; the unkeyed registrations keep their order.
+        Assert.Equal(serviceTypesBefore,
+            services.Where(s => !s.IsKeyedService).Select(s => s.ServiceType).ToArray());
         using var provider = services.BuildServiceProvider();
         var service = Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>());
         Assert.Same(second, service.Inner);
@@ -426,6 +429,103 @@ public class ServiceCollectionExtensionsShould
         Assert.Contains("Unable to instantiate decorated service", exception.Message);
     }
 
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void DecorateService_DisposesContainerCreatedOriginalFromTypeRegistration(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        ((IServiceCollection)services).Add(
+            new ServiceDescriptor(typeof(ITestService), typeof(DisposableTestService), lifetime));
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        DisposableTestService inner;
+        using (var provider = services.BuildServiceProvider())
+        {
+            using var scope = provider.CreateScope();
+            var decorated = Assert.IsType<DecoratedTestService>(
+                scope.ServiceProvider.GetRequiredService<ITestService>());
+            inner = Assert.IsType<DisposableTestService>(decorated.Inner);
+        }
+
+        Assert.Equal(1, inner.DisposeCount);
+    }
+
+    [Theory]
+    [InlineData(ServiceLifetime.Singleton)]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public void DecorateService_DisposesContainerCreatedOriginalFromFactoryRegistration(ServiceLifetime lifetime)
+    {
+        var services = new ServiceCollection();
+        ((IServiceCollection)services).Add(
+            new ServiceDescriptor(typeof(ITestService), _ => new DisposableTestService(), lifetime));
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        DisposableTestService inner;
+        using (var provider = services.BuildServiceProvider())
+        {
+            using var scope = provider.CreateScope();
+            var decorated = Assert.IsType<DecoratedTestService>(
+                scope.ServiceProvider.GetRequiredService<ITestService>());
+            inner = Assert.IsType<DisposableTestService>(decorated.Inner);
+        }
+
+        Assert.Equal(1, inner.DisposeCount);
+    }
+
+    [Fact]
+    public async Task DecorateService_DisposesAsyncDisposableOriginalWhenProviderIsDisposedAsync()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, AsyncDisposableTestService>();
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        var provider = services.BuildServiceProvider();
+        var inner = Assert.IsType<AsyncDisposableTestService>(
+            Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>()).Inner);
+        await provider.DisposeAsync();
+
+        Assert.True(inner.Disposed);
+    }
+
+    [Fact]
+    public void DecorateService_DoesNotDisposeSuppliedInstance()
+    {
+        var instance = new DisposableTestService();
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService>(instance);
+        services.DecorateService<ITestService, DecoratedTestService>();
+
+        using (var provider = services.BuildServiceProvider())
+        {
+            var decorated = Assert.IsType<DecoratedTestService>(provider.GetRequiredService<ITestService>());
+            Assert.Same(instance, decorated.Inner);
+        }
+
+        Assert.Equal(0, instance.DisposeCount);
+    }
+
+    [Fact]
+    public void DecorateService_DisposesOriginalOnceWhenDecoratorsAreStacked()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<ITestService, DisposableTestService>();
+        services.DecorateService<ITestService, DecoratedTestService>();
+        services.DecorateService<ITestService, SecondDecoratedTestService>();
+
+        DisposableTestService inner;
+        using (var provider = services.BuildServiceProvider())
+        {
+            var outer = Assert.IsType<SecondDecoratedTestService>(provider.GetRequiredService<ITestService>());
+            var middle = Assert.IsType<DecoratedTestService>(outer.Inner);
+            inner = Assert.IsType<DisposableTestService>(middle.Inner);
+        }
+
+        Assert.Equal(1, inner.DisposeCount);
+    }
+
     [Fact]
     public void DecorateService_PropagatesDecoratorActivationFailure()
     {
@@ -439,6 +539,23 @@ public class ServiceCollectionExtensionsShould
 
     public interface ITestService
     {
+    }
+
+    public sealed class DisposableTestService : ITestService, IDisposable
+    {
+        public int DisposeCount { get; private set; }
+        public void Dispose() => DisposeCount++;
+    }
+
+    public sealed class AsyncDisposableTestService : ITestService, IAsyncDisposable
+    {
+        public bool Disposed { get; private set; }
+
+        public ValueTask DisposeAsync()
+        {
+            Disposed = true;
+            return ValueTask.CompletedTask;
+        }
     }
 
     public class TestService : ITestService

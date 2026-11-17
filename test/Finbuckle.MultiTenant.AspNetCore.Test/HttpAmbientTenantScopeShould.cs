@@ -178,7 +178,7 @@ public class HttpAmbientTenantScopeShould
             .WithHostStrategy();
         var sp = services.BuildServiceProvider();
 
-        Assert.Single(services, s => s.ServiceType == typeof(IHttpContextFactory));
+        Assert.Single(services, s => s.ServiceType == typeof(IHttpContextFactory) && !s.IsKeyedService);
         var factory = Assert.IsType<TenantScopeHttpContextFactory>(sp.GetRequiredService<IHttpContextFactory>());
         Assert.Same(existing, GetInner(factory));
     }
