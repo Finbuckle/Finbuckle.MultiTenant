@@ -24,11 +24,16 @@ public class MultiTenantMiddlewareShould
             MsOptions.Create(bypassOptions ?? new BypassWhenOptions()),
             MsOptions.Create(shortCircuitOptions ?? new ShortCircuitWhenOptions<string>()));
 
-    private static Task InvokeMiddleware(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp) =>
-        mw.Invoke(context,
+    // In a host, TenantScopeHttpContextFactory begins the ambient scope when the HttpContext is created.
+    // These tests invoke the middleware directly, so begin the scope here instead.
+    private static Task InvokeMiddleware(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp)
+    {
+        sp.BeginTenantScope();
+        return mw.Invoke(context,
             sp.GetRequiredService<ITenantContext<string>>(),
             sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
+    }
 
     [Fact]
     public async Task ResolveGuidTenantAndExposeViaGetTenantInfo()
@@ -53,6 +58,7 @@ public class MultiTenantMiddlewareShould
             MsOptions.Create(new BypassWhenOptions()),
             MsOptions.Create(new ShortCircuitWhenOptions<Guid>()));
 
+        sp.BeginTenantScope();
         await mw.Invoke(context,
             sp.GetRequiredService<ITenantContext<Guid>>(),
             sp.GetRequiredService<ITenantResolver<Guid>>(),

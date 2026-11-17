@@ -19,12 +19,16 @@ ASP.NET Core integration, including [ASP.NET Core-specific strategies](#asp-net-
 When `UseMultiTenant<TId>()` is added to the pipeline, the middleware automatically handles tenant resolution
 for each HTTP request:
 
-1. For every request, the middleware calls `ITenantResolver.ResolveAsync(HttpContext)`.
-2. The resolver iterates through registered strategies (which receive the `HttpContext`) to find a tenant
+1. When the host creates the `HttpContext` for a request, a fresh ambient tenant scope begins (see
+   [The Per-Request Ambient Tenant Scope](#the-per-request-ambient-tenant-scope)). The scope is in effect for the
+   whole pipeline, including middleware that runs before `UseMultiTenant<TId>()`, and ends when the `HttpContext`
+   is disposed.
+2. The middleware calls `ITenantResolver.ResolveAsync(HttpContext)`.
+3. The resolver iterates through registered strategies (which receive the `HttpContext`) to find a tenant
    identifier, then queries stores to find a matching `TenantInfo`.
-3. The middleware begins a fresh ambient tenant scope for the request and, if a tenant is found, sets `TenantInfo`
-   on the `ITenantContext<TTenantInfo, TId>` for that scope.
-4. All services resolved during the request — including `IOptions<T>`, `IOptionsSnapshot<T>`,
+4. If a tenant is found, the middleware sets `TenantInfo` on the `ITenantContext<TTenantInfo, TId>` for the request's
+   scope. If earlier middleware already set a tenant, resolution is skipped and that tenant is kept.
+5. All services resolved during the request — including `IOptions<T>`, `IOptionsSnapshot<T>`,
    `IOptionsMonitor<T>`, and `IMultiTenantDbContext<TId>` — automatically see the resolved tenant.
 
 This means you never need to manually call `ITenantResolver<TId>` or populate `ITenantContext<TId>` in an ASP.NET Core
@@ -72,6 +76,52 @@ app.Run();
 
 If `UseRouting()` is explicitly called in the pipeline it must come **before** `UseMultiTenant<TId>()` when
 using the [Route Strategy](#route-strategy).
+
+### The Per-Request Ambient Tenant Scope
+
+`AddHttpAmbientTenantScope()` wraps the registered `IHttpContextFactory` with `TenantScopeHttpContextFactory`. The
+wrapper begins a new ambient tenant scope when each `HttpContext` is created and ends it when the context is
+disposed, so every request starts with its own unresolved tenant scope. This is the same mechanism ASP.NET Core uses
+to make `IHttpContextAccessor` available for the whole request.
+
+Every ASP.NET Core builder method (all the `With...Strategy()` methods in this package,
+`WithPerTenantAuthentication()`, `BypassWhen()`, `ShortCircuitWhen()`, and their variants) calls
+`AddHttpAmbientTenantScope()` for you. Call it yourself only if you configure MultiTenant for ASP.NET Core with
+general-purpose methods alone, such as `WithStaticStrategy()` or `WithDelegateStrategy()`:
+
+```csharp
+builder.Services.AddMultiTenant<TenantInfo, string>()
+    .WithDelegateStrategy(ctx => Task.FromResult<string?>("initech"))
+    .WithConfigurationStore()
+    .AddHttpAmbientTenantScope();
+```
+
+Calling it more than once has no further effect. If it was never called, `UseMultiTenant<TId>()` throws a
+`MultiTenantException` at startup. If the middleware runs for a request with no active scope (for example, because
+`IHttpContextFactory` was replaced after `AddHttpAmbientTenantScope()`), it throws a `MultiTenantException` for that
+request.
+
+### Long-Lived Connections
+
+Some requests stay open for a long time, such as WebSockets (including SignalR over WebSockets), server-sent events,
+and streaming gRPC calls. For these, the request's tenant scope lasts as long as the connection:
+
+- **The tenant is resolved once, when the connection opens.** It applies to everything that runs as part of that
+  request for the life of the connection, such as each SignalR hub method call or each message on a stream.
+- **The tenant can't change on an open connection.** `TenantInfo` can only be set once per scope, so to switch
+  tenants the client must open a new connection.
+- **The connection request must resolve the tenant.** Make sure the route the connection uses goes through
+  `UseMultiTenant<TId>()` and isn't excluded from resolution. Choose a strategy that works for that request: browsers
+  can't add custom headers when opening a WebSocket, so the [Header Strategy](Strategies#header-strategy) usually
+  won't work there. Route, host, base path, or claim strategies work, as does a query string read with
+  `WithHttpContextStrategy()`.
+- **Transports that use several requests need the same tenant on each.** Some transports, such as SignalR's long
+  polling fallback, spread one logical connection across several HTTP requests, each with its own tenant scope.
+  Make sure every one of those requests resolves to the same tenant.
+- **Work outside the request doesn't see the scope.** Code that runs outside the connection's request, such as a
+  hosted service sending messages through an `IHubContext`, has no ambient tenant scope. Begin one yourself with
+  `IServiceProvider.BeginTenantScope(tenantInfo)` before using tenant-aware services there (see
+  [.NET Generic Host Integration](GenericHost)).
 
 ## ASP.NET Core Strategies
 
@@ -397,11 +447,16 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
 - **Middleware ordering matters.** Place `UseMultiTenant<TId>()` before `UseAuthentication()`, `UseAuthorization()`,
   and any middleware that reads per-tenant options or services.
 - **`TenantInfo` can only be set once** per request. The middleware sets it early in the pipeline. If you
-  need to override it, use `HttpContext.SetTenantInfo<TTenantInfo, TId>()` or `TrySetTenantInfo<TTenantInfo, TId>()` before any tenant-aware
-  services are resolved.
-- **`ITenantContext` is ambient.** The current tenant is held in an `AsyncLocal`, not a scoped DI service. The
-  middleware begins a fresh ambient tenant scope for each request (via `ITenantScopeProvider.BeginScope()`) and sets
-  the resolved tenant on it, so each request sees its own tenant automatically.
+  need to choose the tenant yourself, call `HttpContext.SetTenantInfo<TTenantInfo, TId>()` or
+  `TrySetTenantInfo<TTenantInfo, TId>()` in middleware placed before `UseMultiTenant<TId>()`; the middleware then
+  skips resolution and keeps that tenant.
+- **`ITenantContext` is ambient.** The current tenant is held in an `AsyncLocal`, not a scoped DI service. A fresh
+  ambient tenant scope begins when each request's `HttpContext` is created (see
+  [The Per-Request Ambient Tenant Scope](#the-per-request-ambient-tenant-scope)) and the middleware sets the resolved
+  tenant on it, so each request sees its own tenant automatically.
+- **Long-lived connections keep the tenant they opened with.** WebSockets, SignalR, server-sent events, and
+  streaming gRPC calls keep their request's tenant for the life of the connection. See
+  [Long-Lived Connections](#long-lived-connections).
 - **`IOptionsMonitor<T>` is scoped** in MultiTenant. Do not capture it in a singleton service.
 - **Not all strategies work for all scenarios.** The [Claim Strategy](Strategies#claim-strategy) needs
   authentication middleware to run first. The [Route Strategy](Strategies#route-strategy) requires

@@ -28,15 +28,11 @@ public class ExcludeFromMultiTenantResolutionShould
                     services.AddRouting();
                     services.AddMultiTenant<TenantInfo,string>()
                         .WithStaticStrategy(identifier)
-                        .WithInMemoryStore();
+                        .WithInMemoryStore()
+                        .AddHttpAmbientTenantScope();
                 })
                 .Configure(app =>
                 {
-                    app.Use(async (context, next) =>
-                    {
-                        context.RequestServices.BeginTenantScope();
-                        await next();
-                    });
                     app.UseRouting();
                     app.UseMultiTenant<string>();
 

@@ -33,11 +33,16 @@ public class ImmutableTenantInfoRequestShould
         return (sp, mw);
     }
 
-    private static Task Invoke(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp) =>
-        mw.Invoke(context,
+    // In a host, TenantScopeHttpContextFactory begins the ambient scope when the HttpContext is created.
+    // These tests invoke the middleware directly, so begin the scope here instead.
+    private static Task Invoke(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp)
+    {
+        sp.BeginTenantScope();
+        return mw.Invoke(context,
             sp.GetRequiredService<ITenantContext<string>>(),
             sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
+    }
 
     [Fact]
     public async Task ResolveImmutableTenantForRequest()

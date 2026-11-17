@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,6 +23,36 @@ namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 /// </summary>
 public static class MultiTenantBuilderExtensions
 {
+    /// <summary>
+    /// Begins a new ambient tenant scope for each HTTP request when its <see cref="HttpContext"/> is created, so the
+    /// scope is in effect for the entire request pipeline.
+    /// </summary>
+    /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+    /// <typeparam name="TId">The ID implementation type.</typeparam>
+    /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
+    /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
+    /// <remarks>
+    /// Decorates the registered <see cref="IHttpContextFactory"/> with <see cref="TenantScopeHttpContextFactory"/>,
+    /// registering <see cref="DefaultHttpContextFactory"/> first if none is registered. Every ASP.NET Core builder
+    /// helper calls this method, so it only needs to be called directly when no such helper is used. Calling it more
+    /// than once has no further effect.
+    /// </remarks>
+    public static MultiTenantBuilder<TTenantInfo, TId> AddHttpAmbientTenantScope<TTenantInfo, TId>(
+        this MultiTenantBuilder<TTenantInfo, TId> builder)
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        if (builder.Services.Any(s => s.ServiceType == typeof(HttpAmbientTenantScopeMarker)))
+            return builder;
+
+        builder.Services.TryAddSingleton<IHttpContextFactory, DefaultHttpContextFactory>();
+        builder.Services.DecorateService<IHttpContextFactory, TenantScopeHttpContextFactory>();
+        builder.Services.AddSingleton<HttpAmbientTenantScopeMarker>();
+
+        return builder;
+    }
+
     /// <summary>
     /// Configures <see cref="BypassWhenOptions"/> to control when tenant resolution is bypassed.
     /// </summary>
@@ -34,6 +65,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, Action<BypassWhenOptions> configureOption)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         builder.Services.Configure(configureOption);
         return builder;
     }
@@ -64,6 +96,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, Action<ShortCircuitWhenOptions<TId>> configureOptions)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         builder.Services.Configure(configureOptions);
         return builder;
     }
@@ -130,6 +163,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, Action<MultiTenantAuthenticationOptions> config)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         builder.WithPerTenantAuthenticationCore(config);
         builder.WithPerTenantAuthenticationConventions();
         builder.WithRemoteAuthenticationCallbackStrategy();
@@ -148,6 +182,8 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
+
         // Set events to set and validate tenant for each cookie based authentication principal.
         builder.Services.ConfigureAll<CookieAuthenticationOptions>(options =>
         {
@@ -234,15 +270,16 @@ public static class MultiTenantBuilderExtensions
             null)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
-        config ??= _ => { };
-        builder.Services.Configure(config);
-
         // We need to "decorate" IAuthenticationService so callbacks so that
         // remote authentication can get the tenant from the authentication
         // properties in the state parameter.
         if (builder.Services.All(s => s.ServiceType != typeof(IAuthenticationService)))
             throw new MultiTenantException(
                 "WithPerTenantAuthenticationCore() must be called after AddAuthentication().");
+
+        builder.AddHttpAmbientTenantScope();
+        config ??= _ => { };
+        builder.Services.Configure(config);
         builder.Services.DecorateService<IAuthenticationService, MultiTenantAuthenticationService<TTenantInfo, TId>>();
 
         // We need to "decorate" IAuthenticationScheme provider.
@@ -261,7 +298,10 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithSessionStrategy<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
-        => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
+    {
+        builder.AddHttpAmbientTenantScope();
+        return builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
+    }
 
     /// <summary>
     /// Adds and configures a <see cref="SessionStrategy"/> to the application.
@@ -274,7 +314,10 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithSessionStrategy<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder, string tenantKey)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
-        => builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);
+    {
+        builder.AddHttpAmbientTenantScope();
+        return builder.WithStrategy<SessionStrategy>(ServiceLifetime.Singleton, tenantKey);
+    }
 
     /// <summary>
     /// Adds and configures a <see cref="RemoteAuthenticationCallbackStrategy"/> to the application.
@@ -287,6 +330,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         return builder.WithStrategy<RemoteAuthenticationCallbackStrategy>(ServiceLifetime.Singleton);
     }
 
@@ -314,6 +358,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, Action<BasePathStrategyOptions> configureOptions)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         builder.Services.Configure(configureOptions);
         builder.Services.Configure<MultiTenantOptions<TTenantInfo, TId>>(options =>
         {
@@ -369,7 +414,9 @@ public static class MultiTenantBuilderExtensions
         {
             throw new ArgumentException("Invalid value for \"tenantParam\"", nameof(tenantParam));
         }
-        
+
+        builder.AddHttpAmbientTenantScope();
+
         if(useTenantAmbientRouteValue)
         {
             // Decorate LinkGenerator to promote tenant route value from ambient to explicit values.
@@ -408,6 +455,8 @@ public static class MultiTenantBuilderExtensions
             throw new ArgumentException("Invalid value for \"template\"", nameof(template));
         }
 
+        builder.AddHttpAmbientTenantScope();
+
         return builder.WithStrategy<HostStrategy>(ServiceLifetime.Singleton, template);
     }
 
@@ -437,6 +486,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, string tenantKey)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         BypassSessionPrincipalValidation(builder);
         return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey);
     }
@@ -454,6 +504,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, string tenantKey, string authenticationScheme)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         BypassSessionPrincipalValidation(builder);
         return builder.WithStrategy<ClaimStrategy>(ServiceLifetime.Singleton, tenantKey, authenticationScheme);
     }
@@ -470,6 +521,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, Func<HttpContext, Task<string?>> doStrategy)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         return builder.WithDelegateStrategy(doStrategy);
     }
 
@@ -501,6 +553,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithHeaderStrategy<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder) where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, Constants.TenantToken);
     }
 
@@ -516,6 +569,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder, string tenantKey)
         where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
+        builder.AddHttpAmbientTenantScope();
         return builder.WithStrategy<HeaderStrategy>(ServiceLifetime.Singleton, tenantKey);
     }
 }
