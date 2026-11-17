@@ -39,9 +39,18 @@ public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>
     /// <param name="context">The HTTP context.</param>
     /// <param name="tenantContext">The tenant context.</param>
     /// <param name="tenantResolver">The tenant resolver.</param>
-    /// <param name="tenantScopeProvider">The provider used to begin the ambient tenant scope.</param>
+    /// <param name="tenantScopeProvider">The provider used to verify that an ambient tenant scope is active.</param>
+    /// <exception cref="MultiTenantException">Thrown when no ambient tenant scope is active for the request.</exception>
+    /// <remarks>
+    /// The ambient tenant scope is begun when the <see cref="HttpContext"/> is created, which is configured by
+    /// <c>AddHttpAmbientTenantScope</c>. If a tenant was already set earlier in the pipeline, tenant resolution is
+    /// skipped and that tenant is kept.
+    /// </remarks>
     public async Task Invoke(HttpContext context, ITenantContext<TId> tenantContext, ITenantResolver<TId> tenantResolver, ITenantScopeProvider tenantScopeProvider)
     {
+        if (!tenantScopeProvider.HasScope)
+            throw new MultiTenantException(HttpAmbientTenantScopeMarker.NoScopeMessage);
+
         if (bypassOptions.Predicate?.Invoke(context) == true)
         {
             await next(context);
@@ -55,9 +64,11 @@ public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>
             return;
         }
 
-        var resolvedTenantInfo = await tenantResolver.ResolveAsync(context).ConfigureAwait(false);
-        tenantScopeProvider.BeginScope(); // TODO: find a better way to do this at the start of a request pipline
-        tenantContext.TenantInfo = resolvedTenantInfo;
+        if (!tenantContext.IsResolved)
+        {
+            var resolvedTenantInfo = await tenantResolver.ResolveAsync(context).ConfigureAwait(false);
+            tenantContext.TenantInfo = resolvedTenantInfo;
+        }
 
         if (shortCircuitWhenOptions.Predicate is null || !shortCircuitWhenOptions.Predicate(tenantContext))
             await next(context);

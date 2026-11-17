@@ -39,6 +39,11 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStrategy(sp => new MyStrategy())...
 ```
 
+> In an ASP.NET Core app, if every strategy you configure comes from the base `Finbuckle.MultiTenant` package
+> (including custom strategies added with `WithStrategy`), also call `AddHttpAmbientTenantScope()` so each request gets its own tenant scope. Otherwise
+> `UseMultiTenant<TId>()` throws at startup. ASP.NET Core strategies call it for you. See
+> [The Per-Request Ambient Tenant Scope](AspNetCore#the-per-request-ambient-tenant-scope).
+
 ## Using Multiple Strategies
 
 Multiple strategies can be registered after `AddMultiTenant<TTenantInfo, TId>`. They are tried in registration order. When a
@@ -62,6 +67,11 @@ tenant resolution:
 builder.Services.AddMultiTenant<TenantInfo, string>()
     .WithStaticStrategy("MyTenant")
 ```
+
+> In an ASP.NET Core app, if every strategy you configure comes from the base `Finbuckle.MultiTenant` package
+> (such as the Static Strategy), also call `AddHttpAmbientTenantScope()` so each request gets its own tenant scope. Otherwise
+> `UseMultiTenant<TId>()` throws at startup. ASP.NET Core strategies call it for you. See
+> [The Per-Request Ambient Tenant Scope](AspNetCore#the-per-request-ambient-tenant-scope).
 
 ## Delegate Strategy
 
@@ -90,8 +100,14 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
     {
         var tenantIdentifier = httpContext.Request.Query["tenant"].FirstOrDefault();
         return Task.FromResult(tenantIdentifier);
-    })...
+    })
+    .AddHttpAmbientTenantScope()...
 ```
+
+> In an ASP.NET Core app, if every strategy you configure comes from the base `Finbuckle.MultiTenant` package
+> (such as the Delegate Strategy), also call `AddHttpAmbientTenantScope()` so each request gets its own tenant scope. Otherwise
+> `UseMultiTenant<TId>()` throws at startup. ASP.NET Core strategies call it for you. See
+> [The Per-Request Ambient Tenant Scope](AspNetCore#the-per-request-ambient-tenant-scope).
 
 ## HttpContext Strategy
 

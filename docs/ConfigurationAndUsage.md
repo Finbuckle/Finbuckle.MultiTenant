@@ -77,6 +77,14 @@ in the order registered. See [MultiTenant Strategies](Strategies) for more infor
 
 Configures support for per-tenant authentication. See [Per-Tenant Authentication](Authentication) for more details.
 
+### AddHttpAmbientTenantScope
+
+Begins a fresh ambient tenant scope for each ASP.NET Core request when its `HttpContext` is created, so the scope is in
+effect for the whole request pipeline. Every ASP.NET Core builder method calls it for you, so you only need to call it
+yourself when an ASP.NET Core app uses only general-purpose methods such as `WithStaticStrategy` or
+`WithDelegateStrategy`. See [The Per-Request Ambient Tenant Scope](AspNetCore#the-per-request-ambient-tenant-scope)
+for details.
+
 ## Per-Tenant Options
 
 MultiTenant is designed to integrate with the
@@ -165,8 +173,8 @@ serviceProvider.BeginTenantScope(tenantInfo);
 serviceProvider.BeginTenantScope();
 ```
 
-`BeginTenantScope(tenantInfo)` begins a new ambient scope and assigns `TenantInfo` for it. In ASP.NET Core the
-middleware does this for every request, so you rarely call it directly; in a .NET Generic Host, worker, or console app
+`BeginTenantScope(tenantInfo)` begins a new ambient scope and assigns `TenantInfo` for it. In ASP.NET Core a scope
+begins automatically for every request and the middleware sets the tenant on it, so you rarely call it directly; in a .NET Generic Host, worker, or console app
 you call it yourself once the tenant is resolved (see [.NET Generic Host Integration](GenericHost)). The tenant passed
 in must be valid — a non-default `Id` and non-empty `Identifier` — or a `MultiTenantException` is thrown.
 
@@ -186,7 +194,7 @@ See [ASP.NET Core Integration](AspNetCore#getting-the-current-tenant-in-aspnet-c
 
 - `ITenantContext<TTenantInfo, TId>` is registered as a **singleton** but is **ambient** — the current tenant is held
   in an `AsyncLocal` and flows with the asynchronous execution context, not the DI scope. A scope must be established
-  with `BeginTenantScope` (the middleware does this per request in ASP.NET Core) before the tenant can be read or set.
+  with `BeginTenantScope` (ASP.NET Core does this per request) before the tenant can be read or set.
 - `TenantInfo` can only be set once per scope. Attempting to set it a second time — or reading/setting it with no scope
   established — throws `MultiTenantException`. Use the `HttpContext.TrySetTenantInfo<T, TId>()` extension or check
   `ITenantContext<TId>.IsResolved` to avoid this.
