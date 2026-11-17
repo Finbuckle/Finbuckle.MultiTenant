@@ -178,6 +178,41 @@ begins automatically for every request and the middleware sets the tenant on it,
 you call it yourself once the tenant is resolved (see [.NET Generic Host Integration](GenericHost)). The tenant passed
 in must be valid — a non-default `Id` and non-empty `Identifier` — or a `MultiTenantException` is thrown.
 
+### Running code as a tenant
+
+`IServiceProvider.RunInTenantScopeAsync(tenantInfo, action)` runs a delegate as a given tenant. It creates a new
+dependency injection scope, begins a new ambient tenant scope for `tenantInfo`, runs the delegate, and disposes the DI
+scope when the delegate finishes, even if it throws. The delegate receives the new scope's `IServiceProvider`; resolve
+services from it so scoped services such as a `DbContext` or `IOptionsSnapshot<T>` are created for that tenant.
+
+When it returns, the caller's own tenant scope is unchanged. That makes it safe to use inside an HTTP request or
+another tenant scope, for example an admin endpoint that does work on behalf of a different tenant:
+
+```csharp
+app.MapPost("/admin/tenants/{identifier}/reindex", async (string identifier, HttpContext httpContext,
+    TenantManager<TenantInfo, string> tenantManager) =>
+{
+    var target = await tenantManager.GetByIdentifierAsync(identifier);
+    if (target is null)
+        return Results.NotFound();
+
+    // Runs as the target tenant with its own DbContext; the request's tenant is untouched afterwards.
+    var count = await httpContext.RequestServices.RunInTenantScopeAsync(target, async services =>
+    {
+        var db = services.GetRequiredService<AppDbContext>();
+        return await db.Documents.CountAsync();
+    });
+
+    return Results.Ok(new { reindexed = count });
+});
+```
+
+There are two overloads: one takes a `Func<IServiceProvider, Task>`, and one takes a
+`Func<IServiceProvider, Task<TResult>>` and returns the delegate's result.
+
+> Resolve services inside the delegate, not before the call. A scoped service resolved from the caller's scope was
+> created for the caller's tenant and keeps it.
+
 ### Via Dependency Injection
 
 Within an established scope, the injected `ITenantContext<TTenantInfo, TId>` instance's `TenantInfo` property can be set

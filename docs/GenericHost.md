@@ -215,6 +215,84 @@ else
 }
 ```
 
+## Running Work as a Tenant
+
+`IServiceProvider.RunInTenantScopeAsync(tenantInfo, action)` combines the steps above into one call. It creates a new
+DI scope, begins an ambient tenant scope for `tenantInfo`, passes the new scope's `IServiceProvider` to your delegate,
+and disposes the DI scope when the delegate finishes, even if it throws. The caller's own tenant scope, or lack of
+one, is unchanged when it returns. See
+[Configuration and Usage](ConfigurationAndUsage#running-code-as-a-tenant) for the full description.
+
+### Example: Process Each Message as Its Tenant
+
+The worker pattern above, rewritten with `RunInTenantScopeAsync`. The tenant is resolved in a short-lived scope, then
+the message is handled in a fresh scope for that tenant:
+
+```csharp
+public class QueueProcessor(IServiceProvider services, IServiceScopeFactory scopeFactory) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            var message = await ReceiveMessageAsync(stoppingToken);
+
+            TenantInfo? tenantInfo;
+            await using (var resolveScope = scopeFactory.CreateAsyncScope())
+            {
+                var resolver = resolveScope.ServiceProvider.GetRequiredService<ITenantResolver<TenantInfo, string>>();
+                tenantInfo = await resolver.ResolveAsync(message);
+            }
+
+            if (tenantInfo is null)
+                continue;
+
+            await services.RunInTenantScopeAsync(tenantInfo, scoped =>
+                scoped.GetRequiredService<IMessageHandler>().HandleAsync(message, stoppingToken));
+        }
+    }
+
+    // ReceiveMessageAsync as in the earlier example.
+}
+```
+
+### Example: Run a Job for Every Tenant
+
+A scheduled job that runs once for each tenant. Each tenant gets its own DI scope, so its `DbContext` and per-tenant
+options are separate from every other tenant's:
+
+```csharp
+public class NightlyCleanup(IServiceProvider services, ILogger<NightlyCleanup> logger)
+{
+    public async Task RunAsync(CancellationToken cancellationToken)
+    {
+        IEnumerable<TenantInfo> tenants;
+        await using (var scope = services.CreateAsyncScope())
+        {
+            tenants = await scope.ServiceProvider
+                .GetRequiredService<TenantManager<TenantInfo, string>>()
+                .GetAllAsync(cancellationToken);
+        }
+
+        foreach (var tenant in tenants)
+        {
+            var removed = await services.RunInTenantScopeAsync(tenant, async scoped =>
+            {
+                var db = scoped.GetRequiredService<AppDbContext>();
+                var cutoff = DateTime.UtcNow.AddDays(-30);
+                return await db.AuditEntries.Where(e => e.CreatedUtc < cutoff)
+                    .ExecuteDeleteAsync(cancellationToken);
+            });
+
+            logger.LogInformation("Removed {Count} audit entries for {Tenant}", removed, tenant.Identifier);
+        }
+    }
+}
+```
+
+Runs for different tenants can also execute concurrently, for example with `Task.WhenAll` or `Parallel.ForEachAsync`;
+each run keeps its own tenant.
+
 ## Using TenantResolver Events
 
 The same resolution events available in ASP.NET Core work in Generic Host apps. Configure them
@@ -284,6 +362,7 @@ builder.Services.AddMultiTenantDbContext<AppDbContext, string>(options =>
 
 - **`TenantInfo` can only be set once** per scope. If your worker might encounter multiple circumstances where
   a tenant could be set, use `ITenantContext.IsResolved` to check first, or use a fresh scope each time.
+  `RunInTenantScopeAsync` gives each unit of work a fresh scope for you.
 - **`ITenantResolver.ResolveAsync()` returns a new `TenantContext`** — it does not automatically populate the
   scoped one. You must copy `TenantInfo` yourself.
 - **`IOptionsMonitor<T>` is scoped** in MultiTenant (unlike standard .NET where it is a singleton). Despite
