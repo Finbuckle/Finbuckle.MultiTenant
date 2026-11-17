@@ -135,6 +135,44 @@ public class HttpAmbientTenantScopeShould
         Assert.Contains("AddHttpAmbientTenantScope()", ex.Message);
     }
 
+    [Theory]
+    [InlineData(ServiceLifetime.Scoped)]
+    [InlineData(ServiceLifetime.Transient)]
+    public async Task ThrowAtStartupWhenScopeProviderIsNotSingleton(ServiceLifetime lifetime)
+    {
+        var hostBuilder = new HostBuilder()
+            .ConfigureWebHost(webBuilder => webBuilder
+                .UseTestServer()
+                .ConfigureServices(services =>
+                {
+                    services.AddMultiTenant<TenantInfo, string>().WithHeaderStrategy().WithInMemoryStore();
+                    services.Add(new ServiceDescriptor(typeof(ITenantScopeProvider),
+                        _ => new AmbientTenantContext<TenantInfo, string>(), lifetime));
+                })
+                .Configure(app => app.UseMultiTenant<string>()));
+
+        var ex = await Assert.ThrowsAsync<MultiTenantException>(() => hostBuilder.StartAsync());
+        Assert.Contains("must be registered as a singleton", ex.Message);
+    }
+
+    [Fact]
+    public async Task StartWithACustomSingletonScopeProvider()
+    {
+        var custom = new AmbientTenantContext<TenantInfo, string>();
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder => webBuilder
+                .UseTestServer()
+                .ConfigureServices(services =>
+                {
+                    services.AddMultiTenant<TenantInfo, string>().WithHeaderStrategy().WithInMemoryStore();
+                    services.AddSingleton<ITenantScopeProvider>(custom);
+                })
+                .Configure(app => app.UseMultiTenant<string>()))
+            .StartAsync();
+
+        Assert.Same(custom, host.Services.GetRequiredService<ITenantScopeProvider>());
+    }
+
     [Fact]
     public async Task ThrowFromMiddlewareWhenNoScopeIsActive()
     {

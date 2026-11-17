@@ -97,7 +97,9 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
 ```
 
 Calling it more than once has no further effect. If it was never called, `UseMultiTenant<TId>()` throws a
-`MultiTenantException` at startup. If the middleware runs for a request with no active scope (for example, because
+`MultiTenantException` at startup. It also throws at startup if `ITenantScopeProvider` was replaced with a scoped or
+transient registration, because the scope begun for each request must be the same one the middleware and
+`ITenantContext` use. If the middleware runs for a request with no active scope (for example, because
 `IHttpContextFactory` was replaced after `AddHttpAmbientTenantScope()`), it throws a `MultiTenantException` for that
 request.
 
