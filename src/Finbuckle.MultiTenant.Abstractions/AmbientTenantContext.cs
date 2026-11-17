@@ -24,6 +24,19 @@ public class AmbientTenantContext<TTenantInfo, TId> : ITenantContext<TTenantInfo
         TenantContext.Value = new InternalTenantContext<TTenantInfo, TId>();
     }
 
+    /// <summary>
+    /// Ends the ambient tenant scope for the current asynchronous execution context.
+    /// </summary>
+    public void EndScope()
+    {
+        TenantContext.Value = null;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether an ambient tenant scope has been established for the current asynchronous execution context.
+    /// </summary>
+    public bool HasScope => TenantContext.Value is not null;
+
     ITenantInfo<TId>? ITenantContext<TId>.TenantInfo
     {
         get => TenantInfo;

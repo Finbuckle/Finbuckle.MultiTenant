@@ -96,6 +96,9 @@ default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained fro
   `IServiceProvider.BeginTenantScope(tenantInfo)` extension, which begins a scope and sets the tenant in one call.
   In ASP.NET Core the middleware does this automatically for each request; in other hosts you call it yourself (see
   [.NET Generic Host Integration](GenericHost)).
+* `ITenantScopeProvider.EndScope()` ends the current scope, after which reading or setting the tenant throws until a
+  new scope begins. Work that captured the scope before it ended, such as a background task started during a request,
+  keeps the scope it captured. `ITenantScopeProvider.HasScope` reports whether a scope is active.
 * Accessing `TenantInfo` before a scope has been established throws a `MultiTenantException`
   (`"No ambient tenant scope has been established."`).
 * The `TenantInfo` property holds the current tenant info. Within a scope it **can only be set once** — attempting to
