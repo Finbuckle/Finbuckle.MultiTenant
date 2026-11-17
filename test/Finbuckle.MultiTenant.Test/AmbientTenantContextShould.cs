@@ -15,6 +15,61 @@ public class AmbientTenantContextShould
     }
 
     [Fact]
+    public async Task ReportWhetherAScopeIsActive()
+    {
+        var context = new AmbientTenantContext<TenantInfo, string>();
+
+        await Task.Run(() =>
+        {
+            Assert.False(context.HasScope);
+            context.BeginScope();
+            Assert.True(context.HasScope);
+        });
+    }
+
+    [Fact]
+    public async Task EndScopeClearsTheCurrentScope()
+    {
+        var context = new AmbientTenantContext<TenantInfo, string>();
+
+        await Task.Run(() =>
+        {
+            context.BeginScope();
+            context.TenantInfo = new TenantInfo { Id = "1", Identifier = "1" };
+
+            context.EndScope();
+
+            Assert.False(context.HasScope);
+            Assert.Throws<MultiTenantException>(() => _ = context.TenantInfo);
+        });
+    }
+
+    [Fact]
+    public async Task EndScopeDoesNotAffectWorkThatCapturedTheScope()
+    {
+        var context = new AmbientTenantContext<TenantInfo, string>();
+        var tenant = new TenantInfo { Id = "1", Identifier = "1" };
+        var release = new TaskCompletionSource();
+        Task<TenantInfo?> background = null!;
+
+        await Task.Run(() =>
+        {
+            context.BeginScope();
+            context.TenantInfo = tenant;
+            background = Task.Run<TenantInfo?>(async () =>
+            {
+                await release.Task;
+                return context.TenantInfo;
+            });
+
+            context.EndScope();
+        });
+
+        release.SetResult();
+        Assert.Same(tenant, await background);
+    }
+
+    [Fact]
     public void BeginScopeStartsUnresolvedForGenericAndNonGenericContexts()
     {
         var context = new AmbientTenantContext<TenantInfo, string>();
