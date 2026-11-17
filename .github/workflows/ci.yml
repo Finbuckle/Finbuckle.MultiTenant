@@ -10,29 +10,26 @@ permissions:
 
 jobs:
   build-and-test:
-    strategy:
-      matrix:
-        dotnet: ['10.0']
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          dotnet-version: 10
+          dotnet-version: 11
       - name: build
         run: dotnet build -p:ContinuousIntegrationBuild=true
       - name: test Finbuckle.MultiTenant
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenant.AspNetCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenant.EntityFrameworkCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
       - name: test Finbuckle.MultiTenant.Identity.EntityFrameworkCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
       - name: upload coverage results
         if: always()
