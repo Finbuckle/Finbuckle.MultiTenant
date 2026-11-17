@@ -20,16 +20,16 @@ jobs:
       - name: build
         run: dotnet build -p:ContinuousIntegrationBuild=true
       - name: test Finbuckle.MultiTenant
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.Test
       - name: test Finbuckle.MultiTenant.AspNetCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.AspNetCore.Test
       - name: test Finbuckle.MultiTenant.EntityFrameworkCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
       - name: test Finbuckle.MultiTenant.Identity.EntityFrameworkCore
-        run: dotnet test --no-build -v q -f net${{ matrix.dotnet }} -p:CollectCoverage=true
+        run: dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true
         working-directory: ./test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
       - name: upload coverage results
         if: always()
