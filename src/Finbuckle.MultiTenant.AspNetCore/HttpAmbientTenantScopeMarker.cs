@@ -13,6 +13,11 @@ internal sealed class HttpAmbientTenantScopeMarker
         "No per-request ambient tenant scope is configured. Call AddHttpAmbientTenantScope() on the multi-tenant " +
         "builder, or use an ASP.NET Core helper such as WithRouteStrategy() that calls it for you.";
 
+    internal const string NotSingletonMessage =
+        "ITenantScopeProvider must be registered as a singleton that shares its ambient state with ITenantContext. " +
+        "The registered ITenantScopeProvider resolves to different instances, so the scope begun for each request " +
+        "would not be the one the middleware and ITenantContext use.";
+
     internal const string NoScopeMessage =
         "No ambient tenant scope is active for this request. AddHttpAmbientTenantScope() begins the scope when the " +
         "HttpContext is created; ensure it is called on the multi-tenant builder and that IHttpContextFactory is not " +

@@ -101,6 +101,9 @@ default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained fro
   new scope begins. Work that captured the scope before it ended, such as a background task started during a request,
   keeps the scope it captured. `ITenantScopeProvider.HasScope` reports whether a scope is active. ASP.NET Core ends the
   scope automatically when the request's `HttpContext` is disposed.
+* If you replace the default registration, register `ITenantScopeProvider` as a **singleton** that shares its ambient
+  state with `ITenantContext`, as the default `AmbientTenantContext` registration does. In ASP.NET Core,
+  `UseMultiTenant<TId>()` throws a `MultiTenantException` at startup if it resolves to different instances.
 * Accessing `TenantInfo` before a scope has been established throws a `MultiTenantException`
   (`"No ambient tenant scope has been established."`).
 * The `TenantInfo` property holds the current tenant info. Within a scope it **can only be set once** — attempting to

@@ -6,6 +6,11 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Provides operations for managing the ambient tenant scope for the current execution context.
 /// </summary>
+/// <remarks>
+/// Register implementations as a singleton that shares its ambient state with the registered
+/// <see cref="ITenantContext{TId}"/>, as the default <see cref="AmbientTenantContext{TTenantInfo, TId}"/> registration
+/// does. The ASP.NET Core integration requires this and throws at startup otherwise.
+/// </remarks>
 public interface ITenantScopeProvider
 {
     /// <summary>
