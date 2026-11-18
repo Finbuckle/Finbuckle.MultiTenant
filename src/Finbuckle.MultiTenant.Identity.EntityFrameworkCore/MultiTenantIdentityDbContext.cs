@@ -145,6 +145,13 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     }
 
     /// <inheritdoc />
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.ValidateMultiTenantIdType<TId>();
+    }
+
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

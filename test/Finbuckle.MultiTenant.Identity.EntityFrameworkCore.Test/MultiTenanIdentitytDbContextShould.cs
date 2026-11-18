@@ -328,11 +328,40 @@ public class MultiTenantIdentityDbContextShould
     }
 
     [Fact]
+    public void ThrowWhenBuildingModelIfTenantIdTypeDiffersFromContext()
+    {
+        using var db = new MismatchedTenantIdTypeIdentityDbContext();
+
+        Assert.Throws<MultiTenantException>(() => db.Model);
+    }
+
+    [Fact]
     public void ThrowWhenTenantInfoIsNullAndIdentityEntitiesChanged()
     {
         using var db = new TestIdentityDbContext();
         db.Users.Add(new IdentityUser { UserName = "null-tenant-user", NormalizedUserName = "NULL-TENANT-USER" });
 
         Assert.Throws<MultiTenantException>(() => db.SaveChanges());
+    }
+}
+
+public class MismatchedTenantIdTypeThing
+{
+    public int Id { get; set; }
+}
+
+// A MultiTenantIdentityDbContext<string> that configures an entity with a different tenant id type.
+public class MismatchedTenantIdTypeIdentityDbContext : MultiTenantIdentityDbContext<string>
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite("DataSource=:memory:");
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.Entity<MismatchedTenantIdTypeThing>().IsMultiTenant<int>();
     }
 }

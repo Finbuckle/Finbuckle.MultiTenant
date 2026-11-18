@@ -167,6 +167,30 @@ builder.Entity<MyEntityType>().IsMultiTenant<MyEntityType, string>();
 The typed overload builds its query filter from a compile-time expression rather than with reflection, so it adds no
 trimming or AOT warnings of its own.
 
+### Matching the Tenant ID Type
+
+The tenant ID type passed to `IsMultiTenant` must exactly match the tenant ID type of the database context, e.g. `string`
+for a `MultiTenantDbContext<string>`. If a multi-tenant entity type has a `TenantId` property of a different type, a
+`MultiTenantException` naming the entity type and both types is thrown when the context's model is first built (the
+first time its `Model` is used) rather than when the first query runs. Entity types that are not multi-tenant, including
+those marked with `IsNotMultiTenant`, are not checked.
+
+`MultiTenantDbContext<TId>` and `MultiTenantIdentityDbContext<TId>` perform this check automatically from their
+`ConfigureConventions` override. A derived context that overrides `ConfigureConventions` must call
+`base.ConfigureConventions(configurationBuilder)`, otherwise the check is silently skipped:
+
+```csharp
+protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+{
+    base.ConfigureConventions(configurationBuilder);
+
+    // Configure other conventions...
+}
+```
+
+A context that implements `IMultiTenantDbContext<TId>` directly can opt in by calling `ValidateMultiTenantIdType<TId>()`.
+See [Adding MultiTenant functionality to an existing DbContext](#adding-multitenant-functionality-to-an-existing-dbcontext).
+
 ### Contexts Without a Tenant
 
 The query filter added by `IsMultiTenant` fails closed. If a database context has no tenant set (its `TenantInfo` is
@@ -295,6 +319,19 @@ public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
 {
     this.EnforceMultiTenant<AppDbContext, string>();
     return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+}
+```
+
+Optionally, override `ConfigureConventions` and call the `ModelConfigurationBuilder` extension method
+`ValidateMultiTenantIdType` with the context's tenant ID type. A multi-tenant entity type configured with a different
+tenant ID type then throws a `MultiTenantException` when the model is built. See
+[Matching the Tenant ID Type](#matching-the-tenant-id-type).
+
+```csharp
+protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+{
+    base.ConfigureConventions(configurationBuilder);
+    configurationBuilder.ValidateMultiTenantIdType<string>();
 }
 ```
 
