@@ -200,7 +200,7 @@ public class EntityTypeBuilderExtensionsShould : IDisposable
         });
 
         var entityType = db.Model.FindEntityType(typeof(MyMultiTenantThing));
-        Assert.True(entityType.IsMultiTenant());
+        Assert.True(entityType.IsMultiTenant);
 
         // TenantId shadow property should exist exactly once
         var tenantIdProps = entityType?.GetProperties().Where(p => p.Name == "TenantId").ToList();

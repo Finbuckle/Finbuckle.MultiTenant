@@ -157,6 +157,15 @@ have the attribute, e.g. from another assembly.
 the entity type via `AdjustKey`, `AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes](#keys-and-indexes) for
 more details.
 
+### Checking Whether an Entity Type Is Multi-Tenant
+
+`IsMultiTenant` on an EF Core entity type metadata object is a property, not a method. It is `true` if the entity type
+or any of its base types is configured as multi-tenant:
+
+```csharp
+var isMultiTenant = dbContext.Model.FindEntityType(typeof(MyEntityType))!.IsMultiTenant;
+```
+
 ### Excluding Entities from Multi-Tenancy
 
 In some scenarios, you may need to explicitly mark an entity as non-multi-tenant, even in a multi-tenant database context.
