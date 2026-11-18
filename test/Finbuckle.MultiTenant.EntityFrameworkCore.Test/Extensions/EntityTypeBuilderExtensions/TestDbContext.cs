@@ -80,3 +80,42 @@ public class MyThingWithIntTenantId
     public int Id { get; set; }
     public int TenantId { get; set; }
 }
+
+public class IsolationThing
+{
+    public int Id { get; set; }
+}
+
+public abstract class IsolationDbContextBase(DbContextOptions options)
+    : EntityFrameworkCore.MultiTenantDbContext<string>(options)
+{
+    public DbSet<IsolationThing> Things => Set<IsolationThing>();
+}
+
+// One context type per IsMultiTenant overload so each gets its own cached model.
+public class NonGenericIsolationDbContext(DbContextOptions options) : IsolationDbContextBase(options)
+{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity(typeof(IsolationThing)).IsMultiTenant<string>();
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
+public class TypedIsolationDbContext(DbContextOptions options) : IsolationDbContextBase(options)
+{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<IsolationThing>().IsMultiTenant<IsolationThing, string>();
+        base.OnModelCreating(modelBuilder);
+    }
+}
+
+public class MyBaseThing
+{
+    public int Id { get; set; }
+}
+
+public class MyDerivedThing : MyBaseThing
+{
+}
