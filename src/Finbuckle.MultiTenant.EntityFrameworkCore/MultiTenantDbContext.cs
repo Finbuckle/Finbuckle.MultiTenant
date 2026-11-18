@@ -46,6 +46,13 @@ public abstract class MultiTenantDbContext<TId> : DbContext, IMultiTenantDbConte
     }
 
     /// <inheritdoc />
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+        configurationBuilder.ValidateMultiTenantIdType<TId>();
+    }
+
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ConfigureMultiTenant<TId>();
