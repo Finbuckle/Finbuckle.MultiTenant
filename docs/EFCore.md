@@ -153,9 +153,29 @@ protected override void OnModelCreating(ModelBuilder builder)
 This approach is more flexible than using the `[MultiTenant]` attribute because it can be used for types which do not
 have the attribute, e.g. from another assembly.
 
-`IsMultiTenant()` returns a `MultiTenantEntityTypeBuilder` instance which enables further multi-tenant configuration of
+`IsMultiTenant<TId>()` returns a `MultiTenantEntityTypeBuilder` instance which enables further multi-tenant configuration of
 the entity type via `AdjustKey`, `AdjustIndex`, `AdjustIndexes`, and `AdjustUniqueIndexes`. See [Keys and Indexes](#keys-and-indexes) for
 more details.
+
+`IsMultiTenant` is also available on a typed `EntityTypeBuilder<TEntity>`, which lets you name the entity type and the
+tenant ID type together:
+
+```csharp
+builder.Entity<MyEntityType>().IsMultiTenant<MyEntityType, string>();
+```
+
+The typed overload builds its query filter from a compile-time expression rather than with reflection, so it adds no
+trimming or AOT warnings of its own.
+
+### Contexts Without a Tenant
+
+The query filter added by `IsMultiTenant` fails closed. If a database context has no tenant set (its `TenantInfo` is
+`null`), queries against multi-tenant entity types return no rows rather than all rows. In earlier versions such a query
+threw an `InvalidOperationException` ("An exception was thrown while attempting to evaluate a LINQ query parameter
+expression") wrapping a `NullReferenceException`. Because an unset tenant now yields empty results instead of an
+exception, a tenant that never gets bound to the context (for example when the multi-tenant middleware is not
+registered) shows up as missing data. To deliberately query across tenants, see
+[Query Without the Tenant Filter](#query-without-the-tenant-filter).
 
 ### Checking Whether an Entity Type Is Multi-Tenant
 
@@ -527,7 +547,7 @@ await yourDbContext.SaveChangesAsync(); // Throws MultiTenantException.
 ## Keys and Indexes
 
 When configuring a multi-tenant entity type it is often useful to include the implicit `TenantId` column in the primary
-key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `IsMultiTenant()` provides the following
+key and/or indexes. The `MultiTenantEntityTypeBuilder` instance returned from `IsMultiTenant<TId>()` provides the following
 methods for this purpose:
 
 * `AdjustKey(IMutableKey, ModelBuilder)` - Alters the existing defined key to add the implicit `TenantId`. Note that

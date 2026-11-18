@@ -309,6 +309,25 @@ public class MultiTenantIdentityDbContextShould
     }
 
     [Fact]
+    public void ReturnNoUsersWhenTenantInfoIsNull()
+    {
+        using var connection = new SqliteConnection("DataSource=:memory:");
+        connection.Open();
+        var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
+
+        using var db = new MultiTenantIdentityDbContext<string>(options);
+        db.TenantInfo = new TenantInfo { Id = "t1", Identifier = "t1" };
+        db.Database.EnsureCreated();
+        db.Users.Add(new IdentityUser { UserName = "tenant1-user", NormalizedUserName = "TENANT1-USER" });
+        db.SaveChanges();
+        Assert.Equal(1, db.Users.Count()); // sanity check data exists
+
+        db.TenantInfo = null;
+
+        Assert.Empty(db.Users.ToList());
+    }
+
+    [Fact]
     public void ThrowWhenTenantInfoIsNullAndIdentityEntitiesChanged()
     {
         using var db = new TestIdentityDbContext();
