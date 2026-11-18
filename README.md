@@ -61,7 +61,7 @@ Table of Contents
 
 ## Open Source Maintenance Fee
 
-**Effective November 10th, 20026**
+**Effective November 10th, 2026**
 
 This project participates in the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org).
 
