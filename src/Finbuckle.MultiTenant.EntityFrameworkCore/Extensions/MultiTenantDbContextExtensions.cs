@@ -36,7 +36,7 @@ public static class MultiTenantDbContextExtensions
             // Configure event to handle newly tracked entities.
             context.ChangeTracker.Tracking += (sender, args) =>
             {
-                if (!args.Entry.Metadata.IsMultiTenant() || args.FromQuery ||
+                if (!args.Entry.Metadata.IsMultiTenant || args.FromQuery ||
                     args.Entry.Context is not IMultiTenantDbContext<TId> multiTenantDbContext) return;
 
                 if (multiTenantDbContext.TenantInfo is null)
@@ -69,7 +69,7 @@ public static class MultiTenantDbContextExtensions
 
         var changedMultiTenantEntities = changeTracker.Entries()
             .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
-            .Where(e => e.Metadata.IsMultiTenant()).ToList();
+            .Where(e => e.Metadata.IsMultiTenant).ToList();
 
         // ensure tenant context is valid
         if (changedMultiTenantEntities.Count == 0)

@@ -83,7 +83,7 @@ public class MultiTenantIdentityDbContextShould
         var et = c.Model.FindEntityType(typeof(IdentityUserPasskey<string>));
         if (et == null) return; // Passkey not present for schema 2.
         // For schema 2 passkey should NOT be multi-tenant and unique indexes should not include TenantId.
-        Assert.False(et.IsMultiTenant());
+        Assert.False(et.IsMultiTenant);
         var uniqueProps = et.GetIndexes().Where(i => i.IsUnique).SelectMany(i => i.Properties.Select(p => p.Name));
         Assert.DoesNotContain("TenantId", uniqueProps);
     }
@@ -119,7 +119,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContext>(2);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContext>(2);
         var et = c.Model.FindEntityType(typeof(IdentityUserPasskey<string>));
         if (et == null) return; // May not exist schema 2.
-        Assert.False(et.IsMultiTenant());
+        Assert.False(et.IsMultiTenant);
     }
 
     [Theory]
@@ -145,7 +145,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContext>(3);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Theory]
@@ -161,7 +161,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUser>(2);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUser>(2);
         var et = c.Model.FindEntityType(typeof(IdentityUserPasskey<string>));
         if (et == null) return;
-        Assert.False(et.IsMultiTenant());
+        Assert.False(et.IsMultiTenant);
     }
 
     [Theory]
@@ -187,7 +187,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUser>(3);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Theory]
@@ -203,7 +203,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUserTRole>(2);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUserTRole>(2);
         var et = c.Model.FindEntityType(typeof(IdentityUserPasskey<string>));
         if (et == null) return;
-        Assert.False(et.IsMultiTenant());
+        Assert.False(et.IsMultiTenant);
     }
 
     [Theory]
@@ -229,7 +229,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextTUserTRole>(3);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Theory]
@@ -245,7 +245,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextAll>(2);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextAll>(2);
         var et = c.Model.FindEntityType(typeof(IdentityUserPasskey<string>));
         if (et == null) return;
-        Assert.False(et.IsMultiTenant());
+        Assert.False(et.IsMultiTenant);
     }
 
     [Theory]
@@ -271,7 +271,7 @@ public class MultiTenantIdentityDbContextShould
         var c = CreateDbContextViaDi<TestIdentityDbContextAll>(3);
         var et = c.Model.FindEntityType(entityType);
         Assert.NotNull(et);
-        Assert.True(et.IsMultiTenant());
+        Assert.True(et.IsMultiTenant);
     }
 
     [Fact]
