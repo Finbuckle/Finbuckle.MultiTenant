@@ -143,8 +143,8 @@ the [samples](https://github.com/Finbuckle/Finbuckle.MultiTenant/tree/main/sampl
 - The type parameter passed to `AddMultiTenant<TTenantInfo, TId>()` determines the `ITenantInfo<Tid>` implementation used
   throughout the app. Choose or define a class that fits your tenant data model.
 - `ITenantContext<TTenantInfo, TId>` is an ambient service — the current tenant is held in an `AsyncLocal` and flows
-  with the asynchronous execution context. In ASP.NET Core the scope begins automatically when each request's
-  `HttpContext` is created, and the middleware populates it. In other app models you begin the scope yourself with `BeginTenantScope` after resolving
+  with the asynchronous execution context. In ASP.NET Core the scope begins automatically at the start of each
+  request's pipeline, and the middleware populates it. In other app models you begin the scope yourself with `BeginTenantScope` after resolving
   the tenant (see [.NET Generic Host Integration](GenericHost)).
 - `TenantInfo` can only be set once per scope. The middleware handles this in web apps, but be aware of the
   constraint if you call `SetTenantInfo` or `BeginTenantScope` manually.

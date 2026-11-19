@@ -19,7 +19,7 @@ internal sealed class HttpAmbientTenantScopeMarker
         "would not be the one the middleware and ITenantContext use.";
 
     internal const string NoScopeMessage =
-        "No ambient tenant scope is active for this request. AddHttpAmbientTenantScope() begins the scope when the " +
-        "HttpContext is created; ensure it is called on the multi-tenant builder and that IHttpContextFactory is not " +
-        "replaced after it.";
+        "No ambient tenant scope is active for this request. AddHttpAmbientTenantScope() begins the scope at the " +
+        "start of the request pipeline; ensure it is called on the multi-tenant builder and that the pipeline is " +
+        "built by the ASP.NET Core host so its startup filter runs.";
 }

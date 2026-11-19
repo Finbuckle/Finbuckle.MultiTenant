@@ -20,7 +20,7 @@ If you also need [per-tenant options](Options), add `Finbuckle.MultiTenant.Optio
 
 ## How It Differs from ASP.NET Core
 
-In ASP.NET Core, an ambient tenant scope begins automatically when each request's `HttpContext` is created, and the
+In ASP.NET Core, an ambient tenant scope begins automatically at the start of each request's pipeline, and the
 `UseMultiTenant<TId>()` middleware sets the resolved tenant on it. In a Generic Host app there is **no middleware**. You must manually:
 1. Create a DI scope for each unit of work (message, job, iteration).
 2. Resolve the tenant within that scope using `ITenantResolver`.

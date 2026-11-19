@@ -79,7 +79,7 @@ Configures support for per-tenant authentication. See [Per-Tenant Authentication
 
 ### AddHttpAmbientTenantScope
 
-Begins a fresh ambient tenant scope for each ASP.NET Core request when its `HttpContext` is created, so the scope is in
+Begins a fresh ambient tenant scope at the start of each ASP.NET Core request's pipeline, so the scope is in
 effect for the whole request pipeline. Every ASP.NET Core builder method calls it for you, so you only need to call it
 yourself when an ASP.NET Core app uses only general-purpose methods such as `WithStaticStrategy` or
 `WithDelegateStrategy`. See [The Per-Request Ambient Tenant Scope](AspNetCore#the-per-request-ambient-tenant-scope)
