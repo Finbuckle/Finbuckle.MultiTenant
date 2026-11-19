@@ -24,7 +24,7 @@ public class MultiTenantMiddlewareShould
             MsOptions.Create(bypassOptions ?? new BypassWhenOptions()),
             MsOptions.Create(shortCircuitOptions ?? new ShortCircuitWhenOptions<string>()));
 
-    // In a host, TenantScopeHttpContextFactory begins the ambient scope when the HttpContext is created.
+    // In a host, TenantScopeStartupFilter begins the ambient scope at the start of the request pipeline.
     // These tests invoke the middleware directly, so begin the scope here instead.
     private static Task InvokeMiddleware(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp)
     {

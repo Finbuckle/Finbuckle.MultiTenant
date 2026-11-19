@@ -1,7 +1,6 @@
 // Copyright Finbuckle LLC, Andrew White, and Contributors.
 // Refer to the solution LICENSE file for more information.
 
-using System.Reflection;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.AspNetCore.Options;
@@ -9,7 +8,6 @@ using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -192,71 +190,74 @@ public class HttpAmbientTenantScopeShould
         Assert.Contains("AddHttpAmbientTenantScope()", ex.Message);
     }
 
-    [Fact]
-    public void RegisterDefaultFactoryWhenNoneIsRegistered()
-    {
-        var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo, string>().AddHttpAmbientTenantScope();
-        var sp = services.BuildServiceProvider();
+    private const string StartupFilterTypeName = "TenantScopeStartupFilter";
 
-        var factory = Assert.IsType<TenantScopeHttpContextFactory>(sp.GetRequiredService<IHttpContextFactory>());
-        Assert.IsType<DefaultHttpContextFactory>(GetInner(factory));
-    }
+    private static bool IsTenantScopeStartupFilter(ServiceDescriptor descriptor) =>
+        descriptor.ServiceType == typeof(IStartupFilter) &&
+        descriptor.ImplementationType?.Name == StartupFilterTypeName;
 
     [Fact]
-    public void DecorateAnExistingFactoryOnlyOnceWhenCalledRepeatedly()
+    public void RegisterStartupFilterAheadOfOthersOnlyOnce()
     {
         var services = new ServiceCollection();
-        var existing = new Mock<IHttpContextFactory>().Object;
-        services.AddSingleton(existing);
+        services.AddSingleton(new Mock<IStartupFilter>().Object);
         services.AddMultiTenant<TenantInfo, string>()
             .AddHttpAmbientTenantScope()
             .AddHttpAmbientTenantScope()
             .WithHeaderStrategy()
             .WithHostStrategy();
-        var sp = services.BuildServiceProvider();
 
-        Assert.Single(services, s => s.ServiceType == typeof(IHttpContextFactory) && !s.IsKeyedService);
-        var factory = Assert.IsType<TenantScopeHttpContextFactory>(sp.GetRequiredService<IHttpContextFactory>());
-        Assert.Same(existing, GetInner(factory));
+        Assert.Single(services, IsTenantScopeStartupFilter);
+        Assert.True(IsTenantScopeStartupFilter(services.First(s => s.ServiceType == typeof(IStartupFilter))));
     }
 
     [Fact]
-    public async Task BeginScopeOnCreateAndEndItOnDispose()
+    public async Task EstablishScopeBeforeMiddlewareFromEarlierStartupFilters()
+    {
+        bool? hadScope = null;
+        var earlierFilter = new DelegateStartupFilter(app => app.Use(async (context, next) =>
+        {
+            hadScope = context.RequestServices.GetRequiredService<ITenantScopeProvider>().HasScope;
+            await next();
+        }));
+
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder => webBuilder
+                .UseTestServer()
+                .ConfigureServices(services =>
+                {
+                    services.AddSingleton<IStartupFilter>(earlierFilter);
+                    services.AddMultiTenant<TenantInfo, string>().WithHeaderStrategy().WithInMemoryStore();
+                })
+                .Configure(app =>
+                {
+                    app.UseMultiTenant<string>();
+                    app.Run(context => context.Response.WriteAsync("ok"));
+                }))
+            .StartAsync();
+
+        await host.GetTestClient().GetStringAsync("/");
+
+        Assert.True(hadScope);
+    }
+
+    [Fact]
+    public void LeaveTheHttpContextFactoryUndecorated()
     {
         var services = new ServiceCollection();
         services.AddMultiTenant<TenantInfo, string>().AddHttpAmbientTenantScope();
-        var sp = services.BuildServiceProvider();
-        var factory = sp.GetRequiredService<IHttpContextFactory>();
-        var scopeProvider = sp.GetRequiredService<ITenantScopeProvider>();
 
-        await Task.Run(() =>
-        {
-            Assert.False(scopeProvider.HasScope);
-            var context = factory.Create(new FeatureCollection());
-            Assert.True(scopeProvider.HasScope);
-            Assert.False(sp.GetRequiredService<ITenantContext<TenantInfo, string>>().IsResolved);
-
-            factory.Dispose(context);
-            Assert.False(scopeProvider.HasScope);
-        });
+        // Keeping the default factory lets ASP.NET Core reuse HttpContext instances across requests.
+        Assert.DoesNotContain(services, s => s.ServiceType == typeof(IHttpContextFactory));
     }
 
-    [Fact]
-    public async Task EndScopeEvenWhenInnerDisposeThrows()
+    private sealed class DelegateStartupFilter(Action<IApplicationBuilder> configure) : IStartupFilter
     {
-        var inner = new Mock<IHttpContextFactory>();
-        inner.Setup(f => f.Create(It.IsAny<IFeatureCollection>())).Returns(new DefaultHttpContext());
-        inner.Setup(f => f.Dispose(It.IsAny<HttpContext>())).Throws<InvalidOperationException>();
-        var scopeProvider = new AmbientTenantContext<TenantInfo, string>();
-        var factory = new TenantScopeHttpContextFactory(inner.Object, scopeProvider);
-
-        await Task.Run(() =>
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
         {
-            var context = factory.Create(new FeatureCollection());
-            Assert.Throws<InvalidOperationException>(() => factory.Dispose(context));
-            Assert.False(scopeProvider.HasScope);
-        });
+            configure(app);
+            next(app);
+        };
     }
 
     public static TheoryData<string> HelperNames => new(Helpers.Keys);
@@ -297,13 +298,7 @@ public class HttpAmbientTenantScopeShould
         services.AddRouting();
         services.AddAuthentication();
         Helpers[helper](services.AddMultiTenant<TenantInfo, string>());
-        var sp = services.BuildServiceProvider();
 
-        Assert.IsType<TenantScopeHttpContextFactory>(sp.GetRequiredService<IHttpContextFactory>());
+        Assert.Single(services, IsTenantScopeStartupFilter);
     }
-
-    private static object? GetInner(TenantScopeHttpContextFactory factory) =>
-        typeof(TenantScopeHttpContextFactory)
-            .GetField("inner", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .GetValue(factory);
 }

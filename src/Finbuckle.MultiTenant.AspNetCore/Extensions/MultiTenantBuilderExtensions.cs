@@ -9,6 +9,7 @@ using Finbuckle.MultiTenant.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,17 +25,17 @@ namespace Finbuckle.MultiTenant.AspNetCore.Extensions;
 public static class MultiTenantBuilderExtensions
 {
     /// <summary>
-    /// Begins a new ambient tenant scope for each HTTP request when its <see cref="HttpContext"/> is created, so the
-    /// scope is in effect for the entire request pipeline.
+    /// Begins a new ambient tenant scope for each HTTP request at the very start of the request pipeline, so the
+    /// scope is in effect for every middleware, endpoint, and service in the request.
     /// </summary>
     /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
     /// <typeparam name="TId">The ID implementation type.</typeparam>
     /// <param name="builder">The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> instance.</param>
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     /// <remarks>
-    /// Decorates the registered <see cref="IHttpContextFactory"/> with <see cref="TenantScopeHttpContextFactory"/>,
-    /// registering <see cref="DefaultHttpContextFactory"/> first if none is registered. Every ASP.NET Core builder
-    /// helper calls this method, so it only needs to be called directly when no such helper is used. Calling it more
+    /// Registers an <see cref="Microsoft.AspNetCore.Hosting.IStartupFilter"/> ahead of all other startup filters, so
+    /// its middleware runs before any middleware the application or other startup filters add. Every ASP.NET Core
+    /// builder helper calls this method, so it only needs to be called directly when no such helper is used. Calling it more
     /// than once has no further effect.
     /// </remarks>
     public static MultiTenantBuilder<TTenantInfo, TId> AddHttpAmbientTenantScope<TTenantInfo, TId>(
@@ -46,8 +47,8 @@ public static class MultiTenantBuilderExtensions
         if (builder.Services.Any(s => s.ServiceType == typeof(HttpAmbientTenantScopeMarker)))
             return builder;
 
-        builder.Services.TryAddSingleton<IHttpContextFactory, DefaultHttpContextFactory>();
-        builder.Services.DecorateService<IHttpContextFactory, TenantScopeHttpContextFactory>();
+        // Startup filters registered first wrap the others, so insert at the front to run before all of them.
+        builder.Services.Insert(0, ServiceDescriptor.Singleton<IStartupFilter, TenantScopeStartupFilter>());
         builder.Services.AddSingleton<HttpAmbientTenantScopeMarker>();
 
         return builder;

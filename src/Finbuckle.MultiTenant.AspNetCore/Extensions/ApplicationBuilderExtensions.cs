@@ -33,7 +33,7 @@ public static class FinbuckleMultiTenantApplicationBuilderExtensions
         return builder.UseMiddleware<MultiTenantMiddleware<TId>>();
     }
 
-    // TenantScopeHttpContextFactory is a singleton, so it gets ITenantScopeProvider from the root provider, while the
+    // TenantScopeStartupFilter is a singleton, so it gets ITenantScopeProvider from the root provider, while the
     // middleware gets it from the request's services. Both must be the same instance. Resolve it from two scopes, and
     // twice from one, to catch scoped and transient registrations without resolving from the root, which would fail
     // scope validation for a scoped registration before this clearer error could be thrown.

@@ -42,7 +42,7 @@ public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>
     /// <param name="tenantScopeProvider">The provider used to verify that an ambient tenant scope is active.</param>
     /// <exception cref="MultiTenantException">Thrown when no ambient tenant scope is active for the request.</exception>
     /// <remarks>
-    /// The ambient tenant scope is begun when the <see cref="HttpContext"/> is created, which is configured by
+    /// The ambient tenant scope is begun at the start of the request pipeline, which is configured by
     /// <c>AddHttpAmbientTenantScope</c>. If a tenant was already set earlier in the pipeline, tenant resolution is
     /// skipped and that tenant is kept.
     /// </remarks>

@@ -79,10 +79,11 @@ using the [Route Strategy](#route-strategy).
 
 ### The Per-Request Ambient Tenant Scope
 
-`AddHttpAmbientTenantScope()` wraps the registered `IHttpContextFactory` with `TenantScopeHttpContextFactory`. The
-wrapper begins a new ambient tenant scope when each `HttpContext` is created and ends it when the context is
-disposed, so every request starts with its own unresolved tenant scope. This is the same mechanism ASP.NET Core uses
-to make `IHttpContextAccessor` available for the whole request.
+`AddHttpAmbientTenantScope()` registers a startup filter, ahead of any other startup filters, that adds a small
+middleware at the very start of the request pipeline. That middleware begins a new ambient tenant scope for each
+request, so every request starts with its own unresolved tenant scope that is in effect for all later middleware
+(including middleware added before `UseMultiTenant<TId>()` or by other startup filters), endpoints, and services. The
+scope ends automatically when the request pipeline completes.
 
 Every ASP.NET Core builder method (all the `With...Strategy()` methods in this package,
 `WithPerTenantAuthentication()`, `BypassWhen()`, `ShortCircuitWhen()`, and their variants) calls
@@ -100,8 +101,7 @@ Calling it more than once has no further effect. If it was never called, `UseMul
 `MultiTenantException` at startup. It also throws at startup if `ITenantScopeProvider` was replaced with a scoped or
 transient registration, because the scope begun for each request must be the same one the middleware and
 `ITenantContext` use. If the middleware runs for a request with no active scope (for example, because
-`IHttpContextFactory` was replaced after `AddHttpAmbientTenantScope()`), it throws a `MultiTenantException` for that
-request.
+the pipeline was built without the host's startup filters), it throws a `MultiTenantException` for that request.
 
 ### Long-Lived Connections
 
@@ -453,7 +453,7 @@ See [Data Isolation with ASP.NET Core Identity](Identity) for full details.
   `TrySetTenantInfo<TTenantInfo, TId>()` in middleware placed before `UseMultiTenant<TId>()`; the middleware then
   skips resolution and keeps that tenant.
 - **`ITenantContext` is ambient.** The current tenant is held in an `AsyncLocal`, not a scoped DI service. A fresh
-  ambient tenant scope begins when each request's `HttpContext` is created (see
+  ambient tenant scope begins at the start of each request's pipeline (see
   [The Per-Request Ambient Tenant Scope](#the-per-request-ambient-tenant-scope)) and the middleware sets the resolved
   tenant on it, so each request sees its own tenant automatically.
 - **Long-lived connections keep the tenant they opened with.** WebSockets, SignalR, server-sent events, and

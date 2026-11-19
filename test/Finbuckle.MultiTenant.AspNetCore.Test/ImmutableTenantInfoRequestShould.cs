@@ -33,7 +33,7 @@ public class ImmutableTenantInfoRequestShould
         return (sp, mw);
     }
 
-    // In a host, TenantScopeHttpContextFactory begins the ambient scope when the HttpContext is created.
+    // In a host, TenantScopeStartupFilter begins the ambient scope at the start of the request pipeline.
     // These tests invoke the middleware directly, so begin the scope here instead.
     private static Task Invoke(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp)
     {

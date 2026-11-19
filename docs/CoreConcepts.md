@@ -94,7 +94,7 @@ default implementation is `AmbientTenantContext<TTenantInfo, TId>`, obtained fro
   calling `BeginScope()` / `BeginTenantScope()`.
 * You establish a scope with `ITenantScopeProvider.BeginScope()` or, more commonly, the
   `IServiceProvider.BeginTenantScope(tenantInfo)` extension, which begins a scope and sets the tenant in one call.
-  In ASP.NET Core a scope begins automatically when each request's `HttpContext` is created (see
+  In ASP.NET Core a scope begins automatically at the start of each request's pipeline (see
   [ASP.NET Core Integration](AspNetCore#the-per-request-ambient-tenant-scope)); in other hosts you call it yourself (see
   [.NET Generic Host Integration](GenericHost)).
 * `ITenantScopeProvider.EndScope()` ends the current scope, after which reading or setting the tenant throws until a
