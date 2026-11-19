@@ -258,7 +258,7 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
 
 // UseRouting is optional in ASP.NET Core, but if needed place before UseMultiTenant when the route strategy used
 app.UseRouting();
-app.UseMultiTenant();
+app.UseMultiTenant<string>();
 ```
 
 ### Ambient Route Value Promotion (Link Generation)

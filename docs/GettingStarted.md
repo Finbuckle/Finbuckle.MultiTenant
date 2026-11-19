@@ -34,7 +34,7 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
 var app = builder.Build();
 
 // add the MultiTenant middleware
-app.UseMultiTenant();
+app.UseMultiTenant<string>();
 
 // add other middleware...
 
