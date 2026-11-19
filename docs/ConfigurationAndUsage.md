@@ -21,7 +21,7 @@ builder.Services.AddMultiTenant<TenantInfo, string>()
 var app = builder.Build();
 
 // add the MultiTenant middleware
-app.UseMultiTenant<strinG>();
+app.UseMultiTenant<string>();
 
 // ...add other middleware
 
