@@ -120,6 +120,58 @@ public class HttpAmbientTenantScopeShould
     }
 
     [Fact]
+    public async Task KeepScopeForOnStartingCallbacks()
+    {
+        bool? hadScope = null;
+        string? tenantId = null;
+        using var host = await CreateHostAsync(app =>
+        {
+            var scopeProvider = app.ApplicationServices.GetRequiredService<ITenantScopeProvider>();
+            app.Use(async (context, next) =>
+            {
+                context.Response.OnStarting(() =>
+                {
+                    hadScope = scopeProvider.HasScope;
+                    tenantId = context.GetTenantInfo<TenantInfo, string>()?.Id;
+                    return Task.CompletedTask;
+                });
+                await next();
+            });
+        }, "initech");
+
+        await GetForTenantAsync(host.GetTestClient(), "initech");
+
+        Assert.True(hadScope);
+        Assert.Equal("initech-id", tenantId);
+    }
+
+    [Fact]
+    public async Task EndScopeBeforeOnCompletedCallbacks()
+    {
+        // The scope is begun inside the startup filter's middleware, so it ends when that middleware returns, which is
+        // before the host runs OnCompleted callbacks.
+        var completed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var host = await CreateHostAsync(app =>
+        {
+            var scopeProvider = app.ApplicationServices.GetRequiredService<ITenantScopeProvider>();
+            app.Use(async (context, next) =>
+            {
+                context.Response.OnCompleted(() =>
+                {
+                    completed.TrySetResult(scopeProvider.HasScope);
+                    return Task.CompletedTask;
+                });
+                await next();
+            });
+        }, "initech");
+
+        Assert.Equal("initech-id", await GetForTenantAsync(host.GetTestClient(), "initech"));
+
+        var hadScope = await completed.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.False(hadScope);
+    }
+
+    [Fact]
     public async Task ThrowAtStartupWhenScopeIsNotConfigured()
     {
         var hostBuilder = new HostBuilder()
