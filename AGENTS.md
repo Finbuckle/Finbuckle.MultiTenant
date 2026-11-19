@@ -8,7 +8,7 @@ These instructions apply to the entire repository.
 
 ## Project Overview
 
-Finbuckle.MultiTenant is a .NET 10 multi-tenancy library. The solution is organized around NuGet package projects, xUnit test projects, docs, and runnable samples.
+Finbuckle.MultiTenant is a .NET 11 multi-tenancy library. The solution is organized around NuGet package projects, xUnit test projects, docs, and runnable samples.
 
 - `Finbuckle.MultiTenant.slnx` is the solution file.
 - `src/` contains package projects:
@@ -23,7 +23,7 @@ Finbuckle.MultiTenant is a .NET 10 multi-tenancy library. The solution is organi
 
 ## Build and Test
 
-Use the .NET 10 SDK.
+Use the .NET 11 SDK.
 
 - Build from the repository root:
   ```bash
@@ -39,10 +39,10 @@ Use the .NET 10 SDK.
   ```
 - CI runs these test projects after build:
   ```bash
-  dotnet test --no-build -v q -f net10.0 test/Finbuckle.MultiTenant.Test
-  dotnet test --no-build -v q -f net10.0 test/Finbuckle.MultiTenant.AspNetCore.Test
-  dotnet test --no-build -v q -f net10.0 test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
-  dotnet test --no-build -v q -f net10.0 test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
+  dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true test/Finbuckle.MultiTenant.Test
+  dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true test/Finbuckle.MultiTenant.AspNetCore.Test
+  dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true test/Finbuckle.MultiTenant.EntityFrameworkCore.Test
+  dotnet test --no-build -v q -f net11.0 -p:CollectCoverage=true test/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.Test
   ```
 - Release workflows use Release configuration:
   ```bash
@@ -79,7 +79,7 @@ Run the narrowest relevant tests while iterating, then run `dotnet test` or the 
 
 - Package metadata and shared source settings live in `src/Directory.Build.props`.
 - Package lock files are enabled. If package references change, update the corresponding `packages.lock.json` files intentionally.
-- All source projects currently target `net10.0`.
+- All source projects currently target `net11.0`.
 - Do not change package versions, package metadata, target frameworks, or lock files as a side effect of unrelated work.
 
 ## Docs and Samples
