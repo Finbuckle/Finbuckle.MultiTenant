@@ -41,6 +41,25 @@ Additional support is provided by the following organizations:
 This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](../LICENSE) file for
 license information.
 
+### Open Source Maintenance Fee
+
+The source code is freely available under the terms of the license. Use of the official NuGet packages in
+revenue-generating activities is subject to the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org)
+[EULA](../OSMFEULA.txt). See [pricing](https://www.finbuckle.com/Pricing) for details, including free use
+for smaller organizations.
+
+Release builds that reference the official packages show warning `FBMT0001` until the EULA is accepted. To accept it,
+set the `AcceptFinbuckleEULA` property in your project file or `Directory.Build.props`:
+
+```xml
+<PropertyGroup>
+    <AcceptFinbuckleEULA>true</AcceptFinbuckleEULA>
+</PropertyGroup>
+```
+
+It can also be passed on the command line, for example `dotnet build -c Release -p:AcceptFinbuckleEULA=true`. Builds
+that treat warnings as errors fail until the property is set.
+
 ## Verifying Packages
 
 The official NuGet packages are built and published by the

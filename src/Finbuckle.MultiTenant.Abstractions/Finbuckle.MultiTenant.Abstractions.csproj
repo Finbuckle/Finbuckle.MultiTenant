@@ -4,4 +4,8 @@
         <Description>Abstraction library package for Finbuckle.MultiTenant.</Description>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="buildTransitive/Finbuckle.MultiTenant.Abstractions.targets" Pack="true" PackagePath="buildTransitive/"/>
+    </ItemGroup>
+
 </Project>

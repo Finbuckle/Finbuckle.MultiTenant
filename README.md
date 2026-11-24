@@ -75,6 +75,10 @@ Maintenance Fee applies. The fee directly supports the people maintaining
 the project and helps ensure its long-term health.
 
 To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbuckle).
+See [pricing](https://www.finbuckle.com/Pricing) for details.
+
+Release builds that reference the official packages show warning `FBMT0001` until the EULA is accepted by setting
+`<AcceptFinbuckleEULA>true</AcceptFinbuckleEULA>` in your project file or `Directory.Build.props`.
 
 **Additional support is provided by the following organizations:**
 

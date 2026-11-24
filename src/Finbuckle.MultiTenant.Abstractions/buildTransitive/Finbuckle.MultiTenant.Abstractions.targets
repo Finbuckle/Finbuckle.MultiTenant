@@ -1,0 +1,17 @@
+<Project>
+    <!--
+        Copyright Finbuckle LLC, Andrew White, and Contributors.
+        Refer to the solution LICENSE file for more information.
+
+        Warns when a Release build consumes the official Finbuckle.MultiTenant packages without
+        acknowledging the Open Source Maintenance Fee EULA. Set AcceptFinbuckleEULA to true in the
+        project file or Directory.Build.props to acknowledge it.
+    -->
+    <Target Name="_FinbuckleCheckEULA"
+            BeforeTargets="CoreCompile"
+            Condition="'$(Configuration)' == 'Release' AND '$(AcceptFinbuckleEULA)' != 'true' AND '$(DesignTimeBuild)' != 'true'">
+        <Warning Code="FBMT0001"
+                 Text="Finbuckle.MultiTenant packages are subject to the Open Source Maintenance Fee EULA for revenue-generating use. See https://www.finbuckle.com/Pricing for details, then set &lt;AcceptFinbuckleEULA&gt;true&lt;/AcceptFinbuckleEULA&gt; in your project file or Directory.Build.props to accept it."
+                 HelpLink="https://www.finbuckle.com/Pricing"/>
+    </Target>
+</Project>
