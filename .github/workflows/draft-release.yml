@@ -27,16 +27,55 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: dotnet prepare-release.cs
-      - name: commit, tag and push
+      # Release branches require verified signatures, so the release commit is created through the
+      # GraphQL API, which GitHub signs, instead of being pushed from the runner.
+      - name: commit and tag
         if: steps.prepare.outputs.bump_level != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_VERSION: ${{ steps.prepare.outputs.new_version }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          set -euo pipefail
+          work="$RUNNER_TEMP/release-commit"
+          mkdir -p "$work"
           git add -A
-          git commit -m "chore: release ${{ steps.prepare.outputs.new_version }}"
-          git tag ${{ steps.prepare.outputs.new_version }}
-          git push origin HEAD
-          git push origin ${{ steps.prepare.outputs.new_version }}
+
+          : > "$work/additions.jsonl"
+          git diff --cached --name-only -z --diff-filter=d | while IFS= read -r -d '' path; do
+            base64 -w0 "$path" > "$work/contents.b64"
+            jq -n --arg path "$path" --rawfile contents "$work/contents.b64" \
+              '{path: $path, contents: $contents}' >> "$work/additions.jsonl"
+          done
+
+          : > "$work/deletions.jsonl"
+          git diff --cached --name-only -z --diff-filter=D | while IFS= read -r -d '' path; do
+            jq -n --arg path "$path" '{path: $path}' >> "$work/deletions.jsonl"
+          done
+
+          jq -n \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg branch "$GITHUB_REF_NAME" \
+            --arg head "$(git rev-parse HEAD)" \
+            --arg headline "chore: release $NEW_VERSION" \
+            --slurpfile additions "$work/additions.jsonl" \
+            --slurpfile deletions "$work/deletions.jsonl" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { oid } } }",
+              variables: { input: {
+                branch: { repositoryNameWithOwner: $repo, branchName: $branch },
+                expectedHeadOid: $head,
+                message: { headline: $headline },
+                fileChanges: { additions: $additions, deletions: $deletions }
+              } }
+            }' > "$work/payload.json"
+
+          oid=$(gh api graphql --input "$work/payload.json" --jq '.data.createCommitOnBranch.commit.oid')
+          if [ -z "$oid" ] || [ "$oid" = "null" ]; then
+            echo "createCommitOnBranch did not return a commit" >&2
+            exit 1
+          fi
+          echo "Created release commit $oid on $GITHUB_REF_NAME"
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$NEW_VERSION" -f sha="$oid"
       - name: create draft release
         if: steps.prepare.outputs.bump_level != ''
         env:
