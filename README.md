@@ -119,6 +119,11 @@ the repository.
 This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for
 license information.
 
+The official packages and their assemblies have GitHub
+[artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) that prove they
+were built from this repository. See [Verifying Packages](https://www.finbuckle.com/Docs/Introduction#verifying-packages)
+for how to check them.
+
 ## .NET Foundation
 
 This project is supported by the [.NET Foundation](https://dotnetfoundation.org).

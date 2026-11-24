@@ -41,6 +41,53 @@ Additional support is provided by the following organizations:
 This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](../LICENSE) file for
 license information.
 
+## Verifying Packages
+
+The official NuGet packages are built and published by the
+[NuGet Push Public](https://github.com/Finbuckle/Finbuckle.MultiTenant/blob/main/.github/workflows/nuget-push-public.yml)
+workflow, which creates a GitHub
+[artifact attestation](https://docs.github.com/en/actions/concepts/security/artifact-attestations) for each `.nupkg`,
+`.snupkg`, and library assembly. The attestation proves the file was built from this repository by that workflow. Packages
+released before attestations were added can't be verified this way.
+
+Verification uses the [GitHub CLI](https://cli.github.com). Because NuGet.org adds its own repository signature file,
+`.signature.p7s`, to every package it publishes, a `.nupkg` downloaded from NuGet.org doesn't match the attested file
+until that signature is removed. The assemblies inside the package aren't changed, so they can be verified directly.
+
+### Verify an assembly
+
+After a restore, the package's assemblies are in the local NuGet cache (`~/.nuget/packages` on macOS and Linux,
+`%userprofile%\.nuget\packages` on Windows). Replace `<version>` with the package version:
+
+```bash
+gh attestation verify ~/.nuget/packages/finbuckle.multitenant/<version>/lib/net11.0/Finbuckle.MultiTenant.dll \
+  --repo Finbuckle/Finbuckle.MultiTenant \
+  --signer-workflow Finbuckle/Finbuckle.MultiTenant/.github/workflows/nuget-push-public.yml
+```
+
+### Verify a package
+
+Download the package from NuGet.org, remove `.signature.p7s` from a copy, then verify the copy:
+
+```bash
+curl -L -o Finbuckle.MultiTenant.<version>.nupkg https://www.nuget.org/api/v2/package/Finbuckle.MultiTenant/<version>
+zip -d Finbuckle.MultiTenant.<version>.nupkg .signature.p7s
+gh attestation verify Finbuckle.MultiTenant.<version>.nupkg \
+  --repo Finbuckle/Finbuckle.MultiTenant \
+  --signer-workflow Finbuckle/Finbuckle.MultiTenant/.github/workflows/nuget-push-public.yml
+```
+
+On Windows, where `zip` isn't available, remove the signature with PowerShell 7 instead:
+
+```powershell
+$zip = [System.IO.Compression.ZipFile]::Open("$PWD\Finbuckle.MultiTenant.<version>.nupkg", 'Update')
+$zip.GetEntry('.signature.p7s').Delete()
+$zip.Dispose()
+```
+
+Removing the signature leaves the rest of the package byte-for-byte as it was built. Don't use the modified copy as a
+package source, since NuGet can no longer verify its signature.
+
 ## .NET Foundation
 
 This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
