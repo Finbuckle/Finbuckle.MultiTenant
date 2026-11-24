@@ -3,7 +3,7 @@
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
-See [https://www.finbuckle.com/MultiTenant](https://www.finbuckle.com/MultiTenant) for more details and documentation.
+See [https://www.finbuckle.com/Products](https://www.finbuckle.com/Products) for more details and documentation.
 
 **This release supports .NET 11.**
 
@@ -75,6 +75,10 @@ Maintenance Fee applies. The fee directly supports the people maintaining
 the project and helps ensure its long-term health.
 
 To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbuckle).
+See [pricing](https://www.finbuckle.com/Pricing) for details.
+
+Release builds that reference the official packages show warning `FBMT0001` until the EULA is accepted by setting
+`<AcceptFinbuckleEULA>true</AcceptFinbuckleEULA>` in your project file or `Directory.Build.props`.
 
 **Additional support is provided by the following organizations:**
 
@@ -93,17 +97,17 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/finbu
 ## Quick Start
 
 MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. See the 
-[Getting Started](https://www.finbuckle.com/MultiTenant/Docs/GettingStarted) documentation for more details.
+[Getting Started](https://www.finbuckle.com/Docs/GettingStarted) documentation for more details.
 
 ## Documentation
 
 The library builds on basic multi-tenant functionality to provide a variety of higher level features. See
-the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
+the [documentation](https://www.finbuckle.com/Docs) for more details:
 
-* [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
-* [Per-tenant Authentication](https://www.finbuckle.com/MultiTenant/Docs/Authentication)
-* [Entity Framework Core Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/EFCore)
-* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/Identity)
+* [Per-tenant Options](https://www.finbuckle.com/Docs/Options)
+* [Per-tenant Authentication](https://www.finbuckle.com/Docs/Authentication)
+* [Entity Framework Core Data Isolation](https://www.finbuckle.com/Docs/EFCore)
+* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/Docs/Identity)
 
 ## Sample Projects
 
@@ -116,8 +120,14 @@ the repository.
 
 ## License
 
-This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for
-license information.
+MultiTenant is licensed differently depending on how you get it:
+
+- **Source code** is licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See the
+  [LICENSE](LICENSE) file. You can build and use the library from source under those terms.
+- **Official NuGet packages** are licensed under the [Open Source Maintenance Fee EULA](OSMFEULA.txt). This is the
+  license NuGet shows for the packages, and Visual Studio asks you to accept it when you install them.
+
+See [Open Source Maintenance Fee](#open-source-maintenance-fee) for what the EULA requires.
 
 The official packages and their assemblies have GitHub
 [artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) that prove they

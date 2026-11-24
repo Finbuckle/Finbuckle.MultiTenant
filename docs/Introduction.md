@@ -5,7 +5,7 @@
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
-See [https://www.finbuckle.com/MultiTenant](https://www.finbuckle.com/MultiTenant) for more details and documentation.
+See [https://www.finbuckle.com/Products](https://www.finbuckle.com/Products) for more details and documentation.
 
 **This release supports .NET 11.**
 
@@ -38,8 +38,33 @@ Additional support is provided by the following organizations:
 
 ## License
 
-This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](../LICENSE) file for
-license information.
+MultiTenant is licensed differently depending on how you get it:
+
+- **Source code** is licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See the
+  [LICENSE](../LICENSE) file. You can build and use the library from source under those terms.
+- **Official NuGet packages** are licensed under the [Open Source Maintenance Fee EULA](../OSMFEULA.txt). This is the
+  license NuGet shows for the packages.
+
+### Open Source Maintenance Fee
+
+Under the [Open Source Maintenance Fee](https://opensourcemaintenancefee.org) EULA, use of the official NuGet packages
+in revenue-generating activities is subject to the maintenance fee. See
+[pricing](https://www.finbuckle.com/Pricing) for details, including free use for smaller organizations.
+
+Visual Studio asks you to accept the EULA when you install the packages. Other tools such as `dotnet add package` don't
+prompt.
+
+Release builds that reference the official packages show warning `FBMT0001` until the EULA is accepted. To accept it,
+set the `AcceptFinbuckleEULA` property in your project file or `Directory.Build.props`:
+
+```xml
+<PropertyGroup>
+    <AcceptFinbuckleEULA>true</AcceptFinbuckleEULA>
+</PropertyGroup>
+```
+
+It can also be passed on the command line, for example `dotnet build -c Release -p:AcceptFinbuckleEULA=true`. Builds
+that treat warnings as errors fail until the property is set.
 
 ## Verifying Packages
 

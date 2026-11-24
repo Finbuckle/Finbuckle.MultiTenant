@@ -13,6 +13,10 @@ Core app install `Finbuckle.MultiTenant.AspNetCore`:
 dotnet add package Finbuckle.MultiTenant.AspNetCore
 ```
 
+Release builds show warning `FBMT0001` until you accept the Open Source Maintenance Fee EULA by setting
+`<AcceptFinbuckleEULA>true</AcceptFinbuckleEULA>` in your project. See
+[Open Source Maintenance Fee](Introduction#open-source-maintenance-fee) for details.
+
 ## Basic Configuration
 
 MultiTenant is simple to get started with. Below is a sample app configured to use the subdomain as the tenant

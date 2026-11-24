@@ -2,6 +2,7 @@
 <PropertyGroup>
         <Title>Finbuckle.MultiTenant.Identity.EntityFrameworkCore</Title>
         <Description>Identity Entity Framework Core support for Finbuckle.MultiTenant.</Description>
+        <PackageProjectUrl>https://www.finbuckle.com/Products/Identity</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>

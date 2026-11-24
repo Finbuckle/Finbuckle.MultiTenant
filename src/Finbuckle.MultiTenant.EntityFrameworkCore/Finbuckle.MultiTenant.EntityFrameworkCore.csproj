@@ -2,6 +2,7 @@
     <PropertyGroup>
         <Title>Finbuckle.MultiTenant.EntityFrameworkCore</Title>
         <Description>Entity Framework Core support for Finbuckle.MultiTenant.</Description>
+        <PackageProjectUrl>https://www.finbuckle.com/Products/EntityFrameworkCore</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>

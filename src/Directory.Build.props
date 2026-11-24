@@ -4,8 +4,9 @@
         <Version>10.1.2</Version>
         <Authors>Finbuckle LLC</Authors>
         <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors</Copyright>
-        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>
+        <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageProjectUrl>https://www.finbuckle.com/Products</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>
@@ -30,5 +31,6 @@
     <ItemGroup>
         <None Include="../../finbuckle-128x128.png" Pack="true" PackagePath="/"/>
         <None Include="../../NUGET_README.md" Pack="true" PackagePath="/"/>
+        <None Include="../../OSMFEULA.txt" Pack="true" PackagePath="/"/>
     </ItemGroup>
 </Project>
