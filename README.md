@@ -120,8 +120,14 @@ the repository.
 
 ## License
 
-This project uses the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](LICENSE) file for
-license information.
+MultiTenant is licensed differently depending on how you get it:
+
+- **Source code** is licensed under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0). See the
+  [LICENSE](LICENSE) file. You can build and use the library from source under those terms.
+- **Official NuGet packages** are licensed under the [Open Source Maintenance Fee EULA](OSMFEULA.txt). This is the
+  license NuGet shows for the packages, and Visual Studio asks you to accept it when you install them.
+
+See [Open Source Maintenance Fee](#open-source-maintenance-fee) for what the EULA requires.
 
 The official packages and their assemblies have GitHub
 [artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) that prove they
