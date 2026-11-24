@@ -5,7 +5,7 @@
         <Authors>Finbuckle LLC</Authors>
         <Copyright>Copyright Finbuckle LLC, Andrew White, and Contributors</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-        <PackageProjectUrl>https://www.finbuckle.com/MultiTenant</PackageProjectUrl>
+        <PackageProjectUrl>https://www.finbuckle.com/Products</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Finbuckle/Finbuckle.MultiTenant</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <IncludeSymbols>true</IncludeSymbols>

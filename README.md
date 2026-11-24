@@ -3,7 +3,7 @@
 MultiTenant is an open source multi-tenancy library for modern .NET created and maintained by [Finbuckle LLC](https://www.finbuckle.com).
 It enables tenant resolution, per-tenant app behavior, and per-tenant data isolation.
 
-See [https://www.finbuckle.com/MultiTenant](https://www.finbuckle.com/MultiTenant) for more details and documentation.
+See [https://www.finbuckle.com/Products](https://www.finbuckle.com/Products) for more details and documentation.
 
 **This release supports .NET 11.**
 
@@ -97,17 +97,17 @@ Release builds that reference the official packages show warning `FBMT0001` unti
 ## Quick Start
 
 MultiTenant is designed to be easy to use and follows standard .NET conventions as much as possible. See the 
-[Getting Started](https://www.finbuckle.com/MultiTenant/Docs/GettingStarted) documentation for more details.
+[Getting Started](https://www.finbuckle.com/Docs/GettingStarted) documentation for more details.
 
 ## Documentation
 
 The library builds on basic multi-tenant functionality to provide a variety of higher level features. See
-the [documentation](https://www.finbuckle.com/multitenant/docs) for more details:
+the [documentation](https://www.finbuckle.com/Docs) for more details:
 
-* [Per-tenant Options](https://www.finbuckle.com/MultiTenant/Docs/Options)
-* [Per-tenant Authentication](https://www.finbuckle.com/MultiTenant/Docs/Authentication)
-* [Entity Framework Core Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/EFCore)
-* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/MultiTenant/Docs/Identity)
+* [Per-tenant Options](https://www.finbuckle.com/Docs/Options)
+* [Per-tenant Authentication](https://www.finbuckle.com/Docs/Authentication)
+* [Entity Framework Core Data Isolation](https://www.finbuckle.com/Docs/EFCore)
+* [ASP.NET Core Identity Data Isolation](https://www.finbuckle.com/Docs/Identity)
 
 ## Sample Projects
 

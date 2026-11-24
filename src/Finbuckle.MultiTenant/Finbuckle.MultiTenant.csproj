@@ -2,6 +2,7 @@
     <PropertyGroup>
         <Title>Finbuckle.MultiTenant</Title>
         <Description>Main library package for Finbuckle.MultiTenant.</Description>
+        <PackageProjectUrl>https://www.finbuckle.com/Products/MultiTenant</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>

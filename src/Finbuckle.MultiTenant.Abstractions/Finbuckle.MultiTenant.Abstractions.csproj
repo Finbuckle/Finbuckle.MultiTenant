@@ -2,6 +2,7 @@
     <PropertyGroup>
         <Title>Finbuckle.MultiTenant.Abstractions</Title>
         <Description>Abstraction library package for Finbuckle.MultiTenant.</Description>
+        <PackageProjectUrl>https://www.finbuckle.com/Products/Abstractions</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
