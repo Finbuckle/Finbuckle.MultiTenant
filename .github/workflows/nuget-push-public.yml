@@ -13,6 +13,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  attestations: write
 
 jobs:
   build-test-prep-deploy:
@@ -26,6 +27,19 @@ jobs:
           dotnet-version: 11
       - name: Create the package
         run: dotnet test -c Release -p:ContinuousIntegrationBuild=true && dotnet pack --no-build -c Release --output nupkgs
+      # Attest the packages as built, before NuGet.org adds its repository signature (.signature.p7s), and the
+      # assemblies they contain, which the signature doesn't change. See docs/Introduction.md for verification.
+      - name: Attest build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            nupkgs/*.nupkg
+            nupkgs/*.snupkg
+            src/Finbuckle.MultiTenant.Abstractions/bin/Release/net11.0/Finbuckle.MultiTenant.Abstractions.dll
+            src/Finbuckle.MultiTenant/bin/Release/net11.0/Finbuckle.MultiTenant.dll
+            src/Finbuckle.MultiTenant.AspNetCore/bin/Release/net11.0/Finbuckle.MultiTenant.AspNetCore.dll
+            src/Finbuckle.MultiTenant.EntityFrameworkCore/bin/Release/net11.0/Finbuckle.MultiTenant.EntityFrameworkCore.dll
+            src/Finbuckle.MultiTenant.Identity.EntityFrameworkCore/bin/Release/net11.0/Finbuckle.MultiTenant.Identity.EntityFrameworkCore.dll
       - name: NuGet login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: nuget-login
