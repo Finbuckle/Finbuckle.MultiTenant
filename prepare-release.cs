@@ -346,6 +346,8 @@ static List<ConventionalCommit> ParseCommits(
 
     const string ccPattern        = @"^(?<type>feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(?:\((?<scope>[^)]+)\))?(?<breaking>!)?:\s+(?<desc>.+)$";
     const string brkHeaderPattern = @"^(?:BREAKING CHANGE|BREAKING-CHANGE):\s*(?<note>.*)$";
+    // Any git-trailer-style footer token, e.g. "Co-Authored-By: ...", "Refs #123" or "BREAKING CHANGE: ...".
+    const string footerTokenPattern = @"^(?:BREAKING CHANGE|[A-Za-z][\w-]*)(?:: | #)";
 
     var parsed  = new List<ConventionalCommit>();
     int skipped = 0;
@@ -380,13 +382,16 @@ static List<ConventionalCommit> ParseCommits(
 
             var noteBuilder = new StringBuilder(bm.Groups["note"].Value.Trim());
 
-            // Conventional Commits allows footer values to continue on following indented lines.
+            // A footer value continues on the following lines until a blank line or the next footer token,
+            // whether or not the continuation lines are indented. Wrapped lines are joined with spaces.
             int j = i + 1;
-            while (j < bodyLines.Count && (bodyLines[j].StartsWith(' ') || bodyLines[j].StartsWith('\t')))
+            while (j < bodyLines.Count &&
+                   !string.IsNullOrWhiteSpace(bodyLines[j]) &&
+                   !Regex.IsMatch(bodyLines[j], footerTokenPattern))
             {
                 if (noteBuilder.Length > 0)
-                    noteBuilder.Append('\n');
-                noteBuilder.Append(bodyLines[j].TrimStart());
+                    noteBuilder.Append(' ');
+                noteBuilder.Append(bodyLines[j].Trim());
                 j++;
             }
 
